@@ -59,13 +59,16 @@ public class HomeGUI {
 	public static Composite composite;
 	public static Composite graphComposite;
 	public static Composite projComposite;
+       
 
 	public static boolean isComaparing = false;
 	public static String projectPath = null;
 	public static TreeItem trtmNewTreeitem;
 
 	public static CTabItem graphtabItem;
-
+        public boolean isSelectedProject = true;
+        public boolean isSelectedCompare = true;
+        public boolean isSelectedGraph = true;
 	private SashForm sidebarSF;
 	public SashForm workSF;
 	private CTabFolder2Listener ctfCTF2L;
@@ -194,7 +197,7 @@ public class HomeGUI {
 
 		File projectFile = new File(PropertyFile.filePath);		//to access the workspace
 		projectFile.mkdir();
-		ArrayList<String> projectFiles = new ArrayList<String>(
+		ArrayList<String> projectFiles = new ArrayList<>(
 				Arrays.asList(projectFile.list()));				//load all the projects
 		if (projectFiles.isEmpty())
 			newTab.setVisible(false);
@@ -330,12 +333,97 @@ public class HomeGUI {
 			}
 		});
 		mntmExit.setText("Exit");
+                //shiyam edited
+		//MenuItem mntmView = new MenuItem(menu, SWT.CASCADE);
+		//mntmView.setText("View");
+                
+               
+                // Create the File item's dropdown menu
+                Menu viewMenu = new Menu(menu);
 
-		MenuItem mntmView = new MenuItem(menu, SWT.CASCADE);
-		mntmView.setText("View");
+                // Create all the items in the bar menu
+                MenuItem mnViItem = new MenuItem(menu, SWT.CASCADE);
+                mnViItem.setText("View");
+                mnViItem.setMenu(viewMenu);
 
-		Menu menu_2 = new Menu(mntmView);
-		mntmView.setMenu(menu_2);
+                // Create all the items in the File dropdown menu
+                final MenuItem projectWindowItem = new MenuItem(viewMenu, SWT.CHECK);
+                projectWindowItem.setText("Project Window");
+                projectWindowItem.setSelection(true);
+                projectWindowItem.addSelectionListener(new SelectionAdapter() {
+                       
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+                            
+                            if(false){
+                                projectWindowItem.setSelection(false);
+                                isSelectedProject = false;
+                                newTab.setVisible(false);
+                            }else{
+                                //open the proect window
+                                projectWindowItem.setSelection(true);
+                                isSelectedProject = true;
+                                newTab.setVisible(true);
+                            }
+			}
+		});
+                
+                final MenuItem CompareWindowItem = new MenuItem(viewMenu, SWT.CHECK);
+                CompareWindowItem.setText("Compare Window");
+                CompareWindowItem.setSelection(true);
+                CompareWindowItem.addSelectionListener(new SelectionAdapter() {
+                       
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+                             //projectWindowItem.setSelection(false);
+                            if(isSelectedCompare){
+                                isSelectedCompare = false;
+                                CompareWindowItem.setSelection(isSelectedCompare);
+                                tabFolder.setVisible(false);
+                            }else{
+                                //open the proect window
+                                isSelectedCompare = true;
+                                CompareWindowItem.setSelection(isSelectedCompare);
+                                tabFolder.setVisible(true);
+                            }
+			}
+		});
+                final MenuItem GraphWindowItem = new MenuItem(viewMenu, SWT.CHECK);
+                GraphWindowItem.setText("Graph Window");
+                GraphWindowItem.setSelection(true);
+                GraphWindowItem.addSelectionListener(new SelectionAdapter() {
+                       
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+                             //projectWindowItem.setSelection(false);
+                            if(isSelectedCompare){
+                                GraphWindowItem.setSelection(false);
+                                graphTab.setVisible(false);
+                                isSelectedGraph = false;
+                            }else{
+                                //open the compare window
+                                isSelectedGraph = true;
+                                GraphWindowItem.setSelection(isSelectedGraph);
+                                graphTab.setVisible(true);
+                            }
+			}
+		});
+                
+                
+//                Menu viewMenu = new Menu(shell, SWT.DROP_DOWN);
+//                mntmView.setMenu(viewMenu);
+//
+//                MenuItem menuItemProjectWindow = new MenuItem(viewMenu, SWT.PUSH);
+//                menuItemProjectWindow.setText("&Show Project Window");
+//                
+//                MenuItem menuItemCompareWindow = new MenuItem(viewMenu, SWT.PUSH);
+//                menuItemCompareWindow.setText("&Show Compare Window");
+//                
+//                MenuItem menuItemGraphWindow = new MenuItem(viewMenu, SWT.PUSH);
+//                menuItemGraphWindow.setText("&Show Graph Window");
+
+		//Menu menu_2 = new Menu(mntmView);
+		//mntmView.setMenu(menu_2);
 
 		MenuItem mntmHelp = new MenuItem(menu, SWT.CASCADE);
 		mntmHelp.setText("Help");
