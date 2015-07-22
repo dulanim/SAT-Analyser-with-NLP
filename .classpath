@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface-3.6.2.M20110210.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.2.2.201411280836.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x-2.0.5.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder-2.0.4.jar"/>
+	<classpathentry kind="lib" path="E:/eclipse/plugins/org.eclipse.swtbot.eclipse.finder_2.2.1.201402241301.jar" sourcepath="E:/eclipse/plugins/org.eclipse.swtbot.eclipse.finder_2.2.1.201402241301.jar">
+		<accessrules>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/exceptions/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/finders/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/matchers/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/waits/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/widgets/*"/>
+			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
