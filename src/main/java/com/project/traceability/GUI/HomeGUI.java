@@ -696,9 +696,6 @@ public class HomeGUI {
         });
         methodItem.setText("Methods");
         tree.setMenu(popupMenu);
-        
-        //hasThreeFiles = false;
-		//hasTwoFiles = false;
     }
     
     public static void setupProject(String graphType){
@@ -716,4 +713,5 @@ public class HomeGUI {
                 System.out.println("Graph Type: " + PropertyFile.getGraphType());
                 ReadXML.initApp(projectPath, graphType);
     }
+        
 }
