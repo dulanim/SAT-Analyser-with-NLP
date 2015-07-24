@@ -13,10 +13,13 @@ import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
+import edu.stanford.nlp.trees.tregex.TregexMatcher;
+import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.CoreMap;
 import java.io.PrintWriter;
 import java.util.List;
@@ -135,5 +138,14 @@ public class stanfordCoreNLP {
 
     }
     
+    public void NPIdentification(){
+        System.out.println("Identified noun pharases are:");
+        TregexPattern NPpattern = TregexPattern.compile("@NP !<< @NP");
+        TregexMatcher matcher = NPpattern.matcher(tree);
+        while (matcher.findNextMatchingNode()) {
+        Tree match = matcher.getMatch();
+        System.out.println(Sentence.listToString(match.yield()));
+      }
+    }
     
 }
