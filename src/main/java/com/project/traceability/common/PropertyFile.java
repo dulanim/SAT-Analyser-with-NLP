@@ -18,6 +18,7 @@ public class PropertyFile {
     public static final String wordNetDbDirectory = "C:/Program Files (x86)/WordNet/2.1/dict";
     public static String filePath = "D:/Final Year Project/SATAnalyzer/SATWork/";
     public static String xmlFilePath = "D:/Final Year Project/SATAnalyzer/ATOM";
+    public static String xmlSourceCodeFilePath = "D:/Final Year Project/SATAnalyzer/XML-SourceCode";
     public static final String imagePath = "D:/Final Year Project/Github/Anduril/img"; // img folder in
     // project
     private static String projectName = null;
