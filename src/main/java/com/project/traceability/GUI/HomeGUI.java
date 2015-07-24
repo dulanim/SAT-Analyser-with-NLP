@@ -439,11 +439,9 @@ public class HomeGUI {
 			public void close(CTabFolderEvent e) {
 				e.doit = false;
 				CTabFolder ctf = (CTabFolder) e.getSource();
-                                //deletes the selected tab item in the workspace tabfolder
-				if(ctf.getSelection()!= null){
-                                    CTabItem item = ctf.getSelection();
-                                    item.dispose();
-                                }
+				String ctfname = (String) ctf.getData();
+				CTabItem item = ctf.getSelection();
+				item.dispose();
 				//ctf.dispose();
 				workSF.layout();
 				sidebarSF.layout();
