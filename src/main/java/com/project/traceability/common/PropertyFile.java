@@ -12,14 +12,14 @@ import com.project.traceability.visualization.VisualizeGraph;
  */
 public class PropertyFile {
 
-    public static final String requirementXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/RequirementArtefactFile.xml";
-    public static final String umlXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/UMLArtefactFile.xml";
-    public static final String sourceXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/SourceCodeArtefactFile.xml";
+     public static final String requirementXMLPath = "F:/semi7/FYP/FYP_Workspace_8/RequirementArtefactFile.xml";
+    public static final String umlXMLPath = "F:/semi7/FYP/FYP_Workspace_8/UMLArtefactFile.xml";
+    public static final String sourceXMLPath = "F:/semi7/FYP/FYP_Workspace_8/SourceCodeArtefactFile.xml";
     public static final String wordNetDbDirectory = "C:/Program Files (x86)/WordNet/2.1/dict";
-    public static String filePath = "D:/Final Year Project/SATAnalyzer/SATWork/";
-    public static String xmlFilePath = "D:/Final Year Project/SATAnalyzer/ATOM";
-    public static final String imagePath = "D:/Final Year Project/Github/Anduril/img"; // img folder in
-    // project
+    public static String filePath = "F:/semi7/FYP/FYP_Workspace_8/SATWork/";
+    public static String xmlFilePath = "F:/semi7/FYP/FYP_Workspace_8";
+    public static final String imagePath = "F:/semi7/FYP/Git_Workspace/Anduril/img"; // img folder in
+     // project
     private static String projectName = null;
     public static String graphDbPath = null;
     private static String generatedGexfFilePath = null;
