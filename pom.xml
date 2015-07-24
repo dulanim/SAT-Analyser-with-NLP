@@ -81,7 +81,6 @@
             <groupId>org.eclipse.ide</groupId>
             <artifactId>grouplayout</artifactId>
             <version>1.0</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -169,9 +168,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-            <version>4.4</version>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.5</version>
             <type>jar</type>
         </dependency>
     </dependencies>
