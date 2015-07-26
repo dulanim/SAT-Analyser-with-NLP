@@ -22,9 +22,13 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.CoreMap;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
+import java.util.Stack;
 
 /**
  *
@@ -38,6 +42,8 @@ public class stanfordCoreNLP {
     StanfordCoreNLP pipeline;
     Annotation annotation;
     List<CoreMap> sentences;
+    ArrayList collectionOfTrees=new ArrayList(); // store the tree result
+    static int countTree =0; // variable to count the collection of tree;
 
     public stanfordCoreNLP() {
 
@@ -65,18 +71,40 @@ public class stanfordCoreNLP {
 
     }
 
+    /*set the new string */
+/*    public void setNewText(String text){
+        System.out.println("annotated text: "+text);
+        Annotation annot = new Annotation(text);
+        annotation =annot;
+        pipeline.annotate(annotation);
+        
+    }
+*/
     /* An Annotation is a Map and you can get and use the various analyses individually.
      For instance, this gets the parse tree of the first sentence in the text.
      */
-    public void generateTreeAnnotation() {
+    public ArrayList generateTreeAnnotation() {
+        //System.out.println("1");
         sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
         for (CoreMap sentence : sentences) {
+            //System.out.println("2");
             if (sentence != null && sentence.size() > 0) {
+                
+                //System.out.println("3");
                 tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                //System.out.println("4");
                 out.println();
                 tree.pennPrint(out);
+                collectionOfTrees.add(tree);
+                //System.out.println("5");
             }
         }
+//        System.out.println("array list result for size: "+collectionOfTrees.size());
+//         for(int i =0;i<collectionOfTrees.size();i++){
+//             System.out.println(i+" "+collectionOfTrees.get(i));
+//        }
+//        
+        return collectionOfTrees;
     }
 
     public String generateTextAnnotation() {
@@ -130,22 +158,33 @@ public class stanfordCoreNLP {
         for (CoreMap sentence : sentences) {
             if (sentence != null && sentence.size() > 0) {
                 Map<Integer, edu.stanford.nlp.dcoref.CorefChain> graph = annotation.get(CorefCoreAnnotations.CorefChainAnnotation.class);
-                for (int i = 1; i < graph.size(); i++) {
-                    System.out.println(i + " " + graph.get(i));
-                }
+                
+                System.out.println( graph.toString());
+                String arr=graph.toString();
+                
+//                String arr2[] = arr.split("CHAIN");
+//                
+//                for(int i =0 ;i<arr2.length;i++){
+//                     //System.out.println("array: "+arr2[i] );
+//                     String arr3[] = arr2[i].split("-");
+//                     for(int j=0;j<arr3.length;j++){
+//                         if(!arr3[j].matches("-?\\d+(\\.\\d+)?")){
+//                            //do nothing
+//                             //System.out.println("inner array: "+arr3[j] );
+//                         }
+//                         else{
+//                              System.out.println("inner array: "+arr3[j] );
+//                         }
+//                     }
+//                }
+//               
             }
         }
-
     }
     
-    public void NPIdentification(){
-        System.out.println("Identified noun pharases are:");
-        TregexPattern NPpattern = TregexPattern.compile("@NP !<< @NP");
-        TregexMatcher matcher = NPpattern.matcher(tree);
-        while (matcher.findNextMatchingNode()) {
-        Tree match = matcher.getMatch();
-        System.out.println(Sentence.listToString(match.yield()));
-      }
-    }
+  
+    
+    
+    
     
 }
