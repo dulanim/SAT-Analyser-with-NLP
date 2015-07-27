@@ -131,21 +131,7 @@ public class NewFileWindow {
 			trtmNewTreeitem.setText(projectFiles.get(i));
 		}
 
-		tree.setSelection(HomeGUI.trtmNewTreeitem);
-		tree.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				String string = "";
-				TreeItem[] selection = tree.getSelection();
-				for (int i = 0; i < selection.length; i++) {
-					string += selection[i] + " ";
-					HomeGUI.trtmNewTreeitem = selection[i];
-				}
-				string = string.substring(10, string.length() - 2);
-				HomeGUI.projectPath = PropertyFile.filePath + string
-						+ "/";
-				text_1.setText(HomeGUI.projectPath);
-			}
-		});
+		
 
 		Button btnCancel = new Button(shell, SWT.NONE);
 		btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -178,7 +164,7 @@ public class NewFileWindow {
 				for (int k = 0; k < selectedFiles.length; k++) {
 					text.append(selectedFiles[k] + " , ");
 					path = Paths.get(localFilePath + selectedFiles[k]);
-					Path target = Paths.get(HomeGUI.projectPath);
+					Path target = Paths.get(HomeGUI.projectPath);                                       
 					if (localFilePath != null) {
 						try {
 							Files.copy(path,
