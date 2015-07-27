@@ -9,7 +9,7 @@ import static com.project.traceability.GUI.NewFileWindow.shell;
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
 import static com.project.traceability.GUI.NewProjectWindow.shell;
 import static com.project.traceability.GUI.NewProjectWindow.trtmNewTreeitem;
-import com.project.traceability.SourceCodeToXML.AST;
+import com.project.NLP.SourceCodeToXML.AST;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
 import java.io.File;
