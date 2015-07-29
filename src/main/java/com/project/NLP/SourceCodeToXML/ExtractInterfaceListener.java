@@ -88,69 +88,80 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
         super.enterMethodDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
-        type = "Method";
-        parameterList = new StringBuffer();
-        Java8Parser.MethodDeclaratorContext mdc = ctx.methodHeader().methodDeclarator();
-        methodName = mdc.Identifier().getText();
-        System.out.println("Method Name: " + methodName);
-        methodReturn = ctx.methodHeader().result().getText();
-        System.out.println("Method Return: " + methodReturn);
-        if(ctx.methodModifier().isEmpty()){
+
+        if (ctx.methodModifier().isEmpty()) {
             methodMod = "package-private";
-        }
-        else
-            methodMod = ctx.methodModifier().get(0).getText();
-        System.out.println("Method Modifier: " + methodMod);
+        } else {
+            if (ctx.methodModifier().size() == 2) {
+                if (ctx.methodModifier().get(0).getText().equalsIgnoreCase("Override")) {
+                    //Ignore the method as it is not a class method
+                }
+            } else {
+                methodMod = ctx.methodModifier().get(0).getText();
 
-        if (mdc.formalParameterList() != null) {
-            if (mdc.formalParameterList().formalParameters() != null) {
-                List<Java8Parser.FormalParameterContext> param = mdc.formalParameterList().formalParameters().formalParameter();
+                System.out.println("Override" + ctx.methodModifier().get(0).getText());
+                type = "Method";
+                parameterList = new StringBuffer();
+                Java8Parser.MethodDeclaratorContext mdc = ctx.methodHeader().methodDeclarator();
+                methodName = mdc.Identifier().getText();
+                System.out.println("Method Name: " + methodName);
+                methodReturn = ctx.methodHeader().result().getText();
+                System.out.println("Method Return: " + methodReturn);
 
-                for (Java8Parser.FormalParameterContext par : param) {
+                System.out.println("Method Modifier: " + methodMod);
+
+                if (mdc.formalParameterList() != null) {
+                    if (mdc.formalParameterList().formalParameters() != null) {
+                        List<Java8Parser.FormalParameterContext> param = mdc.formalParameterList().formalParameters().formalParameter();
+
+                        for (Java8Parser.FormalParameterContext par : param) {
+                            paramType = "";
+                            paramName = "";
+                            paramMod = "";
+                            getParameter(par);
+                            System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
+                            parameterList.append(paramName + ":" + paramType + ", ");
+                        }
+                    }
+
                     paramType = "";
                     paramName = "";
                     paramMod = "";
-                    getParameter(par);
+                    getParameter(mdc.formalParameterList().lastFormalParameter().formalParameter());
                     System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
-                    parameterList.append(paramName+ ":"+ paramType +", ");
+                    parameterList.append(paramName + ":" + paramType);
+                    System.out.println(parameterList.toString());
                 }
+                Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
+                artefactElement.appendChild(artefactSubElement);
+
+                Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
+                typeAttr.setValue(type);
+                artefactSubElement.setAttributeNode(typeAttr);
+
+                Attr idAttr = WriteToXML.getDocument().createAttribute("id");
+                idAttr.setValue("SC" + id);
+                id++;
+                artefactSubElement.setAttributeNode(idAttr);
+
+                Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
+                nameAttr.setValue(methodName);
+                artefactSubElement.setAttributeNode(nameAttr);
+
+                Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");
+                visibilityAttr.setValue(methodMod);
+                artefactSubElement.setAttributeNode(visibilityAttr);
+
+                Attr fieldTypeAttr = WriteToXML.getDocument().createAttribute("returnType");
+                fieldTypeAttr.setValue(methodReturn);
+                artefactSubElement.setAttributeNode(fieldTypeAttr);
+
+                Attr parameterAttr = WriteToXML.getDocument().createAttribute("parameters");
+                parameterAttr.setValue(parameterList.toString());
+                artefactSubElement.setAttributeNode(parameterAttr);
             }
-            
-            paramType = "";
-            paramName = "";
-            paramMod = "";
-            getParameter(mdc.formalParameterList().lastFormalParameter().formalParameter());
-            System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
-            parameterList.append(paramName+ ":"+ paramType);                    
-            System.out.println(parameterList.toString());
         }
-        Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
-        artefactElement.appendChild(artefactSubElement);
-        
-        Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
-        typeAttr.setValue(type);
-        artefactSubElement.setAttributeNode(typeAttr);
-        
-        Attr idAttr = WriteToXML.getDocument().createAttribute("id");
-        idAttr.setValue("SC"+id); id++;
-        artefactSubElement.setAttributeNode(idAttr);
-        
-        Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
-        nameAttr.setValue(methodName);
-        artefactSubElement.setAttributeNode(nameAttr);
 
-        Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");
-        visibilityAttr.setValue(methodMod);
-        artefactSubElement.setAttributeNode(visibilityAttr);
-
-        Attr fieldTypeAttr = WriteToXML.getDocument().createAttribute("returnType");
-        fieldTypeAttr.setValue(methodReturn);
-        artefactSubElement.setAttributeNode(fieldTypeAttr);
-        
-        Attr parameterAttr = WriteToXML.getDocument().createAttribute("parameters");
-        parameterAttr.setValue(parameterList.toString());
-        artefactSubElement.setAttributeNode(parameterAttr);
-        
     }
 
     private void getParameter(Java8Parser.FormalParameterContext par) {
