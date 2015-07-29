@@ -46,21 +46,7 @@ public class phrasesIdentification  {
     private int getTreeCount(){
         return tree.size();
     }
-    
-    public void NPIdentification(){
-        System.out.println("Identified noun pharases are:");
-        
-        for(int i=0;i<tree.size();i++){
-            
-            TregexPattern NPpattern = TregexPattern.compile("@VB !<< @VB");
-            TregexMatcher matcher = NPpattern.matcher((Tree)tree.get(i));
-            while (matcher.findNextMatchingNode()) {
-                Tree match = matcher.getMatch();
-                System.out.println(Sentence.listToString(match.yield()));
-            }
-        }
-    }
-    
+
     /*method to identify the phrases in the tree without eliminating redundancy
     parameters are the POS.
     for example: NP, VB, NNP and etc.*/
@@ -82,21 +68,19 @@ public class phrasesIdentification  {
         return phraseLists;
     }
     
-    public ArrayList innerPhrases(String p){
-        
-        ArrayList innerPhraseList = new ArrayList();
-        ArrayList list = phraseLists;
-        /* run entire list*/
-        for(int i=0;i<list.size();i++){
-            stanfordCoreNLP s = new stanfordCoreNLP(list.get(i).toString());
-            //stanfordCoreNLP s = new stanfordCoreNLP("the Bank client");
-            tree =s.generateTreeAnnotation();
-            list=getIdentifiedPhrases("NN");
-            if(list.size()==2){
-                innerPhraseList.add(list.get(0));
-            }
+//    public void NPIdentification(){
+//        System.out.println("Identified noun pharases are:");
+//        
+//        for(int i=0;i<tree.size();i++){
+//            
+//            TregexPattern NPpattern = TregexPattern.compile("@VB !<< @VB");
+//            TregexMatcher matcher = NPpattern.matcher((Tree)tree.get(i));
+//            while (matcher.findNextMatchingNode()) {
+//                Tree match = matcher.getMatch();
+//                System.out.println(Sentence.listToString(match.yield()));
+//            }
+//        }
+//    }
+//    
 
-        }
-        return innerPhraseList;
-    }
 }
