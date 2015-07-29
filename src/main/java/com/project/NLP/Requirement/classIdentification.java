@@ -14,14 +14,14 @@ import java.util.ArrayList;
  */
 public class classIdentification {
 
-    ArrayList list;
-    ArrayList priorToRule1;
-    ArrayList classList;
-    ArrayList afterRule1 = new ArrayList();
-    ;
-    phrasesIdentification np;
+    private ArrayList list;
+    private ArrayList priorToRule1;
+    private ArrayList classList;
+    private ArrayList afterRule1 = new ArrayList();
+    
+    private phrasesIdentification np;
     private ArrayList attributeFromClass = new ArrayList();
-
+    private designElementClass designEleClass = new designElementClass();
     classIdentification() {
 
     }
@@ -61,28 +61,32 @@ public class classIdentification {
         int sizeOfTheList = priorToRule1.size();
         for (int i = 0; i < sizeOfTheList; i++) {
             stanfordCoreNLP s = new stanfordCoreNLP(priorToRule1.get(i).toString());
-            //stanfordCoreNLP s = new stanfordCoreNLP("the Bank client");
             ArrayList tree = s.generateTreeAnnotation();
             phrasesIdentification pI = new phrasesIdentification(tree);
             innerPhraseList = pI.getIdentifiedPhrases(p);
             if (innerPhraseList.size() == 2) {
-                System.out.println("inner pharase ars: " + innerPhraseList.size());
-                System.out.println("inner pharase ars: " + innerPhraseList.get(0));
-
-                /*first noun phrase is considered as class*/
-                afterRule1.add(innerPhraseList.get(0));
-                //System.out.println("size: "+priorToRule1.size());
+                /*checks whether the list contains the design elements
+                if the list don't have the design elements then add it to 
+                the afterRule1 and attributeFromClass
+                */
+                checksWhetherDesignElementExits(innerPhraseList.get(0),innerPhraseList.get(1) );
+                //if(!isContainDesignElements(innerPhraseList)){
+                    /*first noun phrase is considered as class*/
+                    //afterRule1.add(innerPhraseList.get(0));
                     /*second noun phrase is considered as attribute*/
-                attributeFromClass.add(innerPhraseList.get(1));
-
+                    //attributeFromClass.add(innerPhraseList.get(1));
+               // }
+                
             } 
             /*rule 1 but if the the attribute is with the pronoun
             the last NP is taken as the attribute and 
             before the last element is taken as the class
             */
             else if(innerPhraseList.size()>2){
-                afterRule1.add(innerPhraseList.get((innerPhraseList.size()-2)));
-                attributeFromClass.add(innerPhraseList.get((innerPhraseList.size()-1)));
+                checksWhetherDesignElementExits(innerPhraseList.get((innerPhraseList.size()-2)),innerPhraseList.get((innerPhraseList.size()-1)) );
+                
+                //afterRule1.add(innerPhraseList.get((innerPhraseList.size()-2)));
+                //attributeFromClass.add(innerPhraseList.get((innerPhraseList.size()-1)));
                 
             }   
             else if (innerPhraseList.size() == 1) {
@@ -95,6 +99,28 @@ public class classIdentification {
         return afterRule1;
     }
 
+    /*this method checks whether the attribute or class contains the design elemets.
+    if so it will skip those elements and store rest of the artefacts
+    parameter: className, attribute
+    */
+    public void checksWhetherDesignElementExits(Object className, Object attribute){
+        ArrayList designElements = designEleClass.getDesignElementsList();
+        //for(int i=0;i<designElements.size();i++){
+            
+            if(!designElements.contains(className)){
+                System.out.println("design class... :"+String.valueOf(className) );
+                afterRule1.add(String.valueOf(className));
+                
+            }
+            if(!designElements.contains(attribute)){
+                System.out.println("design attribute... :"+String.valueOf(attribute) );
+                attributeFromClass.add(String.valueOf(attribute));
+                
+            }
+            
+       // }
+    }
+    
     /*rule1 continuos...
     if the phrase consists PRP + NN identify the PRP as a class and NN as attribute
     but the PRP is stored already in class list. so store the NN as attributeFromClass
