@@ -95,6 +95,7 @@ public class NewProjectWindow {
                 super.widgetSelected(se); //To change body of generated methods, choose Tools | Templates.
                 if(!text.getText().isEmpty()){
                     AddSourceCodeFile addSourceWin = new AddSourceCodeFile();
+                    //shell.setVisible(false);
                     addSourceWin.open();         
                 }
                 else{
