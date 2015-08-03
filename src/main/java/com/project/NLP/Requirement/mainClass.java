@@ -20,7 +20,7 @@ public class mainClass {
     public static void main(String args[]) {
 
         String document = "The bank client must be able to deposit an amount to \n"
-                + "and withdraw an amount from his or her accounts\n"
+                + "and withdraw an amount from The bank client account\n"
                 + "using the bank application.";
 //        Each transaction must be\n"
 //                + "recorded, and the client must have the ability to\n"
@@ -38,8 +38,12 @@ public class mainClass {
         stanford.generateCorefLink();
         /*noun pharase identification*/
         classIdentification np = new classIdentification(tree);
-        ArrayList list =np.nounPharseIdentification("NP");
-        System.out.println(list);
+        ArrayList list =np.getClasses();
+        System.out.println("class found:"+list);
+        
+        list =np.getAttributeFromClass();
+        System.out.println("Attribute found:"+list);
+        
         
 
     }
