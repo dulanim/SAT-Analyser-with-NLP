@@ -8,9 +8,6 @@ package com.project.NLP.SourceCodeToXML;
 import java.util.ArrayList;
 import java.util.List;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 
@@ -183,7 +180,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
-        WriteToXML.createDocument();
+        //WriteToXML.createDocument();
         /*<Artefacts><Artefact type="SourceCode">
          </Artefact type></Artefacts>
          */
@@ -209,7 +206,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 //implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
         //
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
-        WriteToXML.getDocument().appendChild(artefactElement);
+        AST.artefacts.appendChild(artefactElement);
         Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
         nameAttr.setValue(className);
         artefactElement.setAttributeNode(nameAttr);
