@@ -12,14 +12,13 @@ import com.project.traceability.visualization.VisualizeGraph;
  */
 public class PropertyFile {
 
-    public static final String requirementXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/RequirementArtefactFile.xml";
-    public static final String umlXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/UMLArtefactFile.xml";
-    public static final String sourceXMLPath = "D:/Final Year Project/SATAnalyzer/ATOM/SourceCodeArtefactFile.xml";
-    public static final String wordNetDbDirectory = "C:/Program Files (x86)/WordNet/2.1/dict";
-    public static String filePath = "D:/Final Year Project/SATAnalyzer/SATWork/";
-    public static String xmlFilePath = "D:/Final Year Project/SATAnalyzer/ATOM";
-    public static String xmlSourceCodeFilePath = "D:/Final Year Project/SATAnalyzer/XML-SourceCode";
-    public static final String imagePath = "D:/Final Year Project/Github/Anduril/img"; // img folder in
+    public static final String requirementXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/RequirementArtefactFile.xml";
+    public static final String umlXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/UMLArtefactFile.xml";
+    public static final String sourceXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/SourceCodeArtefactFile.xml";
+    public static final String wordNetDbDirectory = "C:/Program Files/WordNet/2.1/dict/";
+    public static String filePath = "E:/SATWork/";
+    public static String xmlFilePath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files";
+    public static final String imagePath = "E:/Drive Copied/Shiyamalan/projects/fyp/last-year/SAT-master/sat/img"; // img folder in
     // project
     private static String projectName = null;
     public static String graphDbPath = null;
@@ -27,10 +26,11 @@ public class PropertyFile {
     private static String relationshipXMLPath = null;
     public static String graphType = null;
     private static VisualizeGraph visual = null;
-    public static final String testFilePath = "E:/SATWork/test/";
+    public static final String testFilePath = "E:/SATWork/";
     public static final String testXmlFilePath = "E:/ATOM/test/";
-    public static final String testDb = "E:/SATWork/Test/test.graphDb";
-    public static final String testGraphFile = "E:/SATWork/Test/test.gexf";
+    public static final String testDb = "E:/SATWork/Test/Test.graphDb";
+    public static final String testGraphFile = "E:/SATWork/Test/Test.gexf";
+    public static final String xmlSourceCodeFilePath = "";
 
     public static String getProjectName() {
         return projectName;

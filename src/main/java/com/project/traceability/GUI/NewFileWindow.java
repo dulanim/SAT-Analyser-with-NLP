@@ -1,5 +1,10 @@
 package com.project.traceability.GUI;
 
+import com.project.NLP.UMLToXML.jsonreader.JSONReader;
+import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
+import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.NLP.staticdata.StaticData;
+import com.project.progress.progressbar.ProgressBarCustom;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.BufferedReader;
@@ -51,9 +56,8 @@ public class NewFileWindow {
 	static String localFilePath;
 	static String[] selectedFiles;
 	static StyledText codeText;
-
+        String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
 	static String textString;
-
 	FileDialog fileDialog;
 	private Text text_1;
 
@@ -156,8 +160,13 @@ public class NewFileWindow {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fileDialog = new FileDialog(shell, SWT.MULTI);
 				fileDialog.setText("Open");
+                                if(HomeGUI.isSelectionForUMLFile){
+                                    fileDialog.setFilterExtensions(formats); // Windows
+                                                                  // wild cards
+                                }
 				fileDialog.setFilterPath(PropertyFile.xmlFilePath);
 				localFilePath = fileDialog.open();
+                                StaticData.umlFilePath = localFilePath;
 				localFilePath = localFilePath.replace(Paths.get(localFilePath)
 						.getFileName().toString(), "");
 				selectedFiles = fileDialog.getFileNames();
@@ -174,8 +183,10 @@ public class NewFileWindow {
 							e1.printStackTrace();
 						}
 					}
-				}
+				
+                                 
 			}
+                     }
 		});
 		btnNewButton.setBounds(349, 413, 75, 25);
 		btnNewButton.setText("Browse");
@@ -197,8 +208,31 @@ public class NewFileWindow {
 					HomeGUI.hasTwoFiles = true;
 				if(selectedFiles.length == 3)
 					HomeGUI.hasThreeFiles = true;
+                                
+                                
 				openFiles();
+                                if(HomeGUI.isSelectionForUMLFile){
+                                    //check the formats exists or not 
+                                   // ProgressBarCustom progressBarCustom = new ProgressBarCustom();
+                                    //progressBarCustom.create();
+                                    WriteToXML xmlWriter = new WriteToXML();
+                                    XMLReader xmlReader = new XMLReader();
+                                    if(StaticData.umlFilePath.contains(".xmi")||
+                                            StaticData.umlFilePath.contains(".uml")){
+                                       xmlReader.readUMLXMI();
+                                       xmlWriter.createXML();
+                                    }else if(StaticData.umlFilePath.contains(".mdj")){
+                                        
+                                     //   progressBarCustom.updateProgressBar();
+                                        JSONReader reader = new JSONReader();
+                                        reader.readJson();
+                                        xmlWriter.createXML();
+                                    }
+                                
+                               }
+                               
 			}
+                        
 		});
 		btnSave.setBounds(375, 472, 49, 25);
 		btnSave.setText("Open");

@@ -5,7 +5,7 @@
  */
 package com.project.traceability.GUI;
 
-import static com.project.traceability.GUI.NewFileWindow.shell;
+
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
 import static com.project.traceability.GUI.NewProjectWindow.shell;
 import static com.project.traceability.GUI.NewProjectWindow.trtmNewTreeitem;

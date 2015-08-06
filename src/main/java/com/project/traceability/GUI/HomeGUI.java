@@ -62,6 +62,7 @@ public class HomeGUI {
        
 
 	public static boolean isComaparing = false;
+        public static boolean isSelectionForUMLFile = false;
 	public static String projectPath = null;
 	public static TreeItem trtmNewTreeitem;
 
@@ -282,10 +283,10 @@ public class HomeGUI {
 
 		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
 		mntmNewSubmenu.setText("File");
-
+               
 		Menu menu_1 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_1);
-
+                
 		MenuItem mntmNew = new MenuItem(menu_1, SWT.CASCADE);
 		mntmNew.setText("New");
 
@@ -615,7 +616,33 @@ public class HomeGUI {
             }
         });
         fileItem.setText("File");
-
+        MenuItem umlFileItem = new MenuItem(newMenu, SWT.NONE);
+        umlFileItem.setText("Import UML File");
+        umlFileItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                File file = new File(projectPath);
+                if (!file.isDirectory()) {
+                    TreeItem parent = trtmNewTreeitem.getParentItem();
+                    trtmNewTreeitem = trtmNewTreeitem.getParentItem();
+                    projectPath = PropertyFile.filePath + parent.getText();
+                }
+                System.out.println(trtmNewTreeitem + projectPath);
+                NewFileWindow newFileWin = new NewFileWindow();
+                isSelectionForUMLFile = true;
+                newFileWin.open(trtmNewTreeitem, projectPath);
+              
+            }
+        });
+         // isSelectionForUMLFile = false;
+//        Menu newMenu1 = new Menu(popupMenu);
+//        fileItem.setMenu(newMenu1);
+//        
+//        MenuItem mntmUMLSubmenu = new MenuItem(newMenu1, SWT.NONE);
+//        mntmUMLSubmenu.setText("Import UMLDiagram File");
+                
+        
+        
         Menu visualMenu = new Menu(popupMenu);
         graphItem.setMenu(visualMenu);
 

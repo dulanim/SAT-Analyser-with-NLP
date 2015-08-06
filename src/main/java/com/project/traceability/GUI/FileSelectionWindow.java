@@ -22,9 +22,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
 import com.project.traceability.common.PropertyFile;
+import org.eclipse.swt.layout.grouplayout.GroupLayout;
 
 /**
  * @author Gitanjali Nov 17, 2014
