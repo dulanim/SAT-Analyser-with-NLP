@@ -6,8 +6,6 @@
 package com.project.NLP.SourceCodeToXML;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -17,8 +15,8 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.*;
 import org.openide.util.Exceptions;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -27,11 +25,15 @@ import org.openide.util.Exceptions;
 public class AST {
 
     public static String file;
+    public static Element artefacts;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        WriteToXML.createDocument();
+        artefacts = WriteToXML.getDocument().createElement("Artefacts");
+        WriteToXML.getDocument().appendChild(artefacts);
         while (true) {
             System.out.print("Enter :");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
@@ -48,17 +50,14 @@ public class AST {
 
     public void convertFileToXML(String fileName) {
         try {
-            // TODO code application logic here
-            String splitName[] = fileName.split("\\\\");
-            AST.file = splitName[splitName.length - 1];
-            System.out.println(fileName);
+            // TODO code application logic here            
             Java8Lexer lexer = new Java8Lexer(new ANTLRFileStream(fileName.trim()));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             Java8Parser parser = new Java8Parser(tokens);
             ParserRuleContext tree = parser.compilationUnit();
 
             ParseTreeWalker walker = new ParseTreeWalker(); // create standard walker
-            ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);
+            ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);                
             walker.walk(extractor, tree);
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(AST.class.getName()).log(Level.SEVERE, null, ex);
