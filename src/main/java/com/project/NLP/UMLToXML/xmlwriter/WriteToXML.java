@@ -32,6 +32,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.GUI.HomeGUI;
+import com.project.traceability.common.PropertyFile;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -120,7 +122,8 @@ public class WriteToXML {
 		DOMSource source = new DOMSource(doc);
                 String driveLetter = getSuitableDrive();
                 
-                File f = new File("E:\\temp\\xmlFiles");
+                File f = new File(HomeGUI.projectPath + File.separator +
+                        "umlXML");
                 if(!f.exists())
                     f.mkdir();
                 String fileName = f.getPath() + File.separator + "UMLArtifacts.xml";

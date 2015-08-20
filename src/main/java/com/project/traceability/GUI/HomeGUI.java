@@ -297,8 +297,12 @@ public class HomeGUI {
 		mntmProject.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				NewProjectWindow newProjWin = new NewProjectWindow();
-				newProjWin.open();
+//				NewProjectWindow newProjWin = new NewProjectWindow();
+//				newProjWin.open();
+				
+				CreateNewProjectWindow projectWindow = new CreateNewProjectWindow(
+						null, 0);
+				projectWindow.open();
 			}
 		});
 		mntmProject.setText("Project");

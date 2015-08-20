@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.project.traceability.common.PropertyFile;
-import org.eclipse.swt.layout.grouplayout.GroupLayout;
+import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
 
 /**
  * @author Gitanjali Nov 17, 2014

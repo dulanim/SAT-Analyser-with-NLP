@@ -31,16 +31,18 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.2.2.201411280836.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x-2.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder-2.0.4.jar"/>
-	<classpathentry kind="lib" path="E:/eclipse/plugins/org.eclipse.swtbot.eclipse.finder_2.2.1.201402241301.jar" sourcepath="E:/eclipse/plugins/org.eclipse.swtbot.eclipse.finder_2.2.1.201402241301.jar">
-		<accessrules>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/exceptions/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/finders/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/matchers/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/waits/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/swtbot/eclipse/finder/widgets/*"/>
-			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
-		</accessrules>
-	</classpathentry>
+	<classpathentry kind="lib" path="E:/eclipse/plugins/org.eclipse.swtbot.eclipse.core_2.2.1.201402241301.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/core.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/gephi-toolkit.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/jaws-bin.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/org.eclipse.jface-3.6.2.M20110210.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/org.eclipse.swtbot.eclipse.gef.finder_2.2.2.201411280836.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/org.eclipse.swtbot.junit4_x-2.0.5.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/org.eclipse.swtbot.swt.finder-2.0.4.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/org-gephi-neo4j-plugin.jar"/>
+	<classpathentry kind="lib" path="E:/B.Sc/Sem-7/Final Year Project/Anduril/lib/swt-grouplayout.jar"/>
+	<classpathentry kind="lib" path="C:/Users/shiyam/Downloads/Compressed/swt.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
