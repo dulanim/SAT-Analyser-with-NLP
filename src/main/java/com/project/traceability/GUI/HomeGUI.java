@@ -300,9 +300,7 @@ public class HomeGUI {
 //				NewProjectWindow newProjWin = new NewProjectWindow();
 //				newProjWin.open();
 				
-				CreateNewProjectWindow projectWindow = new CreateNewProjectWindow(
-						null, 0);
-				projectWindow.open();
+				ProjectCreateWindow.main(null);
 			}
 		});
 		mntmProject.setText("Project");

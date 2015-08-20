@@ -52,8 +52,8 @@ public class ClassRelationIdentifier {
             }
         }
             
-        canClasses=phraseLists;
-        return canClasses;
+        canRelations=phraseLists;
+        return canRelations;
     }
     
 }

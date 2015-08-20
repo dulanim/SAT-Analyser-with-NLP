@@ -1,33 +1,22 @@
 package com.project.traceability.GUI;
 
-import static com.project.traceability.GUI.HomeGUI.projectPath;
-import static com.project.traceability.GUI.HomeGUI.trtmNewTreeitem;
 import java.io.File;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import com.project.traceability.common.PropertyFile;
-import com.project.traceability.visualization.GraphDB;
-import com.project.traceability.visualization.GraphDB.RelTypes;
-import com.project.traceability.manager.ReadXML;
 import com.project.traceability.manager.RelationManager;
-import java.util.ArrayList;
-import java.util.List;
-import org.eclipse.swt.graphics.Color;
-import processing.core.PConstants;
 
 public class NewProjectWindow {
 
@@ -64,7 +53,7 @@ public class NewProjectWindow {
      * Open the window.
      */
     public Shell open() {
-        Display display = Display.getDefault();
+       // Display display = Display.getDefault();
         createContents();
         shell.open();
         shell.layout();
