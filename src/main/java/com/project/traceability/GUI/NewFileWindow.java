@@ -1,10 +1,5 @@
 package com.project.traceability.GUI;
 
-import com.project.NLP.UMLToXML.jsonreader.JSONReader;
-import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
-import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import com.project.NLP.staticdata.StaticData;
-import com.project.progress.progressbar.ProgressBarCustom;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.BufferedReader;
@@ -36,16 +31,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.UMLToXML.jsonreader.JSONReader;
+import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
+import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.staticdata.StaticData;
 import com.project.traceability.common.PropertyFile;
 
 public class NewFileWindow {
@@ -173,8 +171,10 @@ public class NewFileWindow {
 				for (int k = 0; k < selectedFiles.length; k++) {
 					text.append(selectedFiles[k] + " , ");
 					path = Paths.get(localFilePath + selectedFiles[k]);
-					Path target = Paths.get(HomeGUI.projectPath);                                       
+					Path trgt = Paths.get(HomeGUI.projectPath); 
+                                        String fileName = selectedFiles[k];
 					if (localFilePath != null) {
+                                            Path target = FilePropertyName.getPath(trgt, fileName);
 						try {
 							Files.copy(path,
 									target.resolve(path.getFileName()),
@@ -211,25 +211,25 @@ public class NewFileWindow {
                                 
                                 
 				openFiles();
-                                if(HomeGUI.isSelectionForUMLFile){
-                                    //check the formats exists or not 
-                                   // ProgressBarCustom progressBarCustom = new ProgressBarCustom();
-                                    //progressBarCustom.create();
-                                    WriteToXML xmlWriter = new WriteToXML();
-                                    XMLReader xmlReader = new XMLReader();
-                                    if(StaticData.umlFilePath.contains(".xmi")||
-                                            StaticData.umlFilePath.contains(".uml")){
-                                       xmlReader.readUMLXMI();
-                                       xmlWriter.createXML();
-                                    }else if(StaticData.umlFilePath.contains(".mdj")){
-                                        
-                                     //   progressBarCustom.updateProgressBar();
-                                        JSONReader reader = new JSONReader();
-                                        reader.readJson();
-                                        xmlWriter.createXML();
-                                    }
-                                
-                               }
+//                                if(HomeGUI.isSelectionForUMLFile){
+//                                    //check the formats exists or not 
+//                                   // ProgressBarCustom progressBarCustom = new ProgressBarCustom();
+//                                    //progressBarCustom.create();
+//                                   WriteToXML xmlWriter = new WriteToXML();
+//                                    XMLReader xmlReader = new XMLReader();
+//                                    if(StaticData.umlFilePath.contains(".xmi")||
+//                                       StaticData.umlFilePath.contains(".uml")){
+//                                      xmlReader.readUMLXMI();
+ //                                    xmlWriter.createXML();
+//                                    }else if(StaticData.umlFilePath.contains(".mdj")){
+//                                        
+//                                     //   progressBarCustom.updateProgressBar();
+//                                        JSONReader reader = new JSONReader();
+//                                        reader.readJson();
+//                                        xmlWriter.createXML();
+//                                    }
+//                                
+//                               }
                                
 			}
                         

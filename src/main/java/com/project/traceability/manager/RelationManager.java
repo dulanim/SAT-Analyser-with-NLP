@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.staticdata.FilePropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,7 +82,8 @@ public class RelationManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(document);
             StreamResult streamResult = new StreamResult(
-                    PropertyFile.getRelationshipXMLPath());
+                   new File(
+            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -116,7 +118,7 @@ public class RelationManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(document);
             StreamResult streamResult = new StreamResult(projectPath
-                    + "\\Relations.xml");
+                    + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -136,7 +138,7 @@ public class RelationManager {
 
         List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
 //        List<String> hasToaddRelationBodes = relationNodes;
-        File file = new File(HomeGUI.projectPath + "\\Relations.xml");
+        File file = new File(HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml");
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -207,7 +209,7 @@ public class RelationManager {
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
             StreamResult result = new StreamResult(new File(
-            		HomeGUI.projectPath + "\\Relations.xml").getPath());
+            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -228,7 +230,7 @@ public class RelationManager {
     }
 
     public static List<String> readAll() {
-        File file = new File(HomeGUI.projectPath + "\\Relations.xml");
+        File file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML +File.separator +  "Relations.xml");
         List<String> existingNodes = new ArrayList<String>();
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -284,7 +286,8 @@ public class RelationManager {
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
             StreamResult result = new StreamResult(new File(
-                    HomeGUI.projectPath + "\\Relations.xml").getPath());
+            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator 
+                                +"Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(

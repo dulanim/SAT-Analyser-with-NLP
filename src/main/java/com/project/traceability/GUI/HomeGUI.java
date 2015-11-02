@@ -3,6 +3,7 @@ package com.project.traceability.GUI;
 /**
  * @author Gitanjali Nov 12, 2014
  */
+import com.project.NLP.staticdata.FilePropertyName;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
@@ -38,10 +39,22 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.staticdata.StaticData;
+import com.project.property.config.xml.reader.XMLReader;
+import com.project.property.config.xml.writer.XMLWriter;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.GraphDB.RelTypes;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import java.io.FileNotFoundException;
+import java.util.Set;
+import javax.swing.JOptionPane;
+import javax.swing.tree.TreePath;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import scala.collection.immutable.HashSet;
 
 /**
  * Main Home Window of the tool
@@ -62,11 +75,11 @@ public class HomeGUI {
        
 
 	public static boolean isComaparing = false;
-        public static boolean isSelectionForUMLFile = false;
+	public static boolean isSelectionForUMLFile = false;
 	public static String projectPath = null;
 	public static TreeItem trtmNewTreeitem;
 
-	public static CTabItem graphtabItem;
+        public static CTabItem graphtabItem;
         public boolean isSelectedProject = true;
         public boolean isSelectedCompare = true;
         public boolean isSelectedGraph = true;
@@ -81,15 +94,18 @@ public class HomeGUI {
 	
 	public static boolean hasThreeFiles = false;
 	public static boolean hasTwoFiles = false;
-
+	public static String selectedFolder;
+        public static HomeGUI window;//globally added to refresh the project window
 	/**
 	 * Launch the application.
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		try {
-			HomeGUI window = new HomeGUI(); 		//start the project
+                        //XMLWriter writer = new XMLWriter();
+                        window = new HomeGUI(); 		//start the project
 			window.open();
 			window.eventLoop(Display.getDefault());
 		} catch (Exception e) {
@@ -142,7 +158,13 @@ public class HomeGUI {
 	/**
 	 * Create contents of the window.
 	 */
-	protected void createContents() {
+	public void createContents() {
+		
+		XMLReader reader = new XMLReader();
+		reader.readWorkspaces();
+		//PropertyFile.filePath = StaticData.rootPathName;//update cuureent workspace 
+	
+		
 		shell = new Shell();
 		shell.setBounds(0, 0, screen.width, screen.height - 20);
 		center(shell);
@@ -152,6 +174,7 @@ public class HomeGUI {
 		
 		newTab = new CTabFolder(sidebarSF, SWT.BORDER | SWT.CLOSE);		//to show all the projects in the workspace
 		newTab.setData("Project");
+                newTab.redraw();
 		newTab.setSize(400, 900);
 		newTab.setMinimizeVisible(true);
 		newTab.setMaximizeVisible(true);
@@ -195,18 +218,27 @@ public class HomeGUI {
 
 		graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
 		graphtabItem.setText("Graph");
-
+                
 		File projectFile = new File(PropertyFile.filePath);		//to access the workspace
 		projectFile.mkdir();
-		ArrayList<String> projectFiles = new ArrayList<>(
-				Arrays.asList(projectFile.list()));				//load all the projects
-		if (projectFiles.isEmpty())
-			newTab.setVisible(false);
-
-		CTabItem tbtmProjects = new CTabItem(newTab, SWT.NONE);		//CTabItem to show projects
+		
+		ArrayList<String> projectFiles;
+                /*if(StaticData.fileNames != null){
+		projectFiles = StaticData.fileNames.keySet().
+                }else{
+                    projectFiles = new ArrayList<>();
+                }*/
+                //load all the projects
+                
+                CTabItem tbtmProjects = new CTabItem(newTab, SWT.NONE);		//CTabItem to show projects
 		tbtmProjects.setText("Projects");
+		/*if (projectFiles.isEmpty())
+			newTab.setVisible(false);*/
+		
 
-		tree = new Tree(newTab, SWT.BORDER);				//tree for all projects
+		tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
+        | SWT.H_SCROLL);				//tree for all projects
+                tree.setToolTipText("");
 		
 		tbtmProjects.setControl(projComposite);
 
@@ -219,7 +251,8 @@ public class HomeGUI {
 					trtmNewTreeitem = selection[i];
 				}
 				string = string.substring(10, string.length() - 2);
-				projectPath = PropertyFile.filePath + string + "/";
+				selectedFolder = string;
+				projectPath = PropertyFile.filePath + string + "";
 				if(selection[0].getItemCount() >= 2)
 					hasTwoFiles = true;
 				if(selection[0].getItemCount() > 3)
@@ -229,23 +262,31 @@ public class HomeGUI {
 
 		});
 
-		tree.addMouseListener(new MouseAdapter() {				//mouse double click listener to display the files
+		tree.addMouseListener(new MouseAdapter() {	
+                    //mouse double click listener to display the files
+                    /*
+                    Open files when double clicks 
+                    */
 			@Override
-			public void mouseDoubleClick(MouseEvent arg0) {
+			public void mouseDoubleClick(MouseEvent event) {
 				String string = "";
 				String parent = null;
 				TreeItem[] selection = tree.getSelection();
+                                //Tree tree = (Tree) event.getSource();
+                                //ITreeSelection selection1 = ((ITreeSelection)event.getSelection());
+                                
 				for (int i = 0; i < selection.length; i++) {
 					string += selection[i] + " ";
-					parent += selection[i].getParentItem() + " ";
+					parent += selection[i].getParent() + " ";
 					trtmNewTreeitem = selection[i];
+                                      
 				}
 
 				if(selection[0].getItems().length == 0) {
 					string = string.substring(10, string.length() - 2);
 					parent = parent.substring(14, parent.length() - 2);
-					NewFileWindow.localFilePath = PropertyFile.filePath + parent
-							+ "/";
+					NewFileWindow.localFilePath = StaticData.workspace + File.separator + parent
+							+File.separator;
 					NewFileWindow.createTabLayout(string);
 				} else if(selection[0].getParent().equals(tree)) {
 					trtmNewTreeitem.setExpanded(true);
@@ -255,25 +296,11 @@ public class HomeGUI {
 
 		tbtmProjects.setControl(tree);			//add tree to CTabItem
 
-		if (projectFiles.isEmpty())
+		if (StaticData.workspace.equals(""))
 			tree.setVisible(false);
 		else {
-			for (int i = 0; i < projectFiles.size(); i++) {
-				TreeItem trtmNewTreeitem = new TreeItem(tree, SWT.NONE);
-				trtmNewTreeitem.setText(projectFiles.get(i));
-				File file = new File(PropertyFile.filePath
-						+ projectFiles.get(i) + "/");
-				ArrayList<String> files = new ArrayList<String>(
-						Arrays.asList(file.list()));
-				for (int j = 0; j < files.size(); j++) {
-					
-					if (!files.get(j).contains("graphdb")) {		//to avoid showing the Relations XML file		
-						 TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
-						 fileTreeItem.setText(files.get(j));
-						
-					}
-				}
-			}
+                    //adding project folders and files from workspace in project tab
+                        setUpNewProject(StaticData.workspace,"Initial State");
 		}
 
 		shell.setText("Software Artefact Traceability Analyzer");
@@ -327,7 +354,86 @@ public class HomeGUI {
 			}
 		});
 		mntmSave.setText("Save");
-
+		
+		MenuItem mntmProjctPath = new MenuItem(menu_1, SWT.CASCADE);
+		mntmProjctPath.setText("Switch Project Path");
+                
+		Menu menu_5 = new Menu(mntmProjctPath);
+		mntmProjctPath.setMenu(menu_5);
+		
+		MenuItem mntmWorkspace;// = new MenuItem(menu_5, SWT.NONE);
+                Set<String> set = StaticData.paths;
+                set.remove(StaticData.workspace);
+                List<String> list = new ArrayList<>(set);
+		for(String paths:list){
+			mntmWorkspace	= new MenuItem(menu_5, SWT.NONE);
+			final MenuItem temp = mntmWorkspace;
+			mntmWorkspace.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					//load current location project files
+					//XMLWriter writer = new XMLWriter();
+					String path = temp.getText().trim();
+                                        StaticData.workspace = path;
+					//writer.modifyStatus(true, path);
+					//writer.modifyStatus(false, PropertyFile.filePath);
+					shell.dispose();
+                                        HomeGUI.main(null);
+				}
+			});
+			mntmWorkspace.setText(paths);
+		}
+		mntmWorkspace = new MenuItem(menu_5, SWT.NONE);
+		mntmWorkspace.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int x = JOptionPane.showConfirmDialog(null, "Do you want to change your current workspace?\n"+StaticData.workspace, "Worspace Confirmation", 
+                                            JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+                                   if(x == JOptionPane.YES_OPTION){
+                                        DirectoryDialog dialog = new DirectoryDialog(shell);
+                                        dialog.setFilterPath("c:\\"); // Windows specific
+                                        PropertyFile.filePath = dialog.open();
+                                        
+                                        XMLWriter writer = null;
+                                        if(writer == null){
+                                            writer = new XMLWriter();
+                                        }
+                                        
+                                        if(!StaticData.workspace.equals(PropertyFile.filePath)){
+                                            StaticData.workspace = PropertyFile.filePath;
+                                            writer.createWorkspaceNode(StaticData.workspace, "true");
+                                            shell.dispose();
+                                            ProgressBar bar =  new ProgressBar();
+                                            bar.main(null);
+                                        }
+                                   }else if(x == JOptionPane.NO_OPTION){
+                                       
+                                   }
+			}
+		});
+		mntmWorkspace.setText("Other...");
+		
+		MenuItem mntmRestart = new MenuItem(menu_1, SWT.NONE);
+		mntmRestart.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//restart functionality
+                                shell.dispose();
+                                ProgressBar bar = new ProgressBar();
+                                bar.main(null);
+			}
+		});
+		mntmRestart.setText("Restart");
+		
+		MenuItem mntmRefresh = new MenuItem(menu_1, SWT.NONE);
+		mntmRestart.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//referesh functionality
+			}
+		});
+		mntmRefresh.setText("Refresh");
+		
 		MenuItem mntmExit = new MenuItem(menu_1, SWT.NONE);
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -341,7 +447,7 @@ public class HomeGUI {
 		//mntmView.setText("View");
                 
                
-                // Create the File item's dropdown menu
+                // Create the File item's drop down menu
                 Menu viewMenu = new Menu(menu);
 
                 // Create all the items in the bar menu
@@ -349,15 +455,14 @@ public class HomeGUI {
                 mnViItem.setText("View");
                 mnViItem.setMenu(viewMenu);
 
-                // Create all the items in the File dropdown menu
+                // Create all the items in the File drop down menu
                 final MenuItem projectWindowItem = new MenuItem(viewMenu, SWT.CHECK);
                 projectWindowItem.setText("Project Window");
                 projectWindowItem.setSelection(true);
                 projectWindowItem.addSelectionListener(new SelectionAdapter() {
                        
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-                            
+			public void widgetSelected(SelectionEvent e) {      
                             if(false){
                                 projectWindowItem.setSelection(false);
                                 isSelectedProject = false;
@@ -526,7 +631,7 @@ public class HomeGUI {
 	public static void deleteFiles(String projectPath) {
 
 		TreeItem parent = trtmNewTreeitem.getParentItem();
-
+	
 		MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
 				| SWT.YES | SWT.NO);
 		File filePath = new File(projectPath);
@@ -571,12 +676,20 @@ public class HomeGUI {
             }
         });
         refreshItem.setText("Refresh");
-
         MenuItem deleteItem = new MenuItem(popupMenu, SWT.NONE);
         deleteItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 deleteFiles(projectPath);
+              
+            	XMLWriter writer;
+                try{
+                    writer = new XMLWriter();
+                    writer.deleteProjectFolder(StaticData.rootPathName, selectedFolder);
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+        	
             }
         });
         deleteItem.setText("Delete");
@@ -606,36 +719,42 @@ public class HomeGUI {
         fileItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                File file = new File(projectPath);
-                if (!file.isDirectory()) {
-                    TreeItem parent = trtmNewTreeitem.getParentItem();
-                    trtmNewTreeitem = trtmNewTreeitem.getParentItem();
-                    projectPath = PropertyFile.filePath + parent.getText();
+               
+                try{
+                    File file = new File(projectPath);
+                    if (!file.isDirectory()) {
+
+                        TreeItem parent = trtmNewTreeitem.getParentItem();
+                        trtmNewTreeitem = trtmNewTreeitem.getParentItem();
+                        projectPath = StaticData.workspace + File.separator +  parent.getText();
+                    }
+                    System.out.println(trtmNewTreeitem + projectPath);
+                    NewFileWindow newFileWin = new NewFileWindow();
+                    newFileWin.open(trtmNewTreeitem, projectPath);
+                }catch(Exception ex){
+                    ex.printStackTrace();
                 }
-                System.out.println(trtmNewTreeitem + projectPath);
-                NewFileWindow newFileWin = new NewFileWindow();
-                newFileWin.open(trtmNewTreeitem, projectPath);
             }
         });
         fileItem.setText("File");
-        MenuItem umlFileItem = new MenuItem(newMenu, SWT.NONE);
-        umlFileItem.setText("Import UML File");
-        umlFileItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                File file = new File(projectPath);
-                if (!file.isDirectory()) {
-                    TreeItem parent = trtmNewTreeitem.getParentItem();
-                    trtmNewTreeitem = trtmNewTreeitem.getParentItem();
-                    projectPath = PropertyFile.filePath + parent.getText();
-                }
-                System.out.println(trtmNewTreeitem + projectPath);
-                NewFileWindow newFileWin = new NewFileWindow();
-                isSelectionForUMLFile = true;
-                newFileWin.open(trtmNewTreeitem, projectPath);
-              
-            }
-        });
+//        MenuItem umlFileItem = new MenuItem(newMenu, SWT.NONE);
+//        umlFileItem.setText("Import UML File");
+//        umlFileItem.addSelectionListener(new SelectionAdapter() {
+//            @Override
+//            public void widgetSelected(SelectionEvent e) {
+//                File file = new File(projectPath);
+//                if (!file.isDirectory()) {
+//                    TreeItem parent = trtmNewTreeitem.getParentItem();
+//                    trtmNewTreeitem = trtmNewTreeitem.getParentItem();
+//                    projectPath = StaticData.workspace+ File.separator + parent.getText();
+//                }
+//                System.out.println(trtmNewTreeitem + projectPath);
+//                NewFileWindow newFileWin = new NewFileWindow();
+//                isSelectionForUMLFile = true;
+//                newFileWin.open(trtmNewTreeitem, projectPath);
+//              
+//            }
+//        });
          // isSelectionForUMLFile = false;
 //        Menu newMenu1 = new Menu(popupMenu);
 //        fileItem.setMenu(newMenu1);
@@ -730,15 +849,67 @@ public class HomeGUI {
                 PropertyFile.setProjectName(projectName);
                 PropertyFile.setGraphDbPath(projectPath + projectName
                         + ".graphdb");
-                PropertyFile.setGeneratedGexfFilePath(projectPath + projectName
+                PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator +  projectName
                         + ".gexf");
-                PropertyFile.setRelationshipXMLPath(projectPath
+                PropertyFile.setRelationshipXMLPath(projectPath + File.separator + projectName + FilePropertyName.XML + File.separator
                         + "Relations.xml");
                 PropertyFile.setGraphType(graphType);
                 System.out.println("Path: " + projectPath);
                 System.out.println("DB Path: " + PropertyFile.getGraphDbPath());
                 System.out.println("Graph Type: " + PropertyFile.getGraphType());
                 ReadXML.initApp(projectPath, graphType);
+    }
+    public static void setUpNewProject(String path,String tag){
+     
+//      tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
+//        | SWT.H_SCROLL);
+            try{
+                    File project_root_folder = new File(path);
+                    ArrayList<String> project_sub_folder = new ArrayList<String>(
+                    Arrays.asList(project_root_folder.list()));
+                    
+                    for(String name:project_sub_folder){//Anduril Shaym Uni 
+                        TreeItem rootNewTreeitem = null;
+//                        rootNewTreeitem.set
+                        if(tag.equals("Initial State")){
+                             rootNewTreeitem = new TreeItem(tree, SWT.NONE);
+                        }else{
+                            rootNewTreeitem = new TreeItem(ProjectCreateWindow.trtmNewTreeitem,SWT.NONE);
+                        }
+                        rootNewTreeitem.setText(name);
+                        File temp_file = new File(path + File.separator+name);//name:Anduril
+                        ArrayList<String> internal_folders = new ArrayList<String>(
+                            Arrays.asList(temp_file.list()));//Anduril's file / folder list
+                        
+                        
+                        for(String tempInternalFolderName:internal_folders){//xml uml 
+                            
+                            File tempInternalFolder = new File(temp_file.getPath() + File.separator + tempInternalFolderName);
+                            
+                            if(tempInternalFolder.isDirectory()){
+                                TreeItem trtmNewTreeitem = new TreeItem(rootNewTreeitem, SWT.NONE);
+                                trtmNewTreeitem.setText(tempInternalFolderName);
+                               
+                                ArrayList<String> internal_files = new ArrayList<String>(
+                                Arrays.asList(tempInternalFolder.list()));
+                                for(String tempFileName:internal_files){
+                                    TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
+                                    fileTreeItem.setText(tempFileName);
+                                }
+                            }else{
+                                TreeItem fileTreeItem = new TreeItem(rootNewTreeitem, SWT.NONE);
+                                fileTreeItem.setText(tempInternalFolderName);
+                            }
+                        }
+                        
+                    }
+                    }catch(Exception e){
+                        JOptionPane.showMessageDialog(null,"Selected Path Has some unrelated File\nSelect New Empty Workspace", "File Open Error", JOptionPane.ERROR_MESSAGE);
+                        shell.dispose();
+                        WorkspaceSelectionWindow window = new WorkspaceSelectionWindow();
+                        window.main(null);
+                        
+                    }
     }
         
 }

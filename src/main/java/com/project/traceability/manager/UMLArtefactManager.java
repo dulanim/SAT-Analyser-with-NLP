@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.staticdata.FilePropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class UMLArtefactManager {
 	public static void readXML(String projectPath) {
 		UMLArtefactManager.projectPath = projectPath;
 		// get the xml file
-		File umlXmlFile = new File(projectPath + "UMLArtefactFile.xml");
+		File umlXmlFile = new File(projectPath +  File.separator + FilePropertyName.XML + File.separator + FilePropertyName.UML_ARTIFACT_NAME);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
 		try {

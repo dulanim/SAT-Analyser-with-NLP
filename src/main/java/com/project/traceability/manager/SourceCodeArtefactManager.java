@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.staticdata.FilePropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class SourceCodeArtefactManager {
 
     public static void readXML(String projectPath) {
         SourceCodeArtefactManager.projectPath = projectPath;
-        File sourceXmlFile = new File(projectPath
-                + "SourceCodeArtefactFile.xml");
+        File sourceXmlFile = new File(projectPath + File.separator + FilePropertyName.XML + File.separator
+                + FilePropertyName.SOURCE_ARTIFACT_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {

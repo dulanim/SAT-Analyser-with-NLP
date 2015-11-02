@@ -11,6 +11,7 @@ package com.project.NLP.UMLToXML.xmlwriter;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,29 +22,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import com.project.NLP.UMLToXML.jsonreader.JSONReader;
-import com.project.traceability.model.Attribute;
-import com.project.traceability.model.Dependencies;
-import com.project.traceability.model.ModelData;
-import com.project.traceability.model.Operation;
-import com.project.traceability.model.Parameter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.project.NLP.staticdata.StaticData;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
-import java.io.FilePermission;
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.AccessController;
-import java.util.Arrays;
-import java.util.Map;
-import javax.swing.filechooser.FileSystemView;
+import com.project.traceability.model.Attribute;
+import com.project.traceability.model.Dependencies;
+import com.project.traceability.model.ModelData;
+import com.project.traceability.model.Operation;
+import com.project.traceability.model.Parameter;
 public class WriteToXML {
     
    
@@ -52,19 +41,19 @@ public class WriteToXML {
     public static String fileName = "";
     public void createXML(){
         List<ModelData> classLst = StaticData.classLst;
-        List<Dependencies> depencyList = StaticData.depencyList;
+        //List<Dependencies> depencyList = StaticData.depencyList;
 
      try {
           
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// root elements
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement(StaticData.ARTEFACTS_ROOT);
-                Element artifact = doc.createElement(StaticData.ARTEFACT_ROOT);
-		doc.appendChild(rootElement);
-                rootElement.appendChild(artifact);
+				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+		
+				// root elements
+				Document doc = docBuilder.newDocument();
+				Element rootElement = doc.createElement(StaticData.ARTEFACTS_ROOT);
+		        Element artifact = doc.createElement(StaticData.ARTEFACT_ROOT);
+				doc.appendChild(rootElement);
+		        rootElement.appendChild(artifact);
                 
                 Attr attrType = doc.createAttribute("type");
                 attrType.setValue("UMLDiagram");
@@ -108,7 +97,7 @@ public class WriteToXML {
                  
                     
                 }
-		Element intraConnectionElement = doc.createElement(StaticData.INTRACONNECTION_ROOT);
+                Element intraConnectionElement = doc.createElement(StaticData.INTRACONNECTION_ROOT);
                 artifact.appendChild(intraConnectionElement);//append an artifact main Artifact
                 
                 //Connection Element is adding to InterConnectionsElement
@@ -117,10 +106,10 @@ public class WriteToXML {
 		// write the content into xml file
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
 		DOMSource source = new DOMSource(doc);
-                String driveLetter = getSuitableDrive();
+                //String driveLetter = getSuitableDrive();
                 
                 File f = new File(HomeGUI.projectPath + File.separator +
                         "umlXML");
@@ -300,7 +289,7 @@ public class WriteToXML {
         }
     }
 
-    private String getSuitableDrive() {
+  /*  private String getSuitableDrive() {
                 List <File>files = Arrays.asList(File.listRoots());
                 Map<String,String> driveLetterMap = new HashMap<String,String>();
                   for (File f1 : files) {
@@ -320,5 +309,5 @@ public class WriteToXML {
                    }
                   }
                  return "D:\\";//default
-    }
+    }*/
 }

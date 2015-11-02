@@ -4,26 +4,26 @@
  */
 package com.project.NLP.UMLToXML.xmiumlreader;
 
-import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import java.io.File;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import com.project.NLP.staticdata.StaticData;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.ClassData;
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
-import com.project.NLP.staticdata.StaticData;
 
  
 /**
@@ -52,17 +52,17 @@ public class XMLReader {
         
         
         
-        ClassData tempData = new ClassData();
+    ClassData tempData = new ClassData();
 	doc.getDocumentElement().normalize(); 
 	NodeList nList = doc.getElementsByTagName("packagedElement");
 	for (int temp = 0; temp < nList.getLength(); temp++) {
 		Node nNode = nList.item(temp);
-                tempData = new ClassData();
+        tempData = new ClassData();
 		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
  
-			Element eElement = (Element) nNode;
+						Element eElement = (Element) nNode;
                         
-			String className = eElement.getAttribute("name");
+						String className = eElement.getAttribute("name");
                         String id = eElement.getAttribute("xmi:id");
                         String type = eElement.getAttribute("xmi:type").split(":")[1];
                         

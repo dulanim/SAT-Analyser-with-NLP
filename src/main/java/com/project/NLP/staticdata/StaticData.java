@@ -5,6 +5,7 @@
 package com.project.NLP.staticdata;
 
 import java.util.List;
+
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 
@@ -34,5 +35,7 @@ public class StaticData {
     public static List<ModelData> classLst;
     public static List<Dependencies> depencyList;
     public static String umlFilePath = "";
-    
+	public static String rootPathName; //propety file it is the project root directory
+	public static String []fileNames;//project folder list
+	public static String paths[];
 }

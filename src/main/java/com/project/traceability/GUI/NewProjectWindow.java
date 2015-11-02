@@ -102,10 +102,10 @@ public class NewProjectWindow {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 String projectName = text.getText();
-                projectPath = PropertyFile.filePath + projectName + "/";
+                projectPath = PropertyFile.filePath + projectName + File.separator;
                 PropertyFile.setProjectName(projectName);
                 PropertyFile.setGraphDbPath(projectPath + projectName + ".graphdb");
-                PropertyFile.setGeneratedGexfFilePath(projectPath + projectName + ".gexf");
+                PropertyFile.setGeneratedGexfFilePath(projectPath+ projectName + ".gexf");
                 PropertyFile.setRelationshipXMLPath(projectPath + "Relations.xml");
 
                 shell.close();

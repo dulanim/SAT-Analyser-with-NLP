@@ -73,191 +73,191 @@ public class JSONReader {
             }
             return isExist;
         }
-	public static void readJson() {
+        public static void readJson() {
                 
                StaticData.classLst = new ArrayList<ModelData>();
                StaticData.depencyList = new ArrayList<Dependencies>();
-                ModelData tempData = null;
-		try {
-			// read the json file
-			FileReader reader = new FileReader(filePath);
-
-			JSONParser jsonParser = new JSONParser();
-			JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
-
-			// get a String from the JSON object
-			JSONArray ownedElementArray =  (JSONArray) jsonObject.get("ownedElements");
-                        JSONObject jsonObjOwnedElement = (JSONObject) ownedElementArray.get(0);
-                        
-			JSONArray jsonArrOwnedElement = (JSONArray)jsonObjOwnedElement.get("ownedElements");
-                        
-                        Iterator iterator = jsonArrOwnedElement.iterator();
-                        ViewReader aReader = new ViewReader(jsonArrOwnedElement);
-                        aReader.readViews();
-                        while(iterator.hasNext()){
-                            List<Attribute> attributeList = new ArrayList<Attribute>();
-                            List<Operation> operationList = new ArrayList<Operation>();
-                            JSONObject jsonInnerObj = (JSONObject) iterator.next();
-                            String type = jsonInnerObj.get("_type").toString();
-                            if(type.equals("UMLClass")||
-                                    type.equalsIgnoreCase("UMLInterface")){
-                                
-                                if(type.equals("UMLClass")){
-                                    tempData = new ClassData();
-                                    tempData.setType("Class");
-                                }else{
-                                    tempData = new InterfaceData();
-                                    tempData.setType("Interface");
-                                }
-                                
-                                String Id = jsonInnerObj.get("_id").toString();
-                                JSONArray jsonArr_Depencies = (JSONArray) jsonInnerObj.get("ownedElements");
-                                if(isViewExists(type, aReader, Id)){
-                                tempData.setName(jsonInnerObj.get("name").toString());
-                                tempData.setId(Id);
-                                tempData.setVisibility(jsonInnerObj.get("visibility").toString());
-                               
-                                JSONArray jsonArr_Attributes = (JSONArray) jsonInnerObj.get("attributes");
-                                JSONArray jsonArr_Operations = (JSONArray) jsonInnerObj.get("operations");
-                                
-                                names_id_Map.put(Id,jsonInnerObj.get("name").toString());
-                                if(jsonArr_Attributes != null){
-                                    Iterator attributeIterator = jsonArr_Attributes.iterator();
-                                    
-                                    while(attributeIterator.hasNext()){
-                                    
-                                    JSONObject jsonObject_Attribute = (JSONObject) attributeIterator.next();
-                                    Attribute attribute = new Attribute();
-                                    attribute.setType("UMLAttribute");
-                                    attribute.setId(jsonObject_Attribute.get("_id").toString());
-                                    attribute.setName(jsonObject_Attribute.get("name").toString());
-                                    attribute.setVisibility(jsonObject_Attribute.get("visibility").
-                                            toString());
-                                    attribute.setDataType((String)jsonObject_Attribute.get("type"));
-                                    attribute.setIsStatic(jsonObject_Attribute.get("isStatic").toString());
-                                    
-                                    attributeList.add(attribute);
-                                    
-                                   
-                                    }
-                                }
-                                
-                                if(jsonArr_Operations != null){
-                                Iterator operationIterator = jsonArr_Operations.iterator();
-                                
-                                while(operationIterator.hasNext()){
-                                    
-                                    JSONObject jsonObject_Operation = (JSONObject) operationIterator.next();
-                                    Operation operation = new Operation();
-                                    operation.setType("UMLOpertion");
-                                    operation.setId(jsonObject_Operation.get("_id").toString());
-                                    operation.setName(jsonObject_Operation.get("name").toString());
-                                    operation.setVisibility(jsonObject_Operation.get("visibility").
-                                            toString());
-                                    operation.setIsStatic(jsonObject_Operation.get("isStatic").toString());
-                                    operation.setIsAbstract(jsonObject_Operation.get("isAbstract").toString());
-                                    
-                                    Parameter parameter;// = new Parameter();
-                                    JSONArray jsonArr_Parameter = (JSONArray) jsonObject_Operation.get("parameters");
-                                    
-                                    if(jsonArr_Parameter != null){
-                                        Iterator ParameterIterator = jsonArr_Parameter.iterator();
-                                        List<Parameter> paramList = new ArrayList<Parameter>();
-                                        while(ParameterIterator.hasNext()){
-                                            JSONObject jsonObject_Parameter = (JSONObject) ParameterIterator.next();
-                                            parameter = new Parameter();
-                                            parameter.setParameterName(jsonObject_Parameter.
-                                                    get("name").toString());
-                                            parameter.setParameterType(jsonObject_Parameter.
-                                                    get("type").toString());
-                                            paramList.add(parameter);
-                                        }
-                                        operation.setParameterList(paramList);
-                                    }
-                                    operationList.add(operation);
-                                    }
-                                }
-                                
-                                tempData.setAttributeList(attributeList);
-                                tempData.setOperationList(operationList);
-                                StaticData.classLst.add(tempData);
-                                
-                        }
-                                
-                         if(jsonArr_Depencies != null){
-                                    Iterator depencyIterator = jsonArr_Depencies.iterator();
-                                    while(depencyIterator.hasNext()){
-                                        
-                                      JSONObject jsonObject_OwnedElement = (JSONObject) depencyIterator.next();
-                                      Dependencies dependencies = new Dependencies();
-                                      
-                                      type = jsonObject_OwnedElement.
-                                                  get("_type").toString();
-                                      if(type.equals("UMLGeneralization") ||
-                                              type.equals("UMLInterfaceRealization")){
-                                           Id = jsonObject_OwnedElement.
-                                                  get("_id").toString();
-                                          if(isViewExists(type, aReader, Id)){
-                                          dependencies.setDependency_type(jsonObject_OwnedElement.
-                                                  get("_type").toString());
-                                          String annotation = jsonObject_OwnedElement.
-                                                  get("name").toString();
-                                          JSONObject jsonObjSrc = (JSONObject) jsonObject_OwnedElement.
-                                                  get("source");
-                                          dependencies.setSource_id(jsonObjSrc.get("$ref").toString());
-                                          JSONObject jsonObjTarget = (JSONObject) jsonObject_OwnedElement.
-                                                  get("target");
-                                          dependencies.setTaget_id(jsonObjTarget.get("$ref").toString());
-                                          dependencies.setAnnotation(annotation);
-                                          dependencies.setMuliplicity_src("data");
-                                          dependencies.setMultiplicity_target("data");
-                                          
-                                          StaticData.depencyList.add(dependencies);
-                                          }//if finish of inner
-                                      }else{
-                                          Id = jsonObject_OwnedElement.
-                                                  get("_id").toString();
-                                           if(isViewExists(type, aReader, Id)){
-                                               String annotation = jsonObject_OwnedElement.
-                                                  get("name").toString();
-                                               JSONObject jsonObjectEnd1 = (JSONObject) jsonObject_OwnedElement
-                                                       .get("end1");
-                                               JSONObject tempRef = (JSONObject)jsonObjectEnd1.get("reference");
-                                               String refenceSrc = tempRef.get("$ref").toString();
-                                               String muliplicitySrc = jsonObjectEnd1.get("name").toString();
-                                               
-                                               JSONObject jsonObjectEnd2 = (JSONObject) jsonObject_OwnedElement
-                                                       .get("end2");
-                                               tempRef = (JSONObject)jsonObjectEnd2.get("reference");
-                                               String refenceTarget = tempRef.get("$ref").toString();
-                                               String muliplicityTarget = jsonObjectEnd2.get("name").toString();
-                                               
-                                               dependencies = new Dependencies();
-                                               dependencies.setDependency_type("Association");
-                                               dependencies.setAnnotation(annotation);
-                                               dependencies.setSource_id(refenceSrc);
-                                               dependencies.setTaget_id(refenceTarget);
-                                               dependencies.setMuliplicity_src(muliplicitySrc);
-                                               dependencies.setMultiplicity_target(muliplicityTarget);
-                                               
-                                               StaticData.depencyList.add(dependencies);
-                                           }//if finish inner
-                                      }//else finish of depency
-                                }//while end of depency
-                            }//if checking finish of jsonArr_Depencies
-                     }//if finish of check weather the umlclass or uml interface
-                }//main while loop finish
-
-                        
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} catch (ParseException ex) {
-			ex.printStackTrace();
-		} catch (NullPointerException ex) {
-			ex.printStackTrace();
-		}
+               ModelData tempData = null;
+				try {
+					// read the json file
+					FileReader reader = new FileReader(filePath);
+		
+					JSONParser jsonParser = new JSONParser();
+					JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+		
+					// get a String from the JSON object
+					JSONArray ownedElementArray =  (JSONArray) jsonObject.get("ownedElements");
+		            JSONObject jsonObjOwnedElement = (JSONObject) ownedElementArray.get(0);
+		                        
+					JSONArray jsonArrOwnedElement = (JSONArray)jsonObjOwnedElement.get("ownedElements");
+		                        
+		                        Iterator iterator = jsonArrOwnedElement.iterator();
+		                        ViewReader aReader = new ViewReader(jsonArrOwnedElement);
+		                        aReader.readViews();
+		                        while(iterator.hasNext()){
+		                            List<Attribute> attributeList = new ArrayList<Attribute>();
+		                            List<Operation> operationList = new ArrayList<Operation>();
+		                            JSONObject jsonInnerObj = (JSONObject) iterator.next();
+		                            String type = jsonInnerObj.get("_type").toString();
+		                            if(type.equals("UMLClass")||
+		                                    type.equalsIgnoreCase("UMLInterface")){
+		                                
+		                                if(type.equals("UMLClass")){
+		                                    tempData = new ClassData();
+		                                    tempData.setType("Class");
+		                                }else{
+		                                    tempData = new InterfaceData();
+		                                    tempData.setType("Interface");
+		                                }
+		                                
+		                                String Id = jsonInnerObj.get("_id").toString();
+		                                JSONArray jsonArr_Depencies = (JSONArray) jsonInnerObj.get("ownedElements");
+		                                if(isViewExists(type, aReader, Id)){
+		                                tempData.setName(jsonInnerObj.get("name").toString());
+		                                tempData.setId(Id);
+		                                tempData.setVisibility(jsonInnerObj.get("visibility").toString());
+		                               
+		                                JSONArray jsonArr_Attributes = (JSONArray) jsonInnerObj.get("attributes");
+		                                JSONArray jsonArr_Operations = (JSONArray) jsonInnerObj.get("operations");
+		                                
+		                                names_id_Map.put(Id,jsonInnerObj.get("name").toString());
+		                                if(jsonArr_Attributes != null){
+		                                    Iterator attributeIterator = jsonArr_Attributes.iterator();
+		                                    
+		                                    while(attributeIterator.hasNext()){
+		                                    
+		                                    JSONObject jsonObject_Attribute = (JSONObject) attributeIterator.next();
+		                                    Attribute attribute = new Attribute();
+		                                    attribute.setType("UMLAttribute");
+		                                    attribute.setId(jsonObject_Attribute.get("_id").toString());
+		                                    attribute.setName(jsonObject_Attribute.get("name").toString());
+		                                    attribute.setVisibility(jsonObject_Attribute.get("visibility").
+		                                            toString());
+		                                    attribute.setDataType((String)jsonObject_Attribute.get("type"));
+		                                    attribute.setIsStatic(jsonObject_Attribute.get("isStatic").toString());
+		                                    
+		                                    attributeList.add(attribute);
+		                                    
+		                                   
+		                                    }
+		                                }
+		                                
+		                                if(jsonArr_Operations != null){
+		                                Iterator operationIterator = jsonArr_Operations.iterator();
+		                                
+		                                while(operationIterator.hasNext()){
+		                                    
+		                                    JSONObject jsonObject_Operation = (JSONObject) operationIterator.next();
+		                                    Operation operation = new Operation();
+		                                    operation.setType("UMLOpertion");
+		                                    operation.setId(jsonObject_Operation.get("_id").toString());
+		                                    operation.setName(jsonObject_Operation.get("name").toString());
+		                                    operation.setVisibility(jsonObject_Operation.get("visibility").
+		                                            toString());
+		                                    operation.setIsStatic(jsonObject_Operation.get("isStatic").toString());
+		                                    operation.setIsAbstract(jsonObject_Operation.get("isAbstract").toString());
+		                                    
+		                                    Parameter parameter;// = new Parameter();
+		                                    JSONArray jsonArr_Parameter = (JSONArray) jsonObject_Operation.get("parameters");
+		                                    
+		                                    if(jsonArr_Parameter != null){
+		                                        Iterator ParameterIterator = jsonArr_Parameter.iterator();
+		                                        List<Parameter> paramList = new ArrayList<Parameter>();
+		                                        while(ParameterIterator.hasNext()){
+		                                            JSONObject jsonObject_Parameter = (JSONObject) ParameterIterator.next();
+		                                            parameter = new Parameter();
+		                                            parameter.setParameterName(jsonObject_Parameter.
+		                                                    get("name").toString());
+		                                            parameter.setParameterType(jsonObject_Parameter.
+		                                                    get("type").toString());
+		                                            paramList.add(parameter);
+		                                        }
+		                                        operation.setParameterList(paramList);
+		                                    }
+		                                    operationList.add(operation);
+		                                    }
+		                                }
+		                                
+		                                tempData.setAttributeList(attributeList);
+		                                tempData.setOperationList(operationList);
+		                                StaticData.classLst.add(tempData);
+		                                
+		                        }
+		                                
+		                         if(jsonArr_Depencies != null){
+		                                    Iterator depencyIterator = jsonArr_Depencies.iterator();
+		                                    while(depencyIterator.hasNext()){
+		                                        
+		                                      JSONObject jsonObject_OwnedElement = (JSONObject) depencyIterator.next();
+		                                      Dependencies dependencies = new Dependencies();
+		                                      
+		                                      type = jsonObject_OwnedElement.
+		                                                  get("_type").toString();
+		                                      if(type.equals("UMLGeneralization") ||
+		                                              type.equals("UMLInterfaceRealization")){
+		                                           Id = jsonObject_OwnedElement.
+		                                                  get("_id").toString();
+		                                          if(isViewExists(type, aReader, Id)){
+		                                          dependencies.setDependency_type(jsonObject_OwnedElement.
+		                                                  get("_type").toString());
+		                                          String annotation = jsonObject_OwnedElement.
+		                                                  get("name").toString();
+		                                          JSONObject jsonObjSrc = (JSONObject) jsonObject_OwnedElement.
+		                                                  get("source");
+		                                          dependencies.setSource_id(jsonObjSrc.get("$ref").toString());
+		                                          JSONObject jsonObjTarget = (JSONObject) jsonObject_OwnedElement.
+		                                                  get("target");
+		                                          dependencies.setTaget_id(jsonObjTarget.get("$ref").toString());
+		                                          dependencies.setAnnotation(annotation);
+		                                          dependencies.setMuliplicity_src("data");
+		                                          dependencies.setMultiplicity_target("data");
+		                                          
+		                                          StaticData.depencyList.add(dependencies);
+		                                          }//if finish of inner
+		                                      }else{
+		                                          Id = jsonObject_OwnedElement.
+		                                                  get("_id").toString();
+		                                           if(isViewExists(type, aReader, Id)){
+		                                               String annotation = jsonObject_OwnedElement.
+		                                                  get("name").toString();
+		                                               JSONObject jsonObjectEnd1 = (JSONObject) jsonObject_OwnedElement
+		                                                       .get("end1");
+		                                               JSONObject tempRef = (JSONObject)jsonObjectEnd1.get("reference");
+		                                               String refenceSrc = tempRef.get("$ref").toString();
+		                                               String muliplicitySrc = jsonObjectEnd1.get("name").toString();
+		                                               
+		                                               JSONObject jsonObjectEnd2 = (JSONObject) jsonObject_OwnedElement
+		                                                       .get("end2");
+		                                               tempRef = (JSONObject)jsonObjectEnd2.get("reference");
+		                                               String refenceTarget = tempRef.get("$ref").toString();
+		                                               String muliplicityTarget = jsonObjectEnd2.get("name").toString();
+		                                               
+		                                               dependencies = new Dependencies();
+		                                               dependencies.setDependency_type("Association");
+		                                               dependencies.setAnnotation(annotation);
+		                                               dependencies.setSource_id(refenceSrc);
+		                                               dependencies.setTaget_id(refenceTarget);
+		                                               dependencies.setMuliplicity_src(muliplicitySrc);
+		                                               dependencies.setMultiplicity_target(muliplicityTarget);
+		                                               
+		                                               StaticData.depencyList.add(dependencies);
+		                                           }//if finish inner
+		                                      }//else finish of depency
+		                                }//while end of depency
+		                            }//if checking finish of jsonArr_Depencies
+		                     }//if finish of check weather the umlclass or uml interface
+		                }//main while loop finish
+		
+		                        
+				} catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				} catch (ParseException ex) {
+					ex.printStackTrace();
+				} catch (NullPointerException ex) {
+					ex.printStackTrace();
+				}
                 
                 for(int i=0;i<StaticData.classLst.size();i++){
                     ModelData temp = StaticData.classLst.get(i);
