@@ -8,6 +8,10 @@ import java.util.List;
 
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -35,7 +39,9 @@ public class StaticData {
     public static List<ModelData> classLst;
     public static List<Dependencies> depencyList;
     public static String umlFilePath = "";
-	public static String rootPathName; //propety file it is the project root directory
-	public static String []fileNames;//project folder list
-	public static String paths[];
+    public static String workspace = "/home/shiyam/FinalYearFiles";
+    public static String rootPathName; //propety file it is the project root directory
+    public static HashMap<String,List<String>> folderNames = new HashMap<String, List<String>>();//project folder list
+    public static Set<String> paths = new HashSet<String>();
+    public static HashMap<String,List<String>> internalfileNames = new HashMap<String, List<String>>();//project folder's internal file list
 }
