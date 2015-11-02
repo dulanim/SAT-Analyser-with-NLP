@@ -1,4 +1,4 @@
-package com.project.property.xml.reader;
+package com.project.property.config.xml.reader;
 
 import java.io.File;
 
@@ -8,51 +8,85 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.common.PropertyFile;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
 
 public class XMLReader {
 
-
-	
-	public void read(){
-		File fXmlFile = new File("C:\\Users\\shiyam\\sat_config.xml");
+    DocumentBuilderFactory dbFactory;
+    DocumentBuilder dBuilder;
+    Document doc;
+        public XMLReader(){
+            File config_XmlFile = new File(PropertyFile.configuration_file_path);
 		
 		try{
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(fXmlFile);
+                    dbFactory = DocumentBuilderFactory.newInstance();
+                    dBuilder = dbFactory.newDocumentBuilder();
+                    doc = dBuilder.parse(config_XmlFile);
+                }catch(SAXException e){
+                    JOptionPane.showMessageDialog(null, e.toString(), "Read XML Error", JOptionPane.ERROR_MESSAGE);
+                }catch(ParserConfigurationException e){
+                    JOptionPane.showMessageDialog(null, e.toString(), "Read XML Error", JOptionPane.ERROR_MESSAGE);
+                }catch(IOException e){
+                    JOptionPane.showMessageDialog(null, e.toString(), "Read XML Error", JOptionPane.ERROR_MESSAGE);
+                }
+        }
+	
+        public boolean readStatus(){
+            Boolean any_true = false;
+            try{
+                 //get workspaces
+                 NodeList nList = doc.getElementsByTagName("Workspace");
+                 Boolean active = false;
+                 for(int i=0;i<nList.getLength();i++){
+                      Element element = (Element)nList.item(i); 
+                      String status = element.getAttribute("active");
+                      active = Boolean.parseBoolean(status);
+                      if(active){
+                          String path = element.getAttribute("path");
+                          StaticData.workspace = path;
+                          return true;
+                      }
+                 }
+                 StaticData.workspace = "";
+                 any_true = false;
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, e.toString(), "Read XML Configuration Status Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            return any_true;
+        }
+        public void readWorkspaces(){
+            
+            File config_XmlFile = new File(PropertyFile.configuration_file_path);
 		
-		NodeList nList = doc.getElementsByTagName("Config");
-		StaticData.paths = new String[nList.getLength()];
-			for(int i=0;i<nList.getLength();i++){
-				Node node = nList.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) node;
-					Boolean status = Boolean.parseBoolean(eElement.getAttribute("active"));
-					NodeList childList = eElement.getElementsByTagName("Root");
-					Element rootElement = (Element)childList.item(0);
-					if(status){
-						
-						StaticData.rootPathName = rootElement.getAttribute("filepath");
-						
-						NodeList folderList = rootElement.getElementsByTagName("Folder");
-						StaticData.fileNames = new String [folderList.getLength()];
-						for(int j=0;j<folderList.getLength();j++){
-							Element element = (Element)folderList.item(j);
-							StaticData.fileNames[j] = element.getAttribute("name");
-						}
-						StaticData.paths[i] = rootElement.getAttribute("filepath") + "*";
-					}else{
-						StaticData.paths[i] = rootElement.getAttribute("filepath");
-					}
-					
-				}
-			}
-		}catch(Exception e){
-			
-		}
-	        
-	}
+		try{
+                    dbFactory = DocumentBuilderFactory.newInstance();
+                    dBuilder = dbFactory.newDocumentBuilder();
+                    doc = dBuilder.parse(config_XmlFile);
+                    //get workspaces
+                    NodeList nList = doc.getElementsByTagName("Workspace");
+                    Boolean active = false;
+                    for(int i=0;i<nList.getLength();i++){
+                       Element element = (Element)nList.item(i); 
+                       String path = element.getAttribute("path");
+                       StaticData.paths.add(path);
+                    }   
+                }catch(SAXException e){
+                    
+                }catch(ParserConfigurationException e){
+                    
+                }catch(IOException e){
+                    
+                }
+               
+        }
 }
