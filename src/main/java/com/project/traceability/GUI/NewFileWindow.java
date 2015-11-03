@@ -195,6 +195,7 @@ public class NewFileWindow {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+                             
 				for (int j = 0; j < selectedFiles.length; j++) {
 					TreeItem treeItem = new TreeItem(
 							HomeGUI.trtmNewTreeitem, SWT.NONE);
@@ -209,27 +210,9 @@ public class NewFileWindow {
 				if(selectedFiles.length == 3)
 					HomeGUI.hasThreeFiles = true;
                                 
-                                
+                               
 				openFiles();
-//                                if(HomeGUI.isSelectionForUMLFile){
-//                                    //check the formats exists or not 
-//                                   // ProgressBarCustom progressBarCustom = new ProgressBarCustom();
-//                                    //progressBarCustom.create();
-//                                   WriteToXML xmlWriter = new WriteToXML();
-//                                    XMLReader xmlReader = new XMLReader();
-//                                    if(StaticData.umlFilePath.contains(".xmi")||
-//                                       StaticData.umlFilePath.contains(".uml")){
-//                                      xmlReader.readUMLXMI();
- //                                    xmlWriter.createXML();
-//                                    }else if(StaticData.umlFilePath.contains(".mdj")){
-//                                        
-//                                     //   progressBarCustom.updateProgressBar();
-//                                        JSONReader reader = new JSONReader();
-//                                        reader.readJson();
-//                                        xmlWriter.createXML();
-//                                    }
-//                                
-//                               }
+
                                
 			}
                         
