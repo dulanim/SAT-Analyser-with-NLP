@@ -11,13 +11,13 @@ import java.util.ArrayList;
  *
  * @author S. Shobiga
  */
-public class storingArtefacts {
+public class StoringArtefacts {
     private String className;
     private ArrayList attributes;
     private ArrayList methods;
     private ArrayList relationships;
     
-    storingArtefacts(){
+    StoringArtefacts(){
         
     }
     
