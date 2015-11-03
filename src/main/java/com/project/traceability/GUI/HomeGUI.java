@@ -49,7 +49,10 @@ import com.project.traceability.visualization.GraphDB.RelTypes;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.io.FileNotFoundException;
 import java.util.Set;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.swt.graphics.Image;
@@ -59,7 +62,7 @@ import scala.collection.immutable.HashSet;
 /**
  * Main Home Window of the tool
  */
-public class HomeGUI {
+public class HomeGUI extends JFrame{
 
 	public static Dimension screen = java.awt.Toolkit.getDefaultToolkit()
 			.getScreenSize();
@@ -69,10 +72,11 @@ public class HomeGUI {
 	public static CTabFolder graphTab;
 	public static CTabFolder newTab;
 	public static Tree tree;
+        public JTree jTree;
 	public static Composite composite;
 	public static Composite graphComposite;
 	public static Composite projComposite;
-       
+        public static Display display;
 
 	public static boolean isComaparing = false;
 	public static boolean isSelectionForUMLFile = false;
@@ -128,6 +132,7 @@ public class HomeGUI {
 	}
 
 	public void eventLoop(Display display) {
+                this.display = display;
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -238,7 +243,10 @@ public class HomeGUI {
 
 		tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
         | SWT.H_SCROLL);				//tree for all projects
-                tree.setToolTipText("");
+                
+                
+                //new FileHiearchyView();
+                tree.setToolTipText(StaticData.workspace);
 		
 		tbtmProjects.setControl(projComposite);
 
@@ -430,6 +438,8 @@ public class HomeGUI {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//referesh functionality
+                            shell.dispose();
+                            HomeGUI.main(null);
 			}
 		});
 		mntmRefresh.setText("Refresh");
@@ -873,10 +883,12 @@ public class HomeGUI {
 //                        rootNewTreeitem.set
                         if(tag.equals("Initial State")){
                              rootNewTreeitem = new TreeItem(tree, SWT.NONE);
+                             rootNewTreeitem.setImage(new Image(display, FilePropertyName.IMAGE_PATH.concat("folder.gif")));
                         }else{
                             rootNewTreeitem = new TreeItem(ProjectCreateWindow.trtmNewTreeitem,SWT.NONE);
                         }
                         rootNewTreeitem.setText(name);
+                       
                         File temp_file = new File(path + File.separator+name);//name:Anduril
                         ArrayList<String> internal_folders = new ArrayList<String>(
                             Arrays.asList(temp_file.list()));//Anduril's file / folder list
@@ -889,16 +901,21 @@ public class HomeGUI {
                             if(tempInternalFolder.isDirectory()){
                                 TreeItem trtmNewTreeitem = new TreeItem(rootNewTreeitem, SWT.NONE);
                                 trtmNewTreeitem.setText(tempInternalFolderName);
-                               
+                                trtmNewTreeitem.setImage(new Image(display,
+                                            FilePropertyName.IMAGE_PATH.concat("folder.gif")));
+                                
                                 ArrayList<String> internal_files = new ArrayList<String>(
                                 Arrays.asList(tempInternalFolder.list()));
                                 for(String tempFileName:internal_files){
                                     TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
                                     fileTreeItem.setText(tempFileName);
+                                    fileTreeItem.setImage(new Image(display,
+                                            FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
                                 }
                             }else{
                                 TreeItem fileTreeItem = new TreeItem(rootNewTreeitem, SWT.NONE);
                                 fileTreeItem.setText(tempInternalFolderName);
+                                fileTreeItem.setImage(new Image(display,FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
                             }
                         }
                         
