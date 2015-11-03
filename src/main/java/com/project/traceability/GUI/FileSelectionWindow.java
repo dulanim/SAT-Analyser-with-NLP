@@ -3,6 +3,8 @@
  */
 package com.project.traceability.GUI;
 
+import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.staticdata.StaticData;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,14 +75,14 @@ public class FileSelectionWindow {
 	protected void createContents(final String project) {
 		shell = new Shell();
 		shell.setSize(449, 299);
-		shell.setText("File Selection");
+		shell.setText("Artifacts Selection");
 		center(shell);
 		Label lblSelectTwoFiles = new Label(shell, SWT.NONE);
 		FormData fd_lblSelectTwoFiles = new FormData();
 		fd_lblSelectTwoFiles.left = new FormAttachment(0, 10);
 		fd_lblSelectTwoFiles.right = new FormAttachment(0, 177);
 		lblSelectTwoFiles.setLayoutData(fd_lblSelectTwoFiles);
-		lblSelectTwoFiles.setText("Select two files");
+		lblSelectTwoFiles.setText("Select two Artifact");
 
 		composite = new Composite(shell, SWT.NONE);
 
@@ -110,37 +112,83 @@ public class FileSelectionWindow {
 					.addContainerGap(27, Short.MAX_VALUE))
 		);
 		composite.setLayout(gl_composite);
-
-		File projectFile = new File(PropertyFile.filePath);
+                /*
+                we show only artifact not name of file related artifact
+                
+                */
+               
+		File projectFile = new File(StaticData.workspace);
 		ArrayList<String> projectFiles = new ArrayList<String>(
 				Arrays.asList(projectFile.list()));
 		final Set<String> selectedFilesSet = new HashSet<String>();
 		for (int i = 0; i < projectFiles.size(); i++) {
 			if (projectFiles.get(i).equals(project)) {
-				File file = new File(PropertyFile.filePath + project + "/");
-				ArrayList<String> files = new ArrayList<String>(
-						Arrays.asList(file.list()));
-				files.remove("Relations.xml");
+				final File uml_file = new File(PropertyFile.filePath + project + File.separator +
+                                        FilePropertyName.XML+File.separator + FilePropertyName.UML_ARTIFACT_NAME);
+				final File docs_file = new File(PropertyFile.filePath + project + File.separator +
+                                        FilePropertyName.XML+File.separator + FilePropertyName.REQUIREMENT_ARTIFACT_NAME);
+                                final File src_file = new File(PropertyFile.filePath + project + File.separator +
+                                        FilePropertyName.XML+File.separator + FilePropertyName.SOURCE_ARTIFACT_NAME);
+                                
+//                               ArrayList<String> files = new ArrayList<String>(
+//						Arrays.asList(file.list()));
+//				files.remove("Relations.xml");
 				int count = 0;
-				for (int j = 0; j < files.size(); j++) {
-					if(files.get(j).contains(".xml")) {
+				for (int j = 0; j < 3; j++) {
+					if(uml_file.getPath().contains(".xml") && j==0) {
 						final Button btnCheckButton = new Button(composite,
 								SWT.CHECK);
-						btnCheckButton.setText(files.get(j));
+						btnCheckButton.setText("Requirement Artifact");
 						btnCheckButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent e) {
 								if (btnCheckButton.getSelection()) {
-									selectedFilesSet.add(btnCheckButton.getText());
-								} else if (!btnCheckButton.getSelection()) {
-									selectedFilesSet.remove(btnCheckButton.getText());
+									selectedFilesSet.add(FilePropertyName.REQUIREMENT_ARTIFACT_NAME);
+                                                                        PropertyFile.requirementXMLPath = docs_file.getPath();
+								}else if (!btnCheckButton.getSelection()) {
+									selectedFilesSet.remove(FilePropertyName.REQUIREMENT_ARTIFACT_NAME);
 								}
 							}
 						});
 						btnCheckButton.setBounds(30, (j + 2 - count) * 20, 400,
-								(j + 1 - count) * 20);
-					} else
+								(j + 1 - count) * 30);
+					}else if(uml_file.getPath().contains(".xml") && j==1) {
+						final Button btnCheckButton = new Button(composite,
+								SWT.CHECK);
+						btnCheckButton.setText("UML Artifact");
+						btnCheckButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent e) {
+								if (btnCheckButton.getSelection()) {
+                                                                    PropertyFile.umlXMLPath = uml_file.getPath();
+                                                                    selectedFilesSet.add(FilePropertyName.UML_ARTIFACT_NAME);
+								} else if (!btnCheckButton.getSelection()) {
+									selectedFilesSet.remove(FilePropertyName.UML_ARTIFACT_NAME);
+								}
+							}
+						});
+						btnCheckButton.setBounds(30, (j + 2 - count) * 20, 400,
+								(j + 1 - count) * 30);
+					}else if(uml_file.getPath().contains(".xml") && j==2) {
+						final Button btnCheckButton = new Button(composite,
+								SWT.CHECK);
+						btnCheckButton.setText("Source Code Artifact");
+						btnCheckButton.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent e) {
+								if (btnCheckButton.getSelection()) {
+                                                                    PropertyFile.sourceXMLPath = src_file.getPath();
+                                                                    selectedFilesSet.add(FilePropertyName.SOURCE_ARTIFACT_NAME);
+								} else if (!btnCheckButton.getSelection()) {
+									selectedFilesSet.remove(FilePropertyName.SOURCE_ARTIFACT_NAME);
+								}
+							}
+						});
+						btnCheckButton.setBounds(30, (j + 2 - count) * 20, 400,
+								(j + 1 - count) * 30);
+					}else{
 						count++;
+                                        }
 				}
 			}
 		}
