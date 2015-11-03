@@ -8,6 +8,7 @@ package com.project.NLP.UMLToXML.xmlwriter;
  *
  * @author shiyam
  */
+import com.project.NLP.staticdata.FilePropertyName;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -45,15 +46,15 @@ public class WriteToXML {
 
      try {
           
-				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 		
 				// root elements
-				Document doc = docBuilder.newDocument();
-				Element rootElement = doc.createElement(StaticData.ARTEFACTS_ROOT);
-		        Element artifact = doc.createElement(StaticData.ARTEFACT_ROOT);
-				doc.appendChild(rootElement);
-		        rootElement.appendChild(artifact);
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement(StaticData.ARTEFACTS_ROOT);
+		Element artifact = doc.createElement(StaticData.ARTEFACT_ROOT);
+		doc.appendChild(rootElement);
+		rootElement.appendChild(artifact);
                 
                 Attr attrType = doc.createAttribute("type");
                 attrType.setValue("UMLDiagram");
@@ -106,28 +107,22 @@ public class WriteToXML {
 		// write the content into xml file
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
 		DOMSource source = new DOMSource(doc);
                 //String driveLetter = getSuitableDrive();
                 
-                File f = new File(HomeGUI.projectPath + File.separator +
-                        "umlXML");
+                File f = new File(HomeGUI.projectPath + File.separator 
+                        +FilePropertyName.UML);
                 if(!f.exists())
                     f.mkdir();
-                String fileName = f.getPath() + File.separator + "UMLArtifacts.xml";
+                String fileName = f.getPath() + File.separator + FilePropertyName.UML_ARTIFACT_NAME;
                 File xmlFile = new File(fileName);
                 StreamResult result = new StreamResult(xmlFile.getPath());
 
                 transformer.transform(source, result);
 
                 System.out.println("File saved into " + f.getPath());
-               
-
-                
-                 
-
-		
 
 	  } catch (ParserConfigurationException pce) {
 		pce.printStackTrace();

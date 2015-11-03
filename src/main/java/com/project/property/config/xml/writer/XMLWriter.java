@@ -1,7 +1,10 @@
-package com.project.property.xml.writer;
+package com.project.property.config.xml.writer;
 
 
+import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.common.PropertyFile;
 import java.io.File;
+import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,83 +21,126 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import java.util.Date;
 public class XMLWriter {
-	String filepath = "C:\\Users\\shiyam\\sat_config.xml";
+	String filepath = PropertyFile.configuration_file_path;//PropertyFile.filePath + File.separator + "sat_config.xml";
 	DocumentBuilderFactory docFactory;
 	DocumentBuilder docBuilder;
 	Document doc;
-	public XMLWriter(){
-		
+	public XMLWriter() {
+		PropertyFile.configuration_file_path = filepath;//assign configuration file path it is in home directory
 		try{
 			File file = new File(filepath);
 			if(!file.exists())
 				{
 					file.createNewFile();
-					docFactory = DocumentBuilderFactory.newInstance();
+                                        docFactory = DocumentBuilderFactory.newInstance();
 					docBuilder = docFactory.newDocumentBuilder();
-					doc = docBuilder.parse(filepath);
-					create_root();
-				}
-			docFactory = DocumentBuilderFactory.newInstance();
-			docBuilder = docFactory.newDocumentBuilder();
-			doc = docBuilder.parse(filepath);
-		}catch(Exception e){
-			
-		}
+					doc = docBuilder.newDocument();
+                                        create_root();
+					
+                                }
+                        docFactory = DocumentBuilderFactory.newInstance();
+                        docBuilder = docFactory.newDocumentBuilder();
+                        doc = docBuilder.parse(filepath);
+                                
+		}catch(IOException e){
+			e.printStackTrace();
+		}catch(SAXException e){
+                        e.printStackTrace();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
 		
 	}
 	private void create_root(){
 		
-		FileWriter reader = new F
+		//FileWriter reader = new F
+                Element root_element_configs = doc.createElement("Configs");
+                doc.appendChild(root_element_configs);
+                Element wrkspacesElmnt = doc.createElement("Workspaces");
+                root_element_configs.appendChild(wrkspacesElmnt);
 		call_done();
+                createDefaultNode();//adding default to configs node
 	}
 	public void modifyStatus(Boolean active,String path){
 		//switch project path
 		try {
-			NodeList nList = doc.getElementsByTagName("Config");
+			NodeList nList = doc.getElementsByTagName("Workspace");
 			for(int i=0;i<nList.getLength();i++){
 				Element element = (Element)nList.item(i);
-				NodeList rootList = element.getElementsByTagName("Root");
-				
-				for(int j=0;j<rootList.getLength();j++){
-					String tempPath = ((Element)rootList.item(0)).getAttribute("filepath");
-					if(tempPath.equals(path)){
-						// update  attribute
-						NamedNodeMap attr = element.getAttributes();
-						Node nodeAttr = attr.getNamedItem("active");
-						nodeAttr.setTextContent(Boolean.toString(active));
-						call_done();
-						return ;
-					}
-				}
-				
-			}
-			
-			
+				String workspace_path = element.getAttribute("path");
+                               
+                                if(workspace_path.equals(path)){
+				// update  attribute
+                                    NamedNodeMap attr = element.getAttributes();
+                                    Node nodeAttr = attr.getNamedItem("active");
+                                    nodeAttr.setTextContent(Boolean.toString(active));
+                                    call_done();
+                                    
+				}else{
+                                    NamedNodeMap attr = element.getAttributes();
+                                    Node nodeAttr = attr.getNamedItem("active");
+                                    nodeAttr.setTextContent(Boolean.toString(false));
+                                    call_done();
+                                }
+			}	
 		}catch(Exception e){
 			
 		}
 	}
-	public void createMainNode(String path){
+        
+        public void createDefaultNode(){
+            //adding default config node
+            Node root = doc.getElementsByTagName("Configs").item(0);
+            Element config = doc.createElement("Config");
+
+            Attr NameAttr = doc.createAttribute("active");
+            NameAttr.setValue("");
+            config.setAttributeNode(NameAttr);
+
+            NameAttr = doc.createAttribute("default");
+            NameAttr.setValue("");
+            config.setAttributeNode(NameAttr);
+           
+            root.appendChild(config);
+        
+            call_done();
+        }
+        public Boolean readDefaultNode(){
+            //get status
+            NodeList nList = doc.getElementsByTagName("Config");
+            Boolean active = false;
+            for(int i=0;i<nList.getLength();i++){
+               Element element = (Element)nList.item(i); 
+               String tempactive = element.getAttribute("active");
+               active = Boolean.parseBoolean(tempactive);
+               StaticData.workspace = element.getAttribute("default");
+            }       
+            return active;
+        }
+	public void createWorkspaceNode(String path,String active){
 		//create main project path
-		Node root = doc.getElementsByTagName("Configs").item(0);
-		Element config = doc.createElement("Config");
-		
-		Attr NameAttr = doc.createAttribute("active");
-        NameAttr.setValue("true");
-        config.setAttributeNode(NameAttr);
+	Node root = doc.getElementsByTagName("Configs").item(0);
+	
         
-        Element rootElmnt = doc.createElement("Root");
+        Node wrkspacesNode = doc.getElementsByTagName("Workspaces").item(0);
+        
+        Element wrkspaceElmnt = doc.createElement("Workspace");
         Attr Attr = doc.createAttribute("path");
-        Attr.setValue("");
-        rootElmnt.setAttributeNode(Attr);
+        Attr.setValue(path);
+        wrkspaceElmnt.setAttributeNode(Attr);
         
-        Element foldersElmnt = doc.createElement("Folders");
+        Attr = doc.createAttribute("createTime");
+        Attr.setValue(new Date().toString());//add date time optional field
+        wrkspaceElmnt.setAttributeNode(Attr);
         
+        Attr = doc.createAttribute("active");
+        Attr.setValue(active);
+        wrkspaceElmnt.setAttributeNode(Attr);
         
-        config.appendChild(rootElmnt);
-        rootElmnt.appendChild(foldersElmnt);
-        root.appendChild(config);
+        wrkspacesNode.appendChild(wrkspaceElmnt);
         
         call_done();
 	}
@@ -129,6 +175,7 @@ public class XMLWriter {
 			
 		}
 	}
+       
 	public void createSubFolderName(String path,String folderName){
 		
 		//when project adding to specific path or a folder adding into path
@@ -141,28 +188,28 @@ public class XMLWriter {
 				for(int j=0;j<rootList.getLength();j++){
 					Element root = ((Element)rootList.item(j));
 					Element parent = (Element)root.getElementsByTagName("Folders").item(0);
-					String tempPath = root.getAttribute("filepath");
+					String tempPath = root.getAttribute("path");
 					if(tempPath.equals(path)){
 						
 						// append a new node to Root
-						Element folder = doc.createElement("Folder");
+                                            Element folder = doc.createElement("Folder");
 					
-	                    Attr NameAttr = doc.createAttribute("name");
-	                    NameAttr.setValue(folderName);
-	                    folder.setAttributeNode(NameAttr);
+                                            Attr NameAttr = doc.createAttribute("name");
+                                            NameAttr.setValue(folderName);
+                                            folder.setAttributeNode(NameAttr);
 	                    
-	                    Attr createTimeAttr = doc.createAttribute("createTime");
-	                    createTimeAttr.setValue("");
-	                    folder.setAttributeNode(createTimeAttr);
+                                            Attr createTimeAttr = doc.createAttribute("createTime");
+                                            createTimeAttr.setValue("");
+                                            folder.setAttributeNode(createTimeAttr);
 	                    
-	                    Attr modifedTimeAttr = doc.createAttribute("modifiedTime");
-	                    modifedTimeAttr.setValue("");
-	                    folder.setAttributeNode(modifedTimeAttr);	
+                                            Attr modifedTimeAttr = doc.createAttribute("modifiedTime");
+                                            modifedTimeAttr.setValue("");
+                                            folder.setAttributeNode(modifedTimeAttr);	
 	                    
-	                    parent.appendChild(folder);
+                                            parent.appendChild(folder);
 
-	                    call_done();
-	                    return ;
+                                            call_done();
+                                            return ;
 					}
 				}
 				
@@ -177,24 +224,24 @@ public class XMLWriter {
 	public void call_done(){
 		try{
 			
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
+		// write the content into xml file
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
 	        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
 	        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
-			DOMSource source = new DOMSource(doc);
+                DOMSource source = new DOMSource(doc);
 	         //String driveLetter = getSuitableDrive();
 	                
-	                File f = new File(filepath);
-	                StreamResult result = new StreamResult(f.getPath());
-	                transformer.transform(source, result);
-	                System.out.println("File saved into " + f.getPath());
+	        File f = new File(filepath);
+	        StreamResult result = new StreamResult(f.getPath());
+	        transformer.transform(source, result);
+	        System.out.println("File saved into " + f.getPath());
 		
-				System.out.println("Done");
+                System.out.println("Done");
 		}catch (TransformerException tfe) {
 			tfe.printStackTrace();
-		 }catch(Exception e){
+		}catch(Exception e){
 			 
-		 }
+		}
 	}
 }
