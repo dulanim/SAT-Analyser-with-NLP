@@ -50,6 +50,7 @@ import com.project.traceability.manager.UMLSourceClassManager;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.utils.Constants.ImageType;
+import java.io.File;
 
 public class CompareWindow {
 
@@ -98,7 +99,7 @@ public class CompareWindow {
 
 		display = Display.getDefault();
 		createContents(selectedFiles);
-		ReadFiles.readFiles(PropertyFile.filePath + project + "\\");
+		ReadFiles.readFiles(PropertyFile.filePath + project);
 		compareFiles(project, selectedFiles);
 		return shell;
 	}
@@ -434,7 +435,7 @@ public class CompareWindow {
 	 * @param selectedFiles
 	 */
 	private void compareFiles(String project, ArrayList<String> selectedFiles) {
-		String filePath = PropertyFile.filePath + project + "\\";
+		String filePath = PropertyFile.filePath + project;
 		HomeGUI.isComaparing = true;
 		// ReadFiles.readFiles(filePath);
 		if (selectedFiles.get(0).contains("UML")
