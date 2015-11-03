@@ -8,7 +8,7 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xms1024m -classpath %classpath ${packageClassName}</exec.args>
+                <exec.args>-Xms1024m -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

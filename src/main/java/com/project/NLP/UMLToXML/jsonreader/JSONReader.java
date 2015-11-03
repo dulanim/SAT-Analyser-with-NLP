@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -250,13 +251,26 @@ public class JSONReader {
 		
 		                        
 				} catch (FileNotFoundException ex) {
-					ex.printStackTrace();
+                                    ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
+					
 				} catch (IOException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				} catch (ParseException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				} catch (NullPointerException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				}
                 
                 for(int i=0;i<StaticData.classLst.size();i++){
