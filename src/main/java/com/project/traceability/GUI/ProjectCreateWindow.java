@@ -26,6 +26,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.project.NLP.staticdata.StaticData;
 import com.project.property.config.xml.writer.XMLWriter;
+import static com.project.traceability.GUI.HomeGUI.display;
 import static com.project.traceability.GUI.HomeGUI.tree;
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
 import static com.project.traceability.GUI.NewProjectWindow.shell;
@@ -35,6 +36,7 @@ import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
 import javax.swing.JOptionPane;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Monitor;
@@ -227,9 +229,9 @@ public class ProjectCreateWindow {
                                 HomeGUI.newTab.setVisible(true);
                                 HomeGUI.tree.setVisible(true);
 
-                               trtmNewTreeitem = new TreeItem(tree, SWT.NONE);
-                               trtmNewTreeitem.setText(projectName);
-
+                                trtmNewTreeitem = new TreeItem(tree, SWT.NONE);
+                                trtmNewTreeitem.setText(projectName);
+                                trtmNewTreeitem.setImage(new Image(display, FilePropertyName.IMAGE_PATH.concat("folder.gif")));
                                 File file = new File(projectPath);
                                 file.mkdir();
                                 FilePropertyName.addSubFolderIntoProject(file);
