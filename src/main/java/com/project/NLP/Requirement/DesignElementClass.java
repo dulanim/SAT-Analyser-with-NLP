@@ -28,15 +28,28 @@ public class DesignElementClass {
      */
     private void setDesignElementsList() {
         designElements.add("company");
+        designElements.add("companies");
         designElements.add("application");
+        designElements.add("applications");
         designElements.add("computer");
+        designElements.add("computers");
         designElements.add("data");
+        designElements.add("datas");
         designElements.add("detail");
+        designElements.add("details");        
         designElements.add("information");
+        designElements.add("informations");
         designElements.add("organization");
+        designElements.add("organizations");
         designElements.add("record");
+        designElements.add("records");
         designElements.add("system");
+        designElements.add("systems");
         designElements.add("user");
+        designElements.add("users");
+        designElements.add("type");
+        designElements.add("types");
+        
 
     }
 
