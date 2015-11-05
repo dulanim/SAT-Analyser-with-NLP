@@ -64,8 +64,8 @@ public class ClassIdentification {
     /*find the noun phrases in the sentence*/
 
     public ArrayList nounPharseIdentification(String phrase) {
-        //ArrayList verb = np.getIdentifiedPhrases(phrase);
-        ArrayList verb = np.getClass("");
+        ArrayList verb = np.getIdentifiedPhrases(phrase);
+        //ArrayList verb = np.getClass("");
         return verb;
     }
 
@@ -170,7 +170,7 @@ public class ClassIdentification {
      but the PRP is stored already in class list. so store the NN as attributeFromClass
      */
     private void checkPRP(PhrasesIdentification PI) {
-        ArrayList innerPhraseList = PI.getIdentifiedPhrases("NP");
+        ArrayList innerPhraseList = PI.getIdentifiedPhrases1("NP");
         //ArrayList 
 
         ArrayList nn;
