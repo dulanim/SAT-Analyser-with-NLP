@@ -6,52 +6,68 @@
 package com.project.NLP.Requirement;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  *
  * @author S. Shobiga
  */
 public class StoringArtefacts {
-    private String className;
-    private ArrayList attributes;
-    private ArrayList methods;
-    private ArrayList relationships;
+    private HashSet className;
+    private HashSet attributes;
+    private HashSet methods;
+    private HashSet relationships;
     
     StoringArtefacts(){
         
     }
     
-    public void setClassName(){
+    public void setClassName(HashSet clName){
+        className = clName;
+        //removeRedundant(clName);
         
     }
-    public void setAttributess(){
+    public void setAttributess(HashSet attr){
+        attributes= attr;
         
     }
-    public void setMethods(){
-        
+    public void setMethods(HashSet met){
+        methods = met;
     }
-    public void setRelationships(){
+    public void setRelationships(HashSet rel){
+        relationships = rel;
         
     }
     
-    public String getClassName(){
-        return "";
+    public HashSet getClassName(){
+        return className;
     }
     
-    public ArrayList getAttributes(){
+    public HashSet getAttributes(){
 
         return attributes;
     }
     
-    public ArrayList getMethods(){
+    public HashSet getMethods(){
 
         return methods;
     }
     
-    public ArrayList getRelationships(){
+    public HashSet getRelationships(){
 
         return relationships;
     }
     
-    
+/*    private void removeRedundant(HashSet setItems){
+        Iterator iterator = setItems.iterator();
+        while(iterator.hasNext()){
+            if(className.isEmpty()){
+                className.add(iterator.next());
+            }
+            
+        }
+        
+    }
+*/   
 }
