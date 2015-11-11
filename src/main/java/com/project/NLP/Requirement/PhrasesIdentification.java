@@ -9,6 +9,7 @@ package com.project.NLP.Requirement;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.WordStemmer;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class PhrasesIdentification {
     private ArrayList nounList;
     private ArrayList adjClassList;
     private ArrayList adjAttributeList;
+    private WordStemmer wordStemmer=new WordStemmer();
     
     static StanfordCoreNLPModified stanford;
 
@@ -63,11 +65,15 @@ public class PhrasesIdentification {
         attributeLists = new ArrayList();
         int VBGExist =0;
         String vbg;
+        int adjectiveExist =0;
+        int adjectiveNoun =0;
+        String adj="";
+        
         List<Tree> leaves;
         String phraseNotation = "NP([<NNS|NN]$VP)";//@" + phrase + "! << @" + phrase;
 
         for (Tree child : tree) {
-
+            wordStemmer.visitTree(child);
             TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
             TregexMatcher matcher = VBpattern.matcher((Tree) child);
 
@@ -83,8 +89,32 @@ public class PhrasesIdentification {
                     for (Tree inChild : innerChild) {
                         System.out.println("\n--innerChild  " + inChild + "-------\n");
 
-                        
-                        
+                         if(inChild.value().equals("JJ") ){
+                            adjectiveExist++;
+                            leaves=inChild.getLeaves();
+                            System.out.println("LLLLLLLLEaves:"+leaves.size()+" "+leaves.get(0)+"  ..."+leaves);
+                            adj = leaves.get(0).yieldWords().get(0).word();
+                        }
+                        if(adjectiveExist ==1){
+                            if(inChild.value().equals("NN")){
+                                leaves=inChild.getLeaves();
+                                adjectiveNoun++;
+                                String cl ="";
+                                if(adjectiveNoun ==1){
+                                    cl = leaves.get(0).yieldWords().get(0).word();
+                                    System.out.println("added...."+cl);
+                                    nounList.add(adj + " "+cl);
+                                }
+                                if(adjectiveNoun>1){
+                                    nounList.remove(cl);
+                                    cl+=" "+leaves.get(0).yieldWords().get(0).word();
+                                    nounList.add(cl);
+                                    System.out.println("added and removed ."+cl);
+                                }
+                            }
+                        }
+
+                        else{
                         if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
@@ -99,7 +129,7 @@ public class PhrasesIdentification {
                             }
                             count++;
                         }
-                        
+                        }
                     
                     }
                 } else {
@@ -120,13 +150,13 @@ public class PhrasesIdentification {
             }
 
         }
-        ArrayList clList = getAdjectiveClass();
+        /*ArrayList clList = getAdjectiveClass();
         if(!clList.isEmpty()){
             for(int i=0;i<clList.size();i++){
                 nounList.add(clList.get(i));
             }
         }
-        
+        */
         System.out.println("NOUN LIST :"+nounList);
         return nounList;
 
@@ -142,7 +172,7 @@ public class PhrasesIdentification {
         String phraseNotation = "NP[<NNS|NN]!$VP";// !<VBG";//@" + phrase + "! << @" + phrase;
 
         for (Tree child : tree) {
-
+            wordStemmer.visitTree(child);
             TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
             TregexMatcher matcher = VBpattern.matcher((Tree) child);
 
@@ -229,14 +259,14 @@ public class PhrasesIdentification {
             }
 
         }
-       /* ArrayList adjAtt = getAdjectiveAttribute();
+        ArrayList adjAtt = getAdjectiveAttribute();
         
         if(!adjAtt.isEmpty()){
             for(int i=0;i<adjAtt.size();i++){
                 attributeLists.add(adjAtt.get(i));
             }
         }
-        */
+        
         System.out.println("Attribute LIST :"+attributeLists);
         return attributeLists;
 
@@ -257,7 +287,7 @@ public class PhrasesIdentification {
         String phraseNotation = "NP[<NNS|NN]!$VP";//@" + phrase + "! << @" + phrase;
 
         for (Tree child : tree) {
-
+            wordStemmer.visitTree(child);
             TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
             TregexMatcher matcher = VBpattern.matcher((Tree) child);
 
@@ -342,7 +372,7 @@ public class PhrasesIdentification {
         String phraseNotation = "NP[<NNS|NN]!$VP";//@" + phrase + "! << @" + phrase;
 
         for (Tree child : tree) {
-
+            wordStemmer.visitTree(child);
             TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
             TregexMatcher matcher = VBpattern.matcher((Tree) child);
 
