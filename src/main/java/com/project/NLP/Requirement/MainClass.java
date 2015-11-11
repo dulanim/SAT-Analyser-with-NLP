@@ -82,6 +82,8 @@ public class MainClass {
         HashSet attrList = new HashSet();
         StringBuffer sbf = new StringBuffer();
         StringBuffer sb = new StringBuffer();
+        StoringArtefacts storingArtefacts;
+        ArrayList artefacts = new ArrayList(); // to store the overall artefacts
 
         BufferedWriter bwr;
         try {
@@ -102,6 +104,13 @@ public class MainClass {
                     attrList = attr.getAttributes();
                     System.out.println("ATTRIBUTE LIST: " + attrList);
 
+                    /*calling storingArtefacts class
+                     store the results inorder to find the class- attri - metho -relation */
+                    storingArtefacts = new StoringArtefacts();
+                    storingArtefacts.setClassName(classList);
+                    storingArtefacts.setAttributess(attrList);
+                    artefacts.add(storingArtefacts);
+
                     sb = writeToStringBuffer(classList, attrList, sbf);
 
                 }
@@ -113,6 +122,13 @@ public class MainClass {
 
             //close the stream
             bwr.close();
+
+            System.out.println("=================");
+            for (int i = 0; i < artefacts.size(); i++) {
+                System.out.println(((StoringArtefacts) (artefacts.get(i))).getClassName());
+            }
+
+            //removeReduntantArtefacts(artefacts);
 
         } catch (Exception e) {
 
@@ -204,6 +220,55 @@ public class MainClass {
             }
         }
         return l;
+    }
+
+    /*remove reduntant artefacts*/
+    private static void removeReduntantArtefacts(ArrayList artefacts) {
+        HashSet clName = new HashSet();
+        HashSet temp = new HashSet();
+        HashSet attr = new HashSet();
+        
+        for (int i = 0; i < artefacts.size(); i++) {
+            
+            HashSet cl = ((StoringArtefacts) artefacts.get(i)).getClassName();
+            HashSet at = ((StoringArtefacts) artefacts.get(i)).getAttributes();
+            //System.out.println(tempStoringArtefactsObject.getClassName());
+            Iterator ite1 = cl.iterator();
+            while (ite1.hasNext()) {
+                String s = ite1.next().toString();
+                if (clName.isEmpty()) {
+                    clName.add(s);
+                } else {
+                    Iterator ite2 = clName.iterator();
+                    while (ite2.hasNext()) {
+                        String ss = ite2.next().toString();
+                        if (s.equalsIgnoreCase(ss)) {
+                            //System.out.println("s :" + s + " ss: " + ss + " foun- not added");
+                            newStoringArtefactsObject(s,at);
+                            System.out.println("Attribute for s:"+at );
+                        } else {
+                            temp.add(s);
+                        }
+                    }
+                }
+            }
+        }
+
+        Iterator ite = temp.iterator();
+        while(ite.hasNext()){
+            clName.add(ite.next());
+                    
+        }
+        System.out.println("Final classes: " + clName);
+
+    }
+    
+    
+    private void newStoringArtefactsObject(String cl, HashSet attr){
+        StoringArtefacts storeArt = new StoringArtefacts();
+        storeArt.addClassName(cl);
+        storeArt.addAttributess(attr);
+        
     }
 
     /*
