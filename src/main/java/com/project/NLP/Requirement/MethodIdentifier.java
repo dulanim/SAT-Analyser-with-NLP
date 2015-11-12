@@ -12,6 +12,7 @@ import edu.stanford.nlp.trees.WordStemmer;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 /**
@@ -23,7 +24,10 @@ import java.util.ArrayList;
 public class MethodIdentifier {
     ArrayList tree;
     String document;
-    private ArrayList commonVerbs=new ArrayList();
+    Tree[] treeAn;
+    HashSet classList;
+    //private ArrayList commonVerbs=new ArrayList();
+    private HashSet commonVerbs =new HashSet();
     WordStemmer wordStemmer=new WordStemmer();
     
     public MethodIdentifier(){
@@ -38,6 +42,13 @@ public class MethodIdentifier {
     public MethodIdentifier(String document){
         this.document=document;
         createCommonVerbs();
+    }
+    
+    public MethodIdentifier(Tree[] tree,HashSet classList){
+        this.classList=classList;
+        this.treeAn =tree;
+        createCommonVerbs();
+        
     }
     
     void createCommonVerbs(){
@@ -97,6 +108,34 @@ public class MethodIdentifier {
         System.out.print("\n---VPList----"+vpList+"----\n");
         return vpList;    
      }
+     
+     HashSet identifyCandidateMethods(Tree[] tree){
+        
+        String phraseNotation = "VB|VBN>VP";//@VB>VP" ; //& VBN >VP";//"VP<(VB $++NP)";//"VP:VB";//"@"+"VP"+"! << @"+"VP";
+        HashSet vpList=new HashSet();
+        for (Tree childTree : tree) {
+                    System.out.print("\n---tree_sen----"+childTree+"----\n");
+            /* Stemming the sentence */        
+            wordStemmer.visitTree(childTree);
+            TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
+            TregexMatcher matcher = VBpattern.matcher((Tree) childTree);
+            while (matcher.findNextMatchingNode()) {
+                Tree match = matcher.getMatch();
+                String verb=Sentence.listToString(match.yield());
+                
+                /* Filter to unique verbs  */
+                //List<String> newList = new ArrayList<String>(new HashSet<String>(oldList));
+                //if(!vpList.contains(verb)){
+                    vpList.add(verb);
+                //}
+                System.out.print("\n---phrase match----"+match+"----\n");
+                
+            }
+        }
+        vpList.removeAll(commonVerbs);
+        System.out.print("\n---VPList----"+vpList+"----\n");
+        return vpList;    
+     }
      /*
             
             Tree[] children = tree.children() ;
@@ -136,5 +175,10 @@ public class MethodIdentifier {
        
    }
 */
+
+    @Override
+    public int hashCode() {
+        return super.hashCode(); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

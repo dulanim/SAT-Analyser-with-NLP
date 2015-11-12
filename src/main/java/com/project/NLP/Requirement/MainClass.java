@@ -80,6 +80,7 @@ public class MainClass {
         ArrayList sentence = readFromTextFile();
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
+        HashSet methodList =new HashSet();
         StringBuffer sbf = new StringBuffer();
         StringBuffer sb = new StringBuffer();
         StoringArtefacts storingArtefacts;
@@ -102,16 +103,20 @@ public class MainClass {
                     /*attributes*/
                     AttributeIdentification attr = new AttributeIdentification(tree, attributesFromClass, classList);
                     attrList = attr.getAttributes();
-                    System.out.println("ATTRIBUTE LIST: " + attrList);
+                    System.out.println("ATTRIBUTE LIST: " + attrList); 
+                    
+                    MethodIdentifier mId=new MethodIdentifier(tree, classList);
+                    methodList=mId.identifyCandidateMethods(tree);
 
                     /*calling storingArtefacts class
                      store the results inorder to find the class- attri - metho -relation */
                     storingArtefacts = new StoringArtefacts();
                     storingArtefacts.setClassName(classList);
                     storingArtefacts.setAttributess(attrList);
+                    storingArtefacts.setMethods(methodList);
                     artefacts.add(storingArtefacts);
 
-                    sb = writeToStringBuffer(classList, attrList, sbf);
+                    sb = writeToStringBuffer(classList, attrList,methodList, sbf);
 
                 }
                 writeResultToTextFile(sb, bwr);
@@ -136,9 +141,9 @@ public class MainClass {
 
     }
 
-    private static StringBuffer writeToStringBuffer(HashSet classList, HashSet attrList, StringBuffer sbf) {
+    private static StringBuffer writeToStringBuffer(HashSet classList, HashSet attrList,HashSet methodList, StringBuffer sbf) {
         //StringBuffer sbf = new StringBuffer();
-
+        sbf.append(" Classes :");
         if (!classList.isEmpty()) {
             //if (!attrList.isEmpty()) {
             for (Iterator cl = classList.iterator(); cl.hasNext();) {
@@ -146,11 +151,20 @@ public class MainClass {
                 sbf.append(s + ", ");
 
             }
-            sbf.append("  :");
+            sbf.append("\tAttributes :");
             if (attrList.isEmpty()) {
                 sbf.append("NULL ");
             }
             for (Iterator at = attrList.iterator(); at.hasNext();) {
+                String a = at.next().toString();
+                sbf.append(a + ", ");
+
+            }
+            sbf.append("\tMethods :");
+            if (methodList.isEmpty()){
+                sbf.append("NULL ");
+            }
+            for (Iterator at = methodList.iterator(); at.hasNext();) {
                 String a = at.next().toString();
                 sbf.append(a + ", ");
 
@@ -244,7 +258,7 @@ public class MainClass {
                         String ss = ite2.next().toString();
                         if (s.equalsIgnoreCase(ss)) {
                             //System.out.println("s :" + s + " ss: " + ss + " foun- not added");
-                            newStoringArtefactsObject(s,at);
+                    //        newStoringArtefactsObject(s,at);
                             System.out.println("Attribute for s:"+at );
                         } else {
                             temp.add(s);
@@ -263,14 +277,14 @@ public class MainClass {
 
     }
     
-    
+    /*
     private void newStoringArtefactsObject(String cl, HashSet attr){
         StoringArtefacts storeArt = new StoringArtefacts();
-        storeArt.addClassName(cl);
-        storeArt.addAttributess(attr);
+    //    storeArt.addClassName(cl);
+      //  storeArt.addAttributess(attr);
         
     }
-
+*/
     /*
     
      String req1="The bank client must be able to deposit an amount to\n" +
