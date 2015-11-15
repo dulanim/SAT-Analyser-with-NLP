@@ -59,6 +59,13 @@ public class StoringArtefacts {
         return relationships;
     }
     
+    public void addAttribute(String attribute){
+        attributes.add(attribute);
+    }
+    
+    public void addMethods(String method){
+        methods.add(method);
+    }
 /*    private void removeRedundant(HashSet setItems){
         Iterator iterator = setItems.iterator();
         while(iterator.hasNext()){
