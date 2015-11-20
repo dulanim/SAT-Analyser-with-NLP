@@ -31,6 +31,7 @@ public class MainClass {
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
         HashSet methodList =new HashSet();
+        HashSet relationList = new HashSet();
         StoringArtefacts storingArtefacts;
         String className =null;
         HashMap requirementObjects = new HashMap();
@@ -39,8 +40,7 @@ public class MainClass {
         
         /*Reading requirement file */
         requirementDocument=readFromTextFile("OrderRequirement.txt");
-        System.out.println("In main : "+requirementDocument);
-        
+                
         if (requirementDocument=="") {
             System.out.println("Error : There is no input document !!!");
         }
@@ -67,8 +67,12 @@ public class MainClass {
                 /* methods identification */
                     MethodIdentifier mId=new MethodIdentifier(tree, classList);
                     methodList=mId.identifyCandidateMethods(tree);
-                    
-                 
+                
+                /* relations identificaton */
+                    ClassRelationIdentifier crId=new ClassRelationIdentifier(classList, requirementObjects.keySet());
+                    if(i!=0){
+                       relationList= crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
+                    }
                 /*Storing Class details  */    
                     Iterator iterator = classList.iterator();
                     if(iterator.hasNext()){
@@ -80,6 +84,8 @@ public class MainClass {
                         attributes.addAll(attrList);
                         HashSet methods=storeArt.getMethods();
                         methods.addAll(methodList);
+                        HashSet relations=storeArt.getRelationships();
+                        relations.addAll(relationList);
                     }
                     else{
                         /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
@@ -87,6 +93,7 @@ public class MainClass {
                         storingArtefacts.setClassName(classList);
                         storingArtefacts.setAttributess(attrList);
                         storingArtefacts.setMethods(methodList);
+                        storingArtefacts.setRelationships(relationList);
                         requirementObjects.put(className,storingArtefacts);
                     }
                     
@@ -146,6 +153,7 @@ public class MainClass {
                     StoringArtefacts store=(StoringArtefacts)output.get(className);
                     HashSet attributes= store.getAttributes();
                     HashSet methods=store.getMethods();
+                    HashSet relations=store.getRelationships();
                 
                     sbf.append("\nClass : "+className+"\n");
                     sbf.append("\tAttributes : ");
@@ -156,6 +164,12 @@ public class MainClass {
                     for (Object method : methods) {
                         sbf.append(method.toString()+",");
                     }
+                    sbf.append("\tRelations : ");
+                    for (Object relation : relations) {
+                        ClassRelation rel=(ClassRelation)relation;
+                        sbf.append("Type - "+rel.getRelationType()+"-> Parent -"+rel.getParentElement());
+                    }
+                    
                 
                 }
             

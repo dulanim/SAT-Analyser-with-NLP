@@ -11,44 +11,44 @@ package com.project.NLP.Requirement;
  * @author Vinojan
  * 
  * Blue print of relation between two classes which includes
- * type (Association, Aggregation and Generalization)
- * start element(class)
- * end element(class)
+ * type (Association and Generalization)
+ * start element(class) -child
+ * end element(class) -parent
  * 
  */
 public class ClassRelation {
     
-    String relationType;
-    String startElement;
-    String endElement;
+    private String relationType;
+    private String childElement;
+    private String parentElement;
     
     public ClassRelation(){
         
     }
     
-    public ClassRelation (String type, String start, String end){
+    public ClassRelation (String type, String child, String parent){
         this.relationType=type;
-        this.startElement=start;
-        this.endElement=end;
+        this.childElement=child;
+        this.parentElement=parent;
     }
     
-    private void setRelationType(String type){
+    public void setRelationType(String type){
         this.relationType=type;
     }
-    private String getRelationType(){
+    public  String getRelationType(){
         return relationType;
     }
-    private void setStartElement(String start){
-        this.startElement=start;
+    public  void setCildElement(String child){
+        this.childElement=child;
     }
-    private String getStartElement(){
-        return this.startElement;
+    public  String getChildElement(){
+        return this.childElement;
     }
-    private void setEndElement(String end){
-        this.endElement=end;
+    public  void setParentElement(String parent){
+        this.parentElement=parent;
     }
-    private String getEndElement(){
-        return this.endElement;
+    public String getParentElement(){
+        return this.parentElement;
     }
 }
 

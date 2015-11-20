@@ -12,6 +12,9 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  *
@@ -31,6 +34,63 @@ public class ClassRelationIdentifier {
         this.requirementSentence=text;
         
     }
+    
+    public ClassRelationIdentifier(HashSet classList, Set classSet){
+        
+    }
+    
+    public HashSet identifyGenaralizationByComparing(HashSet classList, Set classSet){
+        HashSet classRelations = new HashSet();
+        if(classList.isEmpty()){
+            System.out.println("Info : There is no class found in the sentence. -Relations identifier");
+        }
+        else if(classList.isEmpty()){
+            System.out.println("Info : There is no class found in the document until this sentence. -Relations identifier");
+        }
+        else{
+            Iterator list= classList.iterator();
+            Iterator set= classSet.iterator();
+            while(list.hasNext()){
+                String classFromlist=list.next().toString();
+                while(set.hasNext()){
+                    // To ignore case, regular expressions must be used
+                    String classFromSet=set.next().toString();
+                    /*
+                    Boolean b;
+                    String string ="Madam";
+                    // Starts with
+                    b=string.matches("(?i)mad.*");
+
+                    // Ends with
+                    b = string.matches("(?i).*adam");
+
+                    // Anywhere
+                    b = string.matches("(?i).*i am.*");
+                    */
+                    if(classFromSet.matches(".+"+classFromlist+".*")){
+                        System.out.println("--------Success --1-- Generalization -----");
+                    }
+                    else if(classFromlist.matches(".+"+classFromSet+".*")){
+                        System.out.println("--------Success --1-1-- Generalization -----");
+                        ClassRelation general =new ClassRelation("Generalization", classFromlist, classFromSet);
+                        classRelations.add(general);
+                        
+                    }
+                    if(classFromSet.endsWith(classFromlist)){
+                        System.out.println("--------Success ----2-- Generalization -----");
+                    }
+                    else if(classFromlist.endsWith(classFromSet)){
+                        System.out.println("--------Success ----2-2-- Generalization -----");
+                    }
+                }
+            }
+        }
+                
+                
+        
+        
+        return classRelations;
+    } 
     
     ArrayList identifyCandidateRelations(String document){
         ArrayList sentenceTree=new ArrayList();
