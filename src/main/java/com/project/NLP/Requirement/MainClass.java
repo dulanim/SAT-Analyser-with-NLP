@@ -27,6 +27,7 @@ public class MainClass {
     private static String requirementDocument="";
 
     public static void main(String args[]) {
+    	System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
@@ -70,9 +71,10 @@ public class MainClass {
                 
                 /* relations identificaton */
                     ClassRelationIdentifier crId=new ClassRelationIdentifier(classList, requirementObjects.keySet());
-                    if(i!=0){
+                    //if(i!=0){
                        relationList= crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
-                    }
+                       relationList.addAll(crId.identifyGenaralizationByHypernym(classList,requirementObjects.keySet()));
+                    //}
                 /*Storing Class details  */    
                     Iterator iterator = classList.iterator();
                     if(iterator.hasNext()){
