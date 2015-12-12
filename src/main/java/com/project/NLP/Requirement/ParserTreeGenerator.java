@@ -6,7 +6,9 @@
 
 package com.project.NLP.Requirement;
 
+import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.trees.Tree;
@@ -65,6 +67,27 @@ public class ParserTreeGenerator {
         return sentenceTree;
     }
 
+    /* nameEntityAnnotation for track the Location and Person name 
+     Return the word if the tokens contains Location, person, organization,misc, time, money, percent, date
+    */
+    public ArrayList generateNamedEntityTagAnnotation() {
+        sentences = document.get(SentencesAnnotation.class);
+        ArrayList nameEntity = new ArrayList();
+        String annotations = "";
+        for (CoreMap sentence : sentences) {
+
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                // this is the NER label of the token
+                annotations = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+                if (annotations.equals("LOCATION") || annotations.equals("PERSON") || annotations.equals("ORGANIZATION") || annotations.equals("MISC") || annotations.equals("TIME") || annotations.equals("MONEY") || annotations.equals("PERCENT") || annotations.equals("DATE")) {
+                    nameEntity.add(token.originalText());
+                }
+
+            }
+        }
+        return nameEntity;
+
+    }
     
 }
     
