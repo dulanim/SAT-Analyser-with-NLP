@@ -115,13 +115,13 @@ public class MainClass {
     */
     private static String readFromTextFile(String file) {
             BufferedReader br = null;
-            String req_Document="";
+            StringBuilder req_Document=new StringBuilder("");
             
             try {
                 String sCurrentLine;
                 br = new BufferedReader(new FileReader(file));
                 while ((sCurrentLine = br.readLine()) != null) {
-                    req_Document= req_Document+" "+sCurrentLine;
+                    req_Document= req_Document.append(" "+sCurrentLine);
                 }
 
             } catch (IOException e) {
@@ -136,7 +136,7 @@ public class MainClass {
                 }
             }
             
-            return req_Document;
+            return req_Document.toString();
         }
 
          
