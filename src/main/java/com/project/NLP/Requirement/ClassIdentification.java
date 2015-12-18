@@ -20,6 +20,8 @@ import java.util.List;
 public class ClassIdentification {
 
     private Tree[] tree;
+    /*Single Tree */
+    private Tree sTree;
     private ArrayList priorToRule1;
     private HashSet classList = new HashSet();
     private ArrayList afterRules = new ArrayList();
@@ -34,6 +36,13 @@ public class ClassIdentification {
 
     ClassIdentification(Tree[] tree){
         this.tree =tree;
+        np = new PhrasesIdentification(tree);
+        applyRules();
+    }
+    
+    /*Single Tree */
+    ClassIdentification(Tree tree){
+        this.sTree=tree;
         np = new PhrasesIdentification(tree);
         applyRules();
     }
@@ -110,12 +119,10 @@ public class ClassIdentification {
     */
     
     public void checksLocationAndPeopleName(ArrayList list){
+        ParserTreeGenerator parser = new ParserTreeGenerator();
+        ArrayList nameEntity;
         for(int j=0;j<list.size();j++){
-            StanfordCoreNLPModified stand = new StanfordCoreNLPModified(list.get(j).toString());
-            /*nameEntity list will have the words if it represents the Location, person, organization and etc
-            in its text
-            */
-            ArrayList nameEntity = stand.generateNamedEntityTagAnnotation();
+            nameEntity = parser.generateNamedEntityTagAnnotation();
             /*remove the location name or people name if list of the class contains*/
             for(int i=0;i<nameEntity.size();i++){
                 if(afterRules.contains(nameEntity.get(i))){

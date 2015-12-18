@@ -10,66 +10,77 @@ import java.util.List;
 import org.w3c.dom.Attr;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
  * @author AARTHIKA
  */
 public class ExtractInterfaceListener extends Java8BaseListener {
-
-    public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
-        this.parser = parser;
-    }
-
+    
+    
     private Java8Parser parser;
     private String paramType, paramName, paramMod;
     private StringBuffer parameterList = new StringBuffer();
     private String methodReturn, methodName, methodMod, type;
-    private String className, classMod, superClass;
-    private String  fieldName,fieldMod, fieldType, fieldInitialValue;
+    private String className, classMod, superClass="";
+    private String fieldName, fieldMod, fieldType;
     private Element artefactElement;
+    public static Node root;
     private List<String> fieldNameList = new ArrayList();
     private List<Java8Parser.InterfaceTypeContext> implementClass = new ArrayList<>();
-    private static int id=1;
+    private static int id = 1;
+    private static String INHERITANCE = "INHERITANCE";
+    private static String COMPOSITION = "COMPOSITION";
+    private String currentClassID = "";
+    public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {        
+        this.parser = parser;
+    }
 
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
         super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
         // ctx.unannType().unannReferenceType().unannClassOrInterfaceType().
         type = "Field";
+        super.enterFieldDeclaration(ctx); 
+        type = "Variable";
+        String associationType = "COMPOSITION";
         if (ctx.unannType().unannPrimitiveType() != null) {
-            fieldType = ctx.unannType().unannPrimitiveType().getText();
+            fieldType = ctx.unannType().unannPrimitiveType().getText();  
+            if (ctx.fieldModifier(0) != null) {
+                fieldMod = ctx.fieldModifier(0).getText();
+            }
+            List<Java8Parser.VariableDeclaratorContext> variables = ctx.variableDeclaratorList().variableDeclarator();
+            for (Java8Parser.VariableDeclaratorContext variable : variables) {
+                fieldNameList.add(variable.variableDeclaratorId().getText());
+            }
+
+            for (String nameList : fieldNameList) {
+                fieldName = nameList;
+                writeFieldToXML();
+            }
         } else if (ctx.unannType().unannReferenceType() != null) {
             fieldType = ctx.unannType().unannReferenceType().getText();
-        }
-        if (ctx.fieldModifier(0) != null) {
-            fieldMod = ctx.fieldModifier(0).getText();
-        }
-        List<Java8Parser.VariableDeclaratorContext> variables = ctx.variableDeclaratorList().variableDeclarator();
-        for (Java8Parser.VariableDeclaratorContext variable : variables) {
-            fieldNameList.add(variable.variableDeclaratorId().getText());
-        }  
-        
-        for(String nameList:fieldNameList) {
-            fieldName = nameList;
-            writeFieldToXML();
-        }
+            
+            AST.scdb.createNodeRelationship(className, currentClassID, fieldType,associationType);
+        }       
         fieldNameList.clear();
     }
-    
     public void writeFieldToXML(){
         
+
         Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
         artefactElement.appendChild(artefactSubElement);
-        
+
         Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
         typeAttr.setValue(type);
         artefactSubElement.setAttributeNode(typeAttr);
-        
+
         Attr idAttr = WriteToXML.getDocument().createAttribute("id");
-        idAttr.setValue("SC"+id); id++;
+        idAttr.setValue("SC" + id);
+        id++;
         artefactSubElement.setAttributeNode(idAttr);
-        
+
         Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
         nameAttr.setValue(fieldName);
         artefactSubElement.setAttributeNode(nameAttr);
@@ -85,7 +96,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
-        super.enterMethodDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
+        super.enterMethodDeclaration(ctx); 
 
         if (ctx.methodModifier().isEmpty()) {
             methodMod = "package-private";
@@ -176,25 +187,22 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     @Override
     public void exitClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
-        WriteToXML.createXML();
+
+             
     }
 
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
-        //WriteToXML.createDocument();
-        /*<Artefacts><Artefact type="SourceCode">
-         </Artefact type></Artefacts>
-         */
         type = "Class";
-        //<ArtefactElement name="Account" type="Class" id="SC1" visibility="public"></ArtefactElement>
+        String inheritanceType = "INHERITANCE";
         className = ctx.normalClassDeclaration().Identifier().getText();
-        
-        if(ctx.normalClassDeclaration().classModifier().isEmpty()){
+
+        if (ctx.normalClassDeclaration().classModifier().isEmpty()) {
             classMod = "package-private";
+        } else {
+            classMod = ctx.normalClassDeclaration().classModifier().get(0).getText();
         }
-        else
-            classMod = ctx.normalClassDeclaration().classModifier().get(0).getText();  
-        
+
         System.out.println("Class: " + className + " Modifier: " + classMod);
 
         if (ctx.normalClassDeclaration().superclass() != null) {
@@ -203,8 +211,12 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         if (ctx.normalClassDeclaration().superinterfaces() != null) {
             implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
         }
+        currentClassID = "SC" + id;
+        AST.scdb.createNodeRelationship(className, currentClassID, superClass,inheritanceType);
+        id++;
 
 //implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
+
         //
         
         /*Element artefact  = WriteToXML.getDocument().createElement("Artefact");
@@ -214,8 +226,12 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         artefactElement.setAttributeNode(rootType);        
         */
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
-        AST.artefact.appendChild(artefactElement);
+        //AST.artefact.appendChild(artefactElement);
        // artefact.appendChild(artefactElement);
+
+        root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0);
+        artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
+        root.appendChild(artefactElement);
         Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
         nameAttr.setValue(className);
         artefactElement.setAttributeNode(nameAttr);
@@ -223,9 +239,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
         typeAttr.setValue(type);
         artefactElement.setAttributeNode(typeAttr);
-        
+
         Attr idAttr = WriteToXML.getDocument().createAttribute("id");
-        idAttr.setValue("SC"+id); id++;
+        idAttr.setValue(currentClassID);
+        
         artefactElement.setAttributeNode(idAttr);
 
         Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");

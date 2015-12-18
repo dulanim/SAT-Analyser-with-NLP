@@ -18,6 +18,8 @@ import java.util.HashSet;
 public class AttributeIdentification {
     
     private Tree[] tree;
+    /*For single tree */
+    private Tree sTree;
     private PhrasesIdentification phrase;
     private ArrayList attributes; 
     private ArrayList attr; // store attributes derived from classIdentification 
@@ -34,6 +36,13 @@ public class AttributeIdentification {
         phrase = new PhrasesIdentification(tree);
         applyRules();
     }
+    
+    /*For single Tree */
+    AttributeIdentification(Tree tree){
+        this.sTree =tree;
+        phrase = new PhrasesIdentification(tree);
+        applyRules();
+    }
 
     /*parameters for the constructors 
     parameter 1: tokenization result from stanford core NLP
@@ -47,6 +56,16 @@ public class AttributeIdentification {
         this.classList=classList;
         applyRules();
     }
+    
+    /*For single Tree */
+    AttributeIdentification(Tree tree, ArrayList attr,HashSet classList){
+        this.sTree =tree;
+        phrase = new PhrasesIdentification(tree);
+        this.attr =attr;
+        this.classList=classList;
+        applyRules();
+    }
+    
     private void applyRules() {
         /*get the attributes derived from class identification*/
         /*rule 1*/

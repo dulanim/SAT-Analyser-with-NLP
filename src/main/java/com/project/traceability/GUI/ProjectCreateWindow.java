@@ -266,7 +266,7 @@ public class ProjectCreateWindow {
                                 if(!FilePropertyName.default_java_project_path.equals(txtRequirementPath.getText())){
                                     //add copy files for source code 
                                     copy(null,StaticData.sourceFilePath,FilePropertyName.SOURCE_CODE);
-                                    AST.main(null);
+                                    //AST.main(null);
                                 
                                 }
 				

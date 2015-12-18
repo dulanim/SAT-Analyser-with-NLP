@@ -25,6 +25,7 @@ public class MethodIdentifier {
     ArrayList tree;
     String document;
     Tree[] treeAn;
+    Tree sTree;
     HashSet classList;
     //private ArrayList commonVerbs=new ArrayList();
     private HashSet commonVerbs =new HashSet();
@@ -50,6 +51,14 @@ public class MethodIdentifier {
         createCommonVerbs();
         
     }
+    /*For single Tree */
+    public MethodIdentifier(Tree tree,HashSet classList){
+        this.classList=classList;
+        this.sTree =tree;
+        createCommonVerbs();
+        
+    }
+    
     
     void createCommonVerbs(){
         commonVerbs.add("be");
@@ -132,6 +141,35 @@ public class MethodIdentifier {
                 
             }
         }
+        vpList.removeAll(commonVerbs);
+        System.out.print("\n---VPList----"+vpList+"----\n");
+        return vpList;    
+     }
+     
+     /*For single Tree */
+     HashSet identifyCandidateMethods(Tree tree){
+        
+        String phraseNotation = "VB|VBN>VP";//@VB>VP" ; //& VBN >VP";//"VP<(VB $++NP)";//"VP:VB";//"@"+"VP"+"! << @"+"VP";
+        HashSet vpList=new HashSet();
+        
+            
+            /* Stemming the sentence */        
+            wordStemmer.visitTree(tree);
+            TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
+            TregexMatcher matcher = VBpattern.matcher(tree);
+            while (matcher.findNextMatchingNode()) {
+                Tree match = matcher.getMatch();
+                String verb=Sentence.listToString(match.yield());
+                
+                /* Filter to unique verbs  */
+                //List<String> newList = new ArrayList<String>(new HashSet<String>(oldList));
+                //if(!vpList.contains(verb)){
+                    vpList.add(verb);
+                //}
+                System.out.print("\n---phrase match----"+match+"----\n");
+                
+            }
+        
         vpList.removeAll(commonVerbs);
         System.out.print("\n---VPList----"+vpList+"----\n");
         return vpList;    
