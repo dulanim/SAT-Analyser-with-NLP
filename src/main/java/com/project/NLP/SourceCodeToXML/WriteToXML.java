@@ -5,6 +5,9 @@
  */
 package com.project.NLP.SourceCodeToXML;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.GUI.HomeGUI;
+import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.common.PropertyFile;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,6 +18,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -32,10 +36,15 @@ import org.xml.sax.SAXException;
 public class WriteToXML {
 
     private static Document document;
-    private static final String destinationPath = PropertyFile.xmlSourceCodeFilePath;
-    private static final String fileName = "SourceCodeArtefactFile";
+    //private static final String fileName = FilePropertyName.SOURCE_ARTIFACT_NAME;
                 //AST.file.replaceAll(".java", "");
-    private static final File file = new File(destinationPath +"\\"+ fileName+".xml");
+    public static File f = new File(PropertyFile.filePath+ File.separator 
+                        +FilePropertyName.SOURCE_CODE);
+    private static final String destinationPath = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName
+            +File.separator + FilePropertyName.XML;
+           
+    private static String fileName =  FilePropertyName.SOURCE_ARTIFACT_NAME;
+    private static final File file = new File(destinationPath,fileName);
     
     public static Document getDocument(){
         return document;
@@ -67,8 +76,11 @@ public class WriteToXML {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
+	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(new FileOutputStream(destinationPath +"\\"+ fileName+".xml"));
+            StreamResult result = new StreamResult(new FileOutputStream
+                        (destinationPath +File.separator+ fileName));
             transformer.transform(source, result);              
             System.out.println("File saved!");
         } catch (TransformerConfigurationException ex) {

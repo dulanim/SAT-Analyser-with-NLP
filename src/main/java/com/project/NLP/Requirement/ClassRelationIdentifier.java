@@ -11,6 +11,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 public class ClassRelationIdentifier {
     
     String requirementSentence;
+    ArrayList classes=new ArrayList(Arrays.asList("account"));
     
     public ClassRelationIdentifier(){
         
@@ -30,31 +32,56 @@ public class ClassRelationIdentifier {
         
     }
     
-     ArrayList identifyCandidateRelations(String sentence){
-        ArrayList canRelations;
-        //canClasses = new ArrayList();
+    ArrayList identifyCandidateRelations(String document){
+        ArrayList sentenceTree=new ArrayList();
+        ArrayList intialRelations=new ArrayList();
+        ParserTreeGenerator treeGen= new ParserTreeGenerator(document);
+        sentenceTree=treeGen.getSentenceParseTree();
+        System.out.println("--------Identified relations are:---------");
+        intialRelations= getPhrase(sentenceTree);
         
-        stanfordCoreNLP stanford = new stanfordCoreNLP(sentence);
-        ArrayList treeTemp = stanford.generateTreeAnnotation();
-        stanford.generateCorefLink();
+        return null;
         
-        ArrayList phraseLists= new ArrayList();
-        String phraseNotation = "@"+"VB"+"! << @"+"VB";
-        System.out.println("--------Identified verb pharases are:---------");
-        
-        for (Object treeTemp1 : treeTemp) {
+    }
+    ArrayList getPhrase(ArrayList<Tree> sentenceTree){
+         
+        String phraseNotation = "NN";  //"NP<(NP $++ (CC $++ NP))";
+        ArrayList vpList=new ArrayList();     
+        for (Tree tree : sentenceTree) {
+                    System.out.print("\n---tree_sen----"+tree+"----\n");
+
             TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
-            TregexMatcher matcher = VBpattern.matcher((Tree) treeTemp1);
+            TregexMatcher matcher = VBpattern.matcher((Tree) tree);
             while (matcher.findNextMatchingNode()) {
                 Tree match = matcher.getMatch();
-                System.out.println("sdf  "+Sentence.listToString(match.yield()));
-                phraseLists.add(Sentence.listToString(match.yield()));
+                String noun=Sentence.listToString(match.yield());
+                if(noun.contains("-")){
+                    String nouns[]=noun.split("-");
+                    if(classes.contains(nouns[nouns.length-1])){
+                        vpList.add(noun);
+                    }
+                    
+                }                
+                else if(noun.contains("_")){
+                    String nouns[]=noun.split("_");
+                     if(classes.contains(nouns[nouns.length-1])){
+                         if(!vpList.contains(noun))
+                                 vpList.add(noun);
+                    }
+                    
+                }
+                
+                
+                
+                System.out.print("\n---phrase match----"+match+"----\n");
+                
             }
         }
-            
-        canRelations=phraseLists;
-        return canRelations;
-    }
+        System.out.print("\n---VPList----"+vpList+"----\n");
+        return vpList;    
+     }
+    
+    
     
 }
 
