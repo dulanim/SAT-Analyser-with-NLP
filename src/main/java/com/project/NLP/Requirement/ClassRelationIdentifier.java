@@ -44,9 +44,9 @@ public class ClassRelationIdentifier {
     public HashSet identifyGenaralizationByComparing(HashSet sentenceClassSet, Set documentClassSet) {
         HashSet classRelations = new HashSet();
         if (sentenceClassSet.isEmpty()) {
-            System.out.println("Info : There is no class found in the sentence. -Relations identifier");
+            System.err.println("Info : There is no class found in the sentence. -Relations identifier");
         } else if (sentenceClassSet.isEmpty()) {
-            System.out.println("Info : There is no class found in the document until this sentence. -Relations identifier");
+            System.err.println("Info : There is no class found in the document until this sentence. -Relations identifier");
         } else {
             Iterator list = sentenceClassSet.iterator();
             Iterator set = documentClassSet.iterator();
