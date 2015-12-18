@@ -8,7 +8,7 @@ package com.project.NLP.UMLToXML.xmlwriter;
  *
  * @author shiyam
  */
-import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.file.operations.FilePropertyName;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +27,9 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.GUI.HomeGUI;
+import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
@@ -112,8 +113,9 @@ public class WriteToXML {
 		DOMSource source = new DOMSource(doc);
                 //String driveLetter = getSuitableDrive();
                 
-                File f = new File(HomeGUI.projectPath + File.separator 
-                        +FilePropertyName.UML);
+                String root = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName;
+                File f = new File(root + File.separator 
+                        +FilePropertyName.XML);
                 if(!f.exists())
                     f.mkdir();
                 String fileName = f.getPath() + File.separator + FilePropertyName.UML_ARTIFACT_NAME;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package com.project.traceability.GUI;
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.property.config.xml.reader.XMLReader;
 import static com.project.traceability.GUI.ProjectCreateWindow.localFilePath;

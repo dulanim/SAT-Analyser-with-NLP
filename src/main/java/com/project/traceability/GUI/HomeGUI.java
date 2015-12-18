@@ -3,7 +3,8 @@ package com.project.traceability.GUI;
 /**
  * @author Gitanjali Nov 12, 2014
  */
-import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.NLP.file.operations.FileSave;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -39,30 +39,30 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
+import com.project.text.undoredo.UndoRedoImpl;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.GraphDB.RelTypes;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import scala.collection.immutable.HashSet;
 
 /**
  * Main Home Window of the tool
  */
-public class HomeGUI extends JFrame{
+public class HomeGUI extends JFrame implements KeyListener{
 
 	public static Dimension screen = java.awt.Toolkit.getDefaultToolkit()
 			.getScreenSize();
@@ -77,12 +77,12 @@ public class HomeGUI extends JFrame{
 	public static Composite graphComposite;
 	public static Composite projComposite;
         public static Display display;
-
+        public static final Map<Boolean,String> activeTab = new HashMap<Boolean,String>();
 	public static boolean isComaparing = false;
 	public static boolean isSelectionForUMLFile = false;
-	public static String projectPath = null;
+	public static String projectPath = "";
 	public static TreeItem trtmNewTreeitem;
-
+        public static TreeItem topParent;
         public static CTabItem graphtabItem;
         public boolean isSelectedProject = true;
         public boolean isSelectedCompare = true;
@@ -175,12 +175,16 @@ public class HomeGUI extends JFrame{
 		center(shell);
 		shell.setLayout(new FillLayout());		
 
+                
+                
 		sidebarSF = new SashForm(shell, SWT.HORIZONTAL | SWT.SMOOTH);  	//sashforms for managing 3 tabfolders
 		
+           
 		newTab = new CTabFolder(sidebarSF, SWT.BORDER | SWT.CLOSE);		//to show all the projects in the workspace
 		newTab.setData("Project");
                 newTab.redraw();
 		newTab.setSize(400, 900);
+                newTab.setToolTipText(StaticData.PROJECT_WINDOW_TOOL_TIP);
 		newTab.setMinimizeVisible(true);
 		newTab.setMaximizeVisible(true);
 
@@ -195,7 +199,7 @@ public class HomeGUI extends JFrame{
 		tabFolder.setData("WorkSpace");
 		tabFolder.setMinimizeVisible(true);
 		tabFolder.setMaximizeVisible(true);
-
+                //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
 		graphTab = new CTabFolder(workSF, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
 		graphTab.setData("Graph");
 		graphTab.setMinimizeVisible(true);
@@ -209,6 +213,47 @@ public class HomeGUI extends JFrame{
 		graphComposite = new Composite(graphTab, SWT.NONE);
 		graphComposite.setLayout(new FillLayout());
 
+                
+                     
+                addEditMenuPopUpMenu();
+                //create ToolBar and ToolItems
+//                final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);
+//                final ToolItem saveToolItem = new ToolItem(bar, SWT.PUSH);
+//                final ToolItem sep1 = new ToolItem(bar, SWT.SEPARATOR);
+//                final ToolItem cutToolItem = new ToolItem(bar, SWT.PUSH);
+//                final ToolItem copyToolItem = new ToolItem(bar, SWT.PUSH);
+//                final ToolItem pasteToolItem = new ToolItem(bar, SWT.PUSH);
+//                
+//                            //set the size and location of the user interface widgets
+//                bar.setSize(50, 55);
+//                bar.setLocation(10, 0);
+//                Device dev = shell.getDisplay();
+//                final Image saveIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                final Image openIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                final Image childIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                final Image cutIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                final Image copyIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                final Image pasteIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+//                //t.setBounds(0, 56, 490, 395);
+//
+//                //Configure the ToolBar
+//                openToolItem.setImage(openIcon);
+//                openToolItem.setText("Open");
+//                openToolItem.setToolTipText("Open File");
+//                saveToolItem.setImage(saveIcon);
+//                saveToolItem.setText("Save");
+//                saveToolItem.setToolTipText("Save File");
+//                cutToolItem.setImage(cutIcon);
+//                cutToolItem.setText("Cut");
+//                cutToolItem.setToolTipText("Cut");
+//                copyToolItem.setImage(copyIcon);
+//                copyToolItem.setText("Copy");
+//                copyToolItem.setToolTipText("Copy");
+//                pasteToolItem.setImage(pasteIcon);
+//                pasteToolItem.setText("Paste");
+//                pasteToolItem.setToolTipText("Paste");
+                
+                
 		defineListeners();
 		
 		newTab.addCTabFolder2Listener(ctfCTF2L);			//for managing maximize, minimize and restore
@@ -242,8 +287,8 @@ public class HomeGUI extends JFrame{
 		
 
 		tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
-        | SWT.H_SCROLL);				//tree for all projects
-                
+        | SWT.H_SCROLL|SWT.MULTI);				//tree for all projects
+                tree.setRedraw(true);
                 
                 //new FileHiearchyView();
                 tree.setToolTipText(StaticData.workspace);
@@ -258,12 +303,13 @@ public class HomeGUI extends JFrame{
 					string += selection[i] + " ";
 					trtmNewTreeitem = selection[i];
 				}
-				string = string.substring(10, string.length() - 2);
+                                if(selection.length > 0)
+                                    string = selection[0].getText();
 				selectedFolder = string;
-				projectPath = PropertyFile.filePath + string + "";
-				if(selection[0].getItemCount() >= 2)
+				projectPath = tree.getToolTipText() + File.separator + string + "";
+				if(selection.length >0 && selection[0].getItemCount() >= 2)
 					hasTwoFiles = true;
-				if(selection[0].getItemCount() > 3)
+				if(selection.length>0 && selection[0].getItemCount() > 3)
 					hasThreeFiles = true;				
 				addPopUpMenu();
 			}
@@ -278,21 +324,34 @@ public class HomeGUI extends JFrame{
 			@Override
 			public void mouseDoubleClick(MouseEvent event) {
 				String string = "";
-				String parent = null;
+				String parent = "";
 				TreeItem[] selection = tree.getSelection();
+                                TreeItem paret = trtmNewTreeitem.getParentItem();;
+                                TreeItem topParent= paret.getParentItem();
+                                
+                                if(topParent == null)
+                                {
+                                    string = selection[0].getText();
+                                    parent = paret.getText();
+                                }else{
+                                    string = selection[0].getText();
+                                    parent = topParent.getText() + File.separator + paret.getText();
+                                }
+                                
+                                //String projectDir = projectPath;
                                 //Tree tree = (Tree) event.getSource();
                                 //ITreeSelection selection1 = ((ITreeSelection)event.getSelection());
                                 
 				for (int i = 0; i < selection.length; i++) {
-					string += selection[i] + " ";
-					parent += selection[i].getParent() + " ";
-					trtmNewTreeitem = selection[i];
+//					string += selection[i] + " ";
+//					parent += selection[i].getParent() + " ";
+//					trtmNewTreeitem = selection[i];
                                       
 				}
 
 				if(selection[0].getItems().length == 0) {
-					string = string.substring(10, string.length() - 2);
-					parent = parent.substring(14, parent.length() - 2);
+					//string = string.substring(10, string.length() - 2);
+					//parent = parent.substring(14, parent.length() - 2);
 					NewFileWindow.localFilePath = StaticData.workspace + File.separator + parent
 							+File.separator;
 					NewFileWindow.createTabLayout(string);
@@ -340,29 +399,16 @@ public class HomeGUI extends JFrame{
 		});
 		mntmProject.setText("Project");
 
-		/*MenuItem mntmFile = new MenuItem(menu_4, SWT.NONE);
-		mntmFile.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				NewFileWindow newFileWin = new NewFileWindow();
-				newFileWin.open();
-			}
-		});
-		mntmFile.setText("File");*/
-
 		MenuItem mntmSave = new MenuItem(menu_1, SWT.NONE);
 		mntmSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog fileDialog = new FileDialog(shell, SWT.SAVE);
-				String localFilePath = fileDialog.open();
-				if (localFilePath != null) {
-					// return pull(sync,localFilePath,remoteFilePath);
-				}
+				new FileSave().saveFile();
 			}
 		});
+               
 		mntmSave.setText("Save");
-		
+		mntmSave.setAccelerator(SWT.CTRL | 'S');
 		MenuItem mntmProjctPath = new MenuItem(menu_1, SWT.CASCADE);
 		mntmProjctPath.setText("Switch Project Path");
                 
@@ -434,7 +480,7 @@ public class HomeGUI extends JFrame{
 		mntmRestart.setText("Restart");
 		
 		MenuItem mntmRefresh = new MenuItem(menu_1, SWT.NONE);
-		mntmRestart.addSelectionListener(new SelectionAdapter() {
+		mntmRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//referesh functionality
@@ -455,8 +501,100 @@ public class HomeGUI extends JFrame{
                 //shiyam edited
 		//MenuItem mntmView = new MenuItem(menu, SWT.CASCADE);
 		//mntmView.setText("View");
+                Menu editMenu = new Menu(menu);
+                MenuItem editMenuItem = new MenuItem(menu,SWT.CASCADE);
+                editMenuItem.setText("Edit");
+                editMenuItem.setMenu(editMenu);
                 
-               
+                MenuItem copy = new MenuItem(editMenu,SWT.NONE);
+                copy.setText("Copy");
+                copy.setAccelerator(SWT.CTRL | 'C');
+                copy.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to copy the text
+                            */
+                            NewFileWindow.codeText.copy();
+			}
+		});
+                
+                MenuItem paste = new MenuItem(editMenu,SWT.NONE);
+                paste.setText("Paste");
+                paste.setAccelerator(SWT.CTRL | 'V');
+                paste.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to paste the text
+                            */
+                            NewFileWindow.codeText.paste();
+			}
+		});
+                
+                MenuItem cut = new MenuItem(editMenu,SWT.NONE);
+                cut.setText("Cut");
+                cut.setAccelerator(SWT.CTRL | 'X');
+                cut.setImage(new Image(shell.getDisplay(),FilePropertyName.IMAGE_PATH+"file_txt.png"));
+                cut.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to paste the text
+                            */
+                            NewFileWindow.codeText.cut();
+			}
+		});
+                
+                
+                MenuItem redo = new MenuItem(editMenu,SWT.NONE);
+                redo.setText("Redo");
+                redo.setImage(new Image(shell.getDisplay(),FilePropertyName.IMAGE_PATH+"file_txt.png"));
+                redo.setAccelerator(SWT.CTRL | 'Y');
+                redo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to redo perform
+                            */
+                            //NewFileWindow.codeText.cut();
+                            new UndoRedoImpl(NewFileWindow.codeText).redo();
+			}
+		});
+                
+                MenuItem undo = new MenuItem(editMenu,SWT.NONE);
+                undo.setText("Undo");
+                undo.setAccelerator(SWT.CTRL | 'Z');
+                undo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to redo perform
+                            */
+                            //NewFileWindow.codeText.cut();
+                            new UndoRedoImpl(NewFileWindow.codeText).undo();
+			}
+		});
+                
+                
+                MenuItem selectAll = new MenuItem(editMenu,SWT.NONE);
+                selectAll.setText("Select All");
+                selectAll.setAccelerator(SWT.CTRL | 'A');
+                selectAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				/*
+                            run how to select All text
+                            */
+                            //NewFileWindow.codeText.cut();
+			}
+		});
+                
+                class Cut extends SelectionAdapter {
+                                public void widgetSelected(SelectionEvent event) {
+                                        
+                                }
+                }
                 // Create the File item's drop down menu
                 Menu viewMenu = new Menu(menu);
 
@@ -644,6 +782,8 @@ public class HomeGUI extends JFrame{
 	
 		MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
 				| SWT.YES | SWT.NO);
+                
+                
 		File filePath = new File(projectPath);
 		if (!filePath.isDirectory()) {
 			projectPath = PropertyFile.filePath + parent.getText() + "/"
@@ -654,21 +794,61 @@ public class HomeGUI extends JFrame{
 		messageBox.setText("Deleting " + projectPath);
 		int response = messageBox.open();
 		if (response == SWT.YES) {
+                    
+                    if(trtmNewTreeitem.getText().equals(FilePropertyName.XML)
+                            ||trtmNewTreeitem.getText().equals(FilePropertyName.UML)||
+                            trtmNewTreeitem.getText().equals(FilePropertyName.PROPERTY)
+                            ||trtmNewTreeitem.getText().equals(FilePropertyName.SOURCE_CODE)
+                            ||trtmNewTreeitem.getText().equals(FilePropertyName.REQUIREMENT)){
+                        
+                        
+                         messageBox = new MessageBox(shell, SWT.ICON_ERROR|
+				SWT.ERROR_CANNOT_GET_SELECTION);
+                         messageBox.setMessage("File Delete Error\n" + "Those directory can not delete");
+                         messageBox.setText("Error");
+                         messageBox.open();
+                         return;
+                    }
 			File file = new File(projectPath);
-			String[] files = file.list();
-			if (files != null) {
-				for (String stringFile : files) {
-					File deleteFile = new File(projectPath + stringFile);
-					deleteFile.delete();
-				}
-			}
-			file.delete();
+                        try{
+                            FilePropertyName.delete(file);
+                        }catch(IOException e){
+                            messageBox = new MessageBox(shell, SWT.ICON_ERROR|
+				SWT.ERROR_IO);
+                            messageBox.setMessage("File Delete Error\n" + e.toString());
+                            messageBox.setText("Error");
+                            messageBox.open();
+                        }catch(Exception e){
+                            messageBox = new MessageBox(shell, SWT.ICON_ERROR|
+				SWT.ERROR_IO);
+                            messageBox.setMessage("File Delete Error \n" + e.toString());
+                            messageBox.setText("Error");
+                            messageBox.open();
+                        }
 			HomeGUI.trtmNewTreeitem.dispose();
 		}
 		projComposite.layout();
 	}
 
-
+    public void addEditMenuPopUpMenu(){
+        Menu popupMenu = new Menu(workSF);
+        MenuItem cutItem = new MenuItem(popupMenu, SWT.CASCADE);
+        cutItem.setText("Cut");
+        
+        MenuItem copyItem = new MenuItem(popupMenu, SWT.CASCADE);
+        copyItem.setText("Copy");
+        
+        MenuItem pasteItem = new MenuItem(popupMenu, SWT.CASCADE);
+        pasteItem.setText("Paste");
+        
+        MenuItem selectAllItem = new MenuItem(popupMenu,SWT.CASCADE);
+        selectAllItem.setText("Select All");
+        
+        MenuItem refreshItem = new MenuItem(popupMenu,SWT.CASCADE);
+        refreshItem.setText("Refresh Window");
+        
+        workSF.setMenu(popupMenu);
+    }
     public static void addPopUpMenu() {
         Menu popupMenu = new Menu(tree);
         MenuItem newItem = new MenuItem(popupMenu, SWT.CASCADE);
@@ -686,19 +866,27 @@ public class HomeGUI extends JFrame{
             }
         });
         refreshItem.setText("Refresh");
+        
+        MenuItem projectItem = new MenuItem(popupMenu, SWT.CASCADE);
+        projectItem.setText("Project");
+        Boolean notProject = false;
+        String name = trtmNewTreeitem.getText();
+        if(name.equals(FilePropertyName.UML) || name.equals(FilePropertyName.XML)||
+                name.equals(FilePropertyName.SOURCE_CODE) || name.equals(FilePropertyName.REQUIREMENT)||
+                       name.equals(FilePropertyName.PROPERTY)){
+            notProject = true;
+        }
+        File file = new File(tree.getToolTipText() + File.separator + name);
+        projectItem.setEnabled((file.isDirectory()&& !notProject));
         MenuItem deleteItem = new MenuItem(popupMenu, SWT.NONE);
         deleteItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                
+               
                 deleteFiles(projectPath);
               
-            	XMLWriter writer;
-                try{
-                    writer = new XMLWriter();
-                    writer.deleteProjectFolder(StaticData.rootPathName, selectedFolder);
-                }catch(Exception ex){
-                    ex.printStackTrace();
-                }
+            	
         	
             }
         });
@@ -731,12 +919,18 @@ public class HomeGUI extends JFrame{
             public void widgetSelected(SelectionEvent e) {
                
                 try{
-                    File file = new File(projectPath);
-                    if (!file.isDirectory()) {
-
-                        TreeItem parent = trtmNewTreeitem.getParentItem();
+                    File file = new File(HomeGUI.projectPath);
+                    String lastTxt[] = HomeGUI.projectPath.split("/");
+                    String lastName = lastTxt[lastTxt.length-1];
+                    TreeItem item[] = tree.getSelection();
+                    TreeItem parent = trtmNewTreeitem.getParentItem();
+                    topParent= trtmNewTreeitem;
+                    if(parent == null){
                         trtmNewTreeitem = trtmNewTreeitem.getParentItem();
-                        projectPath = StaticData.workspace + File.separator +  parent.getText();
+                        projectPath = HomeGUI.projectPath;
+                    }else{
+                        projectPath = StaticData.workspace + File.separator +  parent.getText() +
+                                File.separator + lastName;
                     }
                     System.out.println(trtmNewTreeitem + projectPath);
                     NewFileWindow newFileWin = new NewFileWindow();
@@ -747,32 +941,22 @@ public class HomeGUI extends JFrame{
             }
         });
         fileItem.setText("File");
-//        MenuItem umlFileItem = new MenuItem(newMenu, SWT.NONE);
-//        umlFileItem.setText("Import UML File");
-//        umlFileItem.addSelectionListener(new SelectionAdapter() {
-//            @Override
-//            public void widgetSelected(SelectionEvent e) {
-//                File file = new File(projectPath);
-//                if (!file.isDirectory()) {
-//                    TreeItem parent = trtmNewTreeitem.getParentItem();
-//                    trtmNewTreeitem = trtmNewTreeitem.getParentItem();
-//                    projectPath = StaticData.workspace+ File.separator + parent.getText();
-//                }
-//                System.out.println(trtmNewTreeitem + projectPath);
-//                NewFileWindow newFileWin = new NewFileWindow();
-//                isSelectionForUMLFile = true;
-//                newFileWin.open(trtmNewTreeitem, projectPath);
-//              
-//            }
-//        });
-         // isSelectionForUMLFile = false;
-//        Menu newMenu1 = new Menu(popupMenu);
-//        fileItem.setMenu(newMenu1);
-//        
-//        MenuItem mntmUMLSubmenu = new MenuItem(newMenu1, SWT.NONE);
-//        mntmUMLSubmenu.setText("Import UMLDiagram File");
+
                 
+        Menu projectMenu = new Menu(popupMenu);
+        projectItem.setMenu(projectMenu);
         
+        MenuItem closeItem = new MenuItem(projectMenu, SWT.NONE);
+        closeItem.addSelectionListener(new SelectionAdapter() {
+            
+        });
+        closeItem.setText("Close");
+        
+        MenuItem deleteProItem = new MenuItem(projectMenu, SWT.NONE);
+        deleteProItem.addSelectionListener(new SelectionAdapter() {
+            
+        });
+        deleteProItem.setText("Delete");
         
         Menu visualMenu = new Menu(popupMenu);
         graphItem.setMenu(visualMenu);
@@ -857,7 +1041,7 @@ public class HomeGUI extends JFrame{
     public static void setupProject(String graphType){
           String projectName = trtmNewTreeitem.getText();
                 PropertyFile.setProjectName(projectName);
-                PropertyFile.setGraphDbPath(projectPath + projectName
+                PropertyFile.setGraphDbPath(projectPath +File.separator + projectName
                         + ".graphdb");
                 PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator +  projectName
                         + ".gexf");
@@ -928,5 +1112,26 @@ public class HomeGUI extends JFrame{
                         
                     }
     }
+    public void keyPressed(KeyEvent e) {
+        // Listen to CTRL+Z for Undo, to CTRL+Y or CTRL+SHIFT+Z for Redo
+        boolean isCtrl = (e.stateMask & SWT.CTRL) > 0;
+        boolean isAlt = (e.stateMask & SWT.ALT) > 0;
+        if (isCtrl && !isAlt) {
+            boolean isShift = (e.stateMask & SWT.SHIFT) > 0;
+            if (!isShift && e.keyCode == 'S') {
+                new FileSave().saveFile();
+            } else if (!isShift && e.keyCode == 'y' || isShift
+                    && e.keyCode == 'z') {
+                
+            }
+        }
+    }    
+    
+    public void keyReleased(KeyEvent e){
         
+    }
+    
+    public void keyTyped(KeyEvent e){
+        
+    }
 }

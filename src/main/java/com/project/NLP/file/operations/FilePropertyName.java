@@ -3,12 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.project.NLP.staticdata;
+package com.project.NLP.file.operations;
 
 import com.project.traceability.GUI.HomeGUI;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 
 
 /**
@@ -24,8 +29,8 @@ public class FilePropertyName {
     File.separator + "Documents";
     public static final String default_project_path = user_root+ File.separator + "Anduril";
     public static final String default_requirement_doc_path  = user_root + File.separator + "requirement.txt";
-    public static final String default_uml_file_path = user_root + File.separator + "umlFile.json";
-    public static final String default_java_project_path = user_root + File.separator + "JavaSourceCode";
+    public static final String default_uml_file_path = user_root + File.separator + "Diagram" +File.separator;
+    public static final String default_java_project_path = user_root + File.separator + "Java"+File.separator + "src";
     public static final String XML = "xml";
     public static final String REQUIREMENT = "txt";
     public static final String UML = "uml";
@@ -67,4 +72,60 @@ public class FilePropertyName {
         add_file = new File(folder,FilePropertyName.PROPERTY);
         add_file.mkdirs();                                                        
     }
+    
+    public static void copy(FileDialog fileDialog,String savePath){
+		
+                String selectedFiles[];
+                Path path;
+		if(savePath != null){
+			selectedFiles = fileDialog.getFileNames();
+			for (int k = 0; k < selectedFiles.length; k++) {
+				
+				path = Paths.get(savePath + selectedFiles[k]);
+				Path target = Paths.get(savePath);
+					try {
+						Files.copy(path,
+								target.resolve(path.getFileName()),
+								REPLACE_EXISTING);
+					} catch (IOException e1) {							
+						e1.printStackTrace();
+					}           
+		}	
+	}
+	}
+    
+    public static void delete(File file)
+    	throws IOException{
+ 
+    	if(file.isDirectory()){
+ 
+    		//directory is empty, then delete it
+    		if(file.list().length==0){
+                   file.delete();
+    		   System.out.println("Directory is deleted : " 
+                                                 + file.getAbsolutePath());  
+    		}else{
+    		   //list all the directory contents
+        	   String files[] = file.list();
+        	   for (String temp : files) {
+        	      //construct the file structure
+        	      File fileDelete = new File(file, temp);
+        	      //recursive delete
+                      delete(fileDelete);
+        	   }
+        	   //check the directory again, if empty then delete it
+        	   if(file.list().length==0){
+           	     file.delete();
+        	     System.out.println("Directory is deleted : " 
+                                                  + file.getAbsolutePath());
+        	   }
+    		}
+    		
+    	}else{//if file, then delete it
+    		file.delete();
+    		System.out.println("File is deleted : " + file.getAbsolutePath());
+    	}
+    }
+
 }
+

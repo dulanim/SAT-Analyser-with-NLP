@@ -1,6 +1,6 @@
 package com.project.traceability.visualization;
 
-import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;

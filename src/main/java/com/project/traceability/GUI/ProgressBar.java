@@ -6,6 +6,9 @@
 package com.project.traceability.GUI;
 
 import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
+import com.project.traceability.staticdata.StaticData;
+import com.project.progress.progressbar.Exection;
+import com.project.progress.progressbar.LogReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import static com.project.traceability.GUI.WorkspaceSelectionWindow.window;
 import javax.swing.SwingUtilities;
@@ -20,7 +23,13 @@ public class ProgressBar extends javax.swing.JFrame {
      * Creates new form ProgressBar
      */
     public ProgressBar() {
-        initComponents();
+          StaticData.lpOut = LogReader.create(System.out);
+          StaticData.lpEror = LogReader.create(System.err);
+          
+            // Set them to stdout / stderr
+          System.setOut(StaticData.lpOut);
+          System.setErr(StaticData.lpOut);
+          initComponents();
     }
 
     /**
@@ -141,6 +150,8 @@ public class ProgressBar extends javax.swing.JFrame {
     }
     private void call_sub_thread(ProgressBar progressBar){
                    jLblStatus.setText("Reading XML File");
+                   System.out.println("Loading the project");
+                   new Task().start();
                    XMLWriter writer = new XMLWriter();
                    com.project.property.config.xml.reader.XMLReader reader = new com.project.property.config.xml.reader.XMLReader();
                    progressBar.setVisible(false);
@@ -161,21 +172,10 @@ public class ProgressBar extends javax.swing.JFrame {
 
       public void run(){
          int i = 0;
-         
-         for(i =0; i<= 100; i+=10){
-            
-            final int progress = i;
-             SwingUtilities.invokeLater(new Runnable() {
-               public void run() {
-                   
-                  jProgressBar.setValue(progress);
-                 
-               }
-            });
-            try {
-               Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-         }
+          System.out.println("Loading the project");
+          System.out.flush();
+          Exection executor = new Exection();
+          executor.execute();
       }
    } 
     // Variables declaration - do not modify//GEN-BEGIN:variables

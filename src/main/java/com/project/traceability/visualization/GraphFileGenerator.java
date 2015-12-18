@@ -157,7 +157,7 @@ public class GraphFileGenerator {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(doc);
-            StreamResult stream = new StreamResult(new File(PropertyFile.filePath+PropertyFile.getProjectName(),PropertyFile.getProjectName()+".gexf").getPath());
+            StreamResult stream = new StreamResult(new File(PropertyFile.getGeneratedGexfFilePath()).getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, stream);

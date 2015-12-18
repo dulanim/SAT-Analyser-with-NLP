@@ -3,8 +3,9 @@
  */
 package com.project.traceability.GUI;
 
-import com.project.NLP.staticdata.FilePropertyName;
-import com.project.NLP.staticdata.StaticData;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.staticdata.StaticData;
+import com.project.progress.progressbar.Exection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -212,6 +213,9 @@ public class FileSelectionWindow {
 					lblNewLabel.setText("");
 					shell.close();
 					window.open(project, selectedFiles);
+                                        
+                        
+                                        
 					/*Runnable longJob = new Runnable() {
 						boolean done = false;
 						int id;
