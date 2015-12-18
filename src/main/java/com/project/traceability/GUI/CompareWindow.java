@@ -99,7 +99,11 @@ public class CompareWindow {
 
 		display = Display.getDefault();
 		createContents(selectedFiles);
-		ReadFiles.readFiles(PropertyFile.filePath + project);
+                
+                TreeItem item = HomeGUI.trtmNewTreeitem;
+                String root = HomeGUI.tree.getToolTipText() + File.separator;
+                PropertyFile.filePath = root;
+		ReadFiles.readFiles(PropertyFile.filePath + item.getText());
 		compareFiles(project, selectedFiles);
 		return shell;
 	}

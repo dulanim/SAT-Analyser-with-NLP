@@ -39,6 +39,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
+        super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
+        // ctx.unannType().unannReferenceType().unannClassOrInterfaceType().
+        type = "Field";
         super.enterFieldDeclaration(ctx); 
         type = "Variable";
         String associationType = "COMPOSITION";
@@ -63,8 +66,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         }       
         fieldNameList.clear();
     }
+    public void writeFieldToXML(){
+        
 
-    public void writeFieldToXML() {
         Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
         artefactElement.appendChild(artefactSubElement);
 
@@ -212,6 +216,19 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         id++;
 
 //implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
+
+        //
+        
+        /*Element artefact  = WriteToXML.getDocument().createElement("Artefact");
+        AST.artefacts.appendChild(artefact);
+        Attr rootType = WriteToXML.getDocument().createAttribute("type");
+        rootType.setValue("SourceCode");
+        artefactElement.setAttributeNode(rootType);        
+        */
+        artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
+        //AST.artefact.appendChild(artefactElement);
+       // artefact.appendChild(artefactElement);
+
         root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0);
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root.appendChild(artefactElement);

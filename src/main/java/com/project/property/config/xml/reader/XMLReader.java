@@ -8,7 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.common.PropertyFile;
 import java.io.IOException;
 import java.util.ArrayList;

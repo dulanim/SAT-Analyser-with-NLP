@@ -1,6 +1,10 @@
 package com.project.traceability.GUI;
 
-import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.SourceCodeToXML.AST;
+import com.project.NLP.UMLToXML.jsonreader.JSONReader;
+import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
+import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.NLP.file.operations.FilePropertyName;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.File;
@@ -24,7 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.writer.XMLWriter;
 import static com.project.traceability.GUI.HomeGUI.display;
 import static com.project.traceability.GUI.HomeGUI.tree;
@@ -34,6 +38,8 @@ import static com.project.traceability.GUI.NewProjectWindow.trtmNewTreeitem;
 import static com.project.traceability.GUI.WorkspaceSelectionWindow.window;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
@@ -44,8 +50,10 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class ProjectCreateWindow {
         public static TreeItem trtmNewTreeitem;
+        public static String projectName;
         public FileDialog docsFileDialog;
 	public FileDialog umlFileDialog;
+        public File srcJavaDir;
 	protected Shell shell;
 	
 	static String localFilePath;
@@ -53,7 +61,6 @@ public class ProjectCreateWindow {
 	static Path path;
         String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
         String req_formats[] ={"*.docs*;*.txt*;*.mdj*"};
-        FileDialog srcFileDialog;
 	private Text txtProjectName;
 	private Text txtRequirementPath;
 	private Text txtUmlPath;
@@ -117,7 +124,7 @@ public class ProjectCreateWindow {
 		txtRequirementPath.setEnabled(false);
 		txtRequirementPath.setEditable(false);
 		txtRequirementPath.setText(FilePropertyName.default_requirement_doc_path);
-		txtRequirementPath.setBounds(127, 37, 343, 21);
+		txtRequirementPath.setBounds(153, 37, 317, 21);
 		
 		final Button btnReqBrwse = new Button(grpImportRequiredFiles, SWT.NONE);
 		btnReqBrwse.setEnabled(false);
@@ -146,13 +153,12 @@ public class ProjectCreateWindow {
 		
 		Label lblDiagramFile = new Label(grpImportRequiredFiles, SWT.NONE);
 		lblDiagramFile.setText("Design Diagram File");
-		lblDiagramFile.setBounds(10, 81, 113, 15);
-		
+		lblDiagramFile.setBounds(10, 81, 137, 15);
 		txtUmlPath = new Text(grpImportRequiredFiles, SWT.BORDER);
 		txtUmlPath.setText(FilePropertyName.default_uml_file_path);
 		txtUmlPath.setEnabled(false);
 		txtUmlPath.setEditable(false);
-		txtUmlPath.setBounds(127, 78, 343, 21);
+                txtUmlPath.setBounds(153, 78, 317, 21);
 		
 		final Button btnUmlBrwse = new Button(grpImportRequiredFiles, SWT.NONE);
 		btnUmlBrwse.setEnabled(false);
@@ -161,16 +167,16 @@ public class ProjectCreateWindow {
 			public void widgetSelected(SelectionEvent arg0) {
 			        
 	                FileDialog fileDialog = new FileDialog(shell, SWT.MULTI);
-					fileDialog.setText("Open");
+			fileDialog.setText("Open");
 	                fileDialog.setFilterExtensions(formats); // Windows           
-					fileDialog.setFilterPath(PropertyFile.xmlFilePath);
-					localFilePath = fileDialog.open();
+			fileDialog.setFilterPath(PropertyFile.xmlFilePath);
+			localFilePath = fileDialog.open();
 	                StaticData.umlFilePath = localFilePath;
-					localFilePath = localFilePath.replace(Paths.get(localFilePath)
+			localFilePath = localFilePath.replace(Paths.get(localFilePath)
 							.getFileName().toString(), "");
-					umlFileDialog = fileDialog;
-					if(localFilePath != null){
-						txtUmlPath.setText(StaticData.umlFilePath);
+			umlFileDialog = fileDialog;
+                            if(localFilePath != null){
+					txtUmlPath.setText(StaticData.umlFilePath);
 				}		
 			}
 		});
@@ -179,45 +185,92 @@ public class ProjectCreateWindow {
 		
 		Label lblProjectPath = new Label(grpImportRequiredFiles, SWT.NONE);
 		lblProjectPath.setText("Project Path");
-		lblProjectPath.setBounds(10, 129, 102, 15);
-		
+		lblProjectPath.setBounds(10, 129, 137, 15);
 		txtProjectPath = new Text(grpImportRequiredFiles, SWT.BORDER);
 		txtProjectPath.setEnabled(false);
 		txtProjectPath.setEditable(false);
-		txtProjectPath.setBounds(127, 126, 343, 21);
-		
+		txtProjectPath.setBounds(153, 126, 317, 21);
+		txtProjectPath.setText(FilePropertyName.default_java_project_path);
+                
 		final Button btnSrcBrwse = new Button(grpImportRequiredFiles, SWT.NONE);
 		btnSrcBrwse.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-			}
+                            /*
+                            Pop up File Chooser Window
+                            */
+                            DirectoryDialog directoryDialog = new DirectoryDialog(shell);
+                            directoryDialog.setText("Open");
+                            localFilePath = directoryDialog.open();
+                            StaticData.sourceFilePath = localFilePath;
+                            localFilePath = localFilePath.replace(Paths.get(localFilePath)
+							.getFileName().toString(), "");
+                            String root = HomeGUI.tree.getToolTipText() + File.separator + txtProjectName.getText();
+                            String path = root + File.separator + FilePropertyName.SOURCE_CODE;
+                            srcJavaDir = new File(path);
+                            if(localFilePath != null){
+					txtProjectPath.setText(StaticData.sourceFilePath);
+				}		
+			
+                        }
 		});
 		btnSrcBrwse.setEnabled(false);
 		btnSrcBrwse.setText("Browse");
 		btnSrcBrwse.setBounds(476, 124, 75, 25);
 		
 		Label lblProjectName = new Label(shell, SWT.NONE);
-		lblProjectName.setBounds(10, 45, 133, 21);
+		lblProjectName.setBounds(10, 45, 175, 21);
 		lblProjectName.setText("Traceabilty Project Name");
 		
                 final Button btnFinish = new Button(shell, SWT.NONE);
 		btnFinish.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				
+                            
                             try{
+                                FilePropertyName.addSubFolderIntoProject(new 
+                                                    File(PropertyFile.filePath));
+                                projectName = txtProjectName.getText();
                                 if(!FilePropertyName.default_requirement_doc_path.equals(txtRequirementPath.getText())){
                                     copy(docsFileDialog,PropertyFile.docsFilePath,FilePropertyName.REQUIREMENT);
+                                    /*
+                                    It is just for demonstration
+                                    */
+                                    //copy(docsFileDialog,"/home/shiyam/XMLfiles/RequirementArtefactFile.xml",FilePropertyName.XML);
+                                   Path path = Paths.get("/home/shiyam/XMLfiles/RequirementArtefactFile.xml");
+                                   Path target = Paths.get(StaticData.workspace + 
+                                        File.separator + txtProjectName.getText().toString()
+                                +File.separator+FilePropertyName.XML);                                       
+				if (localFilePath != null) {
+					try {
+						Files.copy(path,
+								target.resolve(path.getFileName()),
+								REPLACE_EXISTING);
+					} catch (IOException e1) {							
+						e1.printStackTrace();
+					}
+				}
                                 }
                                 if(!FilePropertyName.default_uml_file_path.equals(txtUmlPath.getText())){
                                     copy(umlFileDialog,StaticData.umlFilePath,FilePropertyName.UML);
+                                    WriteToXML xmlWriter = new WriteToXML();
+                                    if(umlFileDialog.getFileName().contains("mdj")){
+                                        JSONReader reader = new JSONReader();
+                                        reader.readJson();
+                                        xmlWriter.createXML();
+                                    }else{
+                                        XMLReader reader = new XMLReader();
+                                        reader.readUMLXMI();
+                                    }
                                 }
                                 if(!FilePropertyName.default_java_project_path.equals(txtRequirementPath.getText())){
                                     //add copy files for source code 
-                                    
+                                    copy(null,StaticData.sourceFilePath,FilePropertyName.SOURCE_CODE);
+                                    //AST.main(null);
+                                
                                 }
 				
-				String projectName = txtProjectName.getText();
+                                
                                 projectPath = PropertyFile.filePath  + File.separator;
                                 PropertyFile.setProjectName(projectName);
                                 PropertyFile.setGraphDbPath(projectPath + projectName + ".graphdb");
@@ -273,14 +326,31 @@ public class ProjectCreateWindow {
 				});
 		
 				String newName = txtProjectName.getText();//typed name currently
+                                Pattern pattern = Pattern.compile("[ `!~#@*+%{}<>\\[\\]|\"\\_^]");
+                                Matcher matcher = pattern.matcher(newName);
+                                if(newName.equals("")||newName.isEmpty() ||newName.contains(" ")){
+                                   btnReqBrwse.setEnabled(false);
+                                   btnUmlBrwse.setEnabled(false);
+                                   btnSrcBrwse.setEnabled(false);
+                                   btnFinish.setEnabled(false);
+                                   JOptionPane.showMessageDialog(null, newName + " is invalid name\n" + "Name should not have space",
+                                           "Error Message",JOptionPane.ERROR_MESSAGE);
+                                   return ;
+                                   
+                                }else if(matcher.find()){
+                                     btnReqBrwse.setEnabled(false);
+                                     btnUmlBrwse.setEnabled(false);
+                                     btnSrcBrwse.setEnabled(false);
+                                     btnFinish.setEnabled(false);
+                                    JOptionPane.showMessageDialog(null, newName + " is invalid name\n" + "Name should not have illegal character",
+                                           "Error Message",JOptionPane.ERROR_MESSAGE);
+                                    return ;
+                                     
+                                }
 				String temp = PropertyFile.filePath + File.separator;
 				PropertyFile.filePath += File.separator +  newName;
 					for (String directorie : directories) {
-						if(directorie.equals(newName)){
-							crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
-							  JOptionPane.showMessageDialog(null, newName + " is already existing in \n" + StaticData.workspace,"Error Message",JOptionPane.ERROR_MESSAGE);
-                                                        return;
-						}else{
+						
 							
 							crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/exact.jpg"));;
 							File folder = new File(PropertyFile.filePath);
@@ -289,17 +359,25 @@ public class ProjectCreateWindow {
 								/*
 								 * File Make Directory
 								 */
-                                                                FilePropertyName.addSubFolderIntoProject(folder);
-//								XMLWriter writer = new XMLWriter();
-//								writer.createMainNode(projectpath,newName);
-							}
-							btnReqBrwse.setEnabled(true);
-							btnUmlBrwse.setEnabled(true);
-							btnSrcBrwse.setEnabled(true);
-                                                        btnFinish.setEnabled(true);
-							return;
+                                                            btnReqBrwse.setEnabled(true);
+                                                            btnUmlBrwse.setEnabled(true);
+                                                            btnSrcBrwse.setEnabled(true);
+                                                            btnFinish.setEnabled(true);
+                                                            return;
+                                                            
+							}else{
+                                                            crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
+                                                            btnReqBrwse.setEnabled(false);
+                                                            btnUmlBrwse.setEnabled(false);
+                                                            btnSrcBrwse.setEnabled(false);
+                                                            btnFinish.setEnabled(false);  
+                                                             JOptionPane.showMessageDialog(null, newName + " is already existing in \n" + 
+                                                                StaticData.workspace,"Error Message",JOptionPane.ERROR_MESSAGE);
+                                                            return;
+                                                        }
+							
 						}
-				}
+				
                                 //if no directories in specific folder add that project folder
                                 if(directories.length == 0){
                                     String projectPath = PropertyFile.filePath+File.separator;
@@ -317,8 +395,8 @@ public class ProjectCreateWindow {
 
 			}
 		});
-		txtProjectName.setBounds(158, 42, 309, 21);
-		
+                
+                txtProjectName.setBounds(192, 42, 278, 21);
 		Button btnCancel = new Button(shell, SWT.NONE);
 		btnCancel.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
 		btnCancel.setBounds(10, 293, 75, 25);
@@ -334,13 +412,13 @@ public class ProjectCreateWindow {
 		
 		Label lblTraceabilityProject = new Label(shell, SWT.NONE);
 		lblTraceabilityProject.setText("Traceability Project  Path");
-		lblTraceabilityProject.setBounds(10, 15, 142, 15);
+                lblTraceabilityProject.setBounds(10, 15, 175, 15);
 		
 		txtCusersshiyamdocuments = new Text(shell, SWT.BORDER);
 		txtCusersshiyamdocuments.setText(StaticData.workspace);
 		txtCusersshiyamdocuments.setEnabled(false);
 		txtCusersshiyamdocuments.setEditable(false);
-		txtCusersshiyamdocuments.setBounds(158, 12, 312, 21);
+		txtCusersshiyamdocuments.setBounds(192, 12, 278, 21);
 		
 		Button button_2 = new Button(shell, SWT.NONE);
 		button_2.addSelectionListener(new SelectionAdapter() {
@@ -371,11 +449,20 @@ public class ProjectCreateWindow {
 			//PropertyFile.docsFilePath = localFilePath;
 			localFilePath = localFilePath.replace(Paths.get(localFilePath)
 					.getFileName().toString(), "");
-			selectedFiles = fileDialog.getFileNames();
+                        
+                        if(fileDialog == null){
+                            srcJavaDir = new File(filePath);
+                            selectedFiles = srcJavaDir.list();
+                            localFilePath = filePath +File.separator;
+                        }else{
+                            selectedFiles = fileDialog.getFileNames();
+                        }
+			
 			for (int k = 0; k < selectedFiles.length; k++) {
 				
 				path = Paths.get(localFilePath + selectedFiles[k]);
-				Path target = Paths.get(StaticData.workspace + File.separator + txtProjectName.getText().toString()
+				Path target = Paths.get(StaticData.workspace + 
+                                        File.separator + txtProjectName.getText().toString()
                                 +File.separator+folder);                                       
 				if (localFilePath != null) {
 					try {

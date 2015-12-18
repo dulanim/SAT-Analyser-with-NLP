@@ -17,13 +17,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.ClassData;
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
+import java.io.IOException;
+import javax.swing.JOptionPane;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
 
  
 /**
@@ -45,7 +49,7 @@ public class XMLReader {
      
         try {
  
-	File fXmlFile = new File("C:\\Users\\shiyam\\modelio\\workspace\\Project1\\XMI\\project1.uml");
+	File fXmlFile = new File(StaticData.umlFilePath);
 	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 	Document doc = dBuilder.parse(fXmlFile);
@@ -203,8 +207,22 @@ public class XMLReader {
                 }
 	}
        
-    } catch (Exception e) {
-	e.printStackTrace();
+    }catch(IOException e){
+        JOptionPane.showMessageDialog(null, e.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    } catch(SAXException e){
+        JOptionPane.showMessageDialog(null, e.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }catch(ParserConfigurationException e){
+        JOptionPane.showMessageDialog(null, e.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }catch (Exception e) {
+        JOptionPane.showMessageDialog(null, e.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
     }
             for(int i=0;i<StaticData.classLst.size();i++){
                     ModelData temp = StaticData.classLst.get(i);

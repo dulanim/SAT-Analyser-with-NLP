@@ -5,7 +5,7 @@
 package com.project.NLP.UMLToXML.jsonreader;
 
 import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.ClassData;
 import com.project.traceability.model.Dependencies;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -87,7 +88,7 @@ public class JSONReader {
 		
 					// get a String from the JSON object
 					JSONArray ownedElementArray =  (JSONArray) jsonObject.get("ownedElements");
-		            JSONObject jsonObjOwnedElement = (JSONObject) ownedElementArray.get(0);
+                                        JSONObject jsonObjOwnedElement = (JSONObject) ownedElementArray.get(0);
 		                        
 					JSONArray jsonArrOwnedElement = (JSONArray)jsonObjOwnedElement.get("ownedElements");
 		                        
@@ -200,8 +201,13 @@ public class JSONReader {
 		                                          if(isViewExists(type, aReader, Id)){
 		                                          dependencies.setDependency_type(jsonObject_OwnedElement.
 		                                                  get("_type").toString());
-		                                          String annotation = jsonObject_OwnedElement.
+		                                          String annotation = "";
+                                                          
+                                                          if(jsonObject_OwnedElement.
+		                                                  get("name") != null){
+                                                              annotation = jsonObject_OwnedElement.
 		                                                  get("name").toString();
+                                                          }
 		                                          JSONObject jsonObjSrc = (JSONObject) jsonObject_OwnedElement.
 		                                                  get("source");
 		                                          dependencies.setSource_id(jsonObjSrc.get("$ref").toString());
@@ -218,20 +224,36 @@ public class JSONReader {
 		                                          Id = jsonObject_OwnedElement.
 		                                                  get("_id").toString();
 		                                           if(isViewExists(type, aReader, Id)){
-		                                               String annotation = jsonObject_OwnedElement.
+                                                               String annotation = "";
+                                                               if(jsonObject_OwnedElement.
+		                                                  get("name") == null){
+                                                                   annotation = "";
+                                                               }else{
+                                                                   annotation = jsonObject_OwnedElement.
 		                                                  get("name").toString();
+                                                               }
+		                                               
 		                                               JSONObject jsonObjectEnd1 = (JSONObject) jsonObject_OwnedElement
 		                                                       .get("end1");
 		                                               JSONObject tempRef = (JSONObject)jsonObjectEnd1.get("reference");
 		                                               String refenceSrc = tempRef.get("$ref").toString();
-		                                               String muliplicitySrc = jsonObjectEnd1.get("name").toString();
+		                                               String muliplicitySrc = "";
 		                                               
+                                                               if(jsonObjectEnd1.get("name") == null){
+                                                                   muliplicitySrc = "";
+                                                               }else{
+                                                                   muliplicitySrc = jsonObjectEnd1.get("name").toString();
+                                                               }
 		                                               JSONObject jsonObjectEnd2 = (JSONObject) jsonObject_OwnedElement
 		                                                       .get("end2");
 		                                               tempRef = (JSONObject)jsonObjectEnd2.get("reference");
 		                                               String refenceTarget = tempRef.get("$ref").toString();
-		                                               String muliplicityTarget = jsonObjectEnd2.get("name").toString();
-		                                               
+		                                               String muliplicityTarget = "";
+		                                               if(jsonObjectEnd2.get("name") == null){
+                                                                   muliplicityTarget = "";
+                                                               }else{
+                                                                   muliplicityTarget = jsonObjectEnd2.get("name").toString();
+                                                               }
 		                                               dependencies = new Dependencies();
 		                                               dependencies.setDependency_type("Association");
 		                                               dependencies.setAnnotation(annotation);
@@ -250,13 +272,26 @@ public class JSONReader {
 		
 		                        
 				} catch (FileNotFoundException ex) {
-					ex.printStackTrace();
+                                    ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
+					
 				} catch (IOException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				} catch (ParseException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				} catch (NullPointerException ex) {
 					ex.printStackTrace();
+                                    JOptionPane.showMessageDialog(null, ex.toString(),
+                                            "Error Message",JOptionPane.ERROR_MESSAGE);
+
 				}
                 
                 for(int i=0;i<StaticData.classLst.size();i++){

@@ -3,7 +3,9 @@
  */
 package com.project.traceability.common;
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.staticdata.StaticData;
+import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.visualization.VisualizeGraph;
 import java.io.File;
 
@@ -33,7 +35,8 @@ public class PropertyFile {
     public static final String testXmlFilePath = "E:/ATOM/test/";
     public static final String testDb = "E:/SATWork/Test/Test.graphDb";
     public static final String testGraphFile = "E:/SATWork/Test/Test.gexf";
-    public static final String xmlSourceCodeFilePath = "";
+    public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator +
+            FilePropertyName.XML;
     public static String configuration_file_path = System.getProperty("user.home")
                 +File.separator + "sat_configuration.xml";
     public static String getProjectName() {

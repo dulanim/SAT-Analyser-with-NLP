@@ -1,6 +1,5 @@
 package com.project.traceability.GUI;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,11 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -39,21 +36,33 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.project.NLP.UMLToXML.jsonreader.JSONReader;
-import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
-import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import com.project.NLP.staticdata.FilePropertyName;
-import com.project.NLP.staticdata.StaticData;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.NLP.file.operations.JavaViewer;
+import com.project.NLP.file.operations.XMLFileStyleFormat;
+import com.project.text.undoredo.UndoRedoImpl;
 import com.project.traceability.common.PropertyFile;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.HashSet;
+import java.util.Set;
+import org.eclipse.swt.custom.CTabFolderAdapter;
+import org.eclipse.swt.custom.CTabFolderEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.TableItem;
 
 public class NewFileWindow {
-
+        public static StyledText codeText;
 	static Shell shell;
 	private Text text;
 	static Path path;
-	static String localFilePath;
+	public static String localFilePath;
 	static String[] selectedFiles;
-	static StyledText codeText;
         String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
 	static String textString;
 	FileDialog fileDialog;
@@ -111,6 +120,7 @@ public class NewFileWindow {
 		shell.setSize(450, 545);
 		shell.setText("New File");
 		center(shell);
+                
 		final Tree tree = new Tree(shell, SWT.BORDER);
 		tree.setBounds(12, 57, 412, 338);
 		System.out.println(HomeGUI.projectPath + "KKKKKKKK");
@@ -164,20 +174,21 @@ public class NewFileWindow {
                                 }
 				fileDialog.setFilterPath(PropertyFile.xmlFilePath);
 				localFilePath = fileDialog.open();
-                                StaticData.umlFilePath = localFilePath;
+                                //StaticData.umlFilePath = localFilePath;
 				localFilePath = localFilePath.replace(Paths.get(localFilePath)
 						.getFileName().toString(), "");
 				selectedFiles = fileDialog.getFileNames();
 				for (int k = 0; k < selectedFiles.length; k++) {
 					text.append(selectedFiles[k] + " , ");
 					path = Paths.get(localFilePath + selectedFiles[k]);
-					Path trgt = Paths.get(HomeGUI.projectPath); 
+                                        String saveLocation = HomeGUI.projectPath;
+					Path trgt = Paths.get(saveLocation); 
                                         String fileName = selectedFiles[k];
 					if (localFilePath != null) {
-                                            Path target = FilePropertyName.getPath(trgt, fileName);
+                                            //Path target = FilePropertyName.getPath(trgt, fileName);
 						try {
 							Files.copy(path,
-									target.resolve(path.getFileName()),
+									trgt.resolve(path.getFileName()),
 									REPLACE_EXISTING);
 						} catch (IOException e1) {							
 							e1.printStackTrace();
@@ -197,10 +208,21 @@ public class NewFileWindow {
 			public void widgetSelected(SelectionEvent e) {
                              
 				for (int j = 0; j < selectedFiles.length; j++) {
+                                        TreeItem treeItm = null;
+                                        if(HomeGUI.trtmNewTreeitem == null){
+                                            treeItm = HomeGUI.topParent;
+                                        }else{
+                                            treeItm = HomeGUI.trtmNewTreeitem;
+                                        }
 					TreeItem treeItem = new TreeItem(
-							HomeGUI.trtmNewTreeitem, SWT.NONE);
+							treeItm, SWT.NONE);
 					treeItem.setText(selectedFiles[j]);
-					HomeGUI.trtmNewTreeitem.setExpanded(true);
+                                        treeItem.setImage(new Image(HomeGUI.display,FilePropertyName.IMAGE_PATH + "file_txt.png"));
+                                        
+                                        if(HomeGUI.trtmNewTreeitem == null)
+                                            treeItm.setExpanded(true);
+                                        else
+                                            treeItm.setExpanded(true);
 					//HomeGUI.treeViewer.refresh(HomeGUI.tree);
 					HomeGUI.projComposite.layout();
 				}
@@ -212,7 +234,7 @@ public class NewFileWindow {
                                 
                                
 				openFiles();
-
+                                //FilePropertyName.copy(fileDialog, localFilePath, textString);
                                
 			}
                         
@@ -231,9 +253,9 @@ public class NewFileWindow {
 	public static void createTabLayout(String fileName) {
 		HomeGUI.tabFolder.setVisible(true);
 
-		CTabItem tabItem = new CTabItem(HomeGUI.tabFolder, SWT.NONE);
+		final CTabItem tabItem = new CTabItem(HomeGUI.tabFolder, SWT.NONE);
 		tabItem.setText(fileName);
-
+                
 		Composite composite = new Composite(HomeGUI.tabFolder, SWT.NONE);
 
 		composite.setLayout(new GridLayout(1, false));
@@ -256,13 +278,18 @@ public class NewFileWindow {
 		spec.grabExcessHorizontalSpace = true;
 		spec.verticalAlignment = GridData.FILL;
 		spec.grabExcessVerticalSpace = true;
+                
+                
 		composite.setLayoutData(spec);
 
 		codeText = new StyledText(composite, SWT.BORDER | SWT.MULTI
 				| SWT.V_SCROLL | SWT.H_SCROLL);
 		codeText.setLayoutData(spec);
-
+                codeText.selectAll();
+                codeText.setAlwaysShowScrollBars(true);
+                codeText.setEditable(false);
 		File file = new File(localFilePath + fileName);
+                tabItem.setToolTipText(file.getPath());
 		try {
 			FileInputStream stream = new FileInputStream(file.getPath());
 			try {
@@ -286,78 +313,68 @@ public class NewFileWindow {
 			displayError(message);
 			return;
 		}
-
+                /*
+                set up opened files on CTab
+                */
+                
 		final Display display = codeText.getDisplay();
 		// display.asyncExec(new Runnable() {
 		// public void run() {
 		codeText.setText(textString);
-		List<XmlRegion> regions = new XmlRegionAnalyzer()
-				.analyzeXml(textString);
-		List<StyleRange> styleRanges = XmlRegionAnalyzer
-				.computeStyleRanges(regions);
-		for (int l = 0; l < regions.size(); l++) {
-			XmlRegion xr = regions.get(l);
-			int regionLength = xr.getEnd() - xr.getStart();
-			switch (xr.getXmlRegionType()) {
-			case MARKUP: {
-				for (int i = 0; i < regionLength; i++) {
-					StyleRange[] range = new StyleRange[] { styleRanges.get(l) };
-					range[0].start = xr.getStart();
-					range[0].length = regionLength;
-					codeText.replaceStyleRanges(xr.getStart(), regionLength,
-							range);
-				}
-				break;
-			}
-			case ATTRIBUTE: {
-				for (int i = 0; i < regionLength; i++) {
-					StyleRange[] range = new StyleRange[] { styleRanges.get(l) };
-					range[0].start = xr.getStart();
-					range[0].length = regionLength;
-					codeText.replaceStyleRanges(xr.getStart(), regionLength,
-							range);
-				}
-				break;
-			}
-			case ATTRIBUTE_VALUE: {
-				for (int i = 0; i < regionLength; i++) {
-					StyleRange[] range = new StyleRange[] { styleRanges.get(l) };
-					range[0].start = xr.getStart();
-					range[0].length = regionLength;
-					codeText.replaceStyleRanges(xr.getStart(), regionLength,
-							range);
-				}
-				break;
-			}
-			case MARKUP_VALUE: {
-				for (int i = 0; i < regionLength; i++) {
-					StyleRange[] range = new StyleRange[] { styleRanges.get(l) };
-					range[0].start = xr.getStart();
-					range[0].length = regionLength;
-					codeText.replaceStyleRanges(xr.getStart(), regionLength,
-							range);
-				}
-				break;
-			}
-			case COMMENT:
-				break;
-			case INSTRUCTION:
-				break;
-			case CDATA:
-				break;
-			case WHITESPACE:
-				break;
-			default:
-				break;
-			}
-
-		}
-
-		// }
-		// });
+                XMLFileStyleFormat xmlFileStyle;
+                JavaViewer viewer;
+                /*
+                    setting respected style for each files
+                */
+                if(file.getPath().contains("xml")){
+                    xmlFileStyle = new XMLFileStyleFormat(textString,codeText);
+                }else if(file.getPath().contains("java")){
+                    viewer = new JavaViewer();
+                    viewer.read(file.getPath());
+                }else{
+                    xmlFileStyle = new XMLFileStyleFormat(textString,codeText);
+                    codeText.setEditable(true);
+                }
+		new UndoRedoImpl(codeText);
 		composite.setData(codeText);
 		tabItem.setControl(composite);
-
+                tabItem.setToolTipText(file.getPath());
+                final CTabItem tabItemFinal = tabItem;
+                
+                // Add an event listener to write the selected tab to stdout
+                // Add a listener to get the close button on each tab
+                HomeGUI.tabFolder.addCTabFolderListener(new CTabFolderAdapter() {
+                  public void itemClosed(CTabFolderEvent event) {
+                      if (event.item.equals(tabItem)) {
+                            event.doit = true;
+                    }
+                  }
+                  
+                  public void itemSelected(CTabFolderEvent event){
+                      System.out.println("Tab CLicked");
+                  }
+                  //public void item
+                });
+                
+                HomeGUI.tabFolder.addMouseMoveListener(new MouseMoveListener() {
+                    public void mouseMove(MouseEvent arg0) {
+                        Point point = new Point(arg0.x, arg0.y);
+                        CTabItem[] items = HomeGUI.tabFolder.getItems();
+                        for (int i = 0; i < items.length;i++) {
+                            if (items[i].getBounds().contains(point)){
+                                //lineFolder.setSelection(items[i]);
+                            }
+                        }
+                    }
+                });
+                HomeGUI.tabFolder.addListener(SWT.MouseHover, new Listener() {
+                    public void handleEvent(Event event) {
+                      Point pt = new Point(event.x, event.y);
+                      CTabItem item = HomeGUI.tabFolder.getItem(pt);
+                      if(item != null)
+                        HomeGUI.activeTab.put(true,item.getToolTipText().toString());
+                    }
+                });
 	}
 
 	public void center(Shell shell) {
@@ -377,4 +394,6 @@ public class NewFileWindow {
 		box.setMessage(msg);
 		box.open();
 	}
+        
+        
 }

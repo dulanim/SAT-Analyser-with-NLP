@@ -1,7 +1,7 @@
 package com.project.property.config.xml.writer;
 
 
-import com.project.NLP.staticdata.StaticData;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.common.PropertyFile;
 import java.io.File;
 import java.io.IOException;

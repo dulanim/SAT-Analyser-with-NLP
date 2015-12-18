@@ -1,6 +1,6 @@
 package com.project.traceability.manager;
 
-import com.project.NLP.staticdata.FilePropertyName;
+import com.project.NLP.file.operations.FilePropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

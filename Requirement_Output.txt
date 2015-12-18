@@ -1,0 +1,9 @@
+
+Class : normal order
+	Attributes : item,	Methods : receive,dispose,
+Class : special order
+	Attributes : item,	Methods : dispose,
+Class : customer
+	Attributes : item,name,location,order,	Methods : receive,record,send,order,
+Class : order
+	Attributes : normal order,special order,customer,	Methods : confirm,close,

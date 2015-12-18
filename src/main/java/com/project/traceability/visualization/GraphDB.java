@@ -1,5 +1,7 @@
 package com.project.traceability.visualization;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
@@ -7,6 +9,7 @@ import com.project.traceability.model.AttributeModel;
 import com.project.traceability.model.MethodModel;
 import com.project.traceability.model.ParameterModel;
 import com.project.traceability.model.RequirementModel;
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +118,7 @@ public class GraphDB {
      */
     public void initiateGraphDB() {
 
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(PropertyFile.getGraphDbPath()).newGraphDatabase();
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY).newGraphDatabase();
         Transaction tx = graphDb.beginTx();
 
         try {
