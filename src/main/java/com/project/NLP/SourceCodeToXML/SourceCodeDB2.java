@@ -5,6 +5,7 @@
  */
 package com.project.NLP.SourceCodeToXML;
 
+import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.common.PropertyFile;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,11 +41,11 @@ public class SourceCodeDB2 {
 
     private static GraphDatabaseService graphDb;
     private static Node firstNode, secondNode;
-    private String fileName = "soucredb-111";
+    private String fileName = "soucredb-121";
 
     public SourceCodeDB2() {
         //start the database server
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + fileName + ".graphdb");
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + ProjectCreateWindow.projectName + ".graphdb");
         createNodes();
     }
 

@@ -5,6 +5,9 @@
  */
 package com.project.NLP.SourceCodeToXML;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.GUI.HomeGUI;
+import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.common.PropertyFile;
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,21 +39,33 @@ import org.xml.sax.SAXException;
 public class WriteToXML {
 
     public static Document document;
-    private static final String destinationPath = PropertyFile.xmlSourceCodeFilePath;
-    private static final String fileName = "SourceCodeArtefactFile";
+    private static String destinationPath;
     //AST.file.replaceAll(".java", "");
-    private static final File file = new File(destinationPath + "\\" + fileName + ".xml");
+    private static File file;
     public static Element artefacts, artefactType, fileLocation;
 
     public static Document getDocument() {
         return document;
     }
 
+    public static void getFilePath(){
+        String root = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName;
+        //System.out.println("Root: "+root);
+        File f = new File(root + File.separator +FilePropertyName.XML);
+        if(!f.exists())
+            f.mkdir();
+        destinationPath = f.getPath() + File.separator + FilePropertyName.SOURCE_ARTIFACT_NAME;
+        file = new File(destinationPath);
+        /*destinationPath = "D:\\myVirtusa\\xml\\Source1.xml";
+        file = new File(destinationPath);*/
+    }
+    
     private static boolean checkFileExist() {
         return file.exists();
     }
 
     public static Document createDocument() {
+        getFilePath();
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -100,14 +115,13 @@ public class WriteToXML {
     }
 
     private static FileOutputStream createXmlFile() throws FileNotFoundException{
-        File file;
         FileOutputStream fos = null;
         
-        file = new File(destinationPath + "\\" + fileName + ".xml");
         if (!file.exists()) {
-            fos = new FileOutputStream(destinationPath + "\\" + fileName+ ".xml");
+            fos = new FileOutputStream(destinationPath,false);
         } else {
-            System.out.println("Source code xml file for the project exissts already.\nDo you waant to create a new version or update the file?\n(Enter Yes to create a new version) ");
+            fos = new FileOutputStream(destinationPath,false);
+            /*System.out.println("Source code xml file for the project exissts already.\nDo you waant to create a new version or update the file?\n(Enter Yes to create a new version) ");
             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
             String response;
             try {
@@ -118,11 +132,11 @@ public class WriteToXML {
                     String newName = br.readLine();
                     fos = new FileOutputStream(destinationPath + "\\" + newName + ".xml");
                 } else {
-                    fos = new FileOutputStream(destinationPath + "\\" + fileName+ ".xml");
+                    fos = new FileOutputStream(destinationPath);
                 }
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
-            }
+            }*/
         }
         return fos;
     }

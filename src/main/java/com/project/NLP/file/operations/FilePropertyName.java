@@ -25,12 +25,12 @@ import org.eclipse.swt.widgets.FileDialog;
  * java project root default path
  */
 public class FilePropertyName {
-    public static String user_root =  System.getProperty("user.home") + 
-    File.separator + "Documents";
-    public static final String default_project_path = user_root+ File.separator + "Anduril";
-    public static final String default_requirement_doc_path  = user_root + File.separator + "requirement.txt";
-    public static final String default_uml_file_path = user_root + File.separator + "Diagram" +File.separator;
-    public static final String default_java_project_path = user_root + File.separator + "Java"+File.separator + "src";
+    public static String user_home = System.getProperty("user.home") + File.separator + "SATAnalyzer";
+    public static String RESOURCE_PATH =  System.getProperty("user.dir") + File.separator + "res";
+    public static final String default_project_path = RESOURCE_PATH+ File.separator + "Anduril";
+    public static final String default_requirement_doc_path  = RESOURCE_PATH + File.separator + "requirement.txt";
+    public static final String default_uml_file_path = RESOURCE_PATH + File.separator + "umlFile.json";
+    public static final String default_java_project_path = RESOURCE_PATH + File.separator + "JavaSourceCode";
     public static final String XML = "xml";
     public static final String REQUIREMENT = "txt";
     public static final String UML = "uml";
@@ -40,8 +40,7 @@ public class FilePropertyName {
     public static final String UML_ARTIFACT_NAME = "UMLArtefactFile.xml";
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
     public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
-    public static final String IMAGE_PATH = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Resources"+File.separator + 
-            "Images" + File.separator;
+    public static final String IMAGE_PATH = System.getProperty("user.dir") + File.separator + "img"+ File.separator;
     public static Path getPath(Path target,String type){
         if(type.contains(XML)){
             target = Paths.get(HomeGUI.projectPath + File.separator + XML);

@@ -237,11 +237,11 @@ public class ProjectCreateWindow {
                                     It is just for demonstration
                                     */
                                     //copy(docsFileDialog,"/home/shiyam/XMLfiles/RequirementArtefactFile.xml",FilePropertyName.XML);
-                                   Path path = Paths.get("/home/shiyam/XMLfiles/RequirementArtefactFile.xml");
+                                   /*Path path = Paths.get(FilePropertyName.user_home + File.separator+"RequirementArtefactFile.xml");
                                    Path target = Paths.get(StaticData.workspace + 
                                         File.separator + txtProjectName.getText().toString()
-                                +File.separator+FilePropertyName.XML);                                       
-				if (localFilePath != null) {
+                                +File.separator+FilePropertyName.XML);           */                            
+				/*if (localFilePath != null) {
 					try {
 						Files.copy(path,
 								target.resolve(path.getFileName()),
@@ -249,7 +249,7 @@ public class ProjectCreateWindow {
 					} catch (IOException e1) {							
 						e1.printStackTrace();
 					}
-				}
+				}*/
                                 }
                                 if(!FilePropertyName.default_uml_file_path.equals(txtUmlPath.getText())){
                                     copy(umlFileDialog,StaticData.umlFilePath,FilePropertyName.UML);
@@ -267,6 +267,9 @@ public class ProjectCreateWindow {
                                     //add copy files for source code 
                                     copy(null,StaticData.sourceFilePath,FilePropertyName.SOURCE_CODE);
                                     //AST.main(null);
+                                    System.out.println(StaticData.sourceFilePath);
+                                    
+                                    new AST().startSourceCodeConversion(StaticData.sourceFilePath);
                                 
                                 }
 				
@@ -296,12 +299,12 @@ public class ProjectCreateWindow {
                             }
 			}
 		});
-		btnFinish.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/exact.jpg"));
+		btnFinish.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));
 		btnFinish.setBounds(486, 293, 75, 25);
 		btnFinish.setText("Finish");
 		btnFinish.setEnabled(false);
 		final Label crctLabl = new Label(shell, SWT.NONE);
-		crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
+		crctLabl.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "violation.jpg"));
 		crctLabl.setBounds(506, 42, 55, 24);
 		
 		txtProjectName = new Text(shell, SWT.BORDER);
@@ -352,7 +355,7 @@ public class ProjectCreateWindow {
 					for (String directorie : directories) {
 						
 							
-							crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/exact.jpg"));;
+							crctLabl.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));;
 							File folder = new File(PropertyFile.filePath);
 							if(!folder.exists()) {
                                                             String projectpath = PropertyFile.filePath+File.separator;
@@ -366,7 +369,7 @@ public class ProjectCreateWindow {
                                                             return;
                                                             
 							}else{
-                                                            crctLabl.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
+                                                            crctLabl.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "violation.jpg"));
                                                             btnReqBrwse.setEnabled(false);
                                                             btnUmlBrwse.setEnabled(false);
                                                             btnSrcBrwse.setEnabled(false);
@@ -398,7 +401,7 @@ public class ProjectCreateWindow {
                 
                 txtProjectName.setBounds(192, 42, 278, 21);
 		Button btnCancel = new Button(shell, SWT.NONE);
-		btnCancel.setImage(SWTResourceManager.getImage("/home/shiyam/Projects/FinalYear/Anduril/img/violation.jpg"));
+		btnCancel.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "violation.jpg"));
 		btnCancel.setBounds(10, 293, 75, 25);
 		btnCancel.setText("Cancel");
 		btnCancel.addSelectionListener(new SelectionAdapter() {
