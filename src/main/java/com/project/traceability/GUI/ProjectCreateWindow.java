@@ -60,7 +60,7 @@ public class ProjectCreateWindow {
 	static String[] selectedFiles;
 	static Path path;
         String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
-        String req_formats[] ={"*.docs*;*.txt*;*.mdj*"};
+        String req_formats[] ={"*.docs*;*.txt*"};
 	private Text txtProjectName;
 	private Text txtRequirementPath;
 	private Text txtUmlPath;
