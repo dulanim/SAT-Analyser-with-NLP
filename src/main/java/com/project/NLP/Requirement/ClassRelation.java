@@ -55,7 +55,7 @@ public class ClassRelation {
     
     
     private int findHashCode(){
-        return calculateAsciValue(relationType)+calculateAsciValue(parentElement)+calculateAsciValue(childElement);
+        return calculateHashValue(relationType)+calculateHashValue(parentElement)+calculateHashValue(childElement);
         
     }
    
@@ -81,15 +81,12 @@ public class ClassRelation {
         return true;
     }
     
-    private int calculateAsciValue(String name){
-        int asciValue=0;
+    private int calculateHashValue(String name){
+        int hashValue=0;
         if(name!=null && !name.equals("")){
-            char[] charArray=(name.toLowerCase()).toCharArray();
-            for(char c: charArray){
-                asciValue+=c;
-            }
+            hashValue=name.hashCode();
         }
-        return asciValue;        
+        return hashValue;        
         
     }
 }
