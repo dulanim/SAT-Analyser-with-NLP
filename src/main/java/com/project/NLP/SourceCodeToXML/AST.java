@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -33,23 +34,31 @@ public class AST {
     public static String file;
     public static SourceCodeDB2 scdb;
     private static Element intraConnections;
+    private AST ast;
+
+       
 
     /**
      * Invokes when the user browses the source code project folder 
      * @param fileName 
      */
-    public void startSourceCodeConversion(String fileName) {
+    public void startSourceCodeConversion(String filePath) {
+        ast = new AST();
+        scdb = new SourceCodeDB2();
         AccessProject project = new AccessProject();
         WriteToXML.createDocument();
-        if (project.javaFilesExists(new File(fileName))) {
+        if (project.javaFilesExists(new File(filePath))) {
             List<File> files = project.getFiles();
             for (File file : files) {
                 System.out.println("File Path - " + file.getAbsolutePath());
-                new AST().convertFileToXML(file.getAbsolutePath());
+                ast.convertFileToXML(file.getAbsolutePath());     
+                System.out.println("Done for: "+file.getAbsolutePath());
+                ast.exitConverter();
             }
+            
         }
         else{
-            //invoke error message
+            JOptionPane.showMessageDialog(null, "Incorrect Path. The specified path does not contain any java files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -68,9 +77,9 @@ public class AST {
             ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);
             walker.walk(extractor, tree);
         } catch (ParserConfigurationException ex) {
-            Logger.getLogger(AST.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Parser problem while parsing the source code files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            JOptionPane.showMessageDialog(null, "Problem occured in the given file.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -114,32 +123,10 @@ public class AST {
         }
     }
     
-    /*
+    
+    
     public static void main(String[] args) throws IOException {
-        AccessProject project = new AccessProject();
-        WriteToXML.createDocument();
-        scdb = new SourceCodeDB2();
-        boolean enter = true;
-        while (enter) {
-            System.out.print("Enter project folder path: ");
-            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-            String filePath = bufferRead.readLine();
-            String splitName[] = filePath.split("\\\\");
-            AST.file = splitName[splitName.length - 1];
-            System.out.println(AST.file);
-            if (filePath.trim().isEmpty()) {
-                new AST().exitConverter();
-                enter = false;
-            } else {
-                if (project.javaFilesExists(new File(filePath))) {
-                    List<File> files = project.getFiles();
-                    for (File file : files) {
-                        System.out.println("File Path - " + file.getAbsolutePath());
-                        new AST().convertFileToXML(file.getAbsolutePath());
-                    }
-                }
-            }
-        }
+        new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
     }
-    */
+    
 }

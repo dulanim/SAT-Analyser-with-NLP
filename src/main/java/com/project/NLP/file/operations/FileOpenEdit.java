@@ -46,12 +46,12 @@ public class FileOpenEdit {
     final Text t = new Text(s, SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL
         | SWT.WRAP | SWT.BORDER);
     //          create images for toolbar buttons
-    final Image saveIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-    final Image openIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-    final Image childIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-    final Image cutIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-    final Image copyIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-    final Image pasteIcon = new Image(d, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
+    final Image saveIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
+    final Image openIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
+    final Image childIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
+    final Image cutIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
+    final Image copyIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
+    final Image pasteIcon = new Image(d, FilePropertyName.IMAGE_PATH+"file_txt.png");
 
     //create ToolBar and ToolItems
     final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);

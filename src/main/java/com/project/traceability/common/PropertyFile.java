@@ -16,14 +16,16 @@ import java.io.File;
  */
 public class PropertyFile {
 
-    public static String requirementXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/RequirementArtefactFile.xml";
-    public static String umlXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/UMLArtefactFile.xml";
-    public static String sourceXMLPath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files/SourceCodeArtefactFile.xml";
-    public static final String wordNetDbDirectory = "/usr/share/wordnet";
+    public static String requirementXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\RequirementArtefactFile.xml";
+    public static String umlXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\UMLArtefactFile.xml";
+    public static String sourceXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\SourceCodeArtefactFile.xml";
+    public static final String wordNetDbDirectory = "C:/Program Files (x86)/WordNet/2.1/dict";
     public static String filePath = StaticData.workspace+File.separator;
-    public static String xmlFilePath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files";
-    public static String docsFilePath = "E:/Drive Copied/Shiyamalan/projects/fyp/SAT-master/XML files";
-    public static final String imagePath = "/home/shiyam/Projects/FinalYear/Anduril/img"; // img folder in
+    public static String xmlFilePath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files";
+    public static String docsFilePath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\";
+    public static final String imagePath = System.getProperty("user.dir")+"\\img"; // img folder in
+    public static String configuration_file_path = System.getProperty("user.home")
+                +File.separator + "sat_configuration.xml";
     // project
     private static String projectName = null;
     public static String graphDbPath = null;
@@ -37,8 +39,7 @@ public class PropertyFile {
     public static final String testGraphFile = "E:/SATWork/Test/Test.gexf";
     public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator +
             FilePropertyName.XML;
-    public static String configuration_file_path = System.getProperty("user.home")
-                +File.separator + "sat_configuration.xml";
+  
     public static String getProjectName() {
         return projectName;
     }
