@@ -49,8 +49,10 @@ import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.GraphDB.RelTypes;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
@@ -100,7 +102,14 @@ public class HomeGUI extends JFrame implements KeyListener{
 	public static boolean hasTwoFiles = false;
 	public static String selectedFolder;
         public static HomeGUI window;//globally added to refresh the project window
-	/**
+	
+        public Map<String,String> recentFilePath = new HashMap<>();
+        public Stack<String> recentNames = new Stack(); 
+        
+        Menu menu_1; // file Menu Drop Bar
+        Menu menu_recent;//hold recent file infors
+        MenuItem mntmRecents;//recent file holder 
+        /**
 	 * Launch the application.
 	 * 
 	 * @param args
@@ -354,7 +363,26 @@ public class HomeGUI extends JFrame implements KeyListener{
 					//parent = parent.substring(14, parent.length() - 2);
 					NewFileWindow.localFilePath = StaticData.workspace + File.separator + parent
 							+File.separator;
+                                        
+                                        recentFilePath.put(NewFileWindow.localFilePath+string,string);
+                                        recentNames.push(string);
+                                        
+                                        
+                                        for(int i=0;i<recentNames.size();i++){
+                                            
+                                            if(i<6){
+                                                 MenuItem mntmRecents = new MenuItem(menu_recent, SWT.CASCADE);
+                                                 mntmRecents.addSelectionListener(new SelectionAdapter() {
+			
+                                                 });
+                                                 mntmRecents.setText(recentNames.pop());
+                                            }else 
+                                                break;
+                                        }
+                                       
 					NewFileWindow.createTabLayout(string);
+                                        
+                                        
 				} else if(selection[0].getParent().equals(tree)) {
 					trtmNewTreeitem.setExpanded(true);
 				}
@@ -378,7 +406,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 		MenuItem mntmNewSubmenu = new MenuItem(menu, SWT.CASCADE);
 		mntmNewSubmenu.setText("File");
                
-		Menu menu_1 = new Menu(mntmNewSubmenu);
+		menu_1 = new Menu(mntmNewSubmenu);
 		mntmNewSubmenu.setMenu(menu_1);
                 
 		MenuItem mntmNew = new MenuItem(menu_1, SWT.CASCADE);
@@ -411,7 +439,30 @@ public class HomeGUI extends JFrame implements KeyListener{
 		mntmSave.setAccelerator(SWT.CTRL | 'S');
 		MenuItem mntmProjctPath = new MenuItem(menu_1, SWT.CASCADE);
 		mntmProjctPath.setText("Switch Project Path");
+                  //  Create the first separator
+                new MenuItem(menu_1, SWT.SEPARATOR);
                 
+                MenuItem mntmClose = new MenuItem(menu_1, SWT.NONE);
+		mntmClose.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				new FileSave().saveFile();
+			}
+		});
+               
+		mntmClose.setText("Close");
+                
+                MenuItem mntmCloseAll = new MenuItem(menu_1, SWT.NONE);
+		mntmCloseAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				new FileSave().saveFile();
+			}
+		});
+               
+		mntmCloseAll.setText("Close All");
+                
+                new MenuItem(menu_1, SWT.SEPARATOR);
 		Menu menu_5 = new Menu(mntmProjctPath);
 		mntmProjctPath.setMenu(menu_5);
 		
@@ -489,7 +540,47 @@ public class HomeGUI extends JFrame implements KeyListener{
 			}
 		});
 		mntmRefresh.setText("Refresh");
-		
+		  //  Create the first separator
+                new MenuItem(menu_1, SWT.SEPARATOR);
+                
+                MenuItem mntmImport = new MenuItem(menu_1, SWT.NONE);
+		mntmImport.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//Import Functionality Here
+                            ImportProjectWindow.copyingLocation = StaticData.workspace;
+                            ImportProjectWindow.main(null);
+                            shell.dispose();
+                            HomeGUI.main(null);
+			}
+		});
+		mntmImport.setText("Import Project");
+                
+                MenuItem mntmExport = new MenuItem(menu_1, SWT.NONE);
+		mntmExport.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				//referesh functionality
+                            shell.dispose();
+                            HomeGUI.main(null);
+                            
+			}
+		});
+		mntmExport.setText("Export Project");
+                //  Create the first separator
+                new MenuItem(menu_1, SWT.SEPARATOR);
+                
+                mntmRecents = new MenuItem(menu_1, SWT.CASCADE);
+		mntmRecents.addSelectionListener(new SelectionAdapter() {
+			
+		});
+		mntmRecents.setText("Recent Files");
+                
+                menu_recent = new Menu(mntmRecents);
+		mntmRecents.setMenu(menu_recent);
+                
+                //  Create the first separator
+                new MenuItem(menu_1, SWT.SEPARATOR);
 		MenuItem mntmExit = new MenuItem(menu_1, SWT.NONE);
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override

@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
