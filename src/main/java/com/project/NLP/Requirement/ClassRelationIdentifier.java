@@ -165,5 +165,83 @@ public class ClassRelationIdentifier {
         System.out.print("\n---VPList----" + vpList + "----\n");
         return vpList;
     }
+    
+    
+    /*  Comparing a class with other class for relation using their names
+     * ex: saving account and account -> Generalization parent: account child: saving account
+     */
+    public HashSet identifyGenaralizationByComparing( Set documentClassSet) {
+        HashSet classRelations = new HashSet();
+        if (documentClassSet.isEmpty()) {
+            System.err.println("Info : There is no class found in the document. -Relations identifier");
+        }  else {
+            Iterator list = documentClassSet.iterator();
+            Iterator set = documentClassSet.iterator();
+            while (list.hasNext()) {
+                String classFromlist = list.next().toString();
+                while (set.hasNext()) {
+                    String classFromSet = set.next().toString();
+
+                    if (classFromSet.matches(".+" + classFromlist + ".*")) {
+                        System.out.println("--------Success --1-- Generalization -----");
+                        ClassRelation general = new ClassRelation("Generalization", classFromSet, classFromlist);
+                        classRelations.add(general);
+                    } else if (classFromlist.matches(".+" + classFromSet + ".*")) {
+                        System.out.println("--------Success --1-1-- Generalization -----");
+                        ClassRelation general = new ClassRelation("Generalization", classFromlist, classFromSet);
+                        classRelations.add(general);
+
+                    }
+
+                }
+            }
+        }
+
+        return classRelations;
+    }
+    
+    /*Using Hypernym and Hyponym to identify Generalization.
+     *Ex: Color is Hypernym of Red
+     */
+    public HashSet identifyGenaralizationByHypernym(Set documentClassSet) {
+        
+        HashSet classRelations = new HashSet();
+        HashSet hypernymSet=new HashSet();
+        HashSet hyponymSet=new HashSet();
+        HypernymHyponym hyps=new HypernymHyponym();
+        
+        if (documentClassSet.isEmpty()) {
+            System.out.println("Info : There is no class found in the sentence. -Relations identifier");
+        } else {
+            Iterator it=documentClassSet.iterator();
+            while(it.hasNext()){
+                String className=(String) it.next();
+                hypernymSet=hyps.getHypernymsForWord(className);
+                hyponymSet=hyps.getHyponymsForWord(className);
+                Iterator iter=hypernymSet.iterator();
+                    while(iter.hasNext()){
+                        String hypernymClass=(String) iter.next();
+                    
+                        if(documentClassSet.contains(hypernymClass)){
+                            ClassRelation general = new ClassRelation("Generalization",className,hypernymClass);
+                            classRelations.add(general);
+                        }
+
+                    }
+                    iter=hyponymSet.iterator();
+                    while(it.hasNext()){
+                        String hyponymClass=(String) iter.next();
+                    
+                        if(documentClassSet.contains(hyponymClass)){
+                            ClassRelation general = new ClassRelation("Generalization",hyponymClass,className);
+                            classRelations.add(general);
+                        }
+
+                    }
+            }
+        }
+        return classRelations;
+    }
+    
 
 }

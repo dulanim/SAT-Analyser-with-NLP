@@ -246,6 +246,9 @@ public class ProjectCreateWindow {
 						Files.copy(path,
 								target.resolve(path.getFileName()),
 								REPLACE_EXISTING);
+                                                
+                                                
+                                                
 					} catch (IOException e1) {							
 						e1.printStackTrace();
 					}
@@ -267,9 +270,14 @@ public class ProjectCreateWindow {
                                     //add copy files for source code 
                                     copy(null,StaticData.sourceFilePath,FilePropertyName.SOURCE_CODE);
                                     //AST.main(null);
+
+                                    AST ast = new AST();
+                                    ast.startSourceCodeConversion(txtRequirementPath.getText());
+
                                     System.out.println(StaticData.sourceFilePath);
                                     
                                     new AST().startSourceCodeConversion(StaticData.sourceFilePath);
+
                                 
                                 }
 				

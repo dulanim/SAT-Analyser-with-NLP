@@ -26,6 +26,8 @@ import org.xml.sax.SAXException;
 
 import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.PropertyFile;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 
 public class RelationManager {
 
@@ -237,6 +239,17 @@ public class RelationManager {
         DocumentBuilder dBuilder;
         try {
             dBuilder = dbFactory.newDocumentBuilder();
+            
+            if(!file.exists()){
+                file.createNewFile();
+                FileWriter fos = new FileWriter(file);
+                
+                String contents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<Relations/>";
+                fos.write(contents);
+                fos.close();
+                
+            }
             Document doc = (Document) dBuilder.parse(file);
             doc.getDocumentElement().normalize();
 
