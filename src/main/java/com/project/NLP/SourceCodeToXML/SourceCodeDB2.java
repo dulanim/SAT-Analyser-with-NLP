@@ -45,7 +45,7 @@ public class SourceCodeDB2 {
 
     public SourceCodeDB2() {
         //start the database server
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + ProjectCreateWindow.projectName + ".graphdb");
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + ProjectCreateWindow.projectName +"-source"+ ".graphdb");
         createNodes();
     }
 
