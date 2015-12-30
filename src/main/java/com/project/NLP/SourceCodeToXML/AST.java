@@ -6,22 +6,17 @@
 package com.project.NLP.SourceCodeToXML;
 
 import static com.project.NLP.SourceCodeToXML.ExtractInterfaceListener.root;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.openide.util.Exceptions;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
@@ -42,7 +37,7 @@ public class AST {
      * Invokes when the user browses the source code project folder 
      * @param fileName 
      */
-    public void startSourceCodeConversion(String filePath) {
+    public void startSourceCodeConversion(String filePath) throws Exception{
         ast = new AST();
         scdb = new SourceCodeDB2();
         AccessProject project = new AccessProject();
@@ -125,7 +120,7 @@ public class AST {
     
     
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException,Exception {
         new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
     }
     
