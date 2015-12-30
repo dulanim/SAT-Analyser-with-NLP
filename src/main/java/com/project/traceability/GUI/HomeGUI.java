@@ -8,7 +8,6 @@ import com.project.NLP.file.operations.FileSave;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -43,23 +42,29 @@ import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
+import static com.project.traceability.GUI.NewFileWindow.shell;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.GraphDB.RelTypes;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import org.eclipse.swt.custom.TreeEditor;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Main Home Window of the tool
@@ -107,8 +112,11 @@ public class HomeGUI extends JFrame implements KeyListener{
         public Stack<String> recentNames = new Stack(); 
         
         Menu menu_1; // file Menu Drop Bar
-        Menu menu_recent;//hold recent file infors
+        public static Menu menu_recent;//hold recent file infors
         MenuItem mntmRecents;//recent file holder 
+        
+        static XMLReader reader;
+        static XMLWriter writer;
         /**
 	 * Launch the application.
 	 * 
@@ -119,6 +127,8 @@ public class HomeGUI extends JFrame implements KeyListener{
 		try {
                         //XMLWriter writer = new XMLWriter();
                         window = new HomeGUI(); 		//start the project
+                        reader = new XMLReader();
+                        reader.readDefaultNode();
 			window.open();
 			window.eventLoop(Display.getDefault());
 		} catch (Exception e) {
@@ -157,31 +167,19 @@ public class HomeGUI extends JFrame implements KeyListener{
 		label.setBounds(5, 5, p.x + 5, p.y + 5);
 	}
 
-	public void center(Shell shell) {
-
-		Rectangle bds = shell.getDisplay().getBounds();
-
-		Point p = shell.getSize();
-		shell.setFullScreen(true);
-		int nLeft = (bds.width - p.x) / 2;
-		int nTop = (bds.height - p.y) / 2;
-
-		shell.setBounds(nLeft, nTop, p.x, p.y);
-	}
 
 	/**
 	 * Create contents of the window.
 	 */
 	public void createContents() {
 		
-		XMLReader reader = new XMLReader();
+		reader = new XMLReader();
 		reader.readWorkspaces();
 		//PropertyFile.filePath = StaticData.rootPathName;//update cuureent workspace 
-	
-		
+                
 		shell = new Shell();
 		shell.setBounds(0, 0, screen.width, screen.height - 20);
-		center(shell);
+                com.project.traceability.common.Dimension.toCenter(shell);
 		shell.setLayout(new FillLayout());		
 
                 
@@ -303,7 +301,24 @@ public class HomeGUI extends JFrame implements KeyListener{
                 tree.setToolTipText(StaticData.workspace);
 		
 		tbtmProjects.setControl(projComposite);
+                
+                tree.addListener(SWT.Expand, new Listener() {
 
+                    @Override
+                    public void handleEvent(Event event) {
+                       changeStatus(event,"expand");
+                    }
+                });
+                
+                tree.addListener(SWT.Collapse, new Listener() {
+
+                    @Override
+                    public void handleEvent(Event event) {
+                        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        changeStatus(event,"unexpand");
+                    }
+                });
+                
 		tree.addListener(SWT.Selection, new Listener() {		//add listener to the tree
 			public void handleEvent(Event e) {
 				String string = "";
@@ -335,7 +350,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 				String string = "";
 				String parent = "";
 				TreeItem[] selection = tree.getSelection();
-                                TreeItem paret = trtmNewTreeitem.getParentItem();;
+                                TreeItem paret = trtmNewTreeitem.getParentItem();
                                 TreeItem topParent= paret.getParentItem();
                                 
                                 if(topParent == null)
@@ -361,26 +376,39 @@ public class HomeGUI extends JFrame implements KeyListener{
 				if(selection[0].getItems().length == 0) {
 					//string = string.substring(10, string.length() - 2);
 					//parent = parent.substring(14, parent.length() - 2);
+                                     String projectName;
+                                     int count = 0;
 					NewFileWindow.localFilePath = StaticData.workspace + File.separator + parent
 							+File.separator;
                                         
-                                        recentFilePath.put(NewFileWindow.localFilePath+string,string);
-                                        recentNames.push(string);
-                                        
-                                        
-                                        for(int i=0;i<recentNames.size();i++){
-                                            
-                                            if(i<6){
-                                                 MenuItem mntmRecents = new MenuItem(menu_recent, SWT.CASCADE);
-                                                 mntmRecents.addSelectionListener(new SelectionAdapter() {
-			
-                                                 });
-                                                 mntmRecents.setText(recentNames.pop());
-                                            }else 
-                                                break;
+                                        if(parent.contains(File.separator)){
+                                            projectName = parent.substring(0,parent.lastIndexOf(File.separator));
+                                        }else{
+                                            projectName = parent;
                                         }
+                                        NewFileWindow.selectedProjectPath = StaticData.workspace + File.separator + 
+                                                projectName;
+                                        
+                                       if(!NewFileWindow.openedFiles.contains(NewFileWindow.localFilePath+string)){
+                                                NewFileWindow.createTabLayout(string,true);
+                                                
+                                        }else{
+                                           /*
+                                           file is opened in tab visiblle that tab
+                                           */
+                                           
+                                           CTabItem items[] = tabFolder.getItems();
+                                           
+                                           for(int i=0;i<items.length;i++){
+                                               
+                                               String tips = items[i].getToolTipText();
+                                               if(tips.equalsIgnoreCase(NewFileWindow.localFilePath+string)){
+                                                tabFolder.setSelection(items[i]);
+                                                break;
+                                               }
+                                           }
+                                       }
                                        
-					NewFileWindow.createTabLayout(string);
                                         
                                         
 				} else if(selection[0].getParent().equals(tree)) {
@@ -395,7 +423,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 			tree.setVisible(false);
 		else {
                     //adding project folders and files from workspace in project tab
-                        setUpNewProject(StaticData.workspace,"Initial State");
+                        setUpNewProject();
 		}
 
 		shell.setText("Software Artefact Traceability Analyzer");
@@ -438,7 +466,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 		mntmSave.setText("Save");
 		mntmSave.setAccelerator(SWT.CTRL | 'S');
 		MenuItem mntmProjctPath = new MenuItem(menu_1, SWT.CASCADE);
-		mntmProjctPath.setText("Switch Project Path");
+		mntmProjctPath.setText("Switch Project Workspace");
                   //  Create the first separator
                 new MenuItem(menu_1, SWT.SEPARATOR);
                 
@@ -456,6 +484,9 @@ public class HomeGUI extends JFrame implements KeyListener{
 		mntmCloseAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+                            
+                                
+                                
 				new FileSave().saveFile();
 			}
 		});
@@ -477,12 +508,14 @@ public class HomeGUI extends JFrame implements KeyListener{
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					//load current location project files
-					//XMLWriter writer = new XMLWriter();
 					String path = temp.getText().trim();
                                         StaticData.workspace = path;
-					//writer.modifyStatus(true, path);
+					XMLWriter xMLWriter = XMLWriter.getXMLWriterInstance("nothing");
+                                        xMLWriter.changeCurrnntWorkspaceVale(path);
 					//writer.modifyStatus(false, PropertyFile.filePath);
-					shell.dispose();
+					
+                                        
+                                        closeMain(shell);
                                         HomeGUI.main(null);
 				}
 			});
@@ -501,15 +534,15 @@ public class HomeGUI extends JFrame implements KeyListener{
                                         
                                         XMLWriter writer = null;
                                         if(writer == null){
-                                            writer = new XMLWriter();
+                                            writer = XMLWriter.getXMLWriterInstance();
                                         }
                                         
                                         if(!StaticData.workspace.equals(PropertyFile.filePath)){
                                             StaticData.workspace = PropertyFile.filePath;
                                             writer.createWorkspaceNode(StaticData.workspace, "true");
                                             shell.dispose();
-                                            ProgressBar bar =  new ProgressBar();
-                                            bar.main(null);
+                                            //StartUpProject bar =  new StartUpProject();
+                                            StartUpProject.main(null);
                                         }
                                    }else if(x == JOptionPane.NO_OPTION){
                                        
@@ -523,9 +556,8 @@ public class HomeGUI extends JFrame implements KeyListener{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//restart functionality
-                                shell.dispose();
-                                ProgressBar bar = new ProgressBar();
-                                bar.main(null);
+                                closeMain(shell);
+                                HomeGUI.main(null);
 			}
 		});
 		mntmRestart.setText("Restart");
@@ -535,8 +567,12 @@ public class HomeGUI extends JFrame implements KeyListener{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				//referesh functionality
-                            shell.dispose();
-                            HomeGUI.main(null);
+//                            closeMain(shell);
+//                            HomeGUI.main(null);
+                            
+                            tree.removeAll();
+                            initWindow();
+                            setUpNewProject();
 			}
 		});
 		mntmRefresh.setText("Refresh");
@@ -550,7 +586,8 @@ public class HomeGUI extends JFrame implements KeyListener{
 				//Import Functionality Here
                             ImportProjectWindow.copyingLocation = StaticData.workspace;
                             ImportProjectWindow.main(null);
-                            shell.dispose();
+                            
+                            closeMain(shell);
                             HomeGUI.main(null);
 			}
 		});
@@ -585,7 +622,9 @@ public class HomeGUI extends JFrame implements KeyListener{
 		mntmExit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				System.exit(0);
+                            
+                                closeMain(shell);
+                                System.exit(5);
 			}
 		});
 		mntmExit.setText("Exit");
@@ -756,31 +795,69 @@ public class HomeGUI extends JFrame implements KeyListener{
 			}
 		});
                 
-                
-//                Menu viewMenu = new Menu(shell, SWT.DROP_DOWN);
-//                mntmView.setMenu(viewMenu);
-//
-//                MenuItem menuItemProjectWindow = new MenuItem(viewMenu, SWT.PUSH);
-//                menuItemProjectWindow.setText("&Show Project Window");
-//                
-//                MenuItem menuItemCompareWindow = new MenuItem(viewMenu, SWT.PUSH);
-//                menuItemCompareWindow.setText("&Show Compare Window");
-//                
-//                MenuItem menuItemGraphWindow = new MenuItem(viewMenu, SWT.PUSH);
-//                menuItemGraphWindow.setText("&Show Graph Window");
+                   
+            tabFolder.addListener(SWT.MouseHover, new Listener() {
+                    public void handleEvent(Event event) {
+                      Point pt = new Point(event.x, event.y);
+                      CTabItem item = HomeGUI.tabFolder.getItem(pt);
+                      XMLWriter writer = XMLWriter.getXMLWriterInstance();
+                      if(item != null){
+                        HomeGUI.activeTab.put(true,item.getToolTipText().toString());
+                         
+                        String filePath = item.getToolTipText();
+                        
+                        writer.setVisibleFilePath(StaticData.workspace,filePath);
+                       }else{
+                        writer.setVisibleFilePath(StaticData.workspace,"");
+                        }           
+                    }
+                });
+                final TreeEditor editor = new TreeEditor(tree);
+                editor.horizontalAlignment = SWT.LEFT;
+                editor.grabHorizontal = true;
+                tree.addKeyListener(new KeyAdapter() {
+                            public void keyPressed(KeyEvent event) {
+                                    if (event.keyCode == SWT.F2 && tree.getSelectionCount() == 1) {
+                                            final TreeItem item = tree.getSelection()[0];
 
-		//Menu menu_2 = new Menu(mntmView);
-		//mntmView.setMenu(menu_2);
+                                            final Text text = new Text(tree, SWT.NONE);
+                                            text.setText(item.getText());
+                                            text.selectAll();
+                                            text.setFocus();
+
+                                            text.addFocusListener(new FocusAdapter() {
+                                            public void focusLost(FocusEvent event) {
+                                              item.setText(text.getText());
+                                              text.dispose();
+                                            }
+                                          });
+                                            
+                                            text.addKeyListener(new KeyAdapter() {
+                                            public void keyPressed(KeyEvent event) {
+                                                switch (event.keyCode) {
+                                                case SWT.CR:
+                                                  item.setText(text.getText());
+                                               
+                                                case SWT.ESC:
+                                                  text.dispose();
+                                                  break;
+                                                }
+                                              }
+                                            });
+                                            editor.setEditor(text, item);
+                                        }
+                        }
+    });
+        
 
 		MenuItem mntmHelp = new MenuItem(menu, SWT.CASCADE);
 		mntmHelp.setText("Help");
 
 		Menu menu_3 = new Menu(mntmHelp);
 		mntmHelp.setMenu(menu_3);
-
-	}	
-
-	
+                
+                initWindow();
+            }
 	private void defineListeners() {
 		ctfCTF2L = new CTabFolder2Adapter() {
 			public void close(CTabFolderEvent e) {
@@ -1144,64 +1221,89 @@ public class HomeGUI extends JFrame implements KeyListener{
                 System.out.println("Graph Type: " + PropertyFile.getGraphType());
                 ReadXML.initApp(projectPath, graphType);
     }
-    public static void setUpNewProject(String path,String tag){
+    public static void setUpNewProject(){
      
-//      tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
-//        | SWT.H_SCROLL);
-            try{
-                    File project_root_folder = new File(path);
-                    ArrayList<String> project_sub_folder = new ArrayList<String>(
-                    Arrays.asList(project_root_folder.list()));
+////      tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
+////        | SWT.H_SCROLL);
+//            try{
+//                    File project_root_folder = new File(path);
+//                    ArrayList<String> project_sub_folder = new ArrayList<String>(
+//                    Arrays.asList(project_root_folder.list()));
+//                    
+//                    for(String name:project_sub_folder){//Anduril Shaym Uni 
+//                        TreeItem rootNewTreeitem = null;
+////                        rootNewTreeitem.set
+//                        if(tag.equals("Initial State")){
+//                             rootNewTreeitem = new TreeItem(tree, SWT.NONE);
+//                             rootNewTreeitem.setImage(new Image(display, FilePropertyName.IMAGE_PATH.concat("folder.gif")));
+//                        }else{
+//                            rootNewTreeitem = new TreeItem(ProjectCreateWindow.trtmNewTreeitem,SWT.NONE);
+//                        }
+//                        rootNewTreeitem.setText(name);
+//                       
+//                        File temp_file = new File(path + File.separator+name);//name:Anduril
+//                        ArrayList<String> internal_folders = new ArrayList<String>(
+//                            Arrays.asList(temp_file.list()));//Anduril's file / folder list
+//                        
+//                        
+//                        for(String tempInternalFolderName:internal_folders){//xml uml 
+//                            
+//                            File tempInternalFolder = new File(temp_file.getPath() + File.separator + tempInternalFolderName);
+//                            
+//                            if(tempInternalFolder.isDirectory()){
+//                                TreeItem trtmNewTreeitem = new TreeItem(rootNewTreeitem, SWT.NONE);
+//                                trtmNewTreeitem.setText(tempInternalFolderName);
+//                                trtmNewTreeitem.setImage(new Image(display,
+//                                            FilePropertyName.IMAGE_PATH.concat("folder.gif")));
+//                                
+//                                ArrayList<String> internal_files = new ArrayList<String>(
+//                                Arrays.asList(tempInternalFolder.list()));
+//                                for(String tempFileName:internal_files){
+//                                    TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
+//                                    fileTreeItem.setText(tempFileName);
+//                                    fileTreeItem.setImage(new Image(display,
+//                                            FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
+//                                }
+//                            }else{
+//                                TreeItem fileTreeItem = new TreeItem(rootNewTreeitem, SWT.NONE);
+//                                fileTreeItem.setText(tempInternalFolderName);
+//                                fileTreeItem.setImage(new Image(display,FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
+//                            }
+//                        }
+//                        
+//                    }
+//                    }catch(Exception e){
+//                        JOptionPane.showMessageDialog(null,"Selected Path Has some unrelated File\nSelect New Empty Workspace", "File Open Error", JOptionPane.ERROR_MESSAGE);
+//                        shell.dispose();
+//                        WorkspaceSelectionWindow window = new WorkspaceSelectionWindow();
+//                        window.main(null);
+//                        
+//                    }
+        
+            File workspace = new File(StaticData.workspace);
+            String projectName[] = workspace.list();
+            
+            String workSpcePath = workspace.getAbsolutePath();
+            if(!(workSpcePath.lastIndexOf(File.separator) == workSpcePath.length()-1)){
+                workSpcePath += File.separator;
+            }
+            createWrkspace();
+            if(projectName != null && projectName.length>0){
+                /*
+                if project exists in given directory show that
+                */
+                
+                for(String name:projectName){
+                    String projectPath = workSpcePath + name;
+                    ImportProjectWindow window = new ImportProjectWindow();
+                    window.tree = tree;
+                    window.builProjectTree(projectPath);
                     
-                    for(String name:project_sub_folder){//Anduril Shaym Uni 
-                        TreeItem rootNewTreeitem = null;
-//                        rootNewTreeitem.set
-                        if(tag.equals("Initial State")){
-                             rootNewTreeitem = new TreeItem(tree, SWT.NONE);
-                             rootNewTreeitem.setImage(new Image(display, FilePropertyName.IMAGE_PATH.concat("folder.gif")));
-                        }else{
-                            rootNewTreeitem = new TreeItem(ProjectCreateWindow.trtmNewTreeitem,SWT.NONE);
-                        }
-                        rootNewTreeitem.setText(name);
-                       
-                        File temp_file = new File(path + File.separator+name);//name:Anduril
-                        ArrayList<String> internal_folders = new ArrayList<String>(
-                            Arrays.asList(temp_file.list()));//Anduril's file / folder list
-                        
-                        
-                        for(String tempInternalFolderName:internal_folders){//xml uml 
-                            
-                            File tempInternalFolder = new File(temp_file.getPath() + File.separator + tempInternalFolderName);
-                            
-                            if(tempInternalFolder.isDirectory()){
-                                TreeItem trtmNewTreeitem = new TreeItem(rootNewTreeitem, SWT.NONE);
-                                trtmNewTreeitem.setText(tempInternalFolderName);
-                                trtmNewTreeitem.setImage(new Image(display,
-                                            FilePropertyName.IMAGE_PATH.concat("folder.gif")));
-                                
-                                ArrayList<String> internal_files = new ArrayList<String>(
-                                Arrays.asList(tempInternalFolder.list()));
-                                for(String tempFileName:internal_files){
-                                    TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
-                                    fileTreeItem.setText(tempFileName);
-                                    fileTreeItem.setImage(new Image(display,
-                                            FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
-                                }
-                            }else{
-                                TreeItem fileTreeItem = new TreeItem(rootNewTreeitem, SWT.NONE);
-                                fileTreeItem.setText(tempInternalFolderName);
-                                fileTreeItem.setImage(new Image(display,FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
-                            }
-                        }
-                        
-                    }
-                    }catch(Exception e){
-                        JOptionPane.showMessageDialog(null,"Selected Path Has some unrelated File\nSelect New Empty Workspace", "File Open Error", JOptionPane.ERROR_MESSAGE);
-                        shell.dispose();
-                        WorkspaceSelectionWindow window = new WorkspaceSelectionWindow();
-                        window.main(null);
-                        
-                    }
+
+                }
+            }
+            
+           showExpandedProject();///show expanded projects     
     }
     public void keyPressed(KeyEvent e) {
         // Listen to CTRL+Z for Undo, to CTRL+Y or CTRL+SHIFT+Z for Redo
@@ -1224,5 +1326,158 @@ public class HomeGUI extends JFrame implements KeyListener{
     
     public void keyTyped(KeyEvent e){
         
+    }
+    
+    public static void closeMain(Shell shell){
+        shell.dispose();
+        
+        writer = XMLWriter.getXMLWriterInstance();
+        List<String> files = new ArrayList<>(NewFileWindow.openedFiles);
+        for(int i=0;i<files.size();i++){
+            writer.changeFileStatus(files.get(i), true);
+        }
+    }
+    
+    
+    public static void showExpandedProject(){
+            
+            TreeItem item[] = tree.getItems();
+            
+            reader = new XMLReader();
+            Map<String,Map<String,Boolean>> projct = reader.
+                                retriveExpenededProject(StaticData.workspace);
+            
+            for(TreeItem itemTemp:item){
+                
+                String temp = itemTemp.getText();
+                
+                Map<String,Boolean> status = projct.get(temp);
+                if(status != null && status.get(temp)){
+                    itemTemp.setExpanded(status.get(temp));
+                    
+                    
+                    TreeItem subItems[] = itemTemp.getItems();
+                    for(TreeItem sub:subItems){
+                        String subTemp = sub.getText();
+                        
+                        if(subTemp.equals(FilePropertyName.SOURCE_CODE))
+                            sub.setExpanded(status.get(FilePropertyName.SOURCE_CODE));
+                        else if(subTemp.equals(FilePropertyName.REQUIREMENT))
+                            sub.setExpanded(status.get(FilePropertyName.REQUIREMENT));
+                        else if(subTemp.equals(FilePropertyName.PROPERTY))
+                            sub.setExpanded(status.get(FilePropertyName.PROPERTY));  
+                        else if(subTemp.equals(FilePropertyName.UML))
+                            sub.setExpanded(status.get(FilePropertyName.UML)); 
+                        else 
+                            sub.setExpanded(status.get(FilePropertyName.XML)); 
+                    }
+                            
+                }
+//                System.out.println(temp);
+//                if(projct.containsKey(temp)){
+//                    itemTemp.setExpanded(true);
+//               }
+            }
+            
+            
+    }
+    public static void createWrkspace(){
+             File wrkspace = new File(StaticData.workspace);
+                if(!wrkspace.exists())
+                    wrkspace.mkdir();
+    }
+    
+    public static void changeStatus(Event event,String tpe){
+         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        TreeItem item = (TreeItem)event.item;
+                        String temp = item.getText();
+                        String projectPath = StaticData.workspace;
+                        TreeItem parent = item.getParentItem();
+                        Boolean status;
+                        String type;
+                        if(parent == null){
+                            //project is expanded 
+                            projectPath += File.separator + temp;
+                            type = "expanded";
+                            if(tpe.equals("expand"))
+                                    status = true;
+                            else
+                                status = false;
+                        }else{
+                            //sub is expanded
+                            String projectName = parent.getText();
+                            projectPath += File.separator + projectName;
+                            type = item.getText();
+                            if(tpe.equals("expand"))
+                                    status = true;
+                            else
+                                status = false;
+                        }
+                        
+                        writer = XMLWriter.getXMLWriterInstance();
+                        writer.setProjectStatus(projectPath, type, status);
+    }
+    
+    private static void displayError(String msg) {
+		MessageBox box = new MessageBox(shell, SWT.ICON_ERROR);
+		box.setMessage(msg);
+		box.open();
+    }
+    public static void initWindow(){
+            /*
+                            initialize opened file when those were opened in tab
+                        */
+            reader = new XMLReader();
+            reader.readDefaultNode();
+            
+            Map<String,List<String>> files = reader.retriveOpenedFiles(StaticData.workspace);
+            
+            Set<String> set1 = files.keySet();
+            List<String> projects = new ArrayList<>(set1);
+            
+                for(String name:projects){
+                    List<String> filesLst = files.get(name);
+                    if(filesLst !=null){
+                        for(String filepath:filesLst){
+                            
+                            int start = filepath.lastIndexOf(File.separator)+1;
+                            
+                            NewFileWindow.localFilePath = filepath.substring(0,start);
+                            
+                            int end;
+                            end = filepath.length();
+                            String fileName = filepath.substring(start,end);
+                            File file = new File(filepath);
+                            if(file.exists()){
+                                
+                                if(NewFileWindow.openedFiles != null &&
+                                        NewFileWindow.openedFiles.contains(filepath))
+                                NewFileWindow.createTabLayout(fileName,false);
+                                else if(NewFileWindow.openedFiles == null){
+                                    NewFileWindow.createTabLayout(fileName,false);
+                                }
+//                                }else if(NewFileWindow.openedFiles.contains(filepath)){
+//                                    try{
+//                                        NewFileWindow.openFile(filepath);
+//                                    }catch(FileNotFoundException e){
+//                                        displayError(e.toString());
+//                                    }catch(IOException e){
+//                                        displayError(e.toString());
+//                                    }
+//                                }
+                            }
+                        }
+                    }
+                }
+                
+                String visiblePath = reader.getVisibleFile(StaticData.workspace);
+                CTabItem items[] = tabFolder.getItems();
+                for(int i=0;i<items.length;i++){
+                    String tips = items[i].getToolTipText();
+                    if(tips.equalsIgnoreCase(visiblePath)){
+                        
+                        tabFolder.setSelection(items[i]);
+                    }
+                }
     }
 }
