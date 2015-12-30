@@ -1,6 +1,7 @@
 package com.project.traceability.GUI;
 
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ImportProjectWindow {
 	private Text txtProjectPath;
 	private Text txtWrkspacePath;
 	
-	Tree tree;
+	public static Tree tree;
 	Button btnFinish;
 	Display display;
 	public static List<File> importFiles;
@@ -79,7 +80,7 @@ public class ImportProjectWindow {
 		shell.setSize(530, 537);
 		shell.setText("Project Import Window");
 		
-                center(shell);
+                Dimension.toCenter(shell);//set the shell into center point 
 		Group grpImportProject = new Group(shell, SWT.NONE);
 		grpImportProject.setText("Import Project");
 		grpImportProject.setBounds(10, 36, 493, 162);
@@ -306,7 +307,7 @@ public class ImportProjectWindow {
 								    }
 								}
 							}
-							shell.dispose();
+							
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							 String content = e1.toString();
@@ -315,6 +316,7 @@ public class ImportProjectWindow {
 
 							e1.printStackTrace();
 						}
+                                                shell.dispose();
 					}
 				}
 			
@@ -346,18 +348,8 @@ public class ImportProjectWindow {
 		lblSelectADirectory.setText("Select a directory to search for existing Eclipse projects.");
 
 	}
-      public void center(Shell shell) {
-
-        Rectangle bds = shell.getDisplay().getBounds();
-
-        Point p = shell.getSize();
-        shell.setFullScreen(true);
-        int nLeft = (bds.width - p.x) / 2;
-        int nTop = (bds.height - p.y) / 2;
-
-        shell.setBounds(nLeft, nTop, p.x, p.y);
-    }
-	private boolean isProjectExists(String projectPath){
+      
+	public boolean isProjectExists(String projectPath){
 		
 		boolean isExists = false;
 		int count = 0;
@@ -392,8 +384,10 @@ public class ImportProjectWindow {
 		return isExists;
 	}
 	
-	private void builProjectTree(String projectPath){
+	public void builProjectTree(String projectPath){
+            
 		/*
+                 *@param projectPath /home/shiyam/wrkspace/Anduril
 		 * this method if the project is in given project path
 		 * build the project hiearchy tree 
 		 */
@@ -406,10 +400,22 @@ public class ImportProjectWindow {
 			if(listFile.length>0){
 				root = new TreeItem(tree, SWT.NONE);
 				String projectName = getSubFolder(file.getAbsolutePath());
-				root.setText(projectName + "(" + file.getAbsolutePath() + ")");
+                                
+                                if(btnFinish != null ){
+                                    //this is for only importwindow
+                                    root.setText(projectName + "(" + file.getAbsolutePath() + ")");
+                                }else{
+                                    /*
+                                    other windows communicate with this method 
+                                    at that time this works
+                                    */
+                                    root.setText(projectName);
+                                }
 				root.setImage(new Image(display,
                         FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
-				importFiles.add(file);
+                                
+                                if(importFiles != null)
+                                    importFiles.add(file);
 			}else{
 				root = new TreeItem(tree, SWT.NONE);
 				root.setText("DefaultProject");
@@ -444,13 +450,15 @@ public class ImportProjectWindow {
 					}
 				}
 			}
-			btnFinish.setEnabled(true);
+                        if(btnFinish != null)
+                            btnFinish.setEnabled(true);
 		}else{
 			//if not exists show message or pop up to user that project is not valid 
-			
-			 String content = "Given Path does not have required file/ folder";
-			 String title = "Information For Selection";
-			 showErrorMessage(content, title);
+			 if(btnFinish != null || importFiles != null){
+                            String content = "Given Path does not have required file/ folder";
+                            String title = "Information For Selection";
+                            showErrorMessage(content, title);
+                         }
 		}
 	}
 	
@@ -465,9 +473,13 @@ public class ImportProjectWindow {
 	}
 	
 	private void showErrorMessage(String content,String title){
-		
-		 MessageBox messageBox = new MessageBox(shell, SWT.ERROR
+
+        MessageBox messageBox = new MessageBox(shell, SWT.ERROR
 	              | SWT.OK);
+                      if(!content.equals(""))
+                          content = "Error In Project";
+                      if(title.equals(""))
+                          title = "Error";
 	     messageBox.setMessage(content);
 	     messageBox.setText(title);
 	     messageBox.open();
