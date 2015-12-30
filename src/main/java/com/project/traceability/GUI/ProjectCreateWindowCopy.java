@@ -29,26 +29,21 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.project.traceability.staticdata.StaticData;
-import com.project.property.config.xml.writer.XMLWriter;
 import static com.project.traceability.GUI.HomeGUI.display;
 import static com.project.traceability.GUI.HomeGUI.tree;
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
-import static com.project.traceability.GUI.NewProjectWindow.shell;
-import static com.project.traceability.GUI.NewProjectWindow.trtmNewTreeitem;
-import static com.project.traceability.GUI.WorkspaceSelectionWindow.window;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.TreeItem;
 
-public class ProjectCreateWindow {
+public class ProjectCreateWindowCopy {
         public static TreeItem trtmNewTreeitem;
         public static String projectName;
         public FileDialog docsFileDialog;
@@ -74,7 +69,7 @@ public class ProjectCreateWindow {
 	 */
 	public static void main(String[] args) {
 		try {
-			ProjectCreateWindow window = new ProjectCreateWindow();
+			ProjectCreateWindowCopy window = new ProjectCreateWindowCopy();
                         
 			window.open();
 		} catch (Exception e) {
@@ -300,14 +295,14 @@ public class ProjectCreateWindow {
                                 file.mkdir();
                                 FilePropertyName.addSubFolderIntoProject(file);
                                 RelationManager.createXML(projectPath);
-                                HomeGUI.setUpNewProject(projectPath,"Run Time");
+                                HomeGUI.setUpNewProject();
 				shell.dispose();
                             }catch(Exception e){
                                 JOptionPane.showMessageDialog(null, e.toString(),"Error Message",JOptionPane.ERROR_MESSAGE);
                             }
 			}
 		});
-		btnFinish.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));
+		//btnFinish.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));
 		btnFinish.setBounds(486, 293, 75, 25);
 		btnFinish.setText("Finish");
 		btnFinish.setEnabled(false);
@@ -363,7 +358,7 @@ public class ProjectCreateWindow {
 					for (String directorie : directories) {
 						
 							
-							crctLabl.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));;
+							//crctLabl.setImage(SWTResourceManager.getImage(FilePropertyName.IMAGE_PATH+ File.separator+ "exact.jpg"));;
 							File folder = new File(PropertyFile.filePath);
 							if(!folder.exists()) {
                                                             String projectpath = PropertyFile.filePath+File.separator;
