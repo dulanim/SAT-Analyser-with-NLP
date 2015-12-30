@@ -236,7 +236,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         //AST.artefact.appendChild(artefactElement);
        // artefact.appendChild(artefactElement);
 
-        root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0);
+        root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0).getParentNode();
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root.appendChild(artefactElement);
         Attr nameAttr = WriteToXML.getDocument().createAttribute("name");

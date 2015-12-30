@@ -4,6 +4,8 @@
  */
 package com.project.traceability.visualization;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.GUI.HomeGUI;
 import java.awt.GridLayout;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +42,11 @@ import org.openide.util.lookup.ServiceProvider;
 
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadFiles;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  *
@@ -53,19 +60,27 @@ public class GraphMouseListener implements PreviewMouseListener {
     ExecutionResult result;
 
     @SuppressWarnings("finally")
-	@Override
+    @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties properties, Workspace workspace) {
 
         for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
             if (clickingInNode(node, event)) {
 
-                graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.getGraphDbPath());       Transaction tx = graphDb.beginTx();
+                graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(/*PropertyFile.getGraphDbPath()*/HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY);
+                System.out.println("DB path- "+PropertyFile.getGraphDbPath());
+                Transaction tx = graphDb.beginTx();
                 try {
 
                     IndexManager index = graphDb.index();
+                    /*ResourceIterable <String> st = GlobalGraphOperations.at(graphDb).getAllPropertyKeys();
+                    System.out.println("Names");
+                    for (String st1 : st) {
+                        System.out.println("Key: "+st1);
+                    }*/
                     Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-
+                   
                     IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
+                    
                     org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
 
                     HashMap<String, Object> nodeProps = new HashMap<>();
@@ -97,7 +112,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                         egoFilter.setPattern(id);
                         egoFilter.setDepth(1);
                         egoFilter.setSelf(true);
-                        
+
                         Query queryEgo = filterController.createQuery(egoFilter);
                         GraphView viewEgo = filterController.filter(queryEgo);
                         graphModel.setVisibleView(viewEgo);
@@ -112,7 +127,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                 } finally {
                     tx.finish();
                     graphDb.shutdown();
-                    return ;
+                    return;
                 }
             }
         }
@@ -122,7 +137,7 @@ public class GraphMouseListener implements PreviewMouseListener {
 
     @Override
     public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
-       
+
     }
 
     @Override
@@ -146,7 +161,9 @@ public class GraphMouseListener implements PreviewMouseListener {
         return xdiff * xdiff + ydiff * ydiff < radius * radius;
     }
 
-    /** Method to show the pop up window when a node is clicked
+    /**
+     * Method to show the pop up window when a node is clicked
+     *
      * @param nodeProps HashMap
      * @return
      */
@@ -174,34 +191,34 @@ public class GraphMouseListener implements PreviewMouseListener {
             int val = JOptionPane.showConfirmDialog(VisualizeGraph.getInstance().getFrame(), "Are you sure you want to delete?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (val == JOptionPane.YES_OPTION) {
                 result = engine.execute("MATCH (n)-[q]-() WHERE n.ID={id} WITH n,q OPTIONAL MATCH (n)-[r:SUB_ELEMENT]-(m) WITH n,q,m OPTIONAL MATCH(m)-[k]-(o) RETURN n,q,m,k", MapUtil.map("id", id));
-              
+
                 IndexManager index = graphDb.index();
                 Index<org.neo4j.graphdb.Node> artefact = index.forNodes("ArtefactElement");
-                
-                Iterator<org.neo4j.graphdb.Node> n_column = result.columnAs("n");               
+
+                Iterator<org.neo4j.graphdb.Node> n_column = result.columnAs("n");
 
                 for (org.neo4j.graphdb.Node node : IteratorUtil
                         .asIterable(n_column)) {
-                	artefact.remove(node);
+                    artefact.remove(node);
                 }
-                
-                Iterator<org.neo4j.graphdb.Node> m_column = result.columnAs("m");               
+
+                Iterator<org.neo4j.graphdb.Node> m_column = result.columnAs("m");
 
                 for (org.neo4j.graphdb.Node node : IteratorUtil
                         .asIterable(m_column)) {
-                	artefact.remove(node);
+                    artefact.remove(node);
                 }
-                
-                Iterator<org.neo4j.graphdb.Node> k_column = result.columnAs("k");               
+
+                Iterator<org.neo4j.graphdb.Node> k_column = result.columnAs("k");
 
                 for (org.neo4j.graphdb.Node node : IteratorUtil
                         .asIterable(k_column)) {
-                	artefact.remove(node);
+                    artefact.remove(node);
                 }
                 result = engine.execute("MATCH (n)-[q]-() WHERE n.ID={id} WITH n,q OPTIONAL MATCH (n)-[r:SUB_ELEMENT]-(m) WITH n,q,m OPTIONAL MATCH(m)-[k]-(o) DELETE n,q,m,k", MapUtil.map("id", id));
                 ReadFiles.deleteArtefact(id);
                 ReadFiles.deleteRelation(id);
-                                
+
             } else {
             }
         }
