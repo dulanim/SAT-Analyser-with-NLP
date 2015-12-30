@@ -43,13 +43,13 @@ public class SourceCodeDB2 {
     private static Node firstNode, secondNode;
     private String fileName = "soucredb-121";
 
-    public SourceCodeDB2() {
+    public SourceCodeDB2() throws Exception{
         //start the database server
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + ProjectCreateWindow.projectName + ".graphdb");
         createNodes();
     }
 
-    public static void createNodes() {
+    public static void createNodes() throws Exception{
         try (Transaction tx = graphDb.beginTx()) {
             firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
             secondNode = graphDb.createNode(ClassLabel.CLASS_NODE);
@@ -58,7 +58,7 @@ public class SourceCodeDB2 {
         
     }
 
-    public static Node getNode(String name) {
+    public static Node getNode(String name) throws Exception{
         ExecutionEngine execEngine = new ExecutionEngine(graphDb);
         Map<String, Object> map = new HashMap<>();
         map.put("className", name);
@@ -76,7 +76,8 @@ public class SourceCodeDB2 {
         return node;
     }
 
-    public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType) {
+    public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType)
+    throws Exception{
         try (Transaction tx = graphDb.beginTx()) {
             
             firstNode = getNode(class1);
