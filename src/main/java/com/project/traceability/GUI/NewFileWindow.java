@@ -39,10 +39,14 @@ import org.eclipse.swt.widgets.TreeItem;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.NLP.file.operations.JavaViewer;
 import com.project.NLP.file.operations.XMLFileStyleFormat;
+import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
+import com.project.traceability.common.Dimension;
 import com.project.traceability.common.PropertyFile;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import org.eclipse.swt.custom.CTabFolderAdapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
@@ -53,6 +57,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -67,6 +72,8 @@ public class NewFileWindow {
 	static String textString;
 	FileDialog fileDialog;
 	private Text text_1;
+        public static String selectedProjectPath;
+        public static Set<String> openedFiles = new HashSet<>();
 
 	/**
 	 * Launch the application.
@@ -119,7 +126,7 @@ public class NewFileWindow {
 		shell = new Shell();
 		shell.setSize(450, 545);
 		shell.setText("New File");
-		center(shell);
+		Dimension.toCenter(shell);
                 
 		final Tree tree = new Tree(shell, SWT.BORDER);
 		tree.setBounds(12, 57, 412, 338);
@@ -246,16 +253,16 @@ public class NewFileWindow {
 
 	public static void openFiles() {
 		for (int j = 0; j < selectedFiles.length; j++) {
-			createTabLayout(selectedFiles[j]);
+			createTabLayout(selectedFiles[j],true);
 		}
 	}
 
-	public static void createTabLayout(String fileName) {
+	public static void createTabLayout(String fileName,boolean flag) {
 		HomeGUI.tabFolder.setVisible(true);
 
 		final CTabItem tabItem = new CTabItem(HomeGUI.tabFolder, SWT.NONE);
 		tabItem.setText(fileName);
-                
+                HomeGUI.tabFolder.setSelection(tabItem);
 		Composite composite = new Composite(HomeGUI.tabFolder, SWT.NONE);
 
 		composite.setLayout(new GridLayout(1, false));
@@ -289,26 +296,53 @@ public class NewFileWindow {
                 codeText.setAlwaysShowScrollBars(true);
                 codeText.setEditable(false);
 		File file = new File(localFilePath + fileName);
+                
+                openedFiles.add(file.getAbsolutePath());
+                
+                
                 tabItem.setToolTipText(file.getPath());
 		try {
-			FileInputStream stream = new FileInputStream(file.getPath());
+                        int recentfileCount = 0;
+			
 			try {
-				Reader in = new BufferedReader(new InputStreamReader(stream));
-				char[] readBuffer = new char[2048];
-				StringBuffer buffer = new StringBuffer((int) file.length());
-				int n;
-				while ((n = in.read(readBuffer)) > 0) {
-					buffer.append(readBuffer, 0, n);
-				}
-				textString = buffer.toString();
-
-				stream.close();
+				
+                                openFile(file.getPath());
+                                
+                                MenuItem[] items = HomeGUI.menu_recent.getItems();
+                                List<String> existing = new ArrayList<>();
+                                for(MenuItem item:items){
+                                           existing.add(item.getText());
+                                }
+                                Iterator<String> itertor = NewFileWindow.openedFiles.iterator();
+                                while(itertor.hasNext()){
+                                   String filePath = itertor.next();
+                                   if(recentfileCount<6 && !existing.contains(filePath)){
+                                        MenuItem mntmRecents = new MenuItem(HomeGUI.menu_recent, SWT.CASCADE);
+                                        mntmRecents.addSelectionListener(new SelectionAdapter() {
+                                        });
+                                        mntmRecents.setText(filePath);
+                                        
+                                        
+                                    recentfileCount++;
+                                   }else if(recentfileCount>6){
+                                        break;
+                                   }//limit to maximum number of files opened as recent
+                                }
+                                //change file status to true since file is open in new tab
+                               
+                                if(flag && (selectedProjectPath != null && !selectedProjectPath.equals(""))){
+                                    XMLWriter writer = XMLWriter.getXMLWriterInstance();
+                                    writer.createFileNode(selectedProjectPath, 
+                                            file.getAbsolutePath());
+                                    writer.changeFileStatus(file.getAbsolutePath(), true);
+                                }
 			} catch (IOException e) {
 				String message = "Err_file_io";
 				displayError(message);
 				return;
 			}
-		} catch (FileNotFoundException e) {
+                        
+		} catch (Exception e) {
 			String message = "Err_not_found";
 			displayError(message);
 			return;
@@ -345,8 +379,36 @@ public class NewFileWindow {
                 // Add a listener to get the close button on each tab
                 HomeGUI.tabFolder.addCTabFolderListener(new CTabFolderAdapter() {
                   public void itemClosed(CTabFolderEvent event) {
+                      
+                       Point pt = new Point(event.x, event.y);
+                       
                       if (event.item.equals(tabItem)) {
+                          
                             event.doit = true;
+                            CTabItem itemsThen[] = HomeGUI.tabFolder.getItems();
+                            
+                            
+                            java.util.List<CTabItem> itemListThen =  Arrays.asList(itemsThen);
+                            java.util.List<String> remainingFiles = new ArrayList<>();
+                            
+                              for(int i=0;i<itemListThen.size();i++){
+                                  
+                                  CTabItem item = itemListThen.get(i);
+                                  String infos = item.getToolTipText();
+                                  remainingFiles.add(infos);
+                              }
+                              
+                             openedFiles.removeAll(remainingFiles);//get removed files
+                             
+                             for(String file:openedFiles){
+                                 //update when file clased
+                                  XMLWriter xmlWriter = XMLWriter.getXMLWriterInstance();
+                                  xmlWriter.changeFileStatus(file, false);
+                             }
+                             openedFiles.clear();
+                             openedFiles.addAll(remainingFiles);
+                           
+                            
                     }
                   }
                   
@@ -377,17 +439,7 @@ public class NewFileWindow {
                 });
 	}
 
-	public void center(Shell shell) {
-
-		Rectangle bds = shell.getDisplay().getBounds();
-
-		Point p = shell.getSize();
-		shell.setFullScreen(true);
-		int nLeft = (bds.width - p.x) / 2;
-		int nTop = (bds.height - p.y) / 2;
-
-		shell.setBounds(nLeft, nTop, p.x, p.y);
-	}
+	
 
 	static void displayError(String msg) {
 		MessageBox box = new MessageBox(shell, SWT.ICON_ERROR);
@@ -395,5 +447,17 @@ public class NewFileWindow {
 		box.open();
 	}
         
-        
+        public static void openFile(String file) throws FileNotFoundException,IOException{
+            FileInputStream stream = new FileInputStream(file);
+            Reader in = new BufferedReader(new InputStreamReader(stream));
+            char[] readBuffer = new char[2048];
+            StringBuffer buffer = new StringBuffer((int) file.length());
+            int n;
+            while ((n = in.read(readBuffer)) > 0) {
+                    buffer.append(readBuffer, 0, n);
+            }
+            textString = buffer.toString();
+
+            stream.close();
+        }
 }
