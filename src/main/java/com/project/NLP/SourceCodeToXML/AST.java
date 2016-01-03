@@ -121,7 +121,3 @@ public class AST {
     
 
     /*public static void main(String[] args) throws IOException {
-        new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
-    }*/
-    
-}
