@@ -60,11 +60,6 @@ import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.eclipse.swt.awt.SWT_AWT;
-import org.gephi.streaming.api.GraphUpdaterEventHandler;
-import org.gephi.streaming.api.event.ElementEvent;
-import org.gephi.streaming.api.event.ElementType;
-import org.gephi.streaming.api.event.EventType;
-import org.gephi.streaming.api.event.GraphEvent;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -80,7 +75,6 @@ public class GraphMouseListener implements PreviewMouseListener {
     GraphDatabaseService graphDb;
     ExecutionEngine engine;
     ExecutionResult result;
-    GraphUpdaterEventHandler gupdate;
 
     @SuppressWarnings("finally")
     @Override
