@@ -7,6 +7,7 @@ package com.project.NLP.SourceCodeToXML;
 
 import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.common.PropertyFile;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,43 +44,49 @@ public class SourceCodeDB2 {
     private static Node firstNode, secondNode;
     private String fileName = "soucredb-121";
 
-    public SourceCodeDB2() throws Exception{
+    public SourceCodeDB2()  {
         //start the database server
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + "\\" + ProjectCreateWindow.projectName +"-source"+ ".graphdb");
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName + File.separator + ProjectCreateWindow.projectName + "-source" + ".graphdb");
         createNodes();
     }
 
-    public static void createNodes() throws Exception{
+    public static void createNodes() {
         try (Transaction tx = graphDb.beginTx()) {
             firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
             secondNode = graphDb.createNode(ClassLabel.CLASS_NODE);
             tx.success();
-        }
-        
+        } 
+
     }
 
-    public static Node getNode(String name) throws Exception{
-        ExecutionEngine execEngine = new ExecutionEngine(graphDb);
-        Map<String, Object> map = new HashMap<>();
-        map.put("className", name);
-        Node node = null;
-        
-        ExecutionResult execResult = execEngine.execute("MATCH (node:CLASS_NODE) \n"
-                + "WHERE node.className={className} \n"
-                + "RETURN node", map);
-        if (execResult.iterator().hasNext()) {
-            node = (Node) execResult.columnAs("node").next();
-        } else {
-            node = null;
-        }
+    public void shutdownDB() {
+        graphDb.shutdown();
+    }
 
+    public static Node getNode(String name) {
+        Node node = null;
+        try (Transaction tx = graphDb.beginTx()) {
+            ExecutionEngine execEngine = new ExecutionEngine(graphDb);
+            Map<String, Object> map = new HashMap<>();
+            map.put("className", name);
+
+            ExecutionResult execResult = execEngine.execute("MATCH (node:CLASS_NODE) \n"
+                    + "WHERE node.className={className} \n"
+                    + "RETURN node", map);
+            if (execResult.iterator().hasNext()) {
+                node = (Node) execResult.columnAs("node").next();
+            } else {
+                node = null;
+            }
+            tx.success();
+
+        } 
         return node;
     }
 
-    public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType)
-    throws Exception{
+    public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType) {
         try (Transaction tx = graphDb.beginTx()) {
-            
+
             firstNode = getNode(class1);
             Relationship relation;
             if (firstNode != null) {
@@ -119,18 +126,18 @@ public class SourceCodeDB2 {
                     //Adds the composition relationship
                     Iterable<Relationship> neighbor = firstNode.getRelationships(Direction.OUTGOING, RelTypes.COMPOSITION);
                     if (neighbor.iterator().hasNext()) {
-                        for (Relationship neighbor1 : neighbor) {                            
-                            if (neighbor1.getEndNode().equals(secondNode)) {    
+                        for (Relationship neighbor1 : neighbor) {
+                            if (neighbor1.getEndNode().equals(secondNode)) {
                                 equal = true;
                                 break;
                             }
                         }
                         //Checks if the relationship already exists or not. If not creates the relationship.
-                        if(!equal){
+                        if (!equal) {
                             relation = firstNode.createRelationshipTo(secondNode, RelTypes.COMPOSITION);
                             relation.setProperty("Relationship", RelTypes.COMPOSITION.toString());
                         }
-                    } else {                        
+                    } else {
                         relation = firstNode.createRelationshipTo(secondNode, RelTypes.COMPOSITION);
                         relation.setProperty("Relationship", RelTypes.COMPOSITION.toString());
                     }
@@ -138,7 +145,7 @@ public class SourceCodeDB2 {
 
             }
             tx.success();
-        }
+        } 
     }
 
     public ArrayList getInheritanceRelationshipData() {
@@ -149,7 +156,7 @@ public class SourceCodeDB2 {
 
             for (Node n : GlobalGraphOperations.at(graphDb).getAllNodesWithLabel(ClassLabel.CLASS_NODE)) {
                 map = new HashMap<>();
-               
+
                 for (Relationship r : n.getRelationships(RelTypes.INHERITANCE, Direction.OUTGOING)) {
                     Node o = r.getOtherNode(n);
                     map.put("1", n.getProperty("class_id").toString());
@@ -157,7 +164,7 @@ public class SourceCodeDB2 {
                     relationshipList.add(map);
                 }
             }
-        }
+        } 
         return relationshipList;
     }
 
@@ -166,14 +173,14 @@ public class SourceCodeDB2 {
         Map<String, String> map;
 
         try (Transaction tx = graphDb.beginTx()) {
-            int count =0;
+            int count = 0;
             for (Node n : GlobalGraphOperations.at(graphDb).getAllNodesWithLabel(ClassLabel.CLASS_NODE)) {
                 map = new HashMap<>();
                 count++;
-                
+
                 for (Relationship r : n.getRelationships(RelTypes.COMPOSITION, Direction.OUTGOING)) {
                     Node o = r.getOtherNode(n);
-                    
+
                     if (!o.getProperty("class_id").toString().isEmpty()) {
                         System.out.println("g " + n.getProperty("class_id") + " " + o.getProperty("class_id"));
                         map.put("1", n.getProperty("class_id").toString());
@@ -184,7 +191,7 @@ public class SourceCodeDB2 {
                 }
             }
             System.out.println(count);
-        }
+        } 
 
         return relationshipList;
     }

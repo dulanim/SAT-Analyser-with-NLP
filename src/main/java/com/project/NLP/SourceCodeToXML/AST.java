@@ -50,6 +50,7 @@ public class AST {
                 System.out.println("Done for: "+file.getAbsolutePath());
                 ast.exitConverter();
             }
+            scdb.shutdownDB();
             
         }
         else{
@@ -92,6 +93,8 @@ public class AST {
         relationshipList = AST.scdb.getAssociationRelationshipData();
         addRelationsToXML(relationshipList, "Composition");
         WriteToXML.createXML();
+        //shutdownDB();
+        
     }
 
     /**
