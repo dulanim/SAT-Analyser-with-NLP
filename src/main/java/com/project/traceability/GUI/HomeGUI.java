@@ -202,7 +202,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 		projComposite.setLayout(new FillLayout());
 
 		workSF = new SashForm(sidebarSF, SWT.VERTICAL | SWT.SMOOTH);		// sash form for vertical CTabFloders
-		sidebarSF.setWeights(new int[] { 1, 3 });
+		sidebarSF.setWeights(new int[] { 1, 5 });
 
 		tabFolder = new CTabFolder(workSF, SWT.BORDER | SWT.CLOSE);			//new CTabFolder to show opened files and compared results
 		tabFolder.setData("WorkSpace");
@@ -1132,7 +1132,7 @@ public class HomeGUI extends JFrame implements KeyListener{
     public static void setupProject(String graphType){
           String projectName = trtmNewTreeitem.getText();
                 PropertyFile.setProjectName(projectName);
-                PropertyFile.setGraphDbPath(projectPath +File.separator + projectName
+                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY+ projectName
                         + ".graphdb");
                 PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator +  projectName
                         + ".gexf");

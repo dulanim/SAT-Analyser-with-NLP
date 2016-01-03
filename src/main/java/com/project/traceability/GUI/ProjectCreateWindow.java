@@ -284,7 +284,7 @@ public class ProjectCreateWindow {
                                 
                                 projectPath = PropertyFile.filePath  + File.separator;
                                 PropertyFile.setProjectName(projectName);
-                                PropertyFile.setGraphDbPath(projectPath + projectName + ".graphdb");
+                                PropertyFile.setGraphDbPath(projectPath +File.separator+ FilePropertyName.PROPERTY+ projectName + ".graphdb");
                                 PropertyFile.setGeneratedGexfFilePath(projectPath+ projectName + ".gexf");
                                 PropertyFile.setRelationshipXMLPath(projectPath + "Relations.xml");
 
