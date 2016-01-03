@@ -463,11 +463,14 @@ public class ImportProjectWindow {
 	}
 	
 	private String getSubFolder(String path){
-		String subFolderName = "DefaultPath";
-		if(path.contains("/")){
+		String subFolderName = "DefaultPath";                
+		if(path.contains("/")){ //For linux
 			subFolderName = path.substring(path.lastIndexOf("/") + 1, 
 					path.length());
-		}
+		}else if(path.contains("\\")){ //For Windows
+                    subFolderName = path.substring(path.lastIndexOf("\\") + 1, 
+					path.length());
+                }
 		
 		return subFolderName;
 	}
