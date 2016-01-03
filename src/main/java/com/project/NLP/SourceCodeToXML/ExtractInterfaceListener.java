@@ -62,7 +62,11 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         } else if (ctx.unannType().unannReferenceType() != null) {
             fieldType = ctx.unannType().unannReferenceType().getText();
             
-            AST.scdb.createNodeRelationship(className, currentClassID, fieldType,associationType);
+            try{
+                AST.scdb.createNodeRelationship(className, currentClassID, fieldType,associationType);
+            }catch(Exception e){
+                
+            }
         }       
         fieldNameList.clear();
     }
@@ -212,7 +216,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
         }
         currentClassID = "SC" + id;
-        AST.scdb.createNodeRelationship(className, currentClassID, superClass,inheritanceType);
+        try{
+            AST.scdb.createNodeRelationship(className, currentClassID, superClass,inheritanceType);
+        }catch(Exception e){
+        }
         id++;
 
 //implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
