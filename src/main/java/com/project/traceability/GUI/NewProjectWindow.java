@@ -104,8 +104,8 @@ public class NewProjectWindow {
                 String projectName = text.getText();
                 projectPath = PropertyFile.filePath + projectName + File.separator;
                 PropertyFile.setProjectName(projectName);
-                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY+ projectName + ".graphdb");
-                PropertyFile.setGeneratedGexfFilePath(projectPath+ projectName + ".gexf");
+                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".graphdb");
+                PropertyFile.setGeneratedGexfFilePath(projectPath+ File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".gexf");
                 PropertyFile.setRelationshipXMLPath(projectPath + "Relations.xml");
 
                 shell.close();

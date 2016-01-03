@@ -1209,9 +1209,9 @@ public class HomeGUI extends JFrame implements KeyListener{
     public static void setupProject(String graphType){
           String projectName = trtmNewTreeitem.getText();
                 PropertyFile.setProjectName(projectName);
-                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY+ projectName
+                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY+ File.separator + projectName
                         + ".graphdb");
-                PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator +  projectName
+                PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator +FilePropertyName.PROPERTY + File.separator +  projectName
                         + ".gexf");
                 PropertyFile.setRelationshipXMLPath(projectPath + File.separator + projectName + FilePropertyName.XML + File.separator
                         + "Relations.xml");
