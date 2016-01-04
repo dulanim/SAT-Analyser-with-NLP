@@ -17,17 +17,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
-/**
- *
- * @author S. Shobiga
- */
 public class MainClass {
     
     private static String requirementDocument="";
+    private static HashMap requirementObjects = new HashMap();
 
     public static void main(String args[]) {
-    	System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
+        System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
@@ -35,7 +33,7 @@ public class MainClass {
         HashSet relationList = new HashSet();
         StoringArtefacts storingArtefacts;
         String className =null;
-        HashMap requirementObjects = new HashMap();
+        
         ArrayList trees =new ArrayList();  
         
         
@@ -70,11 +68,12 @@ public class MainClass {
                     methodList=mId.identifyCandidateMethods(tree);
                 
                 /* relations identificaton */
-                    ClassRelationIdentifier crId=new ClassRelationIdentifier(classList, requirementObjects.keySet());
+                   // ClassRelationIdentifier crId=new ClassRelationIdentifier(classList, requirementObjects.keySet());
                     //if(i!=0){
-                       relationList= crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
-                       relationList.addAll(crId.identifyGenaralizationByHypernym(classList,requirementObjects.keySet()));
+                     //  relationList= crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
+                     //  relationList.addAll(crId.identifyGenaralizationByHypernym(classList,requirementObjects.keySet()));
                     //}
+                    
                 /*Storing Class details  */    
                     Iterator iterator = classList.iterator();
                     if(iterator.hasNext()){
@@ -82,27 +81,33 @@ public class MainClass {
                         }
                     if(requirementObjects.containsKey(className)){
                         StoringArtefacts storeArt=(StoringArtefacts) requirementObjects.get(className);
-                        HashSet attributes=storeArt.getAttributes();
-                        attributes.addAll(attrList);
-                        HashSet methods=storeArt.getMethods();
-                        methods.addAll(methodList);
-                        HashSet relations=storeArt.getRelationships();
-                        relations.addAll(relationList);
+                        storeArt.addAttributes(attrList);
+                        storeArt.addMethods(methodList);
+                        storeArt.addRelationships(relationList);
+                       
                     }
                     else{
                         /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
                         storingArtefacts = new StoringArtefacts();
-                        storingArtefacts.setClassName(classList);
-                        storingArtefacts.setAttributess(attrList);
-                        storingArtefacts.setMethods(methodList);
-                        storingArtefacts.setRelationships(relationList);
+                        storingArtefacts.addClassName(classList);
+                        storingArtefacts.addAttributes(attrList);
+                        storingArtefacts.addMethods(methodList);
+                        storingArtefacts.addRelationships(relationList);
                         requirementObjects.put(className,storingArtefacts);
                     }
                     
 
                 }
+                 
+                /*After finding all classes in the document identifying relationships betweenm them.
+                *
+                */
+                HashSet relationSet=new HashSet();
+                ClassRelationIdentifier crid=new ClassRelationIdentifier();
+                relationSet=crid.identifyGeneralizationRelations(requirementObjects.keySet());
+                addingRelationsToIdentifiedClasses(relationSet);
                 
-                
+              
                 /*Writing the information extracted from Requirement to text file  */
                  writeOutputToTxtFile(requirementObjects);
             }
@@ -138,7 +143,7 @@ public class MainClass {
             
             return req_Document.toString();
         }
-
+ /*
          
          /*Writing output HashMap to a text file 
          *
@@ -157,19 +162,24 @@ public class MainClass {
                     HashSet methods=store.getMethods();
                     HashSet relations=store.getRelationships();
                 
-                    sbf.append("\nClass : "+className+"\n");
-                    sbf.append("\tAttributes : ");
+                    sbf.append("\n\nClass : "+className);
+                    sbf.append("\n\tAttributes : ");
                     for (Object attribute : attributes) {
                         sbf.append(attribute.toString()+",");
                     }
-                    sbf.append("\tMethods : ");
+                    sbf.append("\n\tMethods : ");
                     for (Object method : methods) {
                         sbf.append(method.toString()+",");
                     }
-                    sbf.append("\tRelations : ");
+                    sbf.append("\n\tRelations : ");
                     for (Object relation : relations) {
                         ClassRelation rel=(ClassRelation)relation;
-                        sbf.append("Type - "+rel.getRelationType()+"-> Parent -"+rel.getParentElement());
+                        if(rel.getChildElement().equals(className)){
+                            sbf.append("\t <Type> - "+rel.getRelationType()+"(Parent : "+rel.getParentElement()+")");
+                        }
+                        else if(rel.getParentElement().equals(className)){
+                             sbf.append("\t <Type> - "+rel.getRelationType()+"(Child : "+rel.getChildElement()+")");
+                        }
                     }
                     
                 
@@ -190,6 +200,19 @@ public class MainClass {
             
                 }catch(Exception e){}
             }
+        
+        public static void addingRelationsToIdentifiedClasses(HashSet relations){
+            Iterator iter=relations.iterator();
+            while(iter.hasNext()){
+                ClassRelation classRelation=(ClassRelation)iter.next();
+                String parent=classRelation.getParentElement();
+                String child=classRelation.getChildElement();
+                StoringArtefacts storingArtefacts=(StoringArtefacts)requirementObjects.get(parent);
+                storingArtefacts.addRelationships(classRelation);
+                storingArtefacts=(StoringArtefacts)requirementObjects.get(child);
+                storingArtefacts.addRelationships(classRelation);
+            }
+        }
     
         
 }
