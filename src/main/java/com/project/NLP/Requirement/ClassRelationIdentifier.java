@@ -27,7 +27,7 @@ public class ClassRelationIdentifier {
     private static  WordNetDatabase database = WordNetDatabase.getFileInstance();
     String requirementSentence;
     ArrayList classes = new ArrayList(Arrays.asList("account"));
-    private ArrayList<String> verbPhraseList=new ArrayList<>(Arrays.asList("has","have","contains","contain","includes","include","consists","consist"));
+    private ArrayList<String> verbPhraseList=new ArrayList<>(Arrays.asList("be","has","have","contains","contain","includes","include","consists","consist"));
     private WordStemmer wordStemmer=new WordStemmer();
     
 
@@ -294,7 +294,6 @@ public class ClassRelationIdentifier {
                     Tree verbMatch=verbMatcher.getMatch();
                     String verb=Sentence.listToString(verbMatch.yield());
                     if(verbPhraseList.contains(verb)){
-                        System.out.print("\n---verb in the list----"+verb+"----\n");
                         String noun_1_phraseNotation="NN|NNS>(NP>S)";
                         String noun_2_phraseNotation="NN|NNS>>(NP,(VBZ|VBP>(VP,NP)))";
                         TregexPattern noun_pattern = TregexPattern.compile(noun_1_phraseNotation);
@@ -302,32 +301,29 @@ public class ClassRelationIdentifier {
                         if(noun_matcher.findNextMatchingNode()){
                             Tree nounMatch=noun_matcher.getMatch();
                             String noun1=Sentence.listToString(nounMatch.yield());
-                            System.out.print("\n---noun1----"+noun1+"----\n");
                             if(documentClass.contains(noun1)){
                                 noun_pattern = TregexPattern.compile(noun_2_phraseNotation);
                                 noun_matcher = noun_pattern.matcher((Tree) tree);
                                 if(noun_matcher.findNextMatchingNode()){
                                     nounMatch=noun_matcher.getMatch();
                                     String noun2=Sentence.listToString(nounMatch.yield());
-                                    System.out.print("\n---noun2----"+noun2+"----\n");
-                                    if(documentClass.contains(noun2)){
-                                        ClassRelation clr=new ClassRelation("Association", noun2, noun1);
+                                    if(!noun1.equals(noun2) && documentClass.contains(noun2)){
+                                        ClassRelation clr;
+                                        if(verb.equals("be")){
+                                            clr=new ClassRelation("Generalization", noun1, noun2);
+                                        }
+                                        else{
+                                            clr=new ClassRelation("Association", noun2, noun1);
+                                        }
                                         classRelations.add(clr);
                                     }
                                 }
                             }
-                           
-                           
                         }
-             
-                        
                     }
                 }
-                }
-               
-    
-       
-       return classRelations;
+            }
+        return classRelations;
     }
     
 
