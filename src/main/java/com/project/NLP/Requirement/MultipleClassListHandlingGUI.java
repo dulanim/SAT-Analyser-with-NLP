@@ -43,7 +43,6 @@ public class MultipleClassListHandlingGUI extends JPanel {
     private static JButton deleteButton;
     private static JButton finishButton;
     private static JButton cancelButton;
-    
 
     JPanel panelForAttr = new JPanel(new GridLayout(1, 0)); //grids for the selected attributes and other grid for the original attributes
     JPanel panelEntire = new JPanel(new GridLayout(0, 1));
@@ -79,8 +78,9 @@ public class MultipleClassListHandlingGUI extends JPanel {
     JRadioButton classNameRadioForMethod;
 
     JFrame frame;
-    
-    public static boolean lock =false; //boolean variable to control the frames opening
+
+    public static boolean lock = false; //boolean variable to control the frames opening
+
     public MultipleClassListHandlingGUI() {
 
     }
@@ -109,6 +109,24 @@ public class MultipleClassListHandlingGUI extends JPanel {
         frame.pack();
         frame.setVisible(true);
 
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+          
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                int dialogResult =JOptionPane.showConfirmDialog(frame, "Are you sure to close this window?", "Really Closing?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if(dialogResult== JOptionPane.YES_OPTION) {
+                    lock = false;
+                    frame.dispose();
+                }
+                if(dialogResult == JOptionPane.NO_OPTION){
+                    
+                }
+                
+
+            }
+
+        });
     }
 
     public void gridFormClass() {
@@ -184,7 +202,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                     if (previouslySelectedClass.isEmpty()) {
                         /*close the gui*/
                         //frame.setVisible(false);
-                        lock =false;
+                        lock = false;
                         frame.dispose();
                         //System.exit(0);
 
@@ -214,8 +232,6 @@ public class MultipleClassListHandlingGUI extends JPanel {
 
                 }
             }
-
-       
 
         });
 
@@ -429,11 +445,11 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 attributes = new HashSet();
                 if (iterator.hasNext()) {
                     className = iterator.next().toString();
-                    if(attributeMap.containsKey(className)){
+                    if (attributeMap.containsKey(className)) {
                         attributes = attributeMap.get(className);
                     }
-                    System.out.println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[["+ attributes);
-                    if(methodMap.containsKey(className)){
+                    System.out.println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[" + attributes);
+                    if (methodMap.containsKey(className)) {
                         methods = methodMap.get(className);
                     }
                     System.out.println("Final className :" + className + " Fianl attributes :" + attributes + " Final Methods :" + methods);
@@ -442,13 +458,11 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 outputMessage += "\nClass Name : " + className + "\t\nAttributes : " + attributes + "\n\tMethods: " + methods + "\n";
 
             }
-            
-            
-            if(!attributeMap.isEmpty() || !methodMap.isEmpty()){
+
+            if (!attributeMap.isEmpty() || !methodMap.isEmpty()) {
                 outputMessage = "You have selected the artefacts as follows:" + outputMessage;
                 System.out.println(outputMessage);
-            }
-            else {
+            } else {
                 outputMessage = "You haven't select anything. System assumes none of the classes consists any of the the attributes or methods";
                 System.out.println(outputMessage);
             }
@@ -466,13 +480,12 @@ public class MultipleClassListHandlingGUI extends JPanel {
             outputMessage = "You haven't select anything. System assumes none of the classes consists any of the the attributes or methods";
 
             int dialogResult = JOptionPane.showConfirmDialog(null, outputMessage, "Confirmation Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            if(dialogResult == JOptionPane.YES_OPTION){
+            if (dialogResult == JOptionPane.YES_OPTION) {
                 frame.dispose();
                 //frame.setVisible(false);
                 //System.exit(0);
-            }
-            else if(dialogResult == JOptionPane.NO_OPTION){
-                
+            } else if (dialogResult == JOptionPane.NO_OPTION) {
+
             }
 
         }
@@ -524,10 +537,10 @@ public class MultipleClassListHandlingGUI extends JPanel {
     public HashMap getClassWithMethod() {
         return methodMap;
     }
-    public JFrame getFrame(){
+
+    public JFrame getFrame() {
         return frame;
     }
-
 
     /**
      * Create an Edit menu to support cut/copy/paste.
