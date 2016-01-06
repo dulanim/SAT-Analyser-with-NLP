@@ -97,7 +97,12 @@ public class MainClass {
 
                                 multiClassWithAttribute = multipleClassListHandlingDemo.getClassWithAttribute();
                                 multiClassWithMethod = multipleClassListHandlingDemo.getClassWithMethod();
-                                Thread.sleep(100000);
+                                
+                                while(MultipleClassListHandlingGUI.lock){
+                                    Thread.sleep(100);
+                                }
+                                
+                                System.out.println("out of lock .................................");
                                 Iterator classIterator = classList.iterator();
                                 for (int countClass = 0; countClass < classList.size(); countClass++) {
                                     attributeMulti = new HashSet();
@@ -134,7 +139,7 @@ public class MainClass {
 
                                                 storingArtefacts = new StoringArtefacts();
                                                 storingArtefacts.setClassName(classListMulti);
-                                                storingArtefacts.setAttributess(attributeMulti);
+                                                storingArtefacts.setAttributes(attributeMulti);
                                                 storingArtefacts.setMethods(methodMulti);
                                                 storingArtefacts.setRelationships(relationList);
                                                 requirementObjects.put(classNameMulti, storingArtefacts);
@@ -173,7 +178,7 @@ public class MainClass {
 
                                     storingArtefacts = new StoringArtefacts();
                                     storingArtefacts.setClassName(classList);
-                                    storingArtefacts.setAttributess(attrList);
+                                    storingArtefacts.setAttributes(attrList);
                                     storingArtefacts.setMethods(methodList);
                                     storingArtefacts.setRelationships(relationList);
                                     requirementObjects.put(className, storingArtefacts);
