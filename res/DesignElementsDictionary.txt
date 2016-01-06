@@ -1,0 +1,12 @@
+company
+application
+computer
+data
+detail
+information
+organization
+record
+system
+user
+type
+related

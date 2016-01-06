@@ -55,27 +55,31 @@ public class ClassIdentification {
         /* rule 1 and rule 2 and rule3*/
         afterRules = nounPharseIdentification("NP");
         //afterRules = innerPhrases("NN");
-        
         /*rule 2 */
         checksWhetherDesignElementExits(afterRules);
         /* rule 3*/
         //checksLocationAndPeopleName(afterRules);
+        
+        /*rule 6*/
+        stemming(afterRules);
+    
+        
         /*rule 4- eliminate redundant classes*/
         eliminateRedundantClasses(afterRules);
         /*rule 5- attribues elimination from classes */
         attributesEliminationFromClass(afterRules);
         
-        /*rule 6*/
+        
         
         /*rule 7*/
        
     }
     /*find the noun phrases in the sentence*/
 
-    public ArrayList nounPharseIdentification(String phrase) {
-        ArrayList verb = np.getIdentifiedPhrases(phrase);
+    private ArrayList nounPharseIdentification(String phrase) {
+        ArrayList classL = np.getClassList();
         //ArrayList verb = np.getClass("");
-        return verb;
+        return classL;
     }
 
     /*rule 1
@@ -89,14 +93,14 @@ public class ClassIdentification {
      parameter: className, attribute
      */
     
-    public void checksWhetherDesignElementExits(ArrayList className) {
+    private void checksWhetherDesignElementExits(ArrayList className) {
         ArrayList designElements = designEleClass.getDesignElementsList();
         className.removeAll(designElements);
         afterRules = className;
         System.out.println("cl: "+className);
-       
+             
     }
-    public void checksWhetherDesignElementExits1(Object className, Object attribute) {
+    private void checksWhetherDesignElementExits1(Object className, Object attribute) {
         ArrayList designElements = designEleClass.getDesignElementsList();
         
         if (!designElements.contains(className)) {
@@ -118,7 +122,7 @@ public class ClassIdentification {
     then those concepts will be elemenated from className
     */
     
-    public void checksLocationAndPeopleName(ArrayList list){
+    private void checksLocationAndPeopleName(ArrayList list){
         ParserTreeGenerator parser = new ParserTreeGenerator();
         ArrayList nameEntity;
         for(int j=0;j<list.size();j++){
@@ -154,8 +158,31 @@ public class ClassIdentification {
         System.out.println("attributes: "+attributeFromClass);
     }
     
+    /*rule 6
+    *stemming 
+    *input: classList
+    *output: removed class names using stemming
+    */
+    private void stemming(ArrayList afterRules){
+        
+        for(int i =0 ; i< afterRules.size() - 1; i++){
+            for(int j= i + 1; j < afterRules.size() ; j++ ){
+                if((afterRules.get(j).toString()).startsWith(afterRules.get(i).toString())){
+                    afterRules.remove(j);
+                }
+                if((afterRules.get(i).toString()).startsWith(afterRules.get(j).toString())){
+                    afterRules.remove(i);
+                }
+            }
+            
+        }
+        
+        
+    }
+    
     /*method to get the lists of classes*/
     public HashSet getClasses() {
+        
         
         return classList;
     }

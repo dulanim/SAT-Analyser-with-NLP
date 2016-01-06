@@ -100,7 +100,7 @@ public class AttributeIdentification {
     */
     private void getAttributeList(){
         ArrayList newAtt;
-        newAtt=phrase.getIdentifiedVPPhrases("VP");
+        newAtt=phrase.getAttributeList();
         //newAtt=phrase.getAttribute();
         
         //add the new attributes to the attributes list
