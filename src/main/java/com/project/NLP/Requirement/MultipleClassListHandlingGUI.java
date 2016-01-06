@@ -43,6 +43,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
     private static JButton deleteButton;
     private static JButton finishButton;
     private static JButton cancelButton;
+    
 
     JPanel panelForAttr = new JPanel(new GridLayout(1, 0)); //grids for the selected attributes and other grid for the original attributes
     JPanel panelEntire = new JPanel(new GridLayout(0, 1));
@@ -78,6 +79,8 @@ public class MultipleClassListHandlingGUI extends JPanel {
     JRadioButton classNameRadioForMethod;
 
     JFrame frame;
+    
+    public static boolean lock =false; //boolean variable to control the frames opening
     public MultipleClassListHandlingGUI() {
 
     }
@@ -91,7 +94,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
         this.methodList = methodList;
         finishButton = new JButton(finishString);
         cancelButton = new JButton(cancelString);
-
+        lock = true;
         gridFormClass();
 
         frame = new JFrame("Multiple Class Handling");
@@ -181,6 +184,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                     if (previouslySelectedClass.isEmpty()) {
                         /*close the gui*/
                         //frame.setVisible(false);
+                        lock =false;
                         frame.dispose();
                         //System.exit(0);
 
@@ -200,6 +204,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                         getClassWithAttributesAndMethods();
                         System.out.println("2");
                         /*close the gui*/
+                        lock = false;
                         frame.setVisible(false);
                         //System.exit(0);
                     }
@@ -522,6 +527,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
     public JFrame getFrame(){
         return frame;
     }
+
 
     /**
      * Create an Edit menu to support cut/copy/paste.
