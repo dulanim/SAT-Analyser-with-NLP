@@ -84,7 +84,8 @@ public class GraphMouseListener implements PreviewMouseListener {
             if (clickingInNode(node, event)) {
 
                 graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(/*PropertyFile.getGraphDbPath()*/
-                        HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY);
+                        HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                        + ".graphdb");
                 System.out.println("DB path- " + graphDb.toString());
                 Transaction tx = graphDb.beginTx();                
                 try {

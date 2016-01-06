@@ -53,24 +53,25 @@ public class ReadXML {
             graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
             System.out.println("Entering Req.....");
             graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
-             System.out.println("Entering SourceCode.....");
+            System.out.println("Entering SourceCode.....");
             graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
 
-            // trace class links between UML & source code
+            //trace class links between UML & source code
             relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
             graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
-
+                       
             // trace class links between requirement & source code
-            /*<String> reqSrcRelationNodes = RequirementSourceClassManager
+            List<String> reqSrcRelationNodes = RequirementSourceClassManager
                     .compareClassNames(projectPath);
             graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
-
+            
+            
             List<String> reqUMLRelationNodes = RequirementUMLClassManager
                     .compareClassNames(projectPath);
             graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
 
             relationNodes.addAll(reqSrcRelationNodes);
-            relationNodes.addAll(reqUMLRelationNodes);*/
+            relationNodes.addAll(reqUMLRelationNodes);
 
             List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
             System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
@@ -182,4 +183,5 @@ public class ReadXML {
         readSourceFile(nodeProps, "SC6");
 
     }*/
+    
 }
