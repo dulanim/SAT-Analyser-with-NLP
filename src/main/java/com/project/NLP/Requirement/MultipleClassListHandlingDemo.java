@@ -21,11 +21,10 @@ public class MultipleClassListHandlingDemo extends Thread {
     private HashSet classList;
     private HashSet attributesList;
     private HashSet methodList;
-    private static boolean lock = false;
+    
     MultipleClassListHandlingGUI demo1;
     HashMap<String, HashSet> classWithAttribute = new HashMap<String, HashSet>();
     HashMap<String, HashSet> classWithMethod = new HashMap<String, HashSet>();
-    
 
     MultipleClassListHandlingDemo(HashSet classList, HashSet attributesList, HashSet methodList) {
         //setClass(classList, attributesList, methodList);
@@ -70,8 +69,7 @@ public class MultipleClassListHandlingDemo extends Thread {
                             demo1 = new MultipleClassListHandlingGUI(classList, attributesList, methodList);
                             classWithAttribute = demo1.getClassWithAttribute();
                             classWithMethod = demo1.getClassWithMethod();
-                           
-
+           
                         }
                     });
                     
@@ -80,7 +78,7 @@ public class MultipleClassListHandlingDemo extends Thread {
                     //this.join();
                     //Thread.sleep(1000);
                 } catch (Exception ex) {
-                    lock = false;
+                    
                     System.out.println("6");
                     Exceptions.printStackTrace(ex);
                 }
@@ -101,7 +99,7 @@ public class MultipleClassListHandlingDemo extends Thread {
     public HashMap<String, HashSet> getClassWithMethod(){
         return classWithMethod;
     }
-    
+
 /*    public static void main(String args[]) throws InterruptedException {
         // MultipleClassListHandlingGUI demo = new MultipleClassListHandlingGUI();
         final HashSet classList = new HashSet();
