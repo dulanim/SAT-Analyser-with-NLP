@@ -1,16 +1,7 @@
-Each department is not having an employee.
-Each department is having a student but each staffs is not having an employee.
-checking account hasn't  a saving account.  
-
 
 If the saving-account balance is insufficient to cover the
 requested withdrawal amount and dumm account, the application should
 inform the user and terminate the transaction. 
-
-The application must not verify that a client can
-gain access to his or her account by identification via
-a personal identification number (PIN) code.
-
 
  the transaction must include the
 date, time, transaction type, amount and account
@@ -45,3 +36,11 @@ Each transactions must be recorded the transaction entered.
 
 
 Each saving account must be recorded the saving accounts entered
+
+Each department is not having an employee.
+Each department is having a student but each staffs is not having an employee.
+checking account hasn't  a saving account.  
+
+The application must not verify that a client can
+gain access to his or her account by identification via
+a personal identification number (PIN) code.

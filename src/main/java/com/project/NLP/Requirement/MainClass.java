@@ -59,11 +59,8 @@ public class MainClass {
                 /*For individual sentence in the requirement Document */
                 for (int i = 0; i < trees.size(); i++) {
                     Tree tree = (Tree) trees.get(i);
-                    System.out.println("Tree: " + tree);
-
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
-                    System.out.println("The sentence is negative: " + negativeSentence.isNegativeSentence());
                     if (!negativeSentence.isNegativeSentence()) {
 
                         /*noun pharase identification */
@@ -74,8 +71,7 @@ public class MainClass {
 
                         /*if classList is empty skip the rest of the extraction of artefacts*/
                         if (!classList.isEmpty()) {
-                            //synchronized (this) {
-                                /*attributes identification */
+                            /*attributes identification */
                             AttributeIdentification attr = new AttributeIdentification(tree, attributesFromClass, classList);
                             attrList = attr.getAttributes();
                             System.out.println("ATTRIBUTE LIST: " + attrList);
@@ -86,23 +82,20 @@ public class MainClass {
 
                             /* relations identificaton */
                             ClassRelationIdentifier crId = new ClassRelationIdentifier(classList, requirementObjects.keySet());
-                            //if(i!=0){
                             relationList = crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
                             //relationList.addAll(crId.identifyGenaralizationByHypernym(classList, requirementObjects.keySet()));
-                            //}
-
+                
                             if (classList.size() > 1) {
 
                                 multipleClassListHandlingDemo = new MultipleClassListHandlingDemo(classList, attrList, methodList);
-
                                 multiClassWithAttribute = multipleClassListHandlingDemo.getClassWithAttribute();
                                 multiClassWithMethod = multipleClassListHandlingDemo.getClassWithMethod();
                                 
+                                /*loop to control opening multiple frames*/
                                 while(MultipleClassListHandlingGUI.lock){
                                     Thread.sleep(100);
                                 }
                                 
-                                System.out.println("out of lock .................................");
                                 Iterator classIterator = classList.iterator();
                                 for (int countClass = 0; countClass < classList.size(); countClass++) {
                                     attributeMulti = new HashSet();
@@ -123,8 +116,6 @@ public class MainClass {
                                         //storeClassDetails(classNameMulti, attributeMulti, methodMulti, relationList);
                                         if (!attributeMulti.isEmpty() || !methodMulti.isEmpty()) {
                                             if (requirementObjects.containsKey(classNameMulti)) {
-                                                System.out.println("3333");
-
                                                 StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(classNameMulti);
                                                 HashSet attributes = storeArt.getAttributes();
                                                 attributes.addAll(attributeMulti);
@@ -135,8 +126,6 @@ public class MainClass {
                                                 System.out.println("cl :" + classNameMulti + "\nAttr :" + attributes + "\nMethod :" + methods);
                                             } else {
                                                 /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                                                System.out.println("4444");
-
                                                 storingArtefacts = new StoringArtefacts();
                                                 storingArtefacts.setClassName(classListMulti);
                                                 storingArtefacts.setAttributes(attributeMulti);
@@ -156,15 +145,9 @@ public class MainClass {
                                 Iterator iterator = classList.iterator();
                                 if (iterator.hasNext()) {
                                     className = (String) iterator.next();
-                                    //storeClassDetails(className, attrList, methodList, relationList);
-//                              
-
+                                
                                 }
-
-                                //storeClassDetails(className, attrList, methodList, relationList);
                                 if (requirementObjects.containsKey(className)) {
-                                    System.out.println("1111");
-
                                     StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
                                     HashSet attributes = storeArt.getAttributes();
                                     attributes.addAll(attrList);
@@ -174,8 +157,6 @@ public class MainClass {
                                     relations.addAll(relationList);
                                 } else {
                                     /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                                    System.out.println("2222");
-
                                     storingArtefacts = new StoringArtefacts();
                                     storingArtefacts.setClassName(classList);
                                     storingArtefacts.setAttributes(attrList);
@@ -184,7 +165,6 @@ public class MainClass {
                                     requirementObjects.put(className, storingArtefacts);
                                 }
 
-                                // }
                             }
                         }
                     }
@@ -244,10 +224,10 @@ public class MainClass {
     }
 
     /*Writing output HashMap to a text file 
-     *
-     */
+    *input: output result type: hashMap
+    *output: none
+    */
     public static void writeOutputToTxtFile(HashMap output) {
-        //write to file : "Requirement Output"
         try {
 
             StringBuffer sbf = new StringBuffer();
