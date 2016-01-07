@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
@@ -64,10 +65,13 @@ public class ProjectCreateWindow {
 	static String localFilePath;
 	static String[] selectedFiles;
 	static Path path;
-    String uml_formats[] = { "*.uml*;*.xmi*;*.mdj*"};
-    String req_formats[] ={"*.docs*;*.txt*"};
+       
+        Display display;
+                
+        String uml_formats[] = { "*.uml*;*.xmi*;*.mdj*"};
+        String req_formats[] ={"*.docs*;*.txt*"};
     
-    
+        String errorStatus;
 	/**
 	 * Launch the application.
 	 * @param args
@@ -85,7 +89,7 @@ public class ProjectCreateWindow {
 	 * Open the window.
 	 */
 	public void open() {
-		Display display = Display.getDefault();
+		display = Display.getDefault();
 		createContents();
 		shell.open();
 		shell.layout();
@@ -101,10 +105,10 @@ public class ProjectCreateWindow {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(598, 508);
-		shell.setText("SWT Application");
+		shell.setSize(650, 550);
+		shell.setText("New Project Create Window");
 		
-                 Dimension.toCenter(shell);//set the shell into center point 
+                Dimension.toCenter(shell);//set the shell into center point 
 		Group group = new Group(shell, SWT.NONE);
 		group.setText("Project");
 		group.setBounds(20, 42, 568, 137);
@@ -113,6 +117,10 @@ public class ProjectCreateWindow {
 		label.setText("New Workspace Path");
 		label.setBounds(0, 5, 175, 18);
 		
+                
+                final Composite composite = new Composite(shell, SWT.NONE);
+		composite.setBounds(10, 394, 568, 121);
+                
 		lalProjectWrkspace = new Label(shell, SWT.NONE);
 		lalProjectWrkspace.setText(StaticData.workspace);
 		lalProjectWrkspace.setBounds(221, 10, 347, 17);
@@ -125,7 +133,7 @@ public class ProjectCreateWindow {
 				if(e.keyCode == 10){
 					
 					//The Project work space is entered and pressed enter button
-					String path = textWrkspace.getText().toString();
+					String path = textWrkspace.getText();
 					File file = new File(path);
 					
 					if(!(file.isDirectory() ||
@@ -137,9 +145,9 @@ public class ProjectCreateWindow {
 					}else{
 						MessageBox messageBox;
 						messageBox = new MessageBox(shell, SWT.ERROR);
-					    messageBox.setMessage("Given Path is Invalid");
-					    messageBox.setText("Invalid Path Exception");
-					    messageBox.open();
+                                                messageBox.setMessage("Given Path is Invalid");
+                                                messageBox.setText("Invalid Path Exception");
+                                                messageBox.open();
 					}
 				}
 			}
@@ -311,6 +319,10 @@ public class ProjectCreateWindow {
 		btnSrcBrwse.setEnabled(false);
 		btnSrcBrwse.setBounds(476, 122, 75, 27);
 		
+                final Label lblStatus = new Label(composite, SWT.NONE);
+		lblStatus.setBounds(164, 0, 155, 17);
+		lblStatus.setText("Status");
+                
 		final Button btnOk = new Button(group, SWT.NONE);
 		btnOk.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -332,6 +344,8 @@ public class ProjectCreateWindow {
 					 * name is not valid produce pop up message to user
 					 * 
 					 */
+                                   lblStatus.setText(errorStatus);
+                                   btnFinish.setEnabled(false);
 				}
 			}
 		});
@@ -398,8 +412,7 @@ public class ProjectCreateWindow {
 		
 		
 		
-		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setBounds(10, 394, 568, 97);
+		
 		
 		Button button_2 = new Button(composite, SWT.NONE);
 		button_2.addSelectionListener(new SelectionAdapter() {
@@ -417,56 +430,121 @@ public class ProjectCreateWindow {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				
-				String reqFilePath = PropertyFile.docsFilePath;
-				String umFilePath =  StaticData.umlFilePath;
-				String srcFilePath = StaticData.sourceFilePath;
-				
-				String projectName = txtProjectName.getText();
-				
-				if(!(StaticData.workspace.lastIndexOf(File.separator) == StaticData.workspace.length()-1))
-					StaticData.workspace += (File.separator);
-				
-				File projectRoot = new File(StaticData.workspace + projectName +File.separator);
-					try {
-						projectRoot.mkdir();
-                                                ProjectCreateWindow.projectName = projectName;
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				File reqFile = new File(reqFilePath);
-				File umlFile= new File(umFilePath);
-				File srcFile = new File(srcFilePath);
-				
-				String projectAbsoulutePath = projectRoot.getAbsolutePath() ;
-				
-				if(!(projectAbsoulutePath.lastIndexOf(File.separator) == projectAbsoulutePath.length()-1))
-					projectAbsoulutePath += (File.separator);
+                            
+                                final ProgressBar progressBar = new ProgressBar(composite, SWT.HORIZONTAL | SWT.SMOOTH);
+                                progressBar.setBounds(0, 73, 568, 14);
+                                
+                                final Label lblProgress = new Label(composite, SWT.NONE);
+                                lblProgress.setBounds(163, 104, 405, 17);
+                                lblProgress.setText("New Label");
+                                
+                                new Thread(new Runnable(){
+                                    @Override
+                                    public void run()
+                                    {
+                                        int counter = 0;
+                                        while (lblProgress != null && !lblProgress.isDisposed())
+                                        {
+                                            String text = StaticData.statusString;
+                                                    if (lblProgress != null && !lblProgress.isDisposed()
+                                                            && !text.equals("Finish The Progress")){
+                                                        lblProgress.setText(text);
+                                                        progressBar.setSelection(progressBar
+                                                                .getSelection() + 1);
+                                                    }
+                                                    if(text.equals("Finish The Progress")){
+                                                        progressBar.dispose();
+                                                    }
+                                                
+                                            
+
+                                            try
+                                            {
+                                                Thread.sleep(1000);
+                                            }catch (InterruptedException e){
+                                                displayError(e.toString());
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            
+
+                            String reqFilePath = PropertyFile.docsFilePath;
+                            String umFilePath =  StaticData.umlFilePath;
+                            String srcFilePath = StaticData.sourceFilePath;
+
+                            String projectName = txtProjectName.getText();
+
+                            if(!(StaticData.workspace.lastIndexOf(File.separator) == StaticData.workspace.length()-1))
+                                    StaticData.workspace += (File.separator);
+
+                            File projectRoot = new File(StaticData.workspace + projectName +File.separator);
+                                    try {
+                                            StaticData.statusString = "Making the " +  projectName +" Project Path" + 
+                                            projectRoot.mkdir();
+                                            ProjectCreateWindow.projectName = projectName;
+                                    } catch (Exception e1) {
+                                            // TODO Auto-generated catch block
+                                            e1.printStackTrace();
+                                    }
+                            File reqFile = new File(reqFilePath);
+                            File umlFile= new File(umFilePath);
+                            File srcFile = new File(srcFilePath);
+
+                            String projectAbsoulutePath = projectRoot.getAbsolutePath() ;
+
+                            if(!(projectAbsoulutePath.lastIndexOf(File.separator) == projectAbsoulutePath.length()-1))
+                                    projectAbsoulutePath += (File.separator);
+
+                            File srcFolder = new File(projectAbsoulutePath + FilePropertyName.SOURCE_CODE);
+                            try {
+                                        StaticData.statusString = "Making " + "src Java File path";
+                                        srcFolder.mkdir();
+
+                                        StaticData.statusString = "Copying " + "src Java Files to " + projectName;
+                                        FilePropertyName.copyFolder(srcFile, srcFolder);
+
+
+                                        StaticData.statusString = "Making " + "Text File path";
+                                        File txtFolder = new File(projectAbsoulutePath+FilePropertyName.REQUIREMENT);
+                                        txtFolder.mkdir();
 					
-				File srcFolder = new File(projectAbsoulutePath + FilePropertyName.SOURCE_CODE);
-				try {
-					srcFolder.mkdir();
-					FilePropertyName.copyFolder(srcFile, srcFolder);
-					
-					File txtFolder = new File(projectAbsoulutePath+FilePropertyName.REQUIREMENT);
-					txtFolder.mkdir();
-					
+                                        StaticData.statusString = "Copying " + "File" + reqFile.getName() +" To " + projectName +
+                                                    File.separator + FilePropertyName.REQUIREMENT;
 					FilePropertyName.copyFile(reqFile, txtFolder);
 					
+                                        StaticData.statusString = "Making " + "File Path"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.UML;
 					File umlFolder = new File(projectAbsoulutePath+FilePropertyName.UML);
 					umlFolder.mkdir();
 					
+                                        
+                                        StaticData.statusString = "Copying " + "Uml " + umlFile.getName() +" To " + projectName +
+                                                    File.separator + FilePropertyName.UML;
 					FilePropertyName.copyFile(umlFile, umlFolder);
 					
+                                        
+                                        StaticData.statusString = "Making " + "XML File Path"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.XML;
 					File xmlFolder = new File(projectAbsoulutePath+FilePropertyName.XML);
 					xmlFolder.mkdir();
 					//PropertyFile.setRelationshipXMLPath(xmlFolder + File.separator + FilePropertyName.RELATION_NAME);
 					
+                                        StaticData.statusString = "Preparing " + "Relations.xml File Path"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.XML;
                                         RelationManager.createXML(projectAbsoulutePath.substring(0,projectAbsoulutePath.length()-1));
 					
+                                        
+                                        
+                                        StaticData.statusString = "Making " + "Property File Path"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.PROPERTY;
 					File propertyFolder = new File(projectAbsoulutePath+FilePropertyName.PROPERTY);
 					propertyFolder.mkdir();
                                         
+                                
+                                        
+                                StaticData.statusString = "Making " + " System Files"  +" To " + projectName +
+                                                    File.separator;
                                 projectPath = PropertyFile.filePath  + File.separator;
                                 PropertyFile.setProjectName(projectName);
                                 PropertyFile.setGraphDbPath(projectPath + projectName + ".graphdb");
@@ -485,6 +563,8 @@ public class ProjectCreateWindow {
                                 write the sat_configuration.xml file with 
                                 new project node and workspace node if needed
                                 */
+                                
+                                StaticData.statusString = "Setting Up " + " Project Workspaces";
                                 Adapter.wrkspace = StaticData.workspace;
                                 Adapter.projectPath = StaticData.workspace + projectName;
                                 Adapter.createProjectNode();
@@ -503,9 +583,17 @@ public class ProjectCreateWindow {
                                 
                                 
                                 
+                                StaticData.statusString = "Converting " + " Required Design XML Files"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.XML;
                                 XMLConversion.convertUMLFile();
+                                
+                                StaticData.statusString = "Converting " + " Required Java XML Files"  +" To " + projectName +
+                                                    File.separator + FilePropertyName.XML;
                                 XMLConversion.convertJavaFiles();
+                                
+                                StaticData.statusString = "Finish The Progress";
                                 shell.dispose();
+                                
 				HomeGUI.closeMain(HomeGUI.shell);
                                 HomeGUI.main(null);
                                 
@@ -529,13 +617,14 @@ public class ProjectCreateWindow {
 		btnFinish.setEnabled(false);
 		btnFinish.setBounds(493, 29, 75, 25);
 		
-		Label lblNewLabel = new Label(composite, SWT.NONE);
-		lblNewLabel.setBounds(24, 10, 459, 17);
-		lblNewLabel.setText("New Label");
+		
 		
 		Label label_6 = new Label(shell, SWT.NONE);
 		label_6.setText("New Project Will be created ");
 		label_6.setBounds(20, 10, 189, 17);
+		
+                
+                
 		
 		
 
@@ -545,8 +634,21 @@ public class ProjectCreateWindow {
 		/*
 		 * have to write name validation here
 		 */
+                      
 		boolean isValid = true;
-		return isValid;
+                 if(aName.equals("")||aName.isEmpty()){
+                        errorStatus = "Name should have valid characters Eg: Exampler";
+                        isValid = false;
+                 }
+                 else{
+                        if(!(Character.isUpperCase(aName.charAt(0)))){
+                            errorStatus = "Project Name start with capital";
+                            isValid = false;
+                        }
+                 }
+                 
+            
+            return isValid;
 	}
         
         public void displayError(String msg){
