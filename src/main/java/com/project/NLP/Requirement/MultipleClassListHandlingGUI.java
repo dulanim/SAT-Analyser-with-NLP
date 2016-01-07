@@ -22,6 +22,7 @@ import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+
 /**
  * The ListCutPaste example illustrates cut, copy, paste and drag and drop using
  * three instances of JList. The TransferActionListener class listens for one of
@@ -108,9 +109,16 @@ public class MultipleClassListHandlingGUI extends JPanel {
         gridFormClass();
 
         frame = new JFrame("Multiple Class Handling");
-
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        //frame.setLocationRelativeTo(null);
+        //frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         //ListCutPaste demo = new ListCutPaste();
+        
+        /*centering the frame*/
+        frame.setSize(550,400);
+        frame.setLocationRelativeTo(null);
+        
+     
+
         frame.setJMenuBar(createMenuBar());
         setOpaque(true); //content panes must be opaque
         frame.setContentPane(this);
@@ -310,7 +318,9 @@ public class MultipleClassListHandlingGUI extends JPanel {
         panelForNewArtefacts.setBorder(BorderFactory.createTitledBorder("New "+artefactName));
         panelForArtefacts.add(panelForNewArtefacts);
 
-        setPreferredSize(new Dimension(550, 400));
+//        setPreferredSize(new Dimension(550, 400));
+//        com.project.traceability.common.Dimension.toCenter(frame);
+
         add(panelForArtefacts, BorderLayout.CENTER);
 
         panelEntire.add(panelForArtefacts);
