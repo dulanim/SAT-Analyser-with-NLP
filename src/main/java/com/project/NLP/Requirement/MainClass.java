@@ -195,18 +195,7 @@ public class MainClass {
         }
     }
 
-    /*method to handle the passive voice
-     *input: attributeList and classList
-     *output: swipe the attributeList and classList
-     */
-    public static void passiveVoiceHandling(ParserTreeGenerator parser, HashSet classList, HashSet attributeList) {
-        HashSet tempList = new HashSet();
-        if (parser.isPassiveSentence()) {
-            tempList = classList;
-            classList = attributeList;
-            attributeList = tempList;
-        }
-    }
+   
 
     /* Reading the input Natural Language Requirement File 
      *Input : text file
