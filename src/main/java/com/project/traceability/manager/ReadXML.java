@@ -37,55 +37,10 @@ public class ReadXML {
     public static List<String> relationNodes = new ArrayList<>();
 
     public static void initApp(String projectPath, String graphType) {
-
-        relationNodes = null;
+        
         try {
             HomeGUI.isComaparing = false;
-            ReadFiles.readFiles(projectPath);
-            Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
-            Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
-            List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
-
-            GraphDB graphDB = new GraphDB();
-            graphDB.initiateGraphDB();
-           
-            System.out.println("Entering UML.....");
-            graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
-            System.out.println("Entering Req.....");
-            graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
-            System.out.println("Entering SourceCode.....");
-            graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
-
-            //trace class links between UML & source code
-            relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
-            graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
-                       
-            // trace class links between requirement & source code
-            List<String> reqSrcRelationNodes = RequirementSourceClassManager
-                    .compareClassNames(projectPath);
-            graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
-            
-            
-            List<String> reqUMLRelationNodes = RequirementUMLClassManager
-                    .compareClassNames(projectPath);
-            graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
-
-            relationNodes.addAll(reqSrcRelationNodes);
-            relationNodes.addAll(reqUMLRelationNodes);
-
-            List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
-            System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
-            graphDB.addIntraRelationTOGraphDB(sourceIntraRelations);//add intra relationships between SourceCode elements to db
-            relationNodes.addAll(sourceIntraRelations);
-
-            List<String> UMLIntraRelations = IntraRelationManager.getUMLIntraRelation(projectPath);
-            System.out.println("UML Intra Relation: " + UMLIntraRelations.size());
-            graphDB.addIntraRelationTOGraphDB(UMLIntraRelations);//add intra relationships between UML elements to db
-            relationNodes.addAll(UMLIntraRelations);
-
-            RelationManager.addLinks(relationNodes);
-
-            graphDB.generateGraphFile();//generate the graph file from db
+            transferDataToDBFromXML(projectPath);
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
@@ -98,17 +53,61 @@ public class ReadXML {
         }
     }
 
-    public static void readSourceFile(HashMap<String, Object> nodeProps, String id) throws TransformerException {
+    public static void transferDataToDBFromXML(String projectPath) {
+        relationNodes = null;
+        ReadFiles.readFiles(projectPath);
+        Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
+        Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
+        List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
         
-        String xmlfile = HomeGUI.projectPath + File.separator + XML+ File.separator+ FilePropertyName.SOURCE_ARTIFACT_NAME;
-        System.out.println(xmlfile);
+        GraphDB graphDB = new GraphDB();
+        graphDB.initiateGraphDB();
+        
+        System.out.println("Entering UML.....");
+        graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
+        System.out.println("Entering Req.....");
+        graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
+        System.out.println("Entering SourceCode.....");
+        graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
+        
+        //trace class links between UML & source code
+        relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
+        graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
+        
+        // trace class links between requirement & source code
+        List<String> reqSrcRelationNodes = RequirementSourceClassManager
+                .compareClassNames(projectPath);
+        graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
+        
+        List<String> reqUMLRelationNodes = RequirementUMLClassManager
+                .compareClassNames(projectPath);
+        graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
+        
+        relationNodes.addAll(reqSrcRelationNodes);
+        relationNodes.addAll(reqUMLRelationNodes);
+        
+        List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
+        System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
+        graphDB.addIntraRelationTOGraphDB(sourceIntraRelations);//add intra relationships between SourceCode elements to db
+        relationNodes.addAll(sourceIntraRelations);
+        
+        List<String> UMLIntraRelations = IntraRelationManager.getUMLIntraRelation(projectPath);
+        System.out.println("UML Intra Relation: " + UMLIntraRelations.size());
+        graphDB.addIntraRelationTOGraphDB(UMLIntraRelations);//add intra relationships between UML elements to db
+        relationNodes.addAll(UMLIntraRelations);
+        
+        RelationManager.addLinks(relationNodes);
+        
+        graphDB.generateGraphFile();//generate the graph file from db
+    }
+
+    public static void readSourceFile(HashMap<String, Object> nodeProps, String id , String xmlFile) throws TransformerException {
+
+        System.out.println(xmlFile);
         try {
-
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-
-            Document document = documentBuilder.parse(xmlfile);
+            Document document = documentBuilder.parse(xmlFile);
 
             NodeList nodeList = document.getElementsByTagName("ArtefactElement");
             parent:
@@ -118,7 +117,13 @@ public class ReadXML {
                 if (ID.equals(id)) {
                     NamedNodeMap attr = nodeList.item(x).getAttributes();
                     for (String key : nodeProps.keySet()) {
-                        Node nodeAttr = attr.getNamedItem("key");
+                        String keyval = key.replaceAll("\\s", "");
+                        char a = keyval.charAt(0);
+                        keyval = keyval.replace(a, keyval.toLowerCase().charAt(0));
+                        if (key.equals("ID")) {
+                            keyval = "id";
+                        }
+                        Node nodeAttr = attr.getNamedItem(keyval);
                         nodeAttr.setTextContent(nodeProps.get(key).toString());
                     }
                     break;
@@ -139,18 +144,19 @@ public class ReadXML {
                                 System.out.println(key + " "+value);
                                 //attr.item(i).setNodeValue(value); 
                             }
-                            */
+                             */
                             for (String key : nodeProps.keySet()) {
                                 String keyval = key.replaceAll("\\s", "");
                                 char a = keyval.charAt(0);
                                 keyval = keyval.replace(a, keyval.toLowerCase().charAt(0));
-                                if(key.equals("ID"))
+                                if (key.equals("ID")) {
                                     keyval = "id";
+                                }
                                 Node attrItem = attr.getNamedItem(keyval);
                                 attrItem.setNodeValue(nodeProps.get(key).toString());
-                                System.out.println(keyval + " "+nodeProps.get(key).toString()+" "+key);
+                                System.out.println(keyval + " " + nodeProps.get(key).toString() + " " + key);
                             }
-                            
+
                             break parent;
                         }
                     }
@@ -162,7 +168,7 @@ public class ReadXML {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
             String xmlpath = HomeGUI.projectPath + File.separator + XML;
-            File file = new File(xmlpath,FilePropertyName.SOURCE_ARTIFACT_NAME);
+            File file = new File(xmlpath, FilePropertyName.SOURCE_ARTIFACT_NAME);
             StreamResult result = new StreamResult(file.getPath());
             transformer.transform(source, result);
 
@@ -183,5 +189,4 @@ public class ReadXML {
         readSourceFile(nodeProps, "SC6");
 
     }*/
-    
 }
