@@ -42,7 +42,9 @@ public class MainClass {
         MultipleClassListHandlingDemo multipleClassListHandlingDemo;
         HashSet attributeMulti = new HashSet();
         HashSet methodMulti = new HashSet();
-
+        boolean passiveCheck = false;
+        HashMap passiveMap;
+        HashSet tempList;
         try {
             /*Reading requirement file */
             requirementDocument = readFromTextFile("BankRequirement.txt");
@@ -55,10 +57,11 @@ public class MainClass {
                 ParserTreeGenerator parser = new ParserTreeGenerator(requirementDocument);
                 trees = parser.getSentenceParseTree();
                 ParserTreeGenerator p = new ParserTreeGenerator();
-
+                //passiveCheck = parser.isPassiveSentence();
                 /*For individual sentence in the requirement Document */
-                for (int i = 0; i < trees.size(); i++) {
-                    Tree tree = (Tree) trees.get(i);
+                for (int countTree = 0; countTree < trees.size(); countTree++) {
+                    Tree tree = (Tree) trees.get(countTree);
+                    System.out.println("Tree: " + tree);
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
                     if (!negativeSentence.isNegativeSentence()) {
@@ -76,6 +79,16 @@ public class MainClass {
                             attrList = attr.getAttributes();
                             System.out.println("ATTRIBUTE LIST: " + attrList);
 
+                            /*if the sentence is passive swipe the attributes and methods*/
+                            // passiveVoiceHandling(parser, classList, attrList);
+                            passiveMap = parser.getPassiveSentenceMap();
+                            
+                            if (passiveMap.containsKey(tree)) {
+                                tempList = classList;
+                                classList = attrList;
+                                attrList = tempList;
+                            }
+
                             /* methods identification */
                             MethodIdentifier mId = new MethodIdentifier(tree, classList);
                             methodList = mId.identifyCandidateMethods(tree);
@@ -84,18 +97,18 @@ public class MainClass {
                             ClassRelationIdentifier crId = new ClassRelationIdentifier(classList, requirementObjects.keySet());
                             relationList = crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
                             //relationList.addAll(crId.identifyGenaralizationByHypernym(classList, requirementObjects.keySet()));
-                
+
                             if (classList.size() > 1) {
 
                                 multipleClassListHandlingDemo = new MultipleClassListHandlingDemo(classList, attrList, methodList);
                                 multiClassWithAttribute = multipleClassListHandlingDemo.getClassWithAttribute();
                                 multiClassWithMethod = multipleClassListHandlingDemo.getClassWithMethod();
-                                
+
                                 /*loop to control opening multiple frames*/
-                                while(MultipleClassListHandlingGUI.lock){
+                                while (MultipleClassListHandlingGUI.lock) {
                                     Thread.sleep(100);
                                 }
-                                
+
                                 Iterator classIterator = classList.iterator();
                                 for (int countClass = 0; countClass < classList.size(); countClass++) {
                                     attributeMulti = new HashSet();
@@ -145,7 +158,7 @@ public class MainClass {
                                 Iterator iterator = classList.iterator();
                                 if (iterator.hasNext()) {
                                     className = (String) iterator.next();
-                                
+
                                 }
                                 if (requirementObjects.containsKey(className)) {
                                     StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
@@ -181,11 +194,24 @@ public class MainClass {
 
         }
     }
+
+    /*method to handle the passive voice
+     *input: attributeList and classList
+     *output: swipe the attributeList and classList
+     */
+    public static void passiveVoiceHandling(ParserTreeGenerator parser, HashSet classList, HashSet attributeList) {
+        HashSet tempList = new HashSet();
+        if (parser.isPassiveSentence()) {
+            tempList = classList;
+            classList = attributeList;
+            attributeList = tempList;
+        }
+    }
+
     /* Reading the input Natural Language Requirement File 
      *Input : text file
      *Output :String of the text file
      */
-
     private static String readFromTextFile(String file) {
         BufferedReader br = null;
         String req_Document = "";
@@ -224,9 +250,9 @@ public class MainClass {
     }
 
     /*Writing output HashMap to a text file 
-    *input: output result type: hashMap
-    *output: none
-    */
+     *input: output result type: hashMap
+     *output: none
+     */
     public static void writeOutputToTxtFile(HashMap output) {
         try {
 
