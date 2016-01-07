@@ -22,7 +22,6 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -50,16 +49,12 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.swt.custom.CTabFolderAdapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.TableItem;
 
 public class NewFileWindow {
         public static StyledText codeText;
@@ -317,8 +312,11 @@ public class NewFileWindow {
                                 while(itertor.hasNext()){
                                    String filePath = itertor.next();
                                    if(recentfileCount<6 && !existing.contains(filePath)){
-                                        MenuItem mntmRecents = new MenuItem(HomeGUI.menu_recent, SWT.CASCADE);
+                                        final MenuItem mntmRecents = new MenuItem(HomeGUI.menu_recent, SWT.CASCADE);
                                         mntmRecents.addSelectionListener(new SelectionAdapter() {
+                                            
+                                            String selectedFile = mntmRecents.getText();
+                                           
                                         });
                                         mntmRecents.setText(filePath);
                                         
