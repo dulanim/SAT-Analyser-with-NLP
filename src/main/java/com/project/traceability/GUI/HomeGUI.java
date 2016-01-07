@@ -56,6 +56,7 @@ import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -64,6 +65,9 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -117,6 +121,18 @@ public class HomeGUI extends JFrame implements KeyListener{
         
         static XMLReader reader;
         static XMLWriter writer;
+        
+        static CTabItem visibleItem;
+        static CTabItem selectedTabItem;
+        
+        private CTabItem tbtmPropertyInfos;
+	private Table table;
+	private TableColumn tblclmnProperty;
+	private TableColumn tblclmnValue;
+	private TableCursor tableCursor;
+	private TableItem tableItem;
+	private TableItem tableItem_1;
+        private SashForm graphTapHolder;
         /**
 	 * Launch the application.
 	 * 
@@ -132,7 +148,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 			window.open();
 			window.eventLoop(Display.getDefault());
 		} catch (Exception e) {
-			e.printStackTrace();
+                    displayError(e.toString());
 		}
 	}
 
@@ -162,7 +178,6 @@ public class HomeGUI extends JFrame implements KeyListener{
 	public void initUI() {
 
 		Label label = new Label(shell, SWT.LEFT);
-
 		Point p = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		label.setBounds(5, 5, p.x + 5, p.y + 5);
 	}
@@ -207,60 +222,63 @@ public class HomeGUI extends JFrame implements KeyListener{
 		tabFolder.setMinimizeVisible(true);
 		tabFolder.setMaximizeVisible(true);
                 //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
-		graphTab = new CTabFolder(workSF, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+                
+                graphTapHolder = new SashForm(workSF, SWT.HORIZONTAL | SWT.SMOOTH);	
+		graphTapHolder.setVisible(true);
+                graphTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
 		graphTab.setData("Graph");
 		graphTab.setMinimizeVisible(true);
 		graphTab.setMaximizeVisible(true);
 		
 		workSF.setWeights(new int[] { 1, 1 });
-
+                graphComposite = new Composite(graphTab, SWT.NONE);
+		graphComposite.setLayout(new FillLayout());
 		composite = new Composite(tabFolder, SWT.NONE);
 		composite.setLayout(new FillLayout());
 
-		graphComposite = new Composite(graphTab, SWT.NONE);
-		graphComposite.setLayout(new FillLayout());
-
+                CTabFolder propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+		propertyTab.setData("Property");
+		propertyTab.setMinimizeVisible(true);
+		propertyTab.setMaximizeVisible(true);
+       
                 
-                     
-                addEditMenuPopUpMenu();
-                //create ToolBar and ToolItems
-//                final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem saveToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem sep1 = new ToolItem(bar, SWT.SEPARATOR);
-//                final ToolItem cutToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem copyToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem pasteToolItem = new ToolItem(bar, SWT.PUSH);
-//                
-//                            //set the size and location of the user interface widgets
-//                bar.setSize(50, 55);
-//                bar.setLocation(10, 0);
-//                Device dev = shell.getDisplay();
-//                final Image saveIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image openIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image childIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image cutIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image copyIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image pasteIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                //t.setBounds(0, 56, 490, 395);
-//
-//                //Configure the ToolBar
-//                openToolItem.setImage(openIcon);
-//                openToolItem.setText("Open");
-//                openToolItem.setToolTipText("Open File");
-//                saveToolItem.setImage(saveIcon);
-//                saveToolItem.setText("Save");
-//                saveToolItem.setToolTipText("Save File");
-//                cutToolItem.setImage(cutIcon);
-//                cutToolItem.setText("Cut");
-//                cutToolItem.setToolTipText("Cut");
-//                copyToolItem.setImage(copyIcon);
-//                copyToolItem.setText("Copy");
-//                copyToolItem.setToolTipText("Copy");
-//                pasteToolItem.setImage(pasteIcon);
-//                pasteToolItem.setText("Paste");
-//                pasteToolItem.setToolTipText("Paste");
+		tbtmPropertyInfos = new CTabItem(propertyTab, SWT.NONE);
+		tbtmPropertyInfos.setText("Property Infos");
+//		
+                /*
+                this is property table row sample
+                */
+		table = new Table(propertyTab, SWT.BORDER | SWT.FULL_SELECTION);
+		tbtmPropertyInfos.setControl(table);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		/*
+                this is first coloumn
+                */
+		tblclmnProperty = new TableColumn(table, SWT.NONE);
+		tblclmnProperty.setWidth(100);
+		tblclmnProperty.setText("Property");
+		/*
+                second coloumn
+                */
+		tblclmnValue = new TableColumn(table, SWT.NONE);
+		tblclmnValue.setWidth(100);
+		tblclmnValue.setText("Value");
+		
+                /*
+                table holder for scrolling purpose
+                */
+		tableCursor = new TableCursor(table, SWT.NONE);
+		
+		tableItem = new TableItem(table, SWT.NONE,0);
+		tableItem.setText("New TableItem");
+		
+		tableItem_1 = new TableItem(table, SWT.NONE,1);
+		tableItem_1.setText("New TableItem");
+//		
+                graphTapHolder.setWeights(new int[] {749, 271});
                 
-                
+                addEditMenuPopUpMenu();       
 		defineListeners();
 		
 		newTab.addCTabFolder2Listener(ctfCTF2L);			//for managing maximize, minimize and restore
@@ -275,6 +293,8 @@ public class HomeGUI extends JFrame implements KeyListener{
 
 		graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
 		graphtabItem.setText("Graph");
+             
+                
                 
 		File projectFile = new File(PropertyFile.filePath);		//to access the workspace
 		projectFile.mkdir();
@@ -339,7 +359,22 @@ public class HomeGUI extends JFrame implements KeyListener{
 			}
 
 		});
+                
+                tabFolder.addSelectionListener(new SelectionAdapter() {
 
+                    @Override
+                    public void widgetSelected(SelectionEvent se) {
+                        super.widgetSelected(se); //To change body of generated methods, choose Tools | Templates.
+                        
+                        
+                        selectedTabItem = tabFolder.getSelection();
+                        String temp = selectedTabItem.getToolTipText();
+                        
+                    }
+                    
+                       
+                });
+                
 		tree.addMouseListener(new MouseAdapter() {	
                     //mouse double click listener to display the files
                     /*
@@ -357,9 +392,12 @@ public class HomeGUI extends JFrame implements KeyListener{
                                 {
                                     string = selection[0].getText();
                                     parent = paret.getText();
+                                  
                                 }else{
                                     string = selection[0].getText();
                                     parent = topParent.getText() + File.separator + paret.getText();
+                                    
+                                    
                                 }
                                 
                                 //String projectDir = projectPath;
@@ -397,16 +435,10 @@ public class HomeGUI extends JFrame implements KeyListener{
                                            file is opened in tab visiblle that tab
                                            */
                                            
-                                           CTabItem items[] = tabFolder.getItems();
-                                           
-                                           for(int i=0;i<items.length;i++){
-                                               
-                                               String tips = items[i].getToolTipText();
-                                               if(tips.equalsIgnoreCase(NewFileWindow.localFilePath+string)){
-                                                tabFolder.setSelection(items[i]);
-                                                break;
+                                               if(isExists(NewFileWindow.localFilePath+string)){
+                                                    tabFolder.setSelection(visibleItem);
                                                }
-                                           }
+                                           
                                        }
                                        
                                         
@@ -419,8 +451,10 @@ public class HomeGUI extends JFrame implements KeyListener{
 
 		tbtmProjects.setControl(tree);			//add tree to CTabItem
 
-		if (StaticData.workspace.equals(""))
-			tree.setVisible(false);
+		if (StaticData.workspace.equals("")){
+			tree.setVisible(true);
+                      ///  setUpNewProject();
+                }
 		else {
                     //adding project folders and files from workspace in project tab
                         setUpNewProject();
@@ -475,6 +509,11 @@ public class HomeGUI extends JFrame implements KeyListener{
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				new FileSave().saveFile();
+                                
+                                if(selectedTabItem != null)
+                                    selectedTabItem.dispose();
+                                CTabItem items[] = getTabItem();
+                                //items[0].get
 			}
 		});
                
@@ -539,10 +578,15 @@ public class HomeGUI extends JFrame implements KeyListener{
                                         
                                         if(!StaticData.workspace.equals(PropertyFile.filePath)){
                                             StaticData.workspace = PropertyFile.filePath;
-                                            writer.createWorkspaceNode(StaticData.workspace, "true");
+                                            writer.createWorkspaceNode(StaticData.workspace, "false");
                                             shell.dispose();
+                                            
+                                            
+                                            //update current path as created current workspace
+                                            writer.changeCurrnntWorkspaceVale(StaticData.workspace);
                                             //StartUpProject bar =  new StartUpProject();
-                                            StartUpProject.main(null);
+                                            closeMain(shell);
+                                            HomeGUI.main(null);
                                         }
                                    }else if(x == JOptionPane.NO_OPTION){
                                        
@@ -774,23 +818,28 @@ public class HomeGUI extends JFrame implements KeyListener{
                             }
 			}
 		});
-                final MenuItem GraphWindowItem = new MenuItem(viewMenu, SWT.CHECK);
+                final MenuItem GraphWindowItem = new MenuItem(viewMenu, SWT.CASCADE);
                 GraphWindowItem.setText("Graph Window");
-                GraphWindowItem.setSelection(true);
-                GraphWindowItem.addSelectionListener(new SelectionAdapter() {
+                
+                Menu graphTabMenu = new Menu(viewMenu);
+                GraphWindowItem.setMenu(graphTabMenu);
+                final MenuItem GraphTab = new MenuItem(graphTabMenu,SWT.CHECK);
+                GraphTab.setText("Visualization Window");
+                
+                MenuItem PropertyTab = new MenuItem(graphTabMenu,SWT.CHECK);
+                PropertyTab.setText("Property Window");
+                GraphTab.addSelectionListener(new SelectionAdapter() {
                        
 			@Override
 			public void widgetSelected(SelectionEvent e) {
                              //projectWindowItem.setSelection(false);
-                            if(isSelectedCompare){
-                                GraphWindowItem.setSelection(false);
+                            if(!GraphTab.getSelection()){
                                 graphTab.setVisible(false);
-                                isSelectedGraph = false;
+                                graphTapHolder.setWeights(new int[]{0,1});
                             }else{
-                                //open the compare window
-                                isSelectedGraph = true;
-                                GraphWindowItem.setSelection(isSelectedGraph);
+                                
                                 graphTab.setVisible(true);
+                                graphTapHolder.setWeights(new int[] {749, 271});
                             }
 			}
 		});
@@ -802,7 +851,7 @@ public class HomeGUI extends JFrame implements KeyListener{
                       CTabItem item = HomeGUI.tabFolder.getItem(pt);
                       XMLWriter writer = XMLWriter.getXMLWriterInstance();
                       if(item != null){
-                        HomeGUI.activeTab.put(true,item.getToolTipText().toString());
+                        HomeGUI.activeTab.put(false,item.getToolTipText().toString());
                          
                         String filePath = item.getToolTipText();
                         
@@ -1449,22 +1498,10 @@ public class HomeGUI extends JFrame implements KeyListener{
                             String fileName = filepath.substring(start,end);
                             File file = new File(filepath);
                             if(file.exists()){
-                                
-                                if(NewFileWindow.openedFiles != null &&
-                                        NewFileWindow.openedFiles.contains(filepath))
-                                NewFileWindow.createTabLayout(fileName,false);
-                                else if(NewFileWindow.openedFiles == null){
+                               
+                               if(!isExists(filepath)) 
                                     NewFileWindow.createTabLayout(fileName,false);
-                                }
-//                                }else if(NewFileWindow.openedFiles.contains(filepath)){
-//                                    try{
-//                                        NewFileWindow.openFile(filepath);
-//                                    }catch(FileNotFoundException e){
-//                                        displayError(e.toString());
-//                                    }catch(IOException e){
-//                                        displayError(e.toString());
-//                                    }
-//                                }
+//                             
                             }
                         }
                     }
@@ -1480,4 +1517,27 @@ public class HomeGUI extends JFrame implements KeyListener{
                     }
                 }
     }
+    
+    private static CTabItem[] getTabItem(){
+        CTabItem item[];
+        item = tabFolder.getItems();
+        return item;
+    }
+    
+    public static boolean isExists(String path){
+        
+        CTabItem[] items = getTabItem();
+        boolean isExists = false;
+        for(CTabItem item:items){
+            String tempPath = item.getToolTipText();
+            if(tempPath.equals(path)){
+                isExists = true;
+                visibleItem = item;
+                break;
+            }
+        }
+        return isExists;
+    }
+    
+    
 }
