@@ -6,6 +6,8 @@
 
 package com.project.NLP.Requirement;
 
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -16,6 +18,7 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -25,15 +28,18 @@ import java.util.Properties;
  */
 public class ParserTreeGenerator {
     
+    private String requirementDocument;
     private List<CoreMap> sentences;
     private Annotation document; 
     private ArrayList<Tree> sentenceTree=new ArrayList<>();
+    private ArrayList<String> documentSentences=new ArrayList<>();
+    private Map<Integer, CorefChain> coreferenceChain;
     
     public ParserTreeGenerator(){
         
-    }
-        
+    }       
     public ParserTreeGenerator(String text){
+        this.requirementDocument=text;
         
         /* creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution */
         Properties props = new Properties();
@@ -41,7 +47,7 @@ public class ParserTreeGenerator {
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
         
         /* create an empty Annotation just with the given text  */
-        document = new Annotation(text);
+        document = new Annotation(requirementDocument);
 
         /* run all Annotators on this text  */
         pipeline.annotate(document);
@@ -58,6 +64,8 @@ public class ParserTreeGenerator {
             /* Create the tree annotation for each sentnce in the document and store the trees in a ArrayList  */
             Tree tree = sentence.get(TreeAnnotation.class);
             sentenceTree.add(tree);
+            /*Get the sentences in the document  and store each individual sentence as a element in the ArrayList  */
+            documentSentences.add(sentence.toString());
         }
         
     }
@@ -87,6 +95,21 @@ public class ParserTreeGenerator {
         }
         return nameEntity;
 
+    }
+    
+    /* This is the coreference link graph
+    *Each chain stores a set of mentions that link to each other,
+    *along with a method for getting the most representative mention
+    * Both sentence and token offsets start at 1!
+    */
+    public Map<Integer, CorefChain> generateCoreferenceChains(){
+      coreferenceChain= document.get(CorefCoreAnnotations.CorefChainAnnotation.class);
+      return coreferenceChain;
+    }
+    
+    /* Return the sentences in the requirement document as ArrayList */
+    public ArrayList<String> getDocumentSentences(){
+        return documentSentences;
     }
     
 }
