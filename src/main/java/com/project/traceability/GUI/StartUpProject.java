@@ -16,11 +16,11 @@ public class StartUpProject {
     
      public static void main(String args[]) {
       
-         
-         XMLWriter writer = XMLWriter.getXMLWriterInstance();
-         com.project.property.config.xml.reader.XMLReader reader = new com.project.property.config.xml.reader.XMLReader();
+       
+        XMLWriter writer = XMLWriter.getXMLWriterInstance();
+        com.project.property.config.xml.reader.XMLReader reader = new com.project.property.config.xml.reader.XMLReader();
                    
-         if(reader.readStatus()){
+             if(reader.readStatus()){
                 HomeGUI.main(null);
                       
          }else{
@@ -28,13 +28,5 @@ public class StartUpProject {
              window.main(null);
           }
      }
-        
-        
-        
-        
-        
-        
-        
-        
         
 }
