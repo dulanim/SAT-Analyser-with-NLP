@@ -4,8 +4,6 @@
  */
 package com.project.traceability.model;
 
-import com.project.traceability.model.Property;
-
 /**
  *
  * @author shiyam
