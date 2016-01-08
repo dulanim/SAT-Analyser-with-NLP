@@ -50,6 +50,7 @@ public class AST {
                 System.out.println("Done for: "+file.getAbsolutePath());
                 ast.exitConverter();
             }
+            scdb.shutdownDB();
             
         }
         else{
@@ -92,6 +93,8 @@ public class AST {
         relationshipList = AST.scdb.getAssociationRelationshipData();
         addRelationsToXML(relationshipList, "Composition");
         WriteToXML.createXML();
+        //shutdownDB();
+        
     }
 
     /**
@@ -120,12 +123,8 @@ public class AST {
     
     
 
-    public static void main(String[] args) throws IOException,Exception {
-
     /*public static void main(String[] args) throws IOException {
->>>>>>> 03d1a46d7e088502385f8e480009745f1f0d6efd
         new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
     }*/
-    }
     
 }

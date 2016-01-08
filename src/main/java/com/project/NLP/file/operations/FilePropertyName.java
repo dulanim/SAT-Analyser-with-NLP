@@ -1,3 +1,4 @@
+
 package com.project.NLP.file.operations;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -38,7 +39,7 @@ public class FilePropertyName {
     public static final String UML_ARTIFACT_NAME = "UMLArtefactFile.xml";
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
     public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
-    public static final String IMAGE_PATH =  "img" + File.separator;
+    public static final String IMAGE_PATH = System.getProperty("user.dir") + File.separator + "img"+ File.separator;
 //    public static Path getPath(Path target,String type){
 //        if(type.contains(XML)){
 //            target = Paths.get(HomeGUI.projectPath + File.separator + XML);
@@ -166,8 +167,15 @@ public class FilePropertyName {
     	public static void copyFile(File sourceFile, File destFile) throws IOException {
     			
     			String srcFilePath = sourceFile.getAbsolutePath();
+                        int startIndex = 0;
+    			if(srcFilePath.lastIndexOf("/")>0){
+                            startIndex = srcFilePath.lastIndexOf("/");
+                        }
+                        else if(srcFilePath.lastIndexOf("\\")>0){
+                            startIndex = srcFilePath.lastIndexOf("\\");
+                        }
     			
-    			int startIndex = srcFilePath.lastIndexOf("/");
+                        System.out.println(startIndex);
     			int endIndex = srcFilePath.length();
     			String fileName = srcFilePath.substring(startIndex+1, endIndex);
     			
@@ -175,4 +183,5 @@ public class FilePropertyName {
     			copyFolder(sourceFile, destFile);
     	}
 }
+
 

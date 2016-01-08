@@ -111,7 +111,7 @@ public class GraphFileGenerator {
         this.edges = edges;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         GraphFileGenerator gg = new GraphFileGenerator();
         GraphDatabaseService graphDb = new GraphDatabaseFactory()
@@ -120,17 +120,18 @@ public class GraphFileGenerator {
         gg.setGraphDb(graphDb);
         gg.generateGraphFile(gg.getGraphDb());
         graphDb.shutdown();
-    }
+    }*/
 
     /** Method to generate gexf graph file from db using Gephi Toolkit API
      * @param graphDb GraphDatabaseService
      */
     public void generateGraphFile(GraphDatabaseService graphDb) {
+        System.out.println("Gexf graph "+graphDb.toString());
         this.graphDb = graphDb;
         Gexf gexf = new GexfImpl();
         gexf.setVisualization(true);
         graph = gexf.getGraph();
-        graph.setDefaultEdgeType(EdgeType.DIRECTED).setMode(Mode.STATIC);
+        graph.setDefaultEdgeType(EdgeType.DIRECTED).setMode(Mode.DYNAMIC);
 
         //Transaction tx = graphDb.beginTx();
         engine = new ExecutionEngine(graphDb);

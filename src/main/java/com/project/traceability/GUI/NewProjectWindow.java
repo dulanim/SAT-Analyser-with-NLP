@@ -1,5 +1,7 @@
 package com.project.traceability.GUI;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import static com.project.traceability.GUI.HomeGUI.projectPath;
 import java.io.File;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -102,8 +104,8 @@ public class NewProjectWindow {
                 String projectName = text.getText();
                 projectPath = PropertyFile.filePath + projectName + File.separator;
                 PropertyFile.setProjectName(projectName);
-                PropertyFile.setGraphDbPath(projectPath + projectName + ".graphdb");
-                PropertyFile.setGeneratedGexfFilePath(projectPath+ projectName + ".gexf");
+                PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".graphdb");
+                PropertyFile.setGeneratedGexfFilePath(projectPath+ File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".gexf");
                 PropertyFile.setRelationshipXMLPath(projectPath + "Relations.xml");
 
                 shell.close();

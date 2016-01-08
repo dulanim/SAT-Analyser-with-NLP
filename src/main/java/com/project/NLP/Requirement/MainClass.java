@@ -17,179 +17,289 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
 
 /**
  *
  * @author S. Shobiga
  */
 public class MainClass {
-    
-    private static String requirementDocument="";
+
+    private static String requirementDocument = "";
 
     public static void main(String args[]) {
-    	System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
-        HashSet methodList =new HashSet();
+        HashSet methodList = new HashSet();
         HashSet relationList = new HashSet();
         StoringArtefacts storingArtefacts;
-        String className =null;
+        String className = null;
         HashMap requirementObjects = new HashMap();
-        ArrayList trees =new ArrayList();  
-        
-        
-        /*Reading requirement file */
-        requirementDocument=readFromTextFile("OrderRequirement.txt");
-                
-        if (requirementDocument=="") {
-            System.out.println("Error : There is no input document !!!");
-        }
-        else{
-            ParserTreeGenerator parser=new ParserTreeGenerator(requirementDocument);
-            trees=parser.getSentenceParseTree();
-            
-            /*For individual sentence in the requirement Document */
-            for(int i=0; i<trees.size();i++){
-                Tree tree=(Tree) trees.get(i);
-                 System.out.println(tree); 
-               
-                /*noun pharase identification */
-                    ClassIdentification np = new ClassIdentification(tree);
-                    classList = np.getClasses();
-                    ArrayList attributesFromClass = np.getAttributeFromClass();
-                    System.out.println("CLASS LIST:" + classList);
-                    
-                /*attributes identification */
-                    AttributeIdentification attr = new AttributeIdentification(tree, attributesFromClass, classList);
-                    attrList = attr.getAttributes();
-                    System.out.println("ATTRIBUTE LIST: " + attrList); 
-                    
-                /* methods identification */
-                    MethodIdentifier mId=new MethodIdentifier(tree, classList);
-                    methodList=mId.identifyCandidateMethods(tree);
-                
-                /* relations identificaton */
-                    ClassRelationIdentifier crId=new ClassRelationIdentifier(classList, requirementObjects.keySet());
-                    //if(i!=0){
-                       relationList= crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
-                       relationList.addAll(crId.identifyGenaralizationByHypernym(classList,requirementObjects.keySet()));
-                    //}
-                /*Storing Class details  */    
-                    Iterator iterator = classList.iterator();
-                    if(iterator.hasNext()){
-                        className=(String) iterator.next();
+        ArrayList trees = new ArrayList();
+        HashMap<String, HashSet> multiClassWithAttribute;
+        HashMap<String, HashSet> multiClassWithMethod;
+        MultipleClassListHandlingDemo multipleClassListHandlingDemo;
+        HashSet attributeMulti = new HashSet();
+        HashSet methodMulti = new HashSet();
+        boolean passiveCheck = false;
+        HashMap passiveMap;
+        HashSet tempList;
+        try {
+            /*Reading requirement file */
+            requirementDocument = readFromTextFile("BankRequirement.txt");
+
+            System.setProperty("wordnet.database.dir", "C:\\Program Files (x86)\\WordNet\\2.1\\dict");
+
+            if (requirementDocument == "") {
+                System.out.println("Error : There is no input document !!!");
+            } else {
+                ParserTreeGenerator parser = new ParserTreeGenerator(requirementDocument);
+                trees = parser.getSentenceParseTree();
+                ParserTreeGenerator p = new ParserTreeGenerator();
+                //passiveCheck = parser.isPassiveSentence();
+                /*For individual sentence in the requirement Document */
+                for (int countTree = 0; countTree < trees.size(); countTree++) {
+                    Tree tree = (Tree) trees.get(countTree);
+                    System.out.println("Tree: " + tree);
+                    /*if sentence is not negative, then allowing the artefact extraction*/
+                    NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
+                    if (!negativeSentence.isNegativeSentence()) {
+
+                        /*noun pharase identification */
+                        ClassIdentification np = new ClassIdentification(tree);
+                        classList = np.getClasses();
+                        ArrayList attributesFromClass = np.getAttributeFromClass();
+                        System.out.println("CLASS LIST:" + classList);
+
+                        /*if classList is empty skip the rest of the extraction of artefacts*/
+                        if (!classList.isEmpty()) {
+                            /*attributes identification */
+                            AttributeIdentification attr = new AttributeIdentification(tree, attributesFromClass, classList);
+                            attrList = attr.getAttributes();
+                            System.out.println("ATTRIBUTE LIST: " + attrList);
+
+                            /*if the sentence is passive swipe the attributes and methods*/
+                            // passiveVoiceHandling(parser, classList, attrList);
+                            passiveMap = parser.getPassiveSentenceMap();
+                            
+                            if (passiveMap.containsKey(tree)) {
+                                tempList = classList;
+                                classList = attrList;
+                                attrList = tempList;
+                            }
+
+                            /* methods identification */
+                            MethodIdentifier mId = new MethodIdentifier(tree, classList);
+                            methodList = mId.identifyCandidateMethods(tree);
+
+                            /* relations identificaton */
+                            ClassRelationIdentifier crId = new ClassRelationIdentifier(classList, requirementObjects.keySet());
+                            relationList = crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
+                            //relationList.addAll(crId.identifyGenaralizationByHypernym(classList, requirementObjects.keySet()));
+
+                            if (classList.size() > 1) {
+
+                                multipleClassListHandlingDemo = new MultipleClassListHandlingDemo(classList, attrList, methodList);
+                                multiClassWithAttribute = multipleClassListHandlingDemo.getClassWithAttribute();
+                                multiClassWithMethod = multipleClassListHandlingDemo.getClassWithMethod();
+
+                                /*loop to control opening multiple frames*/
+                                while (MultipleClassListHandlingGUI.lock) {
+                                    Thread.sleep(100);
+                                }
+
+                                Iterator classIterator = classList.iterator();
+                                for (int countClass = 0; countClass < classList.size(); countClass++) {
+                                    attributeMulti = new HashSet();
+                                    methodMulti = new HashSet();
+                                    if (classIterator.hasNext()) {
+                                        String classNameMulti = classIterator.next().toString();
+                                        HashSet classListMulti = new HashSet();
+                                        if (multiClassWithAttribute.containsKey(classNameMulti)) {
+                                            attributeMulti = multiClassWithAttribute.get(classNameMulti);
+                                            classListMulti.add(classNameMulti);
+                                            System.out.println("--------------------------------------------------------------------------------------attribute :" + attributeMulti);
+                                        }
+                                        if (multiClassWithMethod.containsKey(classNameMulti)) {
+                                            methodMulti = multiClassWithMethod.get(classNameMulti);
+                                            classListMulti.add(classNameMulti);
+                                            System.out.println("--------------------------------------------------------------------------------------method :" + methodMulti);
+                                        }
+                                        //storeClassDetails(classNameMulti, attributeMulti, methodMulti, relationList);
+                                        if (!attributeMulti.isEmpty() || !methodMulti.isEmpty()) {
+                                            if (requirementObjects.containsKey(classNameMulti)) {
+                                                StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(classNameMulti);
+                                                HashSet attributes = storeArt.getAttributes();
+                                                attributes.addAll(attributeMulti);
+                                                HashSet methods = storeArt.getMethods();
+                                                methods.addAll(methodMulti);
+                                                HashSet relations = storeArt.getRelationships();
+                                                relations.addAll(relationList);
+                                                System.out.println("cl :" + classNameMulti + "\nAttr :" + attributes + "\nMethod :" + methods);
+                                            } else {
+                                                /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
+                                                storingArtefacts = new StoringArtefacts();
+                                                storingArtefacts.setClassName(classListMulti);
+                                                storingArtefacts.setAttributes(attributeMulti);
+                                                storingArtefacts.setMethods(methodMulti);
+                                                storingArtefacts.setRelationships(relationList);
+                                                requirementObjects.put(classNameMulti, storingArtefacts);
+                                                //System.out.println("cl :"+ classNameMulti+"\nAttr :"+ attributes +"\nMethod :"+methods);
+
+                                            }
+                                        }
+                                    }
+
+                                }
+                            } else if (classList.size() == 1) {
+
+                                /*Storing Class details  */
+                                Iterator iterator = classList.iterator();
+                                if (iterator.hasNext()) {
+                                    className = (String) iterator.next();
+
+                                }
+                                if (requirementObjects.containsKey(className)) {
+                                    StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
+                                    HashSet attributes = storeArt.getAttributes();
+                                    attributes.addAll(attrList);
+                                    HashSet methods = storeArt.getMethods();
+                                    methods.addAll(methodList);
+                                    HashSet relations = storeArt.getRelationships();
+                                    relations.addAll(relationList);
+                                } else {
+                                    /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
+                                    storingArtefacts = new StoringArtefacts();
+                                    storingArtefacts.setClassName(classList);
+                                    storingArtefacts.setAttributes(attrList);
+                                    storingArtefacts.setMethods(methodList);
+                                    storingArtefacts.setRelationships(relationList);
+                                    requirementObjects.put(className, storingArtefacts);
+                                }
+
+                            }
                         }
-                    if(requirementObjects.containsKey(className)){
-                        StoringArtefacts storeArt=(StoringArtefacts) requirementObjects.get(className);
-                        HashSet attributes=storeArt.getAttributes();
-                        attributes.addAll(attrList);
-                        HashSet methods=storeArt.getMethods();
-                        methods.addAll(methodList);
-                        HashSet relations=storeArt.getRelationships();
-                        relations.addAll(relationList);
                     }
-                    else{
-                        /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                        storingArtefacts = new StoringArtefacts();
-                        storingArtefacts.setClassName(classList);
-                        storingArtefacts.setAttributess(attrList);
-                        storingArtefacts.setMethods(methodList);
-                        storingArtefacts.setRelationships(relationList);
-                        requirementObjects.put(className,storingArtefacts);
-                    }
-                    
 
                 }
-                
-                
                 /*Writing the information extracted from Requirement to text file  */
-                 writeOutputToTxtFile(requirementObjects);
+                if (!requirementObjects.isEmpty()) {
+                    writeOutputToTxtFile(requirementObjects);
+                }
             }
-             
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+
+        }
     }
-        
+
+    /*method to handle the passive voice
+     *input: attributeList and classList
+     *output: swipe the attributeList and classList
+     */
+    public static void passiveVoiceHandling(ParserTreeGenerator parser, HashSet classList, HashSet attributeList) {
+        HashSet tempList = new HashSet();
+        if (parser.isPassiveSentence()) {
+            tempList = classList;
+            classList = attributeList;
+            attributeList = tempList;
+        }
+    }
+
     /* Reading the input Natural Language Requirement File 
-        *Input : text file
-        *Output :String of the text file
-    */
+     *Input : text file
+     *Output :String of the text file
+     */
     private static String readFromTextFile(String file) {
-            BufferedReader br = null;
-            StringBuilder req_Document=new StringBuilder("");
-            
-            try {
-                String sCurrentLine;
-                br = new BufferedReader(new FileReader(file));
-                while ((sCurrentLine = br.readLine()) != null) {
-                    req_Document= req_Document.append(" "+sCurrentLine);
+        BufferedReader br = null;
+        String req_Document = "";
+
+        try {
+            String sCurrentLine;
+            br = new BufferedReader(new FileReader(file));
+            while ((sCurrentLine = br.readLine()) != null) {
+                System.out.println("Current Line: " + sCurrentLine);
+
+                /*start a new sentence if the sentence contains but */
+                if (sCurrentLine.contains("but")) {
+                    sCurrentLine = sCurrentLine.replace("but", ". But");
+                }
+                /*if the sentence is having hyphen, then it is replaced by a space*/
+                if (sCurrentLine.contains("-")) {
+                    sCurrentLine = sCurrentLine.replace("-", " ");
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                req_Document += " " + sCurrentLine;
             }
-            
-            return req_Document.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
 
-         
-         /*Writing output HashMap to a text file 
-         *
-         */
-        public  static void writeOutputToTxtFile(HashMap output){
-        //write to file : "Requirement Output"
-            try{
-            
-                StringBuffer sbf=new StringBuffer();
-                Iterator it= output.keySet().iterator();
-                while(it.hasNext()){
-                
-                    String className=it.next().toString();
-                    StoringArtefacts store=(StoringArtefacts)output.get(className);
-                    HashSet attributes= store.getAttributes();
-                    HashSet methods=store.getMethods();
-                    HashSet relations=store.getRelationships();
-                
-                    sbf.append("\nClass : "+className+"\n");
-                    sbf.append("\tAttributes : ");
-                    for (Object attribute : attributes) {
-                        sbf.append(attribute.toString()+",");
-                    }
-                    sbf.append("\tMethods : ");
-                    for (Object method : methods) {
-                        sbf.append(method.toString()+",");
-                    }
-                    sbf.append("\tRelations : ");
-                    for (Object relation : relations) {
-                        ClassRelation rel=(ClassRelation)relation;
-                        sbf.append("Type - "+rel.getRelationType()+"-> Parent -"+rel.getParentElement());
-                    }
-                    
-                
+        return req_Document;
+    }
+
+    /*Writing output HashMap to a text file 
+     *input: output result type: hashMap
+     *output: none
+     */
+    public static void writeOutputToTxtFile(HashMap output) {
+        try {
+
+            StringBuffer sbf = new StringBuffer();
+            Iterator it = output.keySet().iterator();
+            while (it.hasNext()) {
+
+                String className = it.next().toString();
+                StoringArtefacts store = (StoringArtefacts) output.get(className);
+                HashSet attributes = store.getAttributes();
+                HashSet methods = store.getMethods();
+                HashSet relations = store.getRelationships();
+
+                sbf.append("\nClass : " + className + "\n");
+                sbf.append("\tAttributes : ");
+                for (Object attribute : attributes) {
+                    sbf.append(attribute.toString() + ",");
                 }
-            
-                System.out.println(sbf.toString());
-            
-                BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("Requirement_Output.txt")));
-               
-                //write contents of StringBuffer to a file
-                bwr.write(sbf.toString());
-               
-                //flush the stream
-                bwr.flush();
-               
-                //close the stream
-                bwr.close();
-            
-                }catch(Exception e){}
+                sbf.append("\tMethods : ");
+                for (Object method : methods) {
+                    sbf.append(method.toString() + ",");
+                }
+                sbf.append("\tRelations : ");
+                for (Object relation : relations) {
+                    ClassRelation rel = (ClassRelation) relation;
+                    sbf.append("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+                }
+
             }
-    
-        
+
+            System.out.println(sbf.toString());
+
+            BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("Requirement_Output.txt")));
+
+            //write contents of StringBuffer to a file
+            bwr.write(sbf.toString());
+
+            //flush the stream
+            bwr.flush();
+
+            //close the stream
+            bwr.close();
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            e.printStackTrace();
+        }
+    }
+
 }

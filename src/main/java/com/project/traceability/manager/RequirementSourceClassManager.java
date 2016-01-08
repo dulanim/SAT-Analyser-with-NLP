@@ -72,6 +72,7 @@ public class RequirementSourceClassManager {
         //SourceCodeArtefactManager.readXML(projectPath);
         
         //get the sourceMap Class object with id as key
+        SourceCodeArtefactManager.readXML(projectPath);
         Map<String, ArtefactElement> sourceMap = SourceCodeArtefactManager.sourceCodeAretefactElements;
         
         Iterator<Entry<String, ArtefactElement>> sourceIterator = null;

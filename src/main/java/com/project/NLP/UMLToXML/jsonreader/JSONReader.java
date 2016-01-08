@@ -76,8 +76,8 @@ public class JSONReader {
         }
         public static void readJson() {
                 
-               StaticData.classLst = new ArrayList<ModelData>();
-               StaticData.depencyList = new ArrayList<Dependencies>();
+               StaticData.classLst = new ArrayList<>();
+               StaticData.depencyList = new ArrayList<>();
                ModelData tempData = null;
 				try {
 					// read the json file

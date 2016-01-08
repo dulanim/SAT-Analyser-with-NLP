@@ -1,14 +1,12 @@
+
 package com.project.traceability.GUI;
 
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
-import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.staticdata.StaticData;
-import java.awt.JobAttributes;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
@@ -17,12 +15,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.DirectoryDialog;
 
 
@@ -33,7 +29,6 @@ public class WorkspaceSelectionWindow {
 	String path;
         String workspacePath = "";
         Combo combo;
-        boolean isSelected = false; // it is indicting true or false when click check box
 	/**
 	 * Launch the application.
 	 * @param args
@@ -137,19 +132,7 @@ public class WorkspaceSelectionWindow {
 		final Button btnCheckBox = new Button(grpWorkspacePath, SWT.CHECK);
 		btnCheckBox.setBounds(3, 95, 443, 24);
 		btnCheckBox.setText("Use this as default workspace. Do not ask again");
-		btnCheckBox.addSelectionListener(new SelectionAdapter() {
-
-                    @Override
-                    public void widgetSelected(SelectionEvent se) {
-                        /*
-                        getting selection status
-                        */
-                            isSelected = btnCheckBox.getSelection();
-                            System.out.println("Workspace check boc was cliced? " + isSelected);
-                    }
-
-                    
-                });
+		
 		
 		
 		Label lblSelectAWorkspace = new Label(shell, SWT.NONE);
@@ -180,8 +163,7 @@ public class WorkspaceSelectionWindow {
                               File file = new File(path);
                                 if(file.isDirectory()){
                                     XMLWriter writer = XMLWriter.getXMLWriterInstance();
-                                    
-                                    writer.modifyStatus(isSelected, path);
+                                    writer.modifyStatus(btnCheckBox.getSelection(), path);
                                     StaticData.workspace = path;
                                     writer.changeCurrnntWorkspaceVale(path);//set running workspace value
                                     //home/shiyam/project/wrkspace
@@ -214,3 +196,4 @@ public class WorkspaceSelectionWindow {
             }
         }
 }
+

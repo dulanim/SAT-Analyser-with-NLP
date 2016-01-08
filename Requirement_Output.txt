@@ -1,9 +1,17 @@
 
-Class : normal order
-	Attributes : item,	Methods : receive,dispose,
-Class : special order
-	Attributes : item,	Methods : dispose,
-Class : customer
-	Attributes : item,name,location,order,	Methods : receive,record,send,order,
-Class : order
-	Attributes : normal order,special order,customer,	Methods : confirm,close,
+Class : saving account
+	Attributes : balance,dumm account,negative balance,withdrawal amount,transaction,account,	Methods : cover,inform,terminate,	Relations : 
+Class : bank
+	Attributes : types,client,accounts,	Methods : 	Relations : 
+Class : checking account
+	Attributes : saving account,	Methods : 	Relations : 
+Class : client
+	Attributes : access,identification,PIN,personal identification number code,account,	Methods : verify,gain,	Relations : 
+Class : department
+	Attributes : student,	Methods : 	Relations : 
+Class : items
+	Attributes : store,	Methods : dispose,	Relations : 
+Class : transaction
+	Attributes : date,amount,transaction type,account balance,time,transactions,	Methods : include,record,	Relations : 
+Class : staffs
+	Attributes : employee,	Methods : 	Relations : 
