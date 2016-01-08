@@ -203,7 +203,6 @@ public class MainClass {
         }
     }
 
-    
 
     /* Reading the input Natural Language Requirement File 
      *Input : text file

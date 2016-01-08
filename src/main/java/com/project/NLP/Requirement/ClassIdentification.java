@@ -61,7 +61,7 @@ public class ClassIdentification {
         //checksLocationAndPeopleName(afterRules);
         
         /*rule 6*/
-        stemming(afterRules);
+        //stemming(afterRules);
     
         
         /*rule 4- eliminate redundant classes*/
