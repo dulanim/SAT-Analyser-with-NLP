@@ -117,8 +117,6 @@ public class MultipleClassListHandlingGUI extends JPanel {
         frame.setSize(550,400);
         frame.setLocationRelativeTo(null);
         
-     
-
         frame.setJMenuBar(createMenuBar());
         setOpaque(true); //content panes must be opaque
         frame.setContentPane(this);
