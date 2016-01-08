@@ -7,7 +7,9 @@ package com.project.NLP.Requirement;
 
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreAnnotations.LemmaAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,7 +38,7 @@ public class ParserTreeGenerator {
     private Annotation document;
     private ArrayList<Tree> sentenceTree = new ArrayList<>();
     private HashMap passiveSentenceMap = new HashMap();
-
+    private List<String> lemmas = new LinkedList<String>();
     public ParserTreeGenerator() {
 
     }
@@ -71,7 +74,7 @@ public class ParserTreeGenerator {
             sentenceTree.add(tree);
             System.out.println("tree annotation: " + tree);
             passiveSentenceIdentification(sentence, tree);
-
+            lemmatize(sentence);
         }
 
     }
@@ -101,6 +104,22 @@ public class ParserTreeGenerator {
     /*Get the ArrayList which contains the generated Trees for the document */
     public ArrayList<Tree> getSentenceParseTree() {
         return sentenceTree;
+    }
+
+    private void lemmatize(CoreMap sentence) {
+        // Iterate over all tokens in a sentence
+        for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+            // Retrieve and add the lemma for each word into the list of lemmas
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            String s =token.get(LemmaAnnotation.class);
+            System.out.println(s);
+            lemmas.add(s);
+        }
+
+    }
+
+    public List<String> lemattizeList(){
+        return lemmas;
     }
 
     /* nameEntityAnnotation for track the Location and Person name 
