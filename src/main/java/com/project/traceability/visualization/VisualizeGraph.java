@@ -445,59 +445,58 @@ public class VisualizeGraph {
     public void showGraph() {
         //try { Thread.sleep(500); } catch (Exception e) { }
         //Display.getDefault().syncExec(new Runnable() {
-            //public void run() {
-                HomeGUI.isComaparing = false;
-                setPreview();
-                setLayout();
-                target = getTarget();
+        //public void run() {
+        HomeGUI.isComaparing = false;
+        setPreview();
+        setLayout();
+        target = getTarget();
+        
+        HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
+        composite = new Composite(HomeGUI.graphTab,
+                SWT.EMBEDDED);
+        composite.setLayout(new GridLayout(1, false));
+        GridData spec = new GridData();
+        spec.horizontalAlignment = GridData.FILL;
+        spec.grabExcessHorizontalSpace = true;
+        spec.verticalAlignment = GridData.FILL;
+        spec.grabExcessVerticalSpace = true;
+        composite.setLayoutData(spec);
 
-                HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View"+Math.random());
-                composite = new Composite(HomeGUI.graphTab,
-                        SWT.EMBEDDED );
-                composite.setLayout(new GridLayout(1, false));
-                GridData spec = new GridData();
-                spec.horizontalAlignment = GridData.FILL;
-                spec.grabExcessHorizontalSpace = true;
-                spec.verticalAlignment = GridData.FILL;
-                spec.grabExcessVerticalSpace = true;
-                composite.setLayoutData(spec);               
-                               
-                
-                frame = SWT_AWT.new_Frame(composite);
+        frame = SWT_AWT.new_Frame(composite);
 
-                //add refresh button to graph panel
-                Button refresh = new Button("Refresh");
+        //add refresh button to graph panel
+        Button refresh = new Button("Refresh");
 
-                refresh.addActionListener(new ActionListener() {
-                    final String type = PropertyFile.getGraphType();
+        refresh.addActionListener(new ActionListener() {
+            final String type = PropertyFile.getGraphType();
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
-                        /*VisualizeGraph visual = VisualizeGraph.getInstance();//PropertyFile.getVisual();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
+                /*VisualizeGraph visual = VisualizeGraph.getInstance();//PropertyFile.getVisual();
                         visual.importFile();
                         GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();
                         visual.setGraph(model, PropertyFile.getGraphType());
                         visual.setPreview();
                         visual.setLayout();*/
-                    }
-                });
+            }
+        });
 
-                Panel btnPanel = new Panel();
-                btnPanel.setLayout(new FlowLayout());
-                btnPanel.setBackground(Color.LIGHT_GRAY);
-                btnPanel.add(refresh);
+        Panel btnPanel = new Panel();
+        btnPanel.setLayout(new FlowLayout());
+        btnPanel.setBackground(Color.LIGHT_GRAY);
+        btnPanel.add(refresh);
 
-                Panel panel = new Panel();
-                panel.setLayout(new BorderLayout());
-                panel.add(applet, BorderLayout.CENTER);
-                panel.add(refresh, BorderLayout.PAGE_START);
-                frame.add(panel);
-                composite.setData(panel);
-                HomeGUI.graphtabItem.setControl(composite);
-           // }
+        Panel panel = new Panel();
+        panel.setLayout(new BorderLayout());
+        panel.add(applet, BorderLayout.CENTER);
+        panel.add(refresh, BorderLayout.PAGE_START);
+        frame.add(panel);
+        composite.setData(panel);
+        HomeGUI.graphtabItem.setControl(composite);
+        // }
         //});
 
-   }
+    }
 
 }

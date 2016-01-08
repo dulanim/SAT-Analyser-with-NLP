@@ -1,17 +1,17 @@
 
 Class : saving account
-	Attributes : balance,dumm account,withdrawal amount,transaction,	Methods : cover,inform,record,terminate,	Relations : 
+	Attributes : balance,dumm account,negative balance,withdrawal amount,transaction,account,	Methods : cover,inform,terminate,	Relations : 
 Class : bank
-	Attributes : amount,types,client,accounts,	Methods : 	Relations : 
+	Attributes : types,client,accounts,	Methods : 	Relations : 
+Class : checking account
+	Attributes : saving account,	Methods : 	Relations : 
 Class : client
-	Attributes : 	Methods : review,perform,	Relations : 
-Class : accounts
-	Attributes : client,	Methods : 	Relations : 
+	Attributes : access,identification,PIN,personal identification number code,account,	Methods : verify,gain,	Relations : 
 Class : department
 	Attributes : student,	Methods : 	Relations : 
-Class : transactions
-	Attributes : 	Methods : review,perform,	Relations : 
 Class : items
 	Attributes : store,	Methods : dispose,	Relations : 
 Class : transaction
 	Attributes : date,amount,transaction type,account balance,time,transactions,	Methods : include,record,	Relations : 
+Class : staffs
+	Attributes : employee,	Methods : 	Relations : 

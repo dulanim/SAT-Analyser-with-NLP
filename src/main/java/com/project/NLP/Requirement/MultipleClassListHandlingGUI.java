@@ -63,13 +63,23 @@ public class MultipleClassListHandlingGUI extends JPanel {
     JRadioButton classNameRadio;
     HashSet method;
     JPanel panelForMethod = new JPanel(new GridLayout(1, 0));
+    
     JPanel panelEntireForMethod = new JPanel(new GridLayout(0, 1));
-    JList listForMethod;
-    JScrollPane scrollPaneForMethod;
-    JPanel panel2ForMethod; // panel for original attributes
+    JPanel panelForArtefacts = new JPanel(new GridLayout(0, 1));
+    JList listForArtefact;
+    JList listForNewArtefacts;
+    private DefaultListModel listModelForNewAttributes;
+    private DefaultListModel listModelForNewMethods;
+    private DefaultListModel listModelForNewRelationships;
+    
+            
+    
+    JScrollPane scrollPaneForArtefact;
+    JPanel panelForDefaultArtefacts; // panel for defatult artefacts
     JPanel panel1ForMethod = new JPanel(new GridLayout(3, 1)); // panel for class names - button groups
     DefaultListModel listModelForMethod;
-    DefaultListModel listModel2ForMethod;
+    DefaultListModel listModelForArtefacts;
+    DefaultListModel listModelForNewArtefacts;
     JList list2ForMethod;
     String previouslySelectedClassForMethod = "";
     protected HashMap<String, HashSet> methodMap = new HashMap<String, HashSet>();
@@ -78,6 +88,9 @@ public class MultipleClassListHandlingGUI extends JPanel {
     JRadioButton classNameRadioForMethod;
 
     JFrame frame;
+
+    public static boolean lock = false; //boolean variable to control the frames opening
+
     public MultipleClassListHandlingGUI() {
 
     }
@@ -91,7 +104,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
         this.methodList = methodList;
         finishButton = new JButton(finishString);
         cancelButton = new JButton(cancelString);
-
+        lock = true;
         gridFormClass();
 
         frame = new JFrame("Multiple Class Handling");
@@ -106,6 +119,23 @@ public class MultipleClassListHandlingGUI extends JPanel {
         frame.pack();
         frame.setVisible(true);
 
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                int dialogResult = JOptionPane.showConfirmDialog(frame, "Are you sure to close this window?", "Really Closing?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    lock = false;
+                    frame.dispose();
+                }
+                if (dialogResult == JOptionPane.NO_OPTION) {
+
+                }
+
+            }
+
+        });
     }
 
     public void gridFormClass() {
@@ -133,8 +163,10 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 //addButton();
                 /*to refresh the content*/
                 revalidate();
-                gridForm();
-                gridFormForMethod();
+                //gridForm();
+                gridFormForAtrefacts("attributes", attributeList);
+                gridFormForAtrefacts("methods", methodList);
+                
 
             }
         };
@@ -181,6 +213,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                     if (previouslySelectedClass.isEmpty()) {
                         /*close the gui*/
                         //frame.setVisible(false);
+                        lock = false;
                         frame.dispose();
                         //System.exit(0);
 
@@ -200,6 +233,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                         getClassWithAttributesAndMethods();
                         System.out.println("2");
                         /*close the gui*/
+                        lock = false;
                         frame.setVisible(false);
                         //System.exit(0);
                     }
@@ -210,124 +244,90 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 }
             }
 
-       
-
         });
 
         add(panelEntire, BorderLayout.CENTER);
     }
 
-    private void gridForm() {
-        /*Attribute Items*/
-        listModelForAttr_D = new DefaultListModel();
-        Iterator iteratorAttr = attributeList.iterator();
-        for (int attributeListCount = 0; attributeListCount < attributeList.size(); attributeListCount++) {
-            if (iteratorAttr.hasNext()) {
-                String attributeName = iteratorAttr.next().toString();
-                if (!isDuplicatesInDisplayingWindowForAttribute(attributeName)) {
-                    System.out.println("storing in model " + attributeName);
-                    listModelForAttr_D.addElement(attributeName);
-                }
-            }
+    public void gridFormForAtrefacts(String artefactName, HashSet artefactList) {
+        
+        if(artefactName.equalsIgnoreCase("Attributes")){
+            listModelForArtefacts = new DefaultListModel();
+            panelForArtefacts = panelForAttr;
+           
+            
+        }else if(artefactName.equalsIgnoreCase("methods")){
+            listModelForArtefacts = new DefaultListModel();
+            panelForArtefacts = panelForMethod;
+            
+        }else if(artefactName.equalsIgnoreCase("relationships")){
+            
         }
-
-        listForAttr_D = new JList(listModelForAttr_D);
-        listForAttr_D.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scrollPaneForAttr = new JScrollPane(listForAttr_D);
-        scrollPaneForAttr.setPreferredSize(new Dimension(200, 100));
-        listForAttr_D.setDragEnabled(true);
-        listForAttr_D.setTransferHandler(listTrasferHandler);
-        listForAttr_D.setDropMode(DropMode.ON_OR_INSERT);
-        //listForAttr_D.setDropTarget(listModelForAttr_D);
-        panelForDefaultAttr = new JPanel(new BorderLayout());
-        panelForDefaultAttr.add(scrollPaneForAttr, BorderLayout.CENTER);
-        panelForDefaultAttr.setBorder(BorderFactory.createTitledBorder("Default Attributes"));
-
-        listForAttr_D.setBackground(new Color(229, 224, 198));
-        listForAttr_D.setOpaque(true);
-        panelForAttr.add(panelForDefaultAttr);
-
-        add(panelForAttr, BorderLayout.CENTER);
-
-        /*panel for new attributes*/
-        listModel2 = new DefaultListModel();
-        list2 = new JList(listModel2);
-        list2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scrollPaneForAttr = new JScrollPane(list2);
-        scrollPaneForAttr.setPreferredSize(new Dimension(200, 100));
-        list2.setDragEnabled(true);
-        list2.setTransferHandler(listTrasferHandler);
-        list2.setDropMode(DropMode.ON_OR_INSERT);
-
-        JPanel panel3 = new JPanel(new BorderLayout());
-        panel3.add(scrollPaneForAttr, BorderLayout.CENTER);
-        panel3.setBorder(BorderFactory.createTitledBorder("New Attributes"));
-        panelForAttr.add(panel3);
-        setPreferredSize(new Dimension(600, 400));
-        add(panelForAttr, BorderLayout.CENTER);
-
-        panelEntire.add(panelForAttr);
-        panelEntire.repaint();
-        add(panelEntire, BorderLayout.CENTER);
-
-        storeAttributes();
-
-    }
-
-    public void gridFormForMethod() {
+        
         /*method Items*/
-        listModelForMethod = new DefaultListModel();
-        Iterator iteratorMethod = methodList.iterator();
-        for (int methodListCount = 0; methodListCount < methodList.size(); methodListCount++) {
+        listModelForArtefacts = new DefaultListModel();
+        Iterator iteratorMethod = artefactList.iterator();
+        for (int methodListCount = 0; methodListCount < artefactList.size(); methodListCount++) {
             if (iteratorMethod.hasNext()) {
-                String methodName = iteratorMethod.next().toString();
-                if (!isDuplicatesInDisplayingWindowForMethod(methodName)) {
-                    listModelForMethod.addElement(methodName);
+                String name_artefact = iteratorMethod.next().toString();
+                if (!isDuplicatesInDisplayingWindowForMethod(name_artefact)) {
+                    listModelForArtefacts.addElement(name_artefact);
                 }
 
             }
         }
 
-        listForMethod = new JList(listModelForMethod);
-        listForMethod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scrollPaneForMethod = new JScrollPane(listForMethod);
-        scrollPaneForMethod.setPreferredSize(new Dimension(200, 100));
-        listForMethod.setDragEnabled(true);
-        listForMethod.setTransferHandler(listTrasferHandler);
-        listForMethod.setDropMode(DropMode.ON_OR_INSERT);
+        listForArtefact = new JList(listModelForArtefacts);
+        listForArtefact.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        scrollPaneForArtefact = new JScrollPane(listForArtefact);
+        scrollPaneForArtefact.setPreferredSize(new Dimension(200, 100));
+        listForArtefact.setDragEnabled(true);
+        listForArtefact.setTransferHandler(listTrasferHandler);
+        listForArtefact.setDropMode(DropMode.ON_OR_INSERT);
 
-        panel2ForMethod = new JPanel(new BorderLayout());
-        panel2ForMethod.add(scrollPaneForMethod, BorderLayout.CENTER);
-        panel2ForMethod.setBorder(BorderFactory.createTitledBorder("Default Methods"));
+        panelForDefaultArtefacts = new JPanel(new BorderLayout());
+        panelForDefaultArtefacts.add(scrollPaneForArtefact, BorderLayout.CENTER);
+        panelForDefaultArtefacts.setBorder(BorderFactory.createTitledBorder("Default "+artefactName));
 
-        listForMethod.setBackground(new Color(229, 224, 198));
-        listForMethod.setOpaque(true);
-        panelForMethod.add(panel2ForMethod);
-        add(panelForMethod, BorderLayout.CENTER);
+        listForArtefact.setBackground(new Color(243, 253, 252));
+        listForArtefact.setOpaque(true);
+        panelForArtefacts.add(panelForDefaultArtefacts);
+        add(panelForArtefacts, BorderLayout.CENTER);
 
         /*panel for new attributes*/
-        listModel2ForMethod = new DefaultListModel();
-        list2ForMethod = new JList(listModel2ForMethod);
-        list2ForMethod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scrollPaneForMethod = new JScrollPane(list2ForMethod);
-        scrollPaneForMethod.setPreferredSize(new Dimension(200, 100));
-        list2ForMethod.setDragEnabled(true);
-        list2ForMethod.setTransferHandler(listTrasferHandler);
-        list2ForMethod.setDropMode(DropMode.ON_OR_INSERT);
+        
+        listModelForNewArtefacts = new DefaultListModel();
+        listForNewArtefacts = new JList(listModelForNewArtefacts);
+        listForNewArtefacts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        scrollPaneForArtefact = new JScrollPane(listForNewArtefacts);
+        scrollPaneForArtefact.setPreferredSize(new Dimension(200, 100));
+        listForNewArtefacts.setDragEnabled(true);
+        listForNewArtefacts.setTransferHandler(listTrasferHandler);
+        listForNewArtefacts.setDropMode(DropMode.ON_OR_INSERT);
 
-        JPanel panel3 = new JPanel(new BorderLayout());
-        panel3.add(scrollPaneForMethod, BorderLayout.CENTER);
-        panel3.setBorder(BorderFactory.createTitledBorder("New Methods"));
-        panelForMethod.add(panel3);
+        JPanel panelForNewArtefacts = new JPanel(new BorderLayout());
+        panelForNewArtefacts.add(scrollPaneForArtefact, BorderLayout.CENTER);
+        panelForNewArtefacts.setBorder(BorderFactory.createTitledBorder("New "+artefactName));
+        panelForArtefacts.add(panelForNewArtefacts);
 
         setPreferredSize(new Dimension(550, 400));
-        add(panelForMethod, BorderLayout.CENTER);
+        add(panelForArtefacts, BorderLayout.CENTER);
 
-        panelEntire.add(panelForMethod);
+        panelEntire.add(panelForArtefacts);
         panelEntire.repaint();
         add(panelEntire, BorderLayout.CENTER);
 
-        storeMethods();
+        if(artefactName.equalsIgnoreCase("attributes")){
+            listModelForNewAttributes = listModelForNewArtefacts;
+            storeAttributes();
+        }else if (artefactName.equalsIgnoreCase("methods")){
+            listModelForNewMethods = listModelForNewArtefacts;
+            storeMethods();
+        }else if(artefactName.equalsIgnoreCase("relationships")){
+            listModelForNewRelationships = listModelForNewArtefacts;
+        }
+        
+        
 
     }
 
@@ -335,15 +335,15 @@ public class MultipleClassListHandlingGUI extends JPanel {
 
         attribute = new HashSet();
         String attr = "";
-        if (((listModel2 != null) && !(listModel2.isEmpty()))) {
-            int count = listModel2.size();
+        if (((listModelForNewAttributes != null) && !(listModelForNewAttributes.isEmpty()))) {
+            int count = listModelForNewAttributes.size();
             System.out.println("count :" + count);
-            if (!listModel2.isEmpty()) {
+            if (!listModelForNewAttributes.isEmpty()) {
                 System.out.println("2");
 
                 for (int i = 0; i < count; i++) {
-                    System.out.println("class: " + previouslySelectedClass + " attributes :" + listModel2.getElementAt(i));
-                    attr = listModel2.getElementAt(i).toString();
+                    System.out.println("class: " + previouslySelectedClass + " attributes :" + listModelForNewAttributes.getElementAt(i));
+                    attr = listModelForNewAttributes.getElementAt(i).toString();
                     //if (!attribute.contains(attr)) {
                     attribute.add(attr);
                     //}
@@ -356,7 +356,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
     }
 
     private void storeAttributes() {
-        if (((listModel2 != null))) {
+        if (((listModelForNewAttributes != null))) {
             if (attributeMap.get(previouslySelectedClass) != null) {
                 System.out.println("1");
 
@@ -368,7 +368,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                     if (iterator.hasNext()) {
                         String attr = iterator.next().toString();
                         System.out.println("taken from class :" + previouslySelectedClass + " att: " + attr);
-                        listModel2.addElement(attr);
+                        listModelForNewAttributes.addElement(attr);
                     }
                 }
             }
@@ -377,15 +377,15 @@ public class MultipleClassListHandlingGUI extends JPanel {
 
     private void getMethodsFromPanel() {
         method = new HashSet();
-        if (((listModel2ForMethod != null) && !(listModel2ForMethod.isEmpty()))) {
-            int count = listModel2ForMethod.size();
+        if (((listModelForNewMethods != null) && !(listModelForNewMethods.isEmpty()))) {
+            int count = listModelForNewMethods.size();
             System.out.println("count :" + count);
-            if (!listModel2ForMethod.isEmpty()) {
+            if (!listModelForNewMethods.isEmpty()) {
                 System.out.println("4");
 
                 for (int i = 0; i < count; i++) {
-                    System.out.println("class: " + previouslySelectedClass + " methods :" + listModel2ForMethod.getElementAt(i));
-                    method.add(listModel2ForMethod.getElementAt(i));
+                    System.out.println("class: " + previouslySelectedClass + " methods :" + listModelForNewMethods.getElementAt(i));
+                    method.add(listModelForNewMethods.getElementAt(i));
 
                 }
                 methodMap.put(previouslySelectedClass, method);
@@ -394,7 +394,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
     }
 
     private void storeMethods() {
-        if (((listModel2ForMethod != null))) {
+        if (((listModelForNewMethods != null))) {
             if (methodMap.get(previouslySelectedClass) != null) {
                 HashSet storedMethodList = methodMap.get(previouslySelectedClass);
                 Iterator iterator = storedMethodList.iterator();
@@ -404,7 +404,7 @@ public class MultipleClassListHandlingGUI extends JPanel {
                     if (iterator.hasNext()) {
                         String method = iterator.next().toString();
                         System.out.println("taken from class :" + previouslySelectedClass + " att: " + method);
-                        listModel2ForMethod.addElement(method);
+                        listModelForNewMethods.addElement(method);
                     }
                 }
             }
@@ -424,11 +424,11 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 attributes = new HashSet();
                 if (iterator.hasNext()) {
                     className = iterator.next().toString();
-                    if(attributeMap.containsKey(className)){
+                    if (attributeMap.containsKey(className)) {
                         attributes = attributeMap.get(className);
                     }
-                    System.out.println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[["+ attributes);
-                    if(methodMap.containsKey(className)){
+                    System.out.println("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[" + attributes);
+                    if (methodMap.containsKey(className)) {
                         methods = methodMap.get(className);
                     }
                     System.out.println("Final className :" + className + " Fianl attributes :" + attributes + " Final Methods :" + methods);
@@ -437,13 +437,11 @@ public class MultipleClassListHandlingGUI extends JPanel {
                 outputMessage += "\nClass Name : " + className + "\t\nAttributes : " + attributes + "\n\tMethods: " + methods + "\n";
 
             }
-            
-            
-            if(!attributeMap.isEmpty() || !methodMap.isEmpty()){
+
+            if (!attributeMap.isEmpty() || !methodMap.isEmpty()) {
                 outputMessage = "You have selected the artefacts as follows:" + outputMessage;
                 System.out.println(outputMessage);
-            }
-            else {
+            } else {
                 outputMessage = "You haven't select anything. System assumes none of the classes consists any of the the attributes or methods";
                 System.out.println(outputMessage);
             }
@@ -461,13 +459,12 @@ public class MultipleClassListHandlingGUI extends JPanel {
             outputMessage = "You haven't select anything. System assumes none of the classes consists any of the the attributes or methods";
 
             int dialogResult = JOptionPane.showConfirmDialog(null, outputMessage, "Confirmation Dialog", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            if(dialogResult == JOptionPane.YES_OPTION){
+            if (dialogResult == JOptionPane.YES_OPTION) {
                 frame.dispose();
                 //frame.setVisible(false);
                 //System.exit(0);
-            }
-            else if(dialogResult == JOptionPane.NO_OPTION){
-                
+            } else if (dialogResult == JOptionPane.NO_OPTION) {
+
             }
 
         }
@@ -519,7 +516,8 @@ public class MultipleClassListHandlingGUI extends JPanel {
     public HashMap getClassWithMethod() {
         return methodMap;
     }
-    public JFrame getFrame(){
+
+    public JFrame getFrame() {
         return frame;
     }
 
