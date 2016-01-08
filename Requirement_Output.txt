@@ -1,17 +1,21 @@
 
+Class : bank accounts
+	Attributes : amount,	Methods : replace,	Relations : 
 Class : saving account
-	Attributes : balance,dumm account,negative balance,withdrawal amount,transaction,account,	Methods : cover,inform,terminate,	Relations : 
+	Attributes : balance,dumm account,withdrawal amount,transaction,	Methods : cover,inform,terminate,	Relations : 
 Class : bank
-	Attributes : types,client,accounts,	Methods : 	Relations : 
-Class : checking account
-	Attributes : saving account,	Methods : 	Relations : 
+	Attributes : client,account,	Methods : 	Relations : 
+Class : bank account
+	Attributes : amount,	Methods : replace,	Relations : 
 Class : client
-	Attributes : access,identification,PIN,personal identification number code,account,	Methods : verify,gain,	Relations : 
+	Attributes : access,identification,pin,personal identification number code,account,	Methods : verify,gain,	Relations : 
+Class : store
+	Attributes : item,	Methods : dispose,	Relations : 
 Class : department
 	Attributes : student,	Methods : 	Relations : 
-Class : items
-	Attributes : store,	Methods : dispose,	Relations : 
 Class : transaction
-	Attributes : date,amount,transaction type,account balance,time,transactions,	Methods : include,record,	Relations : 
-Class : staffs
-	Attributes : employee,	Methods : 	Relations : 
+	Attributes : date,amount,account balance,time,	Methods : include,	Relations : 
+Class : verification
+	Attributes : candidate,officer,employer,retrieving,	Methods : request,	Relations : 
+Class : customer
+	Attributes : candidate,employer,	Methods : 	Relations : 
