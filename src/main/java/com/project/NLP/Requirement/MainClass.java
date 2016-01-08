@@ -6,6 +6,13 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.traceability.model.Attribute;
+import com.project.traceability.model.Dependencies;
+import com.project.traceability.model.ModelData;
+import com.project.traceability.model.Operation;
+import com.project.traceability.model.Parameter;
+import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -185,7 +192,7 @@ public class MainClass {
                 }
                 /*Writing the information extracted from Requirement to text file  */
                 if (!requirementObjects.isEmpty()) {
-                    writeOutputToTxtFile(requirementObjects);
+                    writeOutputToXMLFile(requirementObjects);
                 }
             }
         } catch (Exception e) {
@@ -195,18 +202,6 @@ public class MainClass {
         }
     }
 
-    /*method to handle the passive voice
-     *input: attributeList and classList
-     *output: swipe the attributeList and classList
-     */
-    public static void passiveVoiceHandling(ParserTreeGenerator parser, HashSet classList, HashSet attributeList) {
-        HashSet tempList = new HashSet();
-        if (parser.isPassiveSentence()) {
-            tempList = classList;
-            classList = attributeList;
-            attributeList = tempList;
-        }
-    }
 
     /* Reading the input Natural Language Requirement File 
      *Input : text file
@@ -253,53 +248,126 @@ public class MainClass {
      *input: output result type: hashMap
      *output: none
      */
-    public static void writeOutputToTxtFile(HashMap output) {
-        try {
-
-            StringBuffer sbf = new StringBuffer();
-            Iterator it = output.keySet().iterator();
-            while (it.hasNext()) {
-
-                String className = it.next().toString();
-                StoringArtefacts store = (StoringArtefacts) output.get(className);
-                HashSet attributes = store.getAttributes();
-                HashSet methods = store.getMethods();
-                HashSet relations = store.getRelationships();
-
-                sbf.append("\nClass : " + className + "\n");
-                sbf.append("\tAttributes : ");
-                for (Object attribute : attributes) {
-                    sbf.append(attribute.toString() + ",");
+    /*
+         
+         /*Writing output HashMap to a text file 
+         *
+         */
+        public  static void writeOutputToXMLFile(HashMap output){
+        //write to file : "Requirement Output"
+            try{
+            
+//                StringBuffer sbf=new StringBuffer();
+//                int count = 1;
+                java.util.List<ModelData> classInfoList = 
+                                new ArrayList<>();
+                java.util.List<Attribute> attributeList;
+                java.util.List<Operation> methodList;
+                java.util.List<Dependencies> dependencyList = new ArrayList<>();
+                Iterator it= output.keySet().iterator();
+                while(it.hasNext()){
+                
+                    ModelData data = new ModelData();
+                    attributeList =  new ArrayList<>();
+                    methodList = new ArrayList<>();
+                    dependencyList = new ArrayList<>();
+                
+                
+                    String className=it.next().toString();
+                    String type = "Class";
+                    
+                    data.setName(className);
+                    data.setType(type);
+                    data.setVisibility("\"\"");
+                    data.setIsStatic("\"\"");
+                    data.setId(className);
+                    StoringArtefacts store=(StoringArtefacts)output.get(className);
+                    HashSet attributes= store.getAttributes();
+                    HashSet methods=store.getMethods();
+                    HashSet relations=store.getRelationships();
+                 
+                    
+//                    sbf.append("\n\nClass : "+className);
+//                    sbf.append("\n\tAttributes : ");
+                    for (Object attribute : attributes) {
+//                        sbf.append(attribute.toString()+",");
+                        Attribute tempAttribute = new Attribute();
+                        tempAttribute.setName(attribute.toString());
+                        tempAttribute.setType("RequrirementAttribute");
+                        tempAttribute.setDataType("\"\"");
+                        tempAttribute.setVisibility("\"\"");
+                        tempAttribute.setIsStatic("\"\"");
+                        
+                        attributeList.add(tempAttribute);
+                        
+                    }
+//                    sbf.append("\n\tMethods : ");
+                    for (Object method : methods) {
+//                        sbf.append(method.toString()+",");
+                        Operation operation = new Operation();
+                        operation.setName(method.toString());
+                        operation.setType("RequrirementMethod");
+                        operation.setIsAbstract("\"\"");
+                        operation.setVisibility("\"\"");
+                        operation.setIsStatic("\"\"");
+                        operation.setReturnType("\"\"");
+                        operation.setParameterList(new ArrayList<Parameter>());
+                        operation.setId("\"\"");
+                        
+                        methodList.add(operation);
+                        
+                    }
+//                    sbf.append("\n\tRelations : ");
+                    for (Object relation : relations) {
+                        
+                        Dependencies dependencies = new Dependencies();
+                        ClassRelation rel=(ClassRelation)relation;
+                        
+                        dependencies.setDependency_type(rel.getRelationType());
+                        
+                        
+                        if(rel.getChildElement().equals(className)){
+                            dependencies.setSource_id(className);
+                            dependencies.setTaget_id(rel.getParentElement());
+//                            sbf.append("\t <Type> - "+rel.getRelationType()+"(Parent : "+rel.getParentElement()+")");
+                        }
+                        else if(rel.getParentElement().equals(className)){
+                            
+                            dependencies.setSource_id(rel.getChildElement());
+                            dependencies.setTaget_id(className);
+                            //sbf.append("\t <Type> - "+rel.getRelationType()+"(Child : "+rel.getChildElement()+")");
+                        }
+                        
+                        dependencyList.add(dependencies);
+                    }
+                    
+                    data.setAttributeList(attributeList);
+                    data.setOperationList(methodList);
+                    
+                    classInfoList.add(data);
+                    
                 }
-                sbf.append("\tMethods : ");
-                for (Object method : methods) {
-                    sbf.append(method.toString() + ",");
-                }
-                sbf.append("\tRelations : ");
-                for (Object relation : relations) {
-                    ClassRelation rel = (ClassRelation) relation;
-                    sbf.append("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-                }
-
+                StaticData.depencyList = dependencyList;
+                StaticData.classLst = classInfoList;
+                
+                WriteToXML writer = new WriteToXML();
+                WriteToXML.type = "Requirement";
+                writer.createXML();
+            
+//                System.out.println(sbf.toString());
+//            
+//                BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("Requirement_Output.txt")));
+//               
+//                //write contents of StringBuffer to a file
+//                bwr.write(sbf.toString());
+//               
+//                //flush the stream
+//                bwr.flush();
+//               
+//                //close the stream
+//                bwr.close();
+            
+                }catch(Exception e){}
             }
-
-            System.out.println(sbf.toString());
-
-            BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("Requirement_Output.txt")));
-
-            //write contents of StringBuffer to a file
-            bwr.write(sbf.toString());
-
-            //flush the stream
-            bwr.flush();
-
-            //close the stream
-            bwr.close();
-
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            e.printStackTrace();
-        }
-    }
 
 }
