@@ -43,7 +43,7 @@ public class MainClass {
         HashSet tempList;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("OrderRequirement.txt");
+            requirementDocument = readFromTextFile("BankRequirement.txt");
 
             System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 
