@@ -75,11 +75,12 @@ public class AttributeIdentification {
         getAttributeList();
         /*rule 4*/
         checksWhetherDesignElementExits();
-        /*rule 5*/
-        findAttributeAssociatedWithLocation();
+        
         /*rule 6*/
         removeRedundancy();
         /*rule 7*/
+        findAttributeAssociatedWithLocation();
+        /*rule 8*/
         removeClassesFromAttributes();
         
     }
@@ -123,7 +124,7 @@ public class AttributeIdentification {
                 
     }
     
-    /*rule 5*/
+    /*rule 6*/
     private void findAttributeAssociatedWithLocation(){
         ArrayList att = phrase.getIdentifiedPhrases1("NN$NNP");
         for(int i=0;i<att.size();i++){
@@ -172,13 +173,17 @@ public class AttributeIdentification {
         }
     }
     
-    /*rule 7*/
+
+    /*rule 8
+    *remove classes from attributes and checks plurals or singular presents in attributes of classes
+    */
     private void removeClassesFromAttributes(){
     
         attributeFinalList.removeAll(classList);
-        //attributeFinalList.remove("account");
-        //removeFromHashSet();
         
+        
+        
+       
     }
     public ArrayList getAttributesTemp(){
         return attributes;
