@@ -6,6 +6,13 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.traceability.model.Attribute;
+import com.project.traceability.model.Dependencies;
+import com.project.traceability.model.ModelData;
+import com.project.traceability.model.Operation;
+import com.project.traceability.model.Parameter;
+import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -196,8 +203,10 @@ public class MainClass {
                 
                 /*Writing the information extracted from Requirement to text file  */
                 if (!requirementObjects.isEmpty()) {
+
                     //WriteRequirementToXML.writeToXMLFile(requirementObjects);
                     WriteRequirementToXML.writeToXMLFile(requirementObjects,requirementObjectRelations);
+
                 }
             }
         } catch (Exception e) {
@@ -249,9 +258,6 @@ public class MainClass {
         return req_Document;
     }
 
-    
-         
-       
     public static void addingRelationsToIdentifiedClasses(HashSet relations){
             Iterator iter=relations.iterator();
             while(iter.hasNext()){

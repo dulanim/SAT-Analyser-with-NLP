@@ -151,11 +151,11 @@ public class WriteRequirementToXML {
                         sbf.append(method.toString()+",");
                     }
                 }
-                sbf.append("\nRelations : ");
+                sbf.append("\nRelations : \n");
                     Iterator relationsIter=requirementClassRelations.iterator();
                     while (relationsIter.hasNext()) {
                         ClassRelation rel=(ClassRelation)relationsIter.next();
-                        sbf.append("\t Type : "+rel.getRelationType()+", Parent : "+rel.getParentElement()+", Child : "+rel.getChildElement()+"\n");
+                        sbf.append("\n Type : "+rel.getRelationType()+", Parent : "+rel.getParentElement()+", Child : "+rel.getChildElement()+"\n");
                         
                     }
             
