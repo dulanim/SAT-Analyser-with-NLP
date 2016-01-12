@@ -97,6 +97,7 @@ public class WriteToXML {
                    
                      //putting INTRACONNECTION
                 }
+                
                 Element intraConnectionElement = doc.createElement(StaticData.INTRACONNECTION_ROOT);
                 artifact.appendChild(intraConnectionElement);//append an artifact main Artifact
                 
@@ -251,6 +252,8 @@ public class WriteToXML {
         try{
             
             List<Dependencies> dependenciesesLst = StaticData.depencyList;
+            System.out.println("WriteToXML ---- : dependency list size : "+dependenciesesLst.size());
+            System.out.println("WriteToXML ---- : dependency list: "+dependenciesesLst);
             for(int i=0;dependenciesesLst != null  && i<dependenciesesLst.size();i++){
                 Dependencies dependencies = dependenciesesLst.get(i);
                 //putting AretefactSubElement
@@ -259,10 +262,12 @@ public class WriteToXML {
 
 		Element typeElement = doc.createElement(StaticData.TYPE_CONNECTION_ROOT);
 		typeElement.appendChild(doc.createTextNode(dependencies.getDependency_type()));
+                System.out.println("WriteToXML ---- : type : "+dependencies.getDependency_type());
 		connectionElement.appendChild(typeElement);
                 
                 Element startPonintElement = doc.createElement(StaticData.STARTPOINT_ROOT);
                 String id = getCurrentDesignId(dependencies.getSource_id());
+                System.out.println("WriteToXML ---- : source : "+dependencies.getSource_id());
 		startPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(startPonintElement);
                 
@@ -273,6 +278,7 @@ public class WriteToXML {
                 
                 Element endPonintElement = doc.createElement(StaticData.ENDPOINT_ROOT);
                 id = getCurrentDesignId(dependencies.getTaget_id());
+                System.out.println("WriteToXML ---- : target : "+dependencies.getTaget_id());
 		endPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(endPonintElement);
                 
