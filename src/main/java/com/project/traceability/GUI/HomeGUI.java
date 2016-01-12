@@ -24,7 +24,6 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -42,12 +41,10 @@ import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
-import static com.project.traceability.GUI.NewFileWindow.shell;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.GraphDB.RelTypes;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +53,7 @@ import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
+import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -64,6 +62,9 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -118,6 +119,15 @@ public class HomeGUI extends JFrame implements KeyListener {
 
     static XMLReader reader;
     static XMLWriter writer;
+
+    private CTabItem tbtmPropertyInfos;
+    private Table table;
+    private TableColumn tblclmnProperty;
+    private TableColumn tblclmnValue;
+    private TableCursor tableCursor;
+    private TableItem tableItem;
+    private TableItem tableItem_1;
+    private SashForm graphTapHolder;
 
     /**
      * Launch the application.
@@ -199,24 +209,96 @@ public class HomeGUI extends JFrame implements KeyListener {
 
         workSF = new SashForm(sidebarSF, SWT.VERTICAL | SWT.SMOOTH);		// sash form for vertical CTabFloders
         sidebarSF.setWeights(new int[]{1, 5});
-
+       
+        
         tabFolder = new CTabFolder(workSF, SWT.BORDER | SWT.CLOSE);			//new CTabFolder to show opened files and compared results
         tabFolder.setData("WorkSpace");
         tabFolder.setMinimizeVisible(true);
         tabFolder.setMaximizeVisible(true);
         //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
-        graphTab = new CTabFolder(workSF, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+//        graphTab = new CTabFolder(workSF, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+//        graphTab.setData("Graph");
+//        graphTab.setMinimizeVisible(true);
+//        graphTab.setMaximizeVisible(true);
+
+        composite = new Composite(tabFolder, SWT.NONE);
+        composite.setLayout(new FillLayout());
+
+        
+
+        //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
+        graphTapHolder = new SashForm(workSF, SWT.HORIZONTAL | SWT.SMOOTH);
+        graphTapHolder.setVisible(true);
+        graphTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
         graphTab.setData("Graph");
         graphTab.setMinimizeVisible(true);
         graphTab.setMaximizeVisible(true);
 
         workSF.setWeights(new int[]{1, 1});
-
+        
+        graphComposite = new Composite(graphTab, SWT.NONE);
+        graphComposite.setLayout(new FillLayout());
+        
+        graphComposite = new Composite(graphTab, SWT.NONE);
+        graphComposite.setLayout(new FillLayout());
         composite = new Composite(tabFolder, SWT.NONE);
         composite.setLayout(new FillLayout());
 
-        graphComposite = new Composite(graphTab, SWT.NONE);
-        graphComposite.setLayout(new FillLayout());
+        CTabFolder propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+        propertyTab.setData("Property");
+        propertyTab.setMinimizeVisible(true);
+        propertyTab.setMaximizeVisible(true);
+
+        tbtmPropertyInfos = new CTabItem(propertyTab, SWT.NONE);
+        tbtmPropertyInfos.setText("Property Infos");
+//		
+                /*
+         this is property table row sample
+         */
+        table = new Table(propertyTab, SWT.BORDER | SWT.FULL_SELECTION);
+        tbtmPropertyInfos.setControl(table);
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        /*
+         this is first coloumn
+         */
+        tblclmnProperty = new TableColumn(table, SWT.NONE);
+        tblclmnProperty.setWidth(100);
+        tblclmnProperty.setText("Property");
+        /*
+         second coloumn
+         */
+        tblclmnValue = new TableColumn(table, SWT.NONE);
+        tblclmnValue.setWidth(100);
+        tblclmnValue.setText("Value");
+
+        /*
+         table holder for scrolling purpose
+         */
+        tableCursor = new TableCursor(table, SWT.NONE);
+
+        tableItem = new TableItem(table, SWT.NONE, 0);
+        tableItem.setText("New TableItem");
+
+        tableItem_1 = new TableItem(table, SWT.NONE, 1);
+        tableItem_1.setText("New TableItem");
+//		
+        graphTapHolder.setWeights(new int[]{749, 271});
+
+        addEditMenuPopUpMenu();
+        defineListeners();
+
+        newTab.addCTabFolder2Listener(ctfCTF2L);			//for managing maximize, minimize and restore
+        newTab.addMouseListener(ctfML);
+
+        tabFolder.addCTabFolder2Listener(ctfCTF2L);
+        tabFolder.addMouseListener(ctfML);
+
+        graphTab.addCTabFolder2Listener(ctfCTF2L);
+        graphTab.addMouseListener(ctfML);
+
+        graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
+        graphtabItem.setText("Graph");
 
         addEditMenuPopUpMenu();
         //create ToolBar and ToolItems
@@ -275,16 +357,16 @@ public class HomeGUI extends JFrame implements KeyListener {
 
         ArrayList<String> projectFiles;
         /*if(StaticData.fileNames != null){
-		projectFiles = StaticData.fileNames.keySet().
-                }else{
-                    projectFiles = new ArrayList<>();
-                }*/
+         projectFiles = StaticData.fileNames.keySet().
+         }else{
+         projectFiles = new ArrayList<>();
+         }*/
         //load all the projects
 
         CTabItem tbtmProjects = new CTabItem(newTab, SWT.NONE);		//CTabItem to show projects
         tbtmProjects.setText("Projects");
         /*if (projectFiles.isEmpty())
-			newTab.setVisible(false);*/
+         newTab.setVisible(false);*/
 
         tree = new Tree(newTab, SWT.BORDER | SWT.BORDER | SWT.V_SCROLL
                 | SWT.H_SCROLL | SWT.MULTI);				//tree for all projects
@@ -339,7 +421,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         tree.addMouseListener(new MouseAdapter() {
             //mouse double click listener to display the files
             /*
-                    Open files when double clicks 
+             Open files when double clicks 
              */
             @Override
             public void mouseDoubleClick(MouseEvent event) {
@@ -388,7 +470,7 @@ public class HomeGUI extends JFrame implements KeyListener {
 
                     } else {
                         /*
-                                           file is opened in tab visiblle that tab
+                         file is opened in tab visiblle that tab
                          */
 
                         CTabItem items[] = tabFolder.getItems();
@@ -632,7 +714,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to copy the text
+                 run how to copy the text
                  */
                 NewFileWindow.codeText.copy();
             }
@@ -645,7 +727,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to paste the text
+                 run how to paste the text
                  */
                 NewFileWindow.codeText.paste();
             }
@@ -659,7 +741,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to paste the text
+                 run how to paste the text
                  */
                 NewFileWindow.codeText.cut();
             }
@@ -673,7 +755,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to redo perform
+                 run how to redo perform
                  */
                 //NewFileWindow.codeText.cut();
                 new UndoRedoImpl(NewFileWindow.codeText).redo();
@@ -687,7 +769,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to redo perform
+                 run how to redo perform
                  */
                 //NewFileWindow.codeText.cut();
                 new UndoRedoImpl(NewFileWindow.codeText).undo();
@@ -701,7 +783,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 /*
-                            run how to select All text
+                 run how to select All text
                  */
                 //NewFileWindow.codeText.cut();
             }
@@ -1272,7 +1354,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         createWrkspace();
         if (projectName != null && projectName.length > 0) {
             /*
-                if project exists in given directory show that
+             if project exists in given directory show that
              */
 
             for (String name : projectName) {
@@ -1410,7 +1492,7 @@ public class HomeGUI extends JFrame implements KeyListener {
 
     public static void initWindow() {
         /*
-                            initialize opened file when those were opened in tab
+         initialize opened file when those were opened in tab
          */
         reader = new XMLReader();
         reader.readDefaultNode();

@@ -4,7 +4,6 @@
  */
 package com.project.traceability.model;
 
-import com.project.traceability.model.Attribute;
 import java.util.List;
 
 /**

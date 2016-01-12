@@ -8,10 +8,7 @@ package com.project.NLP.Requirement;
 
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +19,7 @@ public class MainClass {
     
     private static String requirementDocument="";
     private static HashMap requirementObjects = new HashMap();
+    private static HashSet<ClassRelation> requirementObjectRelations=new HashSet<>();
 
     public static void main(String args[]) {
 
@@ -43,7 +41,7 @@ public class MainClass {
         HashSet tempList;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("BankRequirement.txt");
+            requirementDocument = readFromTextFile("OrderRequirement.txt");
 
             System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 
@@ -182,18 +180,24 @@ public class MainClass {
                 */
                 HashSet relationSet=new HashSet();
                 ClassRelationIdentifier crid=new ClassRelationIdentifier();
-                relationSet=crid.identifyGeneralizationRelations(requirementObjects.keySet());
-                addingRelationsToIdentifiedClasses(relationSet);
+                //relationSet=crid.identifyGeneralizationRelations(requirementObjects.keySet());
+                requirementObjectRelations.addAll(crid.identifyGeneralizationRelations(requirementObjects.keySet()));
+                //addingRelationsToIdentifiedClasses(relationSet);
                 HashSet associationSet=new HashSet();
                  for(Object tree:trees){
-                    associationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
+                   // associationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
+                   //relationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
+                    requirementObjectRelations.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
                  }
-                 System.out.println("---Associaton set : "+associationSet);
-                 addingRelationsToIdentifiedClasses(associationSet);
+                 System.out.println("---Relation set : "+requirementObjectRelations);
+                 //System.out.println("---Associaton set : "+relationSet);
+                // addingRelationsToIdentifiedClasses(associationSet);
+               // addingRelationsToIdentifiedClasses(relationSet);
                 
                 /*Writing the information extracted from Requirement to text file  */
                 if (!requirementObjects.isEmpty()) {
-                    writeOutputToTxtFile(requirementObjects);
+                    //WriteRequirementToXML.writeToXMLFile(requirementObjects);
+                    WriteRequirementToXML.writeToXMLFile(requirementObjects,requirementObjectRelations);
                 }
             }
         } catch (Exception e) {
@@ -245,65 +249,9 @@ public class MainClass {
         return req_Document;
     }
 
-    /*Writing output HashMap to a text file 
-     *input: output result type: hashMap
-     *output: none
-     */
-    public static void writeOutputToTxtFile(HashMap output) {
-        try {
-
-            StringBuffer sbf = new StringBuffer();
-            Iterator it = output.keySet().iterator();
-            while (it.hasNext()) {
-
-                    String className=it.next().toString();
-                    StoringArtefacts store=(StoringArtefacts)output.get(className);
-                    HashSet attributes= store.getAttributes();
-                    HashSet methods=store.getMethods();
-                    HashSet relations=store.getRelationships();
-                
-                    sbf.append("\n\nClass : "+className);
-                    sbf.append("\n\tAttributes : ");
-                    for (Object attribute : attributes) {
-                        sbf.append(attribute.toString()+",");
-                    }
-                    sbf.append("\n\tMethods : ");
-                    for (Object method : methods) {
-                        sbf.append(method.toString()+",");
-                    }
-                    sbf.append("\n\tRelations : ");
-                    for (Object relation : relations) {
-                        ClassRelation rel=(ClassRelation)relation;
-                        if(rel.getChildElement().equals(className)){
-                            sbf.append("\t <Type> - "+rel.getRelationType()+"(Parent : "+rel.getParentElement()+")");
-                        }
-                        else if(rel.getParentElement().equals(className)){
-                             sbf.append("\t <Type> - "+rel.getRelationType()+"(Child : "+rel.getChildElement()+")");
-                        }
-                    }
-                    
-                
-                }
-
-            System.out.println(sbf.toString());
-
-            BufferedWriter bwr = new BufferedWriter(new FileWriter(new File("Requirement_Output.txt")));
-
-            //write contents of StringBuffer to a file
-            bwr.write(sbf.toString());
-
-            //flush the stream
-            bwr.flush();
-
-            //close the stream
-            bwr.close();
-
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            e.printStackTrace();
-        }
-    }
     
+         
+       
     public static void addingRelationsToIdentifiedClasses(HashSet relations){
             Iterator iter=relations.iterator();
             while(iter.hasNext()){
@@ -316,5 +264,4 @@ public class MainClass {
                 storingArtefacts.addRelationships(classRelation);
             }
         }
-
 }

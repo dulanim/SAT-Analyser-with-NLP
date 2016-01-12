@@ -190,19 +190,19 @@ public class ClassRelationIdentifier {
            
             while (list.hasNext()) {
                 String classFromlist = list.next().toString();
-                //System.out.println("----Class1 name------"+classFromlist+" -------");
+                System.out.println("----Class1 name------"+classFromlist+" -------");
                  Iterator set = documentClassSet.iterator();
                 while (set.hasNext()) {
                     String classFromSet = set.next().toString();
-                    //System.out.println("----Class2 name------"+classFromSet+" -------");
+                    System.out.println("----Class2 name------"+classFromSet+" -------");
                     if(!(classFromSet.equals(classFromlist))){
-                       // System.out.println("----Same class name -------");
+                        System.out.println("----Same class name -------");
                         if (classFromSet.matches(".+" + classFromlist + ".*")) {
-                            //System.out.println("--------Success --1-- Generalization -----");
+                            System.out.println("--------Success --1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromSet, classFromlist);
                             classRelations.add(general);
                         } else if (classFromlist.matches(".+" + classFromSet + ".*")) {
-                            //System.out.println("--------Success --1-1-- Generalization -----");
+                            System.out.println("--------Success --1-1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromlist, classFromSet);
                             classRelations.add(general);
 
