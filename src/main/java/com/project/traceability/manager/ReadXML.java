@@ -13,18 +13,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
+import org.neo4j.graphdb.Relationship;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -37,10 +42,10 @@ public class ReadXML {
     public static List<String> relationNodes = new ArrayList<>();
 
     public static void initApp(String projectPath, String graphType) {
-        
+
         try {
             HomeGUI.isComaparing = false;
-            transferDataToDBFromXML(projectPath);
+            transferDataToDBFromXML(projectPath, true);
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
@@ -53,55 +58,128 @@ public class ReadXML {
         }
     }
 
-    public static void transferDataToDBFromXML(String projectPath) {
+    public static void transferDataToDBFromXML(String projectPath, boolean op) {
         relationNodes = null;
         ReadFiles.readFiles(projectPath);
         Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
         Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
         List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
-        
+
+        if (!op) {
+            File f = new File(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                    + ".graphdb");
+            if (f.exists()) {
+                System.out.println("File exist is deleted");
+                f.delete();
+            }
+        }
         GraphDB graphDB = new GraphDB();
         graphDB.initiateGraphDB();
-        
+
         System.out.println("Entering UML.....");
         graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
         System.out.println("Entering Req.....");
         graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
         System.out.println("Entering SourceCode.....");
         graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
-        
+
         //trace class links between UML & source code
         relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
         graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
-        
+
         // trace class links between requirement & source code
         List<String> reqSrcRelationNodes = RequirementSourceClassManager
                 .compareClassNames(projectPath);
         graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
-        
+
         List<String> reqUMLRelationNodes = RequirementUMLClassManager
                 .compareClassNames(projectPath);
         graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
-        
+
         relationNodes.addAll(reqSrcRelationNodes);
         relationNodes.addAll(reqUMLRelationNodes);
-        
+
         List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
         System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
         graphDB.addIntraRelationTOGraphDB(sourceIntraRelations);//add intra relationships between SourceCode elements to db
         relationNodes.addAll(sourceIntraRelations);
-        
+
         List<String> UMLIntraRelations = IntraRelationManager.getUMLIntraRelation(projectPath);
         System.out.println("UML Intra Relation: " + UMLIntraRelations.size());
         graphDB.addIntraRelationTOGraphDB(UMLIntraRelations);//add intra relationships between UML elements to db
         relationNodes.addAll(UMLIntraRelations);
-        
+
         RelationManager.addLinks(relationNodes);
-        
+
         graphDB.generateGraphFile();//generate the graph file from db
     }
 
-    public static void readSourceFile(HashMap<String, Object> nodeProps, String id , String xmlFile) throws TransformerException {
+    public static void deleteNodeFromSourceFile(Set<org.neo4j.graphdb.Node> deleteNodeProps, Set<Relationship> relProps, String xml) {
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(xml);
+            //System.out.println("Nodes deleted: " + deleteNodeProps.size());
+            // System.out.println("Relationships deleted: " + relProps.size());
+
+            deleteRelations(relProps);
+            for (org.neo4j.graphdb.Node nodeProp : deleteNodeProps) {
+                System.out.println("" + nodeProp.getProperty("ID"));
+                NodeList nodeList = document.getElementsByTagName("ArtefactElement");
+                NodeList subList = document.getElementsByTagName("ArtefactSubElement");
+                boolean found = false;
+
+                for (int x = 0, size = nodeList.getLength(); x < size; x++) {
+                    NodeList subNodeList = nodeList.item(x).getChildNodes();
+                    //System.out.println("" + nodeList.item(x));
+                    if (nodeList.item(x) != null) {
+                        if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
+                            System.out.println("Donesc");
+                            //System.out.println(""+nodeList.item(x).getAttributes().toString());
+                            nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
+                            found = true;
+                            break;
+                        }
+
+                    }
+                }
+
+                if (!found) {
+                    for (int y = 1, sizeSb = subList.getLength(); y < sizeSb; y = y + 2) {
+                        if (subList.item(y) != null) {
+                            //System.out.println(""+subNodeList.item(y).getAttributes().toString());
+                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
+                                System.out.println("Done");
+                                subList.item(y).getParentNode().removeChild(subList.item(y));
+                                found = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(document);
+            String xmlpath = HomeGUI.projectPath + File.separator + XML;
+            File file = new File(xmlpath, FilePropertyName.SOURCE_ARTIFACT_NAME);
+
+            System.out.println("file: " + file.getAbsolutePath());
+            StreamResult result = new StreamResult(file.getPath());
+            transformer.transform(source, result);
+
+            System.out.println("Done nod");
+
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerConfigurationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    public static void readSourceFile(HashMap<String, Object> nodeProps, String id, String xmlFile) throws TransformerException {
 
         System.out.println(xmlFile);
         try {
@@ -176,6 +254,63 @@ public class ReadXML {
 
         } catch (ParserConfigurationException | IOException | SAXException pce) {
             pce.printStackTrace();
+        }
+    }
+
+    private static void deleteRelations(Set<Relationship> relProps) {
+        String xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.RELATION_ARTIFACT_NAME;
+        String startNode, endNode, message;
+
+        try {
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(xml);
+            int count = 0;
+            for (Relationship relProp : relProps) {
+                startNode = relProp.getStartNode().getProperty("ID").toString();
+                endNode = relProp.getEndNode().getProperty("ID").toString();
+                //System.out.println(startNode + "-" + endNode);
+                message = relProp.getType().name().toLowerCase().replaceAll("_", "");
+                //if type is sub element ignore..
+                if (!relProp.getType().name().equalsIgnoreCase(GraphDB.RelTypes.SUB_ELEMENT.toString())) {
+                    NodeList nodeList = document.getElementsByTagName("Relation");
+                    parent:
+                    for (int x = 0, size = nodeList.getLength(); x < size;) {
+                        NodeList subNodeList = nodeList.item(x).getChildNodes();
+
+                        if (subNodeList.item(1).getTextContent().equalsIgnoreCase(startNode)
+                                && subNodeList.item(3).getTextContent().toLowerCase().equalsIgnoreCase(message)
+                                && subNodeList.item(5).getTextContent().equalsIgnoreCase(endNode)) {
+                            for (int y = 0, sizeSub = subNodeList.getLength(); y < sizeSub; y++) {
+                                if (subNodeList.item(y) != null) {
+                                    nodeList.item(x).removeChild(subNodeList.item(y));
+                                }
+
+                            }
+                            if (nodeList.item(x) != null) {
+                                nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
+                                break;
+                            }
+                        }
+                        x++;
+                    }
+                }
+            }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(document);
+            String xmlpath = HomeGUI.projectPath + File.separator + XML;
+            File file = new File(xmlpath, FilePropertyName.RELATION_ARTIFACT_NAME);
+            StreamResult result = new StreamResult(file.getPath());
+            transformer.transform(source, result);
+
+            System.out.println("Done Rel");
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerConfigurationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }
 

@@ -40,7 +40,11 @@ import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
 import java.awt.Component;
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import javax.xml.transform.TransformerException;
 import org.neo4j.graphdb.Relationship;
 
@@ -51,11 +55,13 @@ import org.neo4j.graphdb.Relationship;
 @ServiceProvider(service = PreviewMouseListener.class)
 public class GraphMouseListener implements PreviewMouseListener {
 
-    final String ID = "ID";
-    final String TYPE = "Type";
-    GraphDatabaseService graphDb;
-    ExecutionEngine engine;
-    ExecutionResult result;
+    private final String ID = "ID";
+    private final String TYPE = "Type";
+    private GraphDatabaseService graphDb;
+    private ExecutionEngine engine;
+    private ExecutionResult result;
+    private Set<org.neo4j.graphdb.Node> deleteNodeProps;
+    private Set<Relationship> relProps;
 
     @SuppressWarnings("finally")
     @Override
@@ -87,29 +93,26 @@ public class GraphMouseListener implements PreviewMouseListener {
                     HashMap<String, Object> values = showPopup(nodeProps, node);
                     int value = -1;
                     final String id = values.get("ID").toString();
-                    if(values.containsKey("Value")){
-                      value  = Integer.parseInt(values.get("Value").toString()) ;
+                    if (values.containsKey("Value")) {
+                        value = Integer.parseInt(values.get("Value").toString());
                     }
-                    int deleteVal = -1;
-                    if(values.containsKey("Delete")){
-                      deleteVal  = Integer.parseInt(values.get("Delete").toString());
-                    }
-                     
 
                     if (value == JOptionPane.NO_OPTION) {
-                        tx.success();
-                        GraphFileGenerator gg = new GraphFileGenerator();
-                        gg.generateGraphFile(graphDb);
+                        System.out.println("Heliio");
+                        transferDataToDBFromXML(projectPath, false);
+
                         VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();
-                        visual.setGraph(model, PropertyFile.getGraphType());
+                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
+                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
+                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+                        HomeGUI.isComaparing = false;
                         visual.setPreview();
                         visual.setLayout();
+                        tx.success();
                     } else if (value == JOptionPane.YES_OPTION) {
                         //ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
                         System.out.println("Heliio");
-                        transferDataToDBFromXML(projectPath);
+                        transferDataToDBFromXML(projectPath, true);
 
                         VisualizeGraph visual = VisualizeGraph.getInstance();
                         visual.importFile();//import the generated graph file into Gephi toolkit API workspace
@@ -120,21 +123,6 @@ public class GraphMouseListener implements PreviewMouseListener {
                         visual.setLayout();
                         tx.success();
                     }
-                    
-                    if(deleteVal == JOptionPane.YES_OPTION){
-                        System.out.println("Heliio Deletion");
-                        transferDataToDBFromXML(projectPath);
-
-                        VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                        HomeGUI.isComaparing = false;
-                        visual.setPreview();
-                        visual.setLayout();
-                        tx.success();
-                    }
-
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
                     System.out.println(e.toString());
@@ -215,41 +203,66 @@ public class GraphMouseListener implements PreviewMouseListener {
         } else if (response == JOptionPane.NO_OPTION) {
             int confirm = JOptionPane.showConfirmDialog(VisualizeGraph.getInstance().getFrame(), "Are you sure you want to delete?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
-                //delete the node
-                IndexManager index = graphDb.index();
-                Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-                IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", id);
-
-                org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
-                System.out.println("Properties from edition:");
-                for (String key : nodeProps.keySet()) {
-                    System.out.println("Key: " + key + " Value: " + nodeProps.get(key).toString());
-                }
-                Iterator<Relationship> nodeRelation = neo4j_node.getRelationships().iterator();
-                if (!nodeRelation.hasNext()) {
-                    //delete the node if there are no relatioships liked to it.
-                    neo4j_node.delete();
-                } else {
-                    while (nodeRelation.hasNext()) {
-                        Relationship rel = nodeRelation.next();
-                        System.out.println(rel.getStartNode()+" to "+rel.getEndNode()+" is deleted.");
-                        rel.delete();                        
-                    }
-                    neo4j_node.delete();
-                }
-                updateXMLFiles(id, nodeProps);
-                returnVal.put("ID", id);
-                returnVal.put("Delete", confirm);
-                graphDb.shutdown();
+                deleteNodeAndRelations(id, nodeProps, confirm);
             }
-            if(confirm == JOptionPane.NO_OPTION){
-                
+            if (confirm == JOptionPane.NO_OPTION) {
+
             }
         }
 
         returnVal.put("Value", response);
         return returnVal;
 
+    }
+
+    public void deleteNodeAndRelations(final String id, final HashMap<String, Object> nodeProps, int confirm) {
+        //delete the node
+        IndexManager index = graphDb.index();
+        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+        IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", id);
+
+        org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
+        Iterator<Relationship> nodeRelation = neo4j_node.getRelationships().iterator();
+        deleteNodeProps = new HashSet<>();
+        relProps = new HashSet<>();
+        deleteNodeProps.add(neo4j_node);
+
+        deleteNode(nodeRelation, neo4j_node);
+        System.out.println("Size: " + deleteNodeProps.size() + " " + relProps.size());
+        delete(deleteNodeProps, relProps, id);
+        new GraphDB().checkDB();
+
+        //graphDb.shutdown();
+        //updateXMLFiles(id, nodeProps);
+        //returnVal.put("ID", id);
+        //returnVal.put("Value", confirm);
+    }
+
+    public void deleteNode(Iterator<Relationship> nodeRelation, org.neo4j.graphdb.Node neo4j_node) {
+        //System.out.println("Entering ub node delete " + neo4j_node.toString());        
+        if (!nodeRelation.hasNext()) {
+            //delete the node if there are no relatioships liked to it.
+            deleteNodeProps.add(neo4j_node);
+            //neo4j_node.delete();
+        } else {
+            while (nodeRelation.hasNext()) {
+                Relationship rel = nodeRelation.next();
+                //check if the relationship has any subelements to it.
+                if (rel.isType(GraphDB.RelTypes.SUB_ELEMENT) && rel.getStartNode().toString().equalsIgnoreCase(neo4j_node.toString())) {
+                    org.neo4j.graphdb.Node subNode = rel.getEndNode();
+                    Iterator<Relationship> subRel = subNode.getRelationships().iterator();
+                    deleteNode(subRel, subNode);
+                } else if (rel.isType(GraphDB.RelTypes.SUB_ELEMENT) && rel.getEndNode().toString().equalsIgnoreCase(neo4j_node.toString())) {
+                } else {
+                    relProps.add(rel);
+                    //rel.delete();
+                    //deleteNodeProps.add(neo4j_node);
+                }
+
+            }
+            // deleteNodeProps.add(neo4j_node);
+            // neo4j_node.delete();
+        }
     }
 
     /**
@@ -282,6 +295,120 @@ public class GraphMouseListener implements PreviewMouseListener {
         }
     }
 
+    public void delete(Set<org.neo4j.graphdb.Node> nodeProps, Set<Relationship> relProps, String id) {
+        String xml = updateXMLFiles(id);
+        ReadXML.deleteNodeFromSourceFile(deleteNodeProps, relProps, xml);
+        Transaction tx = graphDb.beginTx();
+        ExecutionEngine execEngine = new ExecutionEngine(graphDb);
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        ExecutionResult execResult = null;
+
+        try {
+            IndexManager index = graphDb.index();
+            Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+            Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
+
+            for (Relationship next : relProps) {
+                org.neo4j.graphdb.Node source = next.getStartNode();
+                org.neo4j.graphdb.Node target = next.getEndNode();
+                System.out.print("Source: " + source.getProperty("ID") + " Target: " + target.getProperty("ID"));
+                map.put("relID", next.getStartNode().getProperty("ID") + "-" + next.getEndNode().getProperty("ID"));
+                IndexHits<Relationship> relHits = edges.get("ID", source.getProperty("ID") + "-" + target.getProperty("ID"));
+                Relationship rel = relHits.getSingle();
+                String relid = source.getProperty("ID") + "-" + target.getProperty("ID");
+                if (rel != null) {
+                    deleteRelDB(rel);
+                }
+            }
+
+            for (org.neo4j.graphdb.Node next : nodeProps) {
+                IndexHits<org.neo4j.graphdb.Node> nodeHits = artefacts.get("ID", next.getProperty("ID"));
+                System.out.println("Node : " + next.getProperty("ID"));
+                org.neo4j.graphdb.Node node = nodeHits.getSingle();
+                if (node.hasRelationship(GraphDB.RelTypes.SUB_ELEMENT)) {
+                    Iterable<Relationship> nodeRel = node.getRelationships(GraphDB.RelTypes.SUB_ELEMENT);
+                    for (Iterator<Relationship> iterator = nodeRel.iterator(); iterator.hasNext();) {
+                        Relationship relDel = iterator.next();
+                        String relid = relDel.getStartNode().getProperty("ID") + "-" + relDel.getEndNode().getProperty("ID");
+                        System.out.println("Source: " + relDel.getStartNode().getProperty("ID") + " Target: " + relDel.getEndNode().getProperty("ID"));
+                        map.put("relID", relDel.getStartNode().getProperty("ID") + "-" + relDel.getEndNode().getProperty("ID"));
+                        map.put("subid", relDel.getEndNode().getProperty("ID"));
+                        deleteRelDB(relDel);
+
+                    }
+                    deleteNodeDB(node);
+                    System.out.println("Deleted a:");
+                } else {
+
+                    deleteNodeDB(node);
+                    System.out.println("Deletedb:");
+                }
+            }
+            System.out.println("Complete Deletion");
+            tx.success();
+            tx.close();
+        } finally {
+            tx.finish();
+            graphDb.shutdown();
+        }
+
+    }
+
+    /*public void checkRel(String id) {
+        IndexManager index = graphDb.index();
+        Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
+        IndexHits<Relationship> relHits = edges.get("ID", id);
+
+        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle().getType().name());
+    }
+
+    public void checkNode(String id) {
+        IndexManager index = graphDb.index();
+        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+        IndexHits<org.neo4j.graphdb.Node> relHits = artefacts.get("ID", id);
+        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle());
+    }*/
+
+    public void deleteNodeDB(org.neo4j.graphdb.Node node) {
+        try (Transaction tx = graphDb.beginTx()) {
+            System.out.println("Before:" + node);
+            if (node.hasRelationship()) {
+                for (Relationship key : node.getRelationships()) {
+                    if (key.isType(GraphDB.RelTypes.SUB_ELEMENT) && key.getStartNode() == node) {
+                        key.getEndNode().delete();
+                        System.out.println("REl" + key);
+                        key.delete();
+                    } else {
+                        System.out.println("ll" + key);
+                        key.delete();
+                    }
+                }
+            }
+
+            node.delete();
+            System.out.println("After:" + node);
+            System.out.println("Detail:" + node.hasRelationship());
+            
+            tx.success();
+            tx.close();
+        }
+    }
+
+    public void deleteRelDB(Relationship rel) {
+        try (Transaction tx = graphDb.beginTx()) {
+            System.out.println("Before:" + rel);
+            if (rel.isType(GraphDB.RelTypes.SUB_ELEMENT)) {
+                rel.getEndNode().delete();
+                rel.delete();
+            } else {
+                rel.delete();
+            }
+            tx.success();
+            tx.close();
+        }
+    }
+
     /**
      * When the node is edited the method updates the changes to the relevant
      * database.
@@ -290,18 +417,29 @@ public class GraphMouseListener implements PreviewMouseListener {
      * @param id
      */
     public void edit(HashMap<String, Object> nodeProps, String id) {
-        IndexManager index = graphDb.index();
-        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-        IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", id);
-
-        org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
-        System.out.println("Properties from edition:");
-        for (String key : nodeProps.keySet()) {
-            System.out.println("Key: " + key + " Value: " + nodeProps.get(key).toString());
-            neo4j_node.setProperty(key, nodeProps.get(key).toString());
+        String xml = updateXMLFiles(id);
+        try {
+            ReadXML.readSourceFile(nodeProps, id, xml);
+        } catch (TransformerException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        updateXMLFiles(id, nodeProps);
-        graphDb.shutdown();
+        try (Transaction tx = graphDb.beginTx()) {
+            IndexManager index = graphDb.index();
+            Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+            IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", id);
+
+            org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
+            System.out.println("Properties from edition:");
+            for (String key : nodeProps.keySet()) {
+                System.out.println("Key: " + key + " Value: " + nodeProps.get(key).toString());
+                neo4j_node.setProperty(key, nodeProps.get(key).toString());
+            }
+            tx.success();
+            tx.close();
+        } finally {
+            graphDb.shutdown();
+        }
+
     }
 
     /**
@@ -310,37 +448,23 @@ public class GraphMouseListener implements PreviewMouseListener {
      * @param id
      * @param nodeProps
      */
-    public void updateXMLFiles(String id, HashMap<String, Object> nodeProps) {
+    public String updateXMLFiles(String id) {
         String xml = "";
         switch (id.charAt(0)) {
             case 'S': {
-                try {
-                    xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.SOURCE_ARTIFACT_NAME;
-                    ReadXML.readSourceFile(nodeProps, id, xml);
-                } catch (TransformerException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.SOURCE_ARTIFACT_NAME;
             }
             break;
             case 'R':
-                try {
-                    xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.REQUIREMENT_ARTIFACT_NAME;
-                    ReadXML.readSourceFile(nodeProps, id, xml);
-                } catch (TransformerException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.REQUIREMENT_ARTIFACT_NAME;
                 break;
             case 'D':
-                try {
-                    xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.UML_ARTIFACT_NAME;
-                    ReadXML.readSourceFile(nodeProps, id, xml);
-                } catch (TransformerException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                xml = HomeGUI.projectPath + File.separator + XML + File.separator + FilePropertyName.UML_ARTIFACT_NAME;
                 break;
             default:
                 //do nothing
                 break;
         }
+        return xml;
     }
 }
