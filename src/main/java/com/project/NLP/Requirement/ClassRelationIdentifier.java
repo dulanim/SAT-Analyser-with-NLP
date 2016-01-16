@@ -190,19 +190,19 @@ public class ClassRelationIdentifier {
            
             while (list.hasNext()) {
                 String classFromlist = list.next().toString();
-                //System.out.println("----Class1 name------"+classFromlist+" -------");
+                System.out.println("----Class1 name------"+classFromlist+" -------");
                  Iterator set = documentClassSet.iterator();
                 while (set.hasNext()) {
                     String classFromSet = set.next().toString();
-                    //System.out.println("----Class2 name------"+classFromSet+" -------");
+                    System.out.println("----Class2 name------"+classFromSet+" -------");
                     if(!(classFromSet.equals(classFromlist))){
-                       // System.out.println("----Same class name -------");
+                        System.out.println("----Same class name -------");
                         if (classFromSet.matches(".+" + classFromlist + ".*")) {
-                            //System.out.println("--------Success --1-- Generalization -----");
+                            System.out.println("--------Success --1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromSet, classFromlist);
                             classRelations.add(general);
                         } else if (classFromlist.matches(".+" + classFromSet + ".*")) {
-                            //System.out.println("--------Success --1-1-- Generalization -----");
+                            System.out.println("--------Success --1-1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromlist, classFromSet);
                             classRelations.add(general);
 
@@ -287,13 +287,15 @@ public class ClassRelationIdentifier {
         
             while (matcher.findNextMatchingNode()) {
                 Tree match = matcher.getMatch();
-                               
+                 System.out.println("Sentence match : "+Sentence.listToString(match.yield()));
                 TregexMatcher verbMatcher = verbPattern.matcher(match);
                // while(verbMatcher.findNextMatchingNode()){
                 if(verbMatcher.findNextMatchingNode()){
                     Tree verbMatch=verbMatcher.getMatch();
                     String verb=Sentence.listToString(verbMatch.yield());
+                    System.out.println("Verb match : "+verb);
                     if(verbPhraseList.contains(verb)){
+                        System.out.println("list contains verb : "+verb);
                         String noun_1_phraseNotation="NN|NNS>(NP>S)";
                         String noun_2_phraseNotation="NN|NNS>>(NP,(VBZ|VBP>(VP,NP)))";
                         TregexPattern noun_pattern = TregexPattern.compile(noun_1_phraseNotation);
@@ -301,19 +303,24 @@ public class ClassRelationIdentifier {
                         if(noun_matcher.findNextMatchingNode()){
                             Tree nounMatch=noun_matcher.getMatch();
                             String noun1=Sentence.listToString(nounMatch.yield());
+                            
                             if(documentClass.contains(noun1)){
                                 noun_pattern = TregexPattern.compile(noun_2_phraseNotation);
                                 noun_matcher = noun_pattern.matcher((Tree) tree);
+                                System.out.println("class list contains noun1 : "+noun1);
                                 if(noun_matcher.findNextMatchingNode()){
                                     nounMatch=noun_matcher.getMatch();
                                     String noun2=Sentence.listToString(nounMatch.yield());
                                     if(!noun1.equals(noun2) && documentClass.contains(noun2)){
                                         ClassRelation clr;
+                                        System.out.println("class list contains noun2 : "+noun2);
                                         if(verb.equals("be")){
                                             clr=new ClassRelation("Generalization", noun1, noun2);
+                                            System.out.println("class generalization");
                                         }
                                         else{
                                             clr=new ClassRelation("Association", noun2, noun1);
+                                            System.out.println("class association");
                                         }
                                         classRelations.add(clr);
                                     }

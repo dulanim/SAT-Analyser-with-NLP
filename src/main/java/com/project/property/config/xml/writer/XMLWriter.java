@@ -97,6 +97,7 @@ public class XMLWriter {
 	}
 	public void modifyStatus(Boolean active,String path){
 		//switch project path
+            boolean modified = false;
 		try {
 			NodeList nList = doc.getElementsByTagName("Workspace");
 			for(int i=0;i<nList.getLength();i++){
@@ -108,15 +109,22 @@ public class XMLWriter {
                                     NamedNodeMap attr = element.getAttributes();
                                     Node nodeAttr = attr.getNamedItem("active");
                                     nodeAttr.setTextContent(Boolean.toString(active));
+                                    modified = true;
                                     call_done();
-                                    
-				}else{
-                                    NamedNodeMap attr = element.getAttributes();
-                                    Node nodeAttr = attr.getNamedItem("active");
-                                    nodeAttr.setTextContent(Boolean.toString(false));
-                                    call_done();
-                                }
-			}	
+				}
+			}
+                        if(!modified){
+//                            nList = doc.getElementsByTagName("Workspace");
+//                            Element element = (Element)nList.item(0);
+//                            
+//                            NamedNodeMap attr = element.getAttributes();
+//                            Node nodeAttr = attr.getNamedItem("active");
+//                            nodeAttr.setTextContent(Boolean.toString(false));
+                            
+                            createWorkspaceNode(path, Boolean.toString(active));
+
+                        }
+                        
 		}catch(Exception e){
 			
 		}

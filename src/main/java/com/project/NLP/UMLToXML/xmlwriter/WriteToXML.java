@@ -35,17 +35,18 @@ import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
+import javax.swing.JOptionPane;
 public class WriteToXML {
     
    
-    public static HashMap<String,String> keyIDMap = new HashMap<String, String>();
+    public static HashMap<String,String> keyIDMap = new HashMap<>();
     public int count = 0;
     public static String fileName = "";
+    public static String type = "UMLDiagram";//can change when requirement file writing as xml format
     public void createXML(){
         List<ModelData> classLst = StaticData.classLst;
         //List<Dependencies> depencyList = StaticData.depencyList;
-
-     try {
+            try{
           
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -58,7 +59,7 @@ public class WriteToXML {
 		rootElement.appendChild(artifact);
                 
                 Attr attrType = doc.createAttribute("type");
-                attrType.setValue("UMLDiagram");
+                attrType.setValue(type);
                 artifact.setAttributeNode(attrType);
                 for(int i=0;i<classLst.size();i++){
                     ModelData tempData = classLst.get(i);
@@ -95,15 +96,13 @@ public class WriteToXML {
                     //Operation Element Added
                    
                      //putting INTRACONNECTION
-                    
-                 
-                    
                 }
+                
                 Element intraConnectionElement = doc.createElement(StaticData.INTRACONNECTION_ROOT);
                 artifact.appendChild(intraConnectionElement);//append an artifact main Artifact
                 
                 //Connection Element is adding to InterConnectionsElement
-                 createConnectionElement(doc,intraConnectionElement);
+                createConnectionElement(doc,intraConnectionElement);
                 
 		// write the content into xml file
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -113,31 +112,54 @@ public class WriteToXML {
 		DOMSource source = new DOMSource(doc);
                 //String driveLetter = getSuitableDrive();
                 
-                String root = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName;
-                File f = new File(root + File.separator 
-                        +FilePropertyName.XML);
-                if(!f.exists())
-                    f.mkdir();
-                String fileName = f.getPath() + File.separator + FilePropertyName.UML_ARTIFACT_NAME;
-                File xmlFile = new File(fileName);
+
+                File xmlFile = new File(getFileDir());
                 StreamResult result = new StreamResult(xmlFile.getPath());
 
                 transformer.transform(source, result);
 
-                System.out.println("File saved into " + f.getPath());
+                System.out.println("XML File saved @ " + xmlFile.getPath());
 
-	  } catch (ParserConfigurationException pce) {
-		pce.printStackTrace();
-	  } catch (TransformerException tfe) {
-		tfe.printStackTrace();
+	  } catch(ParserConfigurationException | TransformerException pce) {
+		
+                 JOptionPane.showMessageDialog(null, pce.toString());
 	  }
 	}
         
-
-    private String getDesignElementID() {
+    
+    private String getFileDir(){
+        String dir = System.getProperty("user.home") + File.separator + "temp.xml";//default
         
-        count++;
-        String ID = "D".concat(Integer.toString(count));
+        try{
+            String root = HomeGUI.tree.getToolTipText() + File.separator + 
+                            ProjectCreateWindow.projectName;
+            File f = new File(File.separator +FilePropertyName.XML);
+            if(!f.exists())
+                    f.mkdir();
+            if(type.equals("Requirement")){
+                
+                dir = f.getPath() + File.separator + 
+                        FilePropertyName.REQUIREMENT_ARTIFACT_NAME;
+            }else{
+                dir = f.getPath() + File.separator + 
+                        FilePropertyName.UML_ARTIFACT_NAME;
+            }
+        }catch(Exception e){
+            
+        }
+        return dir;
+    }
+    private String getDesignElementID() {
+        String ID;
+        if(type.equals("Requirement")){
+            count++;
+             ID = "R".concat(Integer.toString(count));
+            
+        }else{
+            count++;
+            ID = "D".concat(Integer.toString(count));
+            
+        }
         return ID;
     }
 
@@ -230,37 +252,42 @@ public class WriteToXML {
         try{
             
             List<Dependencies> dependenciesesLst = StaticData.depencyList;
-            for(int i=0;i<dependenciesesLst.size();i++){
-               Dependencies dependencies = dependenciesesLst.get(i);
-              //putting AretefactSubElement
-              Element connectionElement = doc.createElement(StaticData.CONNECTION_ROOT);
-              intraConnectionElement.appendChild(connectionElement);//append an artifact main root
-              
+            for(int i=0;dependenciesesLst != null  && i<dependenciesesLst.size();i++){
+                Dependencies dependencies = dependenciesesLst.get(i);
+                //putting AretefactSubElement
+                Element connectionElement = doc.createElement(StaticData.CONNECTION_ROOT);
+                intraConnectionElement.appendChild(connectionElement);//append an artifact main root
+
 		Element typeElement = doc.createElement(StaticData.TYPE_CONNECTION_ROOT);
 		typeElement.appendChild(doc.createTextNode(dependencies.getDependency_type()));
-		connectionElement.appendChild(typeElement);
+                connectionElement.appendChild(typeElement);
                 
                 Element startPonintElement = doc.createElement(StaticData.STARTPOINT_ROOT);
                 String id = getCurrentDesignId(dependencies.getSource_id());
-		startPonintElement.appendChild(doc.createTextNode(id));
+                startPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(startPonintElement);
                 
                 Element multiplicitySrcElement = doc.createElement(StaticData.MULTIPLICITY_ROOT);
-		multiplicitySrcElement.appendChild(doc.createTextNode(getNomilizedString(dependencies.getMuliplicity_src())));
+		multiplicitySrcElement.appendChild(
+                        doc.createTextNode(getNomilizedString(dependencies.getMuliplicity_src())));
 		connectionElement.appendChild(multiplicitySrcElement);
                 
                 Element endPonintElement = doc.createElement(StaticData.ENDPOINT_ROOT);
                 id = getCurrentDesignId(dependencies.getTaget_id());
-		endPonintElement.appendChild(doc.createTextNode(id));
+                endPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(endPonintElement);
                 
                 Element multiplicityTargetElement = doc.createElement(StaticData.MULTIPLICITY_ROOT);
-		multiplicityTargetElement.appendChild(doc.createTextNode(getNomilizedString(dependencies.getMultiplicity_target())));
+		String textTarget = getNomilizedString(dependencies.getMultiplicity_target());
+                
+                multiplicityTargetElement.appendChild(doc.createTextNode(textTarget));
 		connectionElement.appendChild(multiplicityTargetElement);
                 
                 Element annotationElement = doc.createElement(StaticData.ANNOTATION_ROOT);
-		annotationElement.appendChild(doc.createTextNode(dependencies.getAnnotation()));
+                String textAnnotation = getNomilizedString(dependencies.getAnnotation());
+		annotationElement.appendChild(doc.createTextNode(textAnnotation));
 		connectionElement.appendChild(annotationElement);
+
             }
             
             

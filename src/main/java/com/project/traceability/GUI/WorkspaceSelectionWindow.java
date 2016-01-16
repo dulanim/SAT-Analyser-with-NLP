@@ -1,14 +1,12 @@
+
 package com.project.traceability.GUI;
 
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
-import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.staticdata.StaticData;
-import java.awt.JobAttributes;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
@@ -17,7 +15,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -199,3 +196,4 @@ public class WorkspaceSelectionWindow {
             }
         }
 }
+

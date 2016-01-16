@@ -1,17 +1,36 @@
 
-Class : saving account
-	Attributes : balance,dumm account,negative balance,withdrawal amount,transaction,account,	Methods : cover,inform,terminate,	Relations : 
-Class : bank
-	Attributes : types,client,accounts,	Methods : 	Relations : 
-Class : checking account
-	Attributes : saving account,	Methods : 	Relations : 
-Class : client
-	Attributes : access,identification,PIN,personal identification number code,account,	Methods : verify,gain,	Relations : 
-Class : department
-	Attributes : student,	Methods : 	Relations : 
-Class : items
-	Attributes : store,	Methods : dispose,	Relations : 
-Class : transaction
-	Attributes : date,amount,transaction type,account balance,time,transactions,	Methods : include,record,	Relations : 
-Class : staffs
-	Attributes : employee,	Methods : 	Relations : 
+
+Class : normal order
+	Attributes : item,
+	Methods : receive,dispose,
+	Relations : 	 <Type> - Generalization(Parent : order)
+
+Class : special order
+	Attributes : item,
+	Methods : dispose,
+	Relations : 	 <Type> - Generalization(Parent : order)
+
+Class : shop
+	Attributes : regular customer,name,point,
+	Methods : give,
+	Relations : 
+
+Class : manager
+	Attributes : shop,employee,
+	Methods : 
+	Relations : 	 <Type> - Generalization(Parent : employee)
+
+Class : employee
+	Attributes : attendance,
+	Methods : swipe_card,register,
+	Relations : 	 <Type> - Generalization(Child : manager)
+
+Class : customer
+	Attributes : item,shop,name,discount,location,customer orders,shop system,order,
+	Methods : confirm,receive,give,record,send,close,order,
+	Relations : 
+
+Class : order
+	Attributes : normal order,special order,
+	Methods : 
+	Relations : 	 <Type> - Generalization(Child : normal order)	 <Type> - Generalization(Child : special order)

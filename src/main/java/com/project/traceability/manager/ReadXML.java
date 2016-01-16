@@ -313,15 +313,4 @@ public class ReadXML {
             Exceptions.printStackTrace(ex);
         }
     }
-
-    /*public static void main(String args[]) throws TransformerException {
-        HashMap<String, Object> nodeProps = new HashMap<>();
-        nodeProps.put("name", "Account");
-        nodeProps.put("id", "SC6");
-        nodeProps.put("type", "Account");
-        nodeProps.put("visibility", "private");
-
-        readSourceFile(nodeProps, "SC6");
-
-    }*/
 }

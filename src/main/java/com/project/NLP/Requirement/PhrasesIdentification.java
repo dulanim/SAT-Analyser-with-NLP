@@ -8,6 +8,7 @@ package com.project.NLP.Requirement;
 
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.Word;
+import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.trees.EnglishGrammaticalRelations;
 import static edu.stanford.nlp.trees.EnglishGrammaticalRelations.AUX_PASSIVE_MODIFIER;
 import edu.stanford.nlp.trees.GrammaticalRelation;
@@ -39,7 +40,7 @@ public class PhrasesIdentification {
     private DesignElementClass designElement;
     private ArrayList designEleList;
     private GrammaticalRelation grammaticalRelation;
-    
+    private Morphology morphology;
 
     //static StanfordCoreNLPModified stanford;
 
@@ -59,7 +60,10 @@ public class PhrasesIdentification {
         this.sTree = tree;
         designElement = new DesignElementClass();
         designEleList = designElement.getDesignElementsList();
-
+        morphology = new Morphology();
+        
+        System.out.println(sTree+ "***************************************"+ sTree.toString());
+        
     }
 
     private int getTreeCount() {
@@ -120,11 +124,13 @@ public class PhrasesIdentification {
         int adjectiveExist = 0;
         int adjectiveNoun = 0;
         String adj = "";
-
+        
         List<Tree> leaves;
         String phraseNotation = "(NP([<NNS|NN]$VP))";//@" + phrase + "! << @" + phrase;
 
+        
         /*For the single Tree */
+        
         //wordStemmer.visitTree(sTree);
         TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
         TregexMatcher matcher = VBpattern.matcher(sTree);
@@ -157,6 +163,7 @@ public class PhrasesIdentification {
                                 className = leaves.get(0).yieldWords().get(0).word();
                                 System.out.println("added...." + className);
                                 nounList.add(adj + " " + className);
+                        
                             }
                             /*if (adjectiveNoun > 1 && adjectiveNoun != inChild.size()) {
                                 nounList.remove(className);
@@ -174,11 +181,12 @@ public class PhrasesIdentification {
                         if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
+                            
                             if (count != 1) {
-                                attributeLists.add(((leaves.get(0).yieldWords()).get(0).word()));
+                                attributeLists.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
                                 System.out.println("count == inn");
                             } else {
-                                nounList.add(((leaves.get(0).yieldWords()).get(0).word()));
+                                nounList.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
                                 System.out.println(">2 else");
                             }
                             count++;
@@ -189,11 +197,17 @@ public class PhrasesIdentification {
             } else {
                 for (Tree inChild : innerChild) {
                     System.out.println("\n--innerChild  " + inChild + "-------\n");
-                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("JJ"))) {
+                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))){
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //phraseLists.add(leaves.get(0 ).yieldWords());
-                        nounList.add(((leaves.get(0).yieldWords()).get(0).word()));
+                        nounList.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
+                        
                         System.out.println("maingjshfkjs");
+                    }
+                    if(inChild.value().equals("JJ")) {
+                        leaves = inChild.getLeaves(); //leaves correspond to the tokens
+                        nounList.add(((leaves.get(0).yieldWords()).get(0).word()));
+                        
                     }
 
                 }
@@ -246,19 +260,19 @@ public class PhrasesIdentification {
                             attribute = leaves.get(0).yieldWords().get(0).word();
 
                             if (!designEleList.contains(attribute)) {
-                                attributeLists.add(attribute);
+                                attributeLists.add(morphology.stem(attribute));
                                 System.out.println("count == inn");
 
                             }
 
                         } else if (count >= 2 && separator == 0) {
-                            attributeLists.remove(attribute);
+                            attributeLists.remove(morphology.stem(attribute));
                             attribute += " " + (leaves.get(0).yieldWords()).get(0).word();
                             attributeLists.add(attribute);
                             System.out.println(">2 else");
                         } else if (count >= 2 && separator == 1) {
                             attribute = (leaves.get(0).yieldWords()).get(0).word();
-                            attributeLists.add(attribute);
+                            attributeLists.add(morphology.stem(attribute));
                         }
 
                         count++;
@@ -271,7 +285,7 @@ public class PhrasesIdentification {
                     if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //phraseLists.add(leaves.get(0 ).yieldWords());
-                        attributeLists.add(((leaves.get(0).yieldWords()).get(0).word()));
+                        attributeLists.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
                         System.out.println("maingjshfkjs");
                     }
 
@@ -659,6 +673,30 @@ public class PhrasesIdentification {
      parameters are the POS.
      for example: NP, VB, NNP and etc.*/
 
+    
+    private void replaceUsingStemming(Tree sTree, List leaves){
+        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        List leavesOfTree = sTree.getChildrenAsList().get(0).getLeaves();
+        System.out.println("Leaves:" +leaves+"  chumma:   "+sTree.contains(leaves));
+        for(int leavesCount =0; leavesCount <leavesOfTree.size(); leavesCount++){
+            System.out.println(leavesOfTree.get(leavesCount));
+            int index =leavesOfTree.indexOf("won");
+            System.out.println(index);
+            
+         
+            
+            
+        }
+        
+        
+        System.out.println("Stree to array:"+sTree.getChildrenAsList().get(0).getLeaves().get(0));
+        System.out.println("Stree to array:"+sTree.getChildrenAsList().equals("won"));
+        
+        
+    }
+    
+    
+    
     public ArrayList getIdentifiedPhrases1(String phrase) {
         phraseLists = new ArrayList();
         String phraseNotation = phrase;
