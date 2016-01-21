@@ -40,17 +40,18 @@ public class ArtefactFrame extends JFrame {
     private static final int DEFAULT_WIDTH = 350;
     private static final int DEFAULT_HEIGHT = 400;
     private HashMap requirementObjects = new HashMap();
-    public static boolean log =true;
+    private HashSet requirementRelationsObjects = new HashSet();
+    public static boolean lock = true;
     protected JTree tree;
 
-    public ArtefactFrame(HashMap output) {
+    public ArtefactFrame(HashMap output, HashSet outputRelations) {
         super();
 
         setTitle("Artefacts Confirmation");
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setLocationRelativeTo(null);
         //tree = jt;
-        addTreeItems(output);
+        addTreeItems(output, outputRelations);
         makeButtons();
         getContentPane().add(tree);
         tree.addMouseListener(new MouseAdapter() {
@@ -61,21 +62,27 @@ public class ArtefactFrame extends JFrame {
                 }
             }
         });
+
         add(new JScrollPane(tree));
     }
 
-    protected void addTreeItems(HashMap output) {
+    protected void addTreeItems(HashMap output, HashSet outputRelations) {
 
+        System.out.println("ADD TREE ITEMS .................");
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Artefacts");
         DefaultMutableTreeNode[] rootDummy = new DefaultMutableTreeNode[output.size()];
         DefaultMutableTreeNode classNames;
         DefaultMutableTreeNode attributes;
         DefaultMutableTreeNode methods;
         DefaultMutableTreeNode relationships;
+        DefaultMutableTreeNode relationshipsGeneralization;
+        DefaultMutableTreeNode relationshipsAssociations;
 
         HashSet attributeSet = null;
         HashSet methodSet = null;
         HashSet relationSet = null;
+        HashSet relationGenSet = new HashSet();
+        HashSet relationAssSet = new HashSet();
 
         Iterator outputIterator = output.keySet().iterator();
         while (outputIterator.hasNext()) {
@@ -88,27 +95,72 @@ public class ArtefactFrame extends JFrame {
             attributes = new DefaultMutableTreeNode("Attributes");
             methods = new DefaultMutableTreeNode("Methods");
             relationships = new DefaultMutableTreeNode("Relationships");
+            relationshipsGeneralization = new DefaultMutableTreeNode("Generalization");
+            relationshipsAssociations = new DefaultMutableTreeNode("Association");
 
             classNames = new DefaultMutableTreeNode(classNameString);
             for (Object attributeItems : attributeSet) {
                 attributes.add(new DefaultMutableTreeNode(attributeItems));
+                System.out.println("attributes: ..." + attributeItems);
+                classNames.add(attributes);
+
             }
 
             for (Object methodItems : methodSet) {
                 methods.add(new DefaultMutableTreeNode(methodItems));
+                System.out.println("methods: ..." + methodItems);
+                classNames.add(methods);
+
             }
 
-            for (Object relationshipItems : relationSet) {
-                relationships.add(new DefaultMutableTreeNode(relationshipItems));
-            }
+            Iterator relationsIterator = outputRelations.iterator();
+            while (relationsIterator.hasNext()) {
+                boolean status = false;
+                Object relationshipItems = relationsIterator.next();
+                ClassRelation rel = (ClassRelation) relationshipItems;
+                Object childClass = rel.getChildElement();
+                if (childClass.toString().equalsIgnoreCase(classNameString)) {
 
+                    //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
+                    System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+
+                    if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                        status = true;
+                        relationshipsGeneralization.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                        relationships.add(relationshipsGeneralization);
+
+                    }
+                    if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                        relationshipsAssociations.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                        status = true;
+
+                    }
+
+                }
+                Object parentClass = rel.getParentElement();
+                if (parentClass.toString().equalsIgnoreCase(classNameString)) {
+                    //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
+                    System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Child -" + rel.getChildElement());
+
+                    if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                        status = true;
+
+                        relationshipsGeneralization.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                        relationships.add(relationshipsGeneralization);
+
+                    }
+                    if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                        relationshipsAssociations.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                        relationships.add(relationshipsAssociations);
+                        status = true;
+                    }
+                }
+                if (status) {
+                    classNames.add(relationships);
+                }
+            }
             root.add(classNames);
-            classNames.add(attributes);
-            classNames.add(methods);
-            classNames.add(relationships);
-
         }
-
         tree = new JTree(root);
     }
 
@@ -193,7 +245,7 @@ public class ArtefactFrame extends JFrame {
             return;
         }
 
-        JFrame frame = new JFrame("InputDialog Example #1");
+        JFrame frame = new JFrame("Edit Window");
 
         // prompt the user to enter their name
         String newArtefactName = JOptionPane.showInputDialog(frame, "New Artefact name...");
@@ -275,12 +327,57 @@ public class ArtefactFrame extends JFrame {
                 if (artefactName.toString().equalsIgnoreCase("Relationships")) {
                     int relationCount = classTreeModel.getChildCount(artefactName);
                     System.out.println("relationCount : " + relationCount);
-                    for (int rCount = 0; rCount < relationCount; rCount++) {
-                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
-                        System.out.println("relationships: " + relationshipName.toString());
-                        relationSet.add(relationshipName.toString());
+                    
+                    for(int rCount = 0; rCount < relationCount; rCount++){
+                        Object relName = classTreeModel.getChild(artefactName, rCount);
+                        if(relName.toString().equalsIgnoreCase("Generalization")){
+                            int genCount = classTreeModel.getChildCount(relName);
+                            for(int gCount =0; gCount < genCount; gCount++ ){
+                                Object genName = classTreeModel.getChild(relName, gCount);
+                                String [] genNameArray = genName.toString().split("->");
+                                System.out.println("string[0]: "+ genNameArray[0] +" String [1]: "+ genNameArray[1]);
+                                String type = genNameArray[0].trim();
+                                String parent = genNameArray[1].trim();
+                                String childs =  className.toString();
+                                if(type.equalsIgnoreCase("Parent")){
+                                    ClassRelation clRelation  = new ClassRelation(type, childs, parent );
+                                    System.out.println(clRelation.getRelationType()+ " "+ clRelation.getChildElement()+"->"+ clRelation.getParentElement());
+                                    requirementRelationsObjects.add(clRelation);
+                                }
+                                
+                            }
+                        }
+                        if(relName.toString().equalsIgnoreCase("Association")){
+                            int assCount = classTreeModel.getChildCount(relName);
+                            for(int aCount =0; aCount < assCount; aCount++ ){
+                                Object assName = classTreeModel.getChild(relName, aCount);
+                                String [] assNameArray = assName.toString().split("->");
+                                System.out.println("string[0]: "+ assNameArray[0] +" String [1]: "+ assNameArray[1]);
+                                
+                                if(assNameArray[0].equalsIgnoreCase("Parent")){
+                                    ClassRelation clRelation  = new ClassRelation(assNameArray[0], className.toString(), assNameArray[1]);
+                                    System.out.println(clRelation.getRelationType()+ " "+ clRelation.getChildElement()+"->"+ clRelation.getParentElement());
+                                    requirementRelationsObjects.add(clRelation);
+                                }
+                                
+                            }
+                            
+                        }
+                        
                     }
-
+                    
+//                    for(int  rCount = 0; rCount < relationCount; rCount++) {
+//                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
+//                        ClassRelation rel = (ClassRelation) relationshipName;
+//                        
+//                    }
+//                    for (int rCount = 0; rCount < relationCount; rCount++) {
+//                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
+//                        ClassRelation rel = (ClassRelation) relationshipName;
+//                        System.out.println("relationships: " + relationshipName.toString());
+//                        System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+//                        relationSet.add("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+//                    }
                 }
 
             }
@@ -296,25 +393,38 @@ public class ArtefactFrame extends JFrame {
 
     }
 
-    public HashMap getRequirementobjects(){
+    public HashMap getRequirementobjects() {
         return requirementObjects;
     }
-    private void makeButtons(){
+
+    public HashSet getRequirementRelationsObject() {
+        System.out.println("Relations..................................ssss");
+        if(requirementRelationsObjects.isEmpty()){
+            System.out.println("EMPTY");
+            
+        }else{
+            System.out.println("Not EMPTY");
+        }
+        return requirementRelationsObjects;
+    }
+
+    private void makeButtons() {
         JPanel panel = new JPanel();
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(new ActionListener(){
+        confirmButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 storeItems();
-                log =false;
+                lock = false;
                 dispose();
-                
+
             }
         });
         panel.add(confirmButton);
         add(panel, BorderLayout.SOUTH);
 
     }
+
     protected void print(HashMap output) {
         System.out.println("PRINTING........");
         Iterator it = output.keySet().iterator();
@@ -338,7 +448,7 @@ public class ArtefactFrame extends JFrame {
 
             for (Object relation : relations) {
                 ClassRelation rel = (ClassRelation) relation;
-                System.out.println(relation.toString());
+                System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
                 //System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
             }
 
