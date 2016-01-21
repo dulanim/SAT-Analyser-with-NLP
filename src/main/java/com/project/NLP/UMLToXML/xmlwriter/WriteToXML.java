@@ -128,6 +128,7 @@ public class WriteToXML {
         
     
     private String getFileDir(){
+        //String dir = System.getProperty("user.home") + File.separator + "temp.xml";//default
         String dir = System.getProperty("user.home") + File.separator + "temp.xml";//default
         
         try{
