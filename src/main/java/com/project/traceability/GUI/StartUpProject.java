@@ -14,8 +14,9 @@ import com.project.property.config.xml.writer.XMLWriter;
  */
 public class StartUpProject {
     
-    XMLWriter writer = XMLWriter.getXMLWriterInstance();
+    
      public static void main(String args[]) {
+    	XMLWriter writer = XMLWriter.getXMLWriterInstance();
         com.project.property.config.xml.reader.XMLReader reader = new com.project.property.config.xml.reader.XMLReader();
                    
              if(reader.readStatus()){
