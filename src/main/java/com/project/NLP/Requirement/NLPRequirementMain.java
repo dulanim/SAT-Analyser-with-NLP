@@ -22,15 +22,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class MainClass {
+public class NLPRequirementMain {
     
     private static String requirementDocument="";
     private static HashMap requirementObjects = new HashMap();
     private static HashSet<ClassRelation> requirementObjectRelations=new HashSet<>();
 
-    public static void main(String args[]) {
+    //public static void main(String args[]) {
 
-
+    public static void extractRequirement(){
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
         HashSet methodList = new HashSet();
@@ -48,7 +48,8 @@ public class MainClass {
         HashSet tempList;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("OrderRequirement.txt");
+            
+            requirementDocument = readFromTextFile(StaticData.requirementFilePath);//"BankRequirement.txt");
 
             System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
 

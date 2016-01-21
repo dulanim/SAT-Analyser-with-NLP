@@ -57,7 +57,7 @@ public class WriteRequirementToXML {
                 for (Object attribute : attributes) {
                     Attribute tempAttribute = new Attribute();
                     tempAttribute.setName(attribute.toString());
-                    tempAttribute.setType("RequrirementAttribute");
+                    tempAttribute.setType("Field");
                     tempAttribute.setDataType("");
                     tempAttribute.setVisibility("");
                     tempAttribute.setIsStatic("");
@@ -67,7 +67,7 @@ public class WriteRequirementToXML {
                 for (Object method : methods) {
                     Operation operation = new Operation();
                     operation.setName(method.toString());
-                    operation.setType("RequrirementMethod");
+                    operation.setType("Method");
                     operation.setIsAbstract("");
                     operation.setVisibility("");
                     operation.setIsStatic("");

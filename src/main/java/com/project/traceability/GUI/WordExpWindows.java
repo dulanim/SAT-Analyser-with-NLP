@@ -1,6 +1,7 @@
 package com.project.traceability.GUI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -26,16 +27,22 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.wb.swt.SWTResourceManager;
-import com.project.traceability.ontology.models.*;
+
+import com.project.traceability.ontology.models.HelpFileReader;
+import com.project.traceability.ontology.models.Helps;
+import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.ontology.models.NavigationModel;
+import com.project.traceability.ontology.models.StaticData;
+import com.project.traceability.ontology.models.Word;
 public class WordExpWindows {
 
 	protected Shell shell;
 	Label lblword2; // it keeps track of word 2 name in text format
 	Label lblword1; // it keeps track of word 2 name in text format
-	Combo combo_parent; // it keeps track of parent names from model.owl file
-	Combo combo_proeprty;//it keeps track of all property name
-	Combo combo_values;//it keeps values according to user selection 
-	static Word word; // give explain about both word in given scenario
+	public static Combo combo_parent; // it keeps track of parent names from model.owl file
+	public static Combo combo_proeprty;//it keeps track of all property name
+	public static Combo combo_values;//it keeps values according to user selection 
+	public static Word word; // give explain about both word in given scenario
 	public static String word1;
 	public static String word2;
 	private static WordExpWindows window;
@@ -45,7 +52,7 @@ public class WordExpWindows {
 	private java.util.List<String> list = null;
 	public String selectedParentItem;
 	public String selectedPropertyItem;
-	public String selectedValueItem;
+	public static String selectedValueItem;
 	
 
 	
@@ -100,7 +107,7 @@ public class WordExpWindows {
 		Display display = Display.getDefault();
 		createContents();
 		window.setWords(word1, word2);
-		window.setParentNames();;
+		window.setParentNames();
 		window.setProperties(true);
 		shell.open();
 		shell.layout();
@@ -122,6 +129,7 @@ public class WordExpWindows {
 		shell.setSize(946, 635);
 		shell.setText("SWT Application");
 		
+		com.project.traceability.common.Dimension.toCenter(shell);
 		Composite composite_1 = new Composite(shell, SWT.NONE);
 		composite_1.setBounds(30, 527, 565, 64);
 		final Button btnEditAddition = new Button(composite_1, SWT.NONE);
@@ -191,8 +199,17 @@ public class WordExpWindows {
 				 * may have parent 
 				 * if parent is not there, get default 
 				 */
+				String items[] = combo_parent.getItems();
+				int pos = combo_parent.getSelectionIndex();
+				selectedParentItem = items[pos];
 				
-				if(selectedParentItem != "" ){
+				items = combo_proeprty.getItems();
+				int posParent = combo_proeprty.getSelectionIndex();
+				selectedPropertyItem = items[posParent];
+				
+				items =  combo_values.getItems();
+				pos = combo_values.getSelectionIndex();
+				selectedValueItem = items[pos];
 					if(selectedPropertyItem != ""){
 						if(selectedValueItem != ""){
 							
@@ -245,7 +262,7 @@ public class WordExpWindows {
 					}
 				}
 			}
-		});
+		);
 		
 		
 		
@@ -283,9 +300,8 @@ public class WordExpWindows {
 				
 				for(int i=0;i<selectionitem.length;i++){
 					selectionitem[i].dispose();
-					if(selectionitem[i].toString().contains(word1)){
-						combo_parent.setEnabled(true);
-					}
+					
+					
 				}
 		
 				
@@ -411,6 +427,7 @@ public class WordExpWindows {
 		
 	}
 	
+	
 	public void setWords(String word1,String word2){
 		//just add word name to separate label field on GUI
 		
@@ -439,7 +456,8 @@ public class WordExpWindows {
 		
 		NavigationModel navigator = NavigationModel.getNavigatorInstane();
 		if(combo_parent !=null){
-			final java.util.List<String> list = navigator.getSubClassFor(word.getType());
+			final java.util.List<String> list = navigator.
+										getSubClassFor(word.getType());
 			for(int i=0;i<list.size();i++){
 				combo_parent.add(list.get(i),i);
 			}
@@ -449,7 +467,24 @@ public class WordExpWindows {
 				@Override
 				public void widgetSelected(SelectionEvent arg0) {
 					// TODO Auto-generated method stub
-					selectedParentItem = list.get(combo_parent.getSelectionIndex());
+                    String items[] = combo_parent.getItems();
+					selectedParentItem = items[combo_parent.getSelectionIndex()];
+                                        
+                    if(selectedParentItem.equals("<<---------------------------->>")){
+	                     /*
+	                      * pop up give instruction press Add Custom Value or other value above this pattern
+	                      */
+	                    MessageBox messageBox = new MessageBox(shell, SWT.ERROR_CANNOT_GET_TEXT
+	                                        		| SWT.OK);
+	                    messageBox.setMessage("You should select Add Custom Value to add custom value");
+	                    messageBox.setText("Information For Selection");
+	                    messageBox.open();
+	                    return;
+                    }else if(selectedParentItem.equals("Add Custom Parent Value")){
+                        InputDialog.type = "Parent";
+                        InputDialog.main(null);
+                        selectedParentItem = InputDialog.selectedValue;
+                    }                    
 				}
 				
 				@Override
@@ -500,19 +535,25 @@ public class WordExpWindows {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				// TODO Auto-generated method stub
-				selectedPropertyItem = list.get(combo_proeprty.getSelectionIndex());
-				if(selectedPropertyItem.equals("Add Custom Value")){
-					InputDialog.main(null);
-					selectedValueItem = InputDialog.selectedValue;
-				}else if(selectedPropertyItem.equals("<<*************************>>")){
+
+                String items[] = combo_proeprty.getItems();
+				selectedPropertyItem = items[combo_proeprty.getSelectionIndex()];
+				if(selectedPropertyItem.equals("Add Custom Property")){
+                                        InputDialog.type = "Property";
+					
+                  InputDialog.type = "Property";
+                  InputDialog.main(null);
+//					selectedValueItem = InputDialog.selectedValue;
+//                    combo_proeprty.add(selectedValueItem);
+				}else if(selectedPropertyItem.equals("<<---------------------------->>")){
 					/*
 					 * pop up give instruction press Add Custom Value or other value above this pattern
 					 */
 					 MessageBox messageBox = new MessageBox(shell, SWT.ERROR_CANNOT_GET_TEXT
 				              | SWT.OK);
-				     messageBox.setMessage("You should select proper value or select Add Custom Value");
-				     messageBox.setText("Information For Selection");
-				     messageBox.open();
+                                         messageBox.setMessage("You should select proper value or select Add Custom Value");
+                                         messageBox.setText("Information For Selection");
+                                         messageBox.open();
 				}else{
 					//get the selected value
 					setPropertyNames(selectedPropertyItem);
@@ -528,7 +569,7 @@ public class WordExpWindows {
 			}
 		});
 	}
-	private void setPropertyNames(String propsName){
+	public void setPropertyNames(String propsName){
 		/*
 		 * it fetch the all properties from model 
 		 * actually communicate with Navigator model
@@ -546,11 +587,13 @@ public class WordExpWindows {
 			public void widgetSelected(SelectionEvent arg0) {
 				// TODO Auto-generated method stub
 				int index = combo_values.getSelectionIndex();
-				String selectedItem = values.get(index);
+				String items[] = combo_values.getItems();
+				String selectedItem = items[index];
 				if(selectedItem.equals("Add Custom Value")){
+					InputDialog.type = "Value";
 					InputDialog.main(null);
-					selectedValueItem = InputDialog.selectedValue;
-				}else if(selectedItem.equals("<<*************************>>")){
+//					selectedValueItem = InputDialog.selectedValue;
+				}else if(selectedItem.equals("<<---------------------------->>")){
 					/*
 					 * pop up give instruction press Add Custom Value or other value above this pattern
 					 */
@@ -582,7 +625,7 @@ public class WordExpWindows {
 		
 	
 		if(flag){
-			combo_parent.setEnabled(false);
+			//combo_parent.setEnabled(false);
 			wordTree = new TreeItem(tree_desc, SWT.NONE);
 			wordTree.setText(word1 + "/"  + word2);
 			
@@ -596,7 +639,7 @@ public class WordExpWindows {
 			property.setText("Property");
 			
 			property_child = new TreeItem(property,SWT.NONE);
-			property_child.setText("hasName");
+			property_child.setText(selectedPropertyItem);
 			
 			property_child_child = new TreeItem(property_child,SWT.NONE);
 			property_child_child.setText(selectedValueItem);
@@ -612,6 +655,9 @@ public class WordExpWindows {
 			description_child = new TreeItem(descriptions,SWT.NONE);
 			description_child.setText(strMessage);
 		}else{
+
+			parent_child = new TreeItem(parent,SWT.NONE);
+			parent_child.setText(selectedParentItem);
 			
 			property_child = new TreeItem(property,SWT.NONE);
 			property_child.setText(selectedPropertyItem);
@@ -625,15 +671,35 @@ public class WordExpWindows {
 			property_child.setExpanded(true);
 		}
 		
-		NavigationModel navigator = NavigationModel.getNavigatorInstane();
-		java.util.List<String> list = navigator.getAllProperties();
+		parent_child.addListener(SWT.MouseHover, new Listener() {
+			
+			@Override
+			public void handleEvent(Event arg0) {
+				// TODO Auto-generated method stub
+				
+				String pointText = arg0.text;
+				System.out.println(pointText);
+			}
+		});
+		//NavigationModel navigator = NavigationModel.getNavigatorInstane();
+//		java.util.List<String> list = navigator.getAllProperties();
+		String itemsProperty[] = combo_proeprty.getItems();
+		String itemsParent[] = combo_parent.getItems();
+		List<String> list = new ArrayList<>(Arrays.asList(itemsProperty));
 		list = removeListItem(list, selectedPropertyItem);
-		
-		this.list = list;
+//		
+//		this.list = list;
+		combo_parent.removeAll();
 		combo_proeprty.removeAll();
 		combo_values.removeAll();
 		for(int i=0;i<list.size();i++){
 			combo_proeprty.add(list.get(i));
+		}
+		
+		list = new ArrayList<>(Arrays.asList(itemsParent));
+		list = removeListItem(list, selectedParentItem);
+		for(int i=0;i<list.size();i++){
+			combo_parent.add(list.get(i));
 		}
 	}
 	

@@ -33,12 +33,11 @@ public class PropertyFile {
     private static String relationshipXMLPath = null;
     public static String graphType = null;
     private static VisualizeGraph visual = null;
-    public static final String testFilePath = "E:/SATWork/";
-    public static final String testXmlFilePath = "E:/ATOM/test/";
-    public static final String testDb = "E:/SATWork/Test/Test.graphDb";
-    public static final String testGraphFile = "E:/SATWork/Test/Test.gexf";
-    public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator +
-            FilePropertyName.XML;
+    public static final String testFilePath =System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator;
+    public static final String testXmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"ATOM"+File.separator+"test"+File.separator;
+    public static final String testDb = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator+"Test"+File.separator+"Test.graphDb";
+    public static final String testGraphFile = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator+"Test"+File.separator+"Test.gexf";
+    public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator + FilePropertyName.XML;
   
     public static String getProjectName() {
         return projectName;
@@ -125,7 +124,8 @@ public class PropertyFile {
     }
 
     public static String getImagePath() {
-        return imagePath;
+//        return imagePath;
+        return "";
     }
 
     public static String getTestFilePath() {

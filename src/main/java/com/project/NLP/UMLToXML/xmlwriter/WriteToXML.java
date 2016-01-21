@@ -35,7 +35,10 @@ import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
+import java.io.IOException;
 import javax.swing.JOptionPane;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 public class WriteToXML {
     
    
@@ -112,48 +115,63 @@ public class WriteToXML {
 		DOMSource source = new DOMSource(doc);
                 //String driveLetter = getSuitableDrive();
                 
-
-                File xmlFile = new File(getFileDir());
+                String fDir=getFileDir();
+                System.out.println("------Writing Requirement XML to Workspace/projectname/xml directory : "+fDir);
+                File xmlFile = new File(fDir);
                 StreamResult result = new StreamResult(xmlFile.getPath());
-
+                
+                 System.out.println("------Writing Requirement XML to Workspace/projectname/xml directory : "+xmlFile.getPath());
+                 
                 transformer.transform(source, result);
 
                 System.out.println("XML File saved @ " + xmlFile.getPath());
 
 	  } catch(ParserConfigurationException | TransformerException pce) {
 		
-                 JOptionPane.showMessageDialog(null, pce.toString());
+                MessageBox box = new MessageBox(ProjectCreateWindow.shell,
+                SWT.ERROR);
+                box.setText("File Not Found Error");
+                box.setMessage(pce.toString());
+                box.open();
+                
 	  }
 	}
         
     
     private String getFileDir(){
-        String dir = System.getProperty("user.home") + File.separator + "temp.xml";//default
+        String dir = System.getProperty("user.home") + File.separator + "RequirementArtefactFile.xml";//default
         
         try{
             String root = HomeGUI.tree.getToolTipText() + File.separator + 
                             ProjectCreateWindow.projectName;
-            File f = new File(File.separator +FilePropertyName.XML);
-            if(!f.exists())
+             System.out.println("------Writing Requirement XML -- root--:  "+ root);
+            File f = new File(root+File.separator +FilePropertyName.XML);
+             System.out.println("------Writing Requirement XML -- XML folder path --:  "+ f.getPath());
+            if(!f.exists()){
+                System.out.println("------Writing Requirement XML -- XML folder path is exist--:  ");
                     f.mkdir();
+            }
             if(type.equals("Requirement")){
-                
+                System.out.println("------Writing Requirement XML -- type :"+type);
                 dir = f.getPath() + File.separator + 
                         FilePropertyName.REQUIREMENT_ARTIFACT_NAME;
             }else{
+                                System.out.println("------Writing Requirement XML -- type :"+type);
                 dir = f.getPath() + File.separator + 
                         FilePropertyName.UML_ARTIFACT_NAME;
             }
         }catch(Exception e){
             
         }
+        
+        System.out.println("------Writing Requirement XML -- XML folder path is returned--:  "+dir);
         return dir;
     }
     private String getDesignElementID() {
         String ID;
         if(type.equals("Requirement")){
             count++;
-             ID = "R".concat(Integer.toString(count));
+             ID = "RQ".concat(Integer.toString(count));
             
         }else{
             count++;

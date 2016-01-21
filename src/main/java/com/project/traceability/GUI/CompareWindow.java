@@ -8,6 +8,7 @@ package com.project.traceability.GUI;
  * Dec 4, 2014
  */
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
@@ -49,6 +50,8 @@ import com.project.traceability.manager.RequirementUMLClassManager;
 import com.project.traceability.manager.UMLSourceClassManager;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
+import com.project.traceability.ontology.models.StaticData;
+import com.project.traceability.ontology.models.Word;
 import com.project.traceability.utils.Constants.ImageType;
 import java.io.File;
 
@@ -117,6 +120,7 @@ public class CompareWindow {
 	}
 
 	/**
+         * @param files
 	 * Create contents of the window.
 	 */
 	protected void createContents(ArrayList<String> files) {
@@ -268,24 +272,20 @@ public class CompareWindow {
 												(ArtefactElement) text.getData(text.getText()))) {
 													String className = updateSubElements(tree.getColumn(0).getText(),
 													tree.getColumn(1).getText());
+                                                                                                        ArtefactElement element1  = (ArtefactElement) selection[0].getData(""+ column+ "");
+                                                                                                        ArtefactElement element2 = (ArtefactElement) text.getData(text.getText());
 													if (className.equals("RS")){		//to compare sub elements
 															RequirementSourceClassManager.relationNodes = null;
 															RequirementSourceClassManager.relationNodes = new ArrayList<String>();
-															RequirementSourceClassManager.compareSubElements(selection[0],
-																	(ArtefactElement) text.getData(text.getText()),
-																	(ArtefactElement) selection[0].getData(""+ column+ ""));
+															RequirementSourceClassManager.compareSubElements(selection[0],element1,element2);
 															RelationManager.addLinks(RequirementSourceClassManager.relationNodes);
 													}
 											else if (className.equals("RU")){
-												RequirementUMLClassManager.compareSubElements(selection[0],
-																(ArtefactElement) selection[0].getData(""+ column+ ""),
-																(ArtefactElement) text.getData(text.getText()));
+												RequirementUMLClassManager.compareSubElements(selection[0],element1,element2);
 												RelationManager.addLinks(RequirementUMLClassManager.relationNodes);
 											}
 											else if (className.equals("US")){
-												UMLSourceClassManager.compareSubElements(selection[0],
-														(ArtefactElement) selection[0].getData("" + column + ""),
-																(ArtefactElement) text.getData(text.getText()));
+												UMLSourceClassManager.compareSubElements(selection[0],element1,element2);
 												RelationManager.addLinks(UMLSourceClassManager.relationNodes);
 											}
 											for (int i = 0; i < classList.length; i++) {
@@ -295,6 +295,10 @@ public class CompareWindow {
 													break;
 												}
 											}
+                                                                                        
+                                                                                        //WordExp Window pops up
+                                                                                        
+                                                                                        showWordExpWindow(element1.getName(), element2.getName(), "Class");
 										}
 									} else if (subElements != null) {			// map new sub element
 										if (confirmMapping(
@@ -399,11 +403,11 @@ public class CompareWindow {
 				
 		stText.setText(text);
 			int offset = text.indexOf("\uFFFC", 0);
-			addImage(new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "exact.jpg"), stText, offset);
+			addImage(new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH  + "exact.jpg"), stText, offset);
 			offset = text.indexOf("\uFFFC", offset + 1);
-			addImage(new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "warning.png"), stText, offset);
+			addImage(new Image(CompareWindow.display,FilePropertyName.IMAGE_PATH + "warning.png"), stText, offset);
 			offset = text.indexOf("\uFFFC", offset + 1);
-			addImage(new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "violation.jpg"), stText, offset);
+			addImage(new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH + "violation.jpg"), stText, offset);
 			
 			stText.addPaintObjectListener(new PaintObjectListener() {
 				@Override
@@ -432,7 +436,36 @@ public class CompareWindow {
 		style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 		stText.setStyleRange(style);		
 	}
-
+        private void showWordExpWindow(String word1,String word2,String type){
+            /*
+            Pop up our ontology for required 
+            two words
+            these are required word should add to ontology file
+            */
+        WordExpWindows.word1 = word1;
+        WordExpWindows.word2 = word2;
+        WordExpWindows.word = new Word();
+        if(type.equals("Class"))
+            WordExpWindows.word.setWordType(StaticData.OWL_CLASS);
+        else if(type.equals("Attribute"))
+            WordExpWindows.word.setWordType(StaticData.OWL_ATTRIBUTE);
+        else
+            WordExpWindows.word.setWordType(StaticData.OWL_METHOD);
+        /*
+        pop up message to user weather you add to dictionary
+        or not
+        */
+        MessageBox message = new MessageBox(shell,SWT.ICON_QUESTION
+                |SWT.YES | SWT.NO);
+				
+        message.setMessage(StaticData.OWL_INFOS);
+        message.setText("User Confirmation Message");
+        int response = message.open();
+                                                                                       
+            if(response == SWT.YES){
+                WordExpWindows.main(null);
+            }
+        }
 	/**
 	 * call appropriate compare classes
 	 * @param project
@@ -458,7 +491,7 @@ public class CompareWindow {
 				&& selectedFiles.get(1).contains("Requirement")
 				|| selectedFiles.get(0).contains("Requirement")
 				&& selectedFiles.get(1).contains("Source")) {
-			RequirementSourceClassManager.compareClassNames(filePath);
+    			RequirementSourceClassManager.compareClassNames(filePath);
 		}
 	}
 

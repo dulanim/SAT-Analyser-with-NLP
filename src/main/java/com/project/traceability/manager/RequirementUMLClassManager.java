@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,8 +33,8 @@ public class RequirementUMLClassManager {
 	static TableItem tableItem;
 	static TreeItem classItem;
 	
-	static Image exactImage = new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "exact.jpg");
-	static Image violateImage = new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "violation.jpg");
+	static Image exactImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "exact.jpg");
+	static Image violateImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "violation.jpg");
 
 	/**
 	 * check whether the requirement classes are implemented in UML
