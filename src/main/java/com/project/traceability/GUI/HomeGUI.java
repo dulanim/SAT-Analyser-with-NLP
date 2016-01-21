@@ -457,6 +457,12 @@ public class HomeGUI extends JFrame implements KeyListener {
                     //parent = parent.substring(14, parent.length() - 2);
                     String projectName;
                     int count = 0;
+                    int begin = StaticData.workspace.lastIndexOf(File.separator);
+                    int end = StaticData.workspace.length();
+                    String type= StaticData.workspace.substring(begin, end);
+                    if(!type.equals(File.separator)){
+                    	StaticData.workspace +=File.separator;
+                    }
                     NewFileWindow.localFilePath = StaticData.workspace+ parent
                             + File.separator;
 
@@ -465,7 +471,9 @@ public class HomeGUI extends JFrame implements KeyListener {
                     } else {
                         projectName = parent;
                     }
-                    NewFileWindow.selectedProjectPath = StaticData.workspace + File.separator
+                    
+                    
+                    NewFileWindow.selectedProjectPath = StaticData.workspace 
                             + projectName;
 
                     String fileName =NewFileWindow.localFilePath.concat(string);

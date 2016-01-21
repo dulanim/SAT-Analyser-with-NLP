@@ -29,7 +29,7 @@ public class XMLReader {
     Document doc;
         public XMLReader(){
             File config_XmlFile = new File(PropertyFile.configuration_file_path);
-		
+            
 		try{
                     dbFactory = DocumentBuilderFactory.newInstance();
                     dBuilder = dbFactory.newDocumentBuilder();
