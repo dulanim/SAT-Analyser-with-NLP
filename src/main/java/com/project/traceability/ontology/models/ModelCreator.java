@@ -141,8 +141,8 @@ public class ModelCreator {
 		
 		
 		OntModel model = 	this.getCreatedModel();
-	    OntClass class1 = null;// =	model.createClass(wordURI1);
-	    OntClass class2 = null;// = 	model.createClass(wordURI2);
+                OntClass class1 = null;// =	model.createClass(wordURI1);
+                OntClass class2 = null;// = 	model.createClass(wordURI2);
 	    //get the root position
 		String wordURI = StaticData.OWL_ROOT_URI + "#"  + aParent;
 		OntClass rootClass = this.model.getOntClass(wordURI);
@@ -239,6 +239,10 @@ public class ModelCreator {
 			OntClass parent1 = model.getOntClass(uri1);
 			OntClass parent2 = model.getOntClass(uri2);
 			
+                        if(parent1 == null || parent2 == null){
+                            
+                            return false;
+                        }
 			NavigationModel navigator = NavigationModel.getNavigatorInstane();
 			Map<String,List<String>> map = navigator.getAllClassesProperty();
 			
@@ -316,11 +320,11 @@ public class ModelCreator {
 	
 	public InputStream getInputStream(){
 		// Use the FileManager to find the input file
-				InputStream in = FileManager.get().open(filePath  + filename);
-
-				if (in == null)
-					throw new IllegalArgumentException("File: "+filename+" not found");
-			return in;
+            filePath = "/home/shiyam/";
+            InputStream in = FileManager.get().open(filePath  + filename);
+            if (in == null)
+                    throw new IllegalArgumentException("File: "+filename+" not found");
+            return in;
 	
 	}
 	

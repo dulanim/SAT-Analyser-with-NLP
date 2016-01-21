@@ -102,37 +102,47 @@ public class RelationManager {
     }
 
     public static void createXML(String projectPath) {
-        try {
+        
+        String filePath = projectPath
+                    + File.separator + FilePropertyName.XML + File.separator + "Relations.xml";
+        
+        File file = new File(filePath);
+        
+        if(!file.exists()){
+        
+            try {
 
-            DocumentBuilderFactory documentFactory = DocumentBuilderFactory
-                    .newInstance();
-            DocumentBuilder documentBuilder = documentFactory
-                    .newDocumentBuilder();
+                DocumentBuilderFactory documentFactory = DocumentBuilderFactory
+                        .newInstance();
+                DocumentBuilder documentBuilder = documentFactory
+                        .newDocumentBuilder();
 
-            Document document = documentBuilder.newDocument();
-            Element rootElement = document.createElement("Relations");
-            document.appendChild(rootElement);
-            System.out.println("start");
+                Document document = documentBuilder.newDocument();
+                Element rootElement = document.createElement("Relations");
+                document.appendChild(rootElement);
+                System.out.println("start");
 
-            // creating and writing to xml file
-            TransformerFactory transformerFactory = TransformerFactory
-                    .newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource domSource = new DOMSource(document);
-            StreamResult streamResult = new StreamResult(projectPath
-                    + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            transformer.setOutputProperty(
-                    "{http://xml.apache.org/xslt}indent-amount", "4");
-            transformer.transform(domSource, streamResult);
+                // creating and writing to xml file
+                TransformerFactory transformerFactory = TransformerFactory
+                        .newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource domSource = new DOMSource(document);
+                StreamResult streamResult = new StreamResult(filePath);
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty(
+                        "{http://xml.apache.org/xslt}indent-amount", "4");
+                transformer.transform(domSource, streamResult);
 
-            System.out.println("File saved to specified path!");
+                System.out.println("File saved to specified path!");
 
-        } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
+            } catch (ParserConfigurationException pce) {
+                pce.printStackTrace();
+            } catch (TransformerException tfe) {
+                tfe.printStackTrace();
+            }
+       }else{
+            return ;
         }
     }
 
@@ -140,7 +150,8 @@ public class RelationManager {
 
         List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
 //        List<String> hasToaddRelationBodes = relationNodes;
-        File file = new File(HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml");
+        File file = new File(HomeGUI.projectPath +File.separator +
+                FilePropertyName.XML +File.separator +"Relations.xml");
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -331,8 +342,10 @@ public class RelationManager {
         //get the full description of rlation "source relationpath target"
         for (int i = 0; i < relationNodes.size(); i += 3) {
             partial = relationNodes.subList(i, i+3);
-            fullDescOfRelationNode.add((partial.toString().substring(1,partial.toString().length()-1)).replaceAll("\\s", ""));
             
+            System.out.println(partial.toString());
+            String sub = (partial.toString().substring(1,partial.toString().length()-1));
+            fullDescOfRelationNode.add(sub.replaceAll("\\s", ""));
 //            System.out.println(partial.toString());
         }
         

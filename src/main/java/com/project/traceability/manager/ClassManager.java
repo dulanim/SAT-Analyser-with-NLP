@@ -5,18 +5,11 @@
  */
 package com.project.traceability.manager;
 
-import com.project.traceability.GUI.CompareWindow;
-import static com.project.traceability.manager.RequirementSourceClassManager.relationNodes;
 import com.project.traceability.model.ArtefactElement;
-import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.semanticAnalysis.SynonymWords;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TreeItem;
 
 /**
  *
