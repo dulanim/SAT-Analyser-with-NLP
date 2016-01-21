@@ -35,7 +35,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
  * Model to add data to Neo4j graph DB.
  *
  * @author Thanu
- * @author Aarthika 
+ * @author Aarthika
  */
 public class GraphDB {
 
@@ -129,7 +129,7 @@ public class GraphDB {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                 + ".graphdb").newGraphDatabase();
         Transaction tx = graphDb.beginTx();
-        
+
         try {
             tx.success();
 
@@ -154,7 +154,7 @@ public class GraphDB {
         for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
             IndexHits<Node> subElement_hits = artefacts.get("ID", artefactsSubElement.getSubElementId());
             Node subNode = subElement_hits.getSingle();
-            ArtefactSubElement temp = artefactsSubElement;           
+            ArtefactSubElement temp = artefactsSubElement;
             if (subNode == null) {
                 addNewSubNodeToDB(temp, artefacts, n, edges);
             } else {
@@ -201,11 +201,14 @@ public class GraphDB {
             } else {
                 m.setProperty("Parameters", "");
             }
-            if (null != mtemp.getContent()) {
-                m.setProperty("Content", mtemp.getContent());
-            } else {
-                m.setProperty("Content", "");
+            if (temp.getSubElementId().charAt(0) == 'R') {
+                if (null != mtemp.getContent()) {
+                    m.setProperty("Content", mtemp.getContent());
+                } else {
+                    m.setProperty("Content", "");
+                }
             }
+
         } else if (temp.getType().equalsIgnoreCase(
                 "UMLAttribute")
                 || temp.getType().equalsIgnoreCase("Field")) {
@@ -251,7 +254,7 @@ public class GraphDB {
             //System.out.println("Node visibility updated " + artefactElement.getType());
         }
         //Identifies if any changes (new/update) hve occured in the sub artefact element of the given artefact element
-        
+
         List<ArtefactSubElement> artefactsSubElements = artefactElement
                 .getArtefactSubElements();
 
@@ -259,10 +262,10 @@ public class GraphDB {
         System.out.println("Sbnode");
         parent:
         for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
-            System.out.print("sb-"+artefactsSubElement.getSubElementId());
+            System.out.print("sb-" + artefactsSubElement.getSubElementId());
             Iterator<Relationship> relations = node
-                .getRelationships(RelTypes.SUB_ELEMENT)
-                .iterator();
+                    .getRelationships(RelTypes.SUB_ELEMENT)
+                    .iterator();
             child:
             while (relations.hasNext()) {
                 Node test = relations.next().getOtherNode(node);
@@ -340,7 +343,7 @@ public class GraphDB {
                     subNode.setProperty("Parameters", "");
                 }
             }//Updates if there are any change in the content of the artefact sub element 
-            else if (null == subNode.getProperty("Content") || !subNode.getProperty("Content").equals(
+            /*else if (null == subNode.getProperty("Content") || !subNode.getProperty("Content").equals(
                     ((MethodModel) temp).getContent())) {
                 if (null != ((MethodModel) temp).getContent()) {
                     subNode.setProperty("Content", ((MethodModel) temp).getContent());
@@ -349,7 +352,7 @@ public class GraphDB {
                     subNode.setProperty("Content", "");
                 }
 
-            }
+            }*/
         }
         //Checks if it is a variable
         if (temp.getType().equalsIgnoreCase(
@@ -395,7 +398,7 @@ public class GraphDB {
                 IndexHits<Node> hits = artefacts.get("ID",
                         artefactElement.getArtefactElementId());
                 Node node = hits.getSingle();
-                if (node == null) {                     
+                if (node == null) {
                     addNewNodeToDB(myLabel, artefacts, edges, artefactElement);
                 } else {
                     updateNodeToDB(node, artefactElement);
@@ -419,12 +422,11 @@ public class GraphDB {
                 }
             }
             for (Relationship r : GlobalGraphOperations.at(graphDb).getAllRelationships()) {
-                System.out.println(""+r.getStartNode().getProperty("ID")+"-"+r.getEndNode().getProperty("ID")+":"+r.getType().name());
+                System.out.println("" + r.getStartNode().getProperty("ID") + "-" + r.getEndNode().getProperty("ID") + ":" + r.getType().name());
             }
-        }
-        finally{
+        } finally {
             graphDb.shutdown();
-        
+
         }
     }
 
@@ -439,7 +441,7 @@ public class GraphDB {
             IndexManager index = graphDb.index();
             Index<Node> artefacts = index.forNodes("ArtefactElement");
             Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
-            
+
             for (int i = 0; i < relation.size(); i++) {
                 IndexHits<Node> hits = artefacts.get("ID", relation.get(i));
                 Node source = hits.getSingle();
@@ -576,7 +578,7 @@ public class GraphDB {
                     n.setProperty("ID", requirement.getRequirementId());
                     n.setProperty("Name", requirement.getName());
                     n.setProperty("Type", requirement.getType());
-                    n.setProperty("Content", requirement.getContent());
+                    //n.setProperty("Content", requirement.getContent());
                     n.setProperty("Priority", requirement.getPriority());
                     n.setProperty("Title", requirement.getTitle());
                     artefacts.add(n, "ID", n.getProperty("ID"));
@@ -605,5 +607,5 @@ public class GraphDB {
         GraphFileGenerator preview = new GraphFileGenerator();
         preview.generateGraphFile(graphDb);
         graphDb.shutdown();
-    }    
+    }
 }

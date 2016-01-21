@@ -100,6 +100,7 @@ public class HomeGUI extends JFrame implements KeyListener {
     public SashForm workSF;
     private CTabFolder2Listener ctfCTF2L;
     private MouseListener ctfML;
+    public static CTabFolder propertyTab ;
 
     static TreeViewer treeViewer;
 
@@ -120,12 +121,12 @@ public class HomeGUI extends JFrame implements KeyListener {
     static XMLReader reader;
     static XMLWriter writer;
 
-    private CTabItem tbtmPropertyInfos;
-    private Table table;
-    private TableColumn tblclmnProperty;
-    private TableColumn tblclmnValue;
-    private TableCursor tableCursor;
-    private TableItem tableItem;
+    public static CTabItem tbtmPropertyInfos;
+    public static Table table;
+    public static TableColumn tblclmnProperty;
+    public static TableColumn tblclmnValue;
+    public static TableCursor tableCursor;
+    public static TableItem tableItem;
     private TableItem tableItem_1;
     private SashForm graphTapHolder;
 
@@ -222,15 +223,12 @@ public class HomeGUI extends JFrame implements KeyListener {
 //        graphTab.setMaximizeVisible(true);
 
         composite = new Composite(tabFolder, SWT.NONE);
-        composite.setLayout(new FillLayout());
-
-        
+        composite.setLayout(new FillLayout());        
 
         //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
         graphTapHolder = new SashForm(workSF, SWT.HORIZONTAL | SWT.SMOOTH);
         graphTapHolder.setVisible(true);
         graphTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
-        graphTab.setData("Graph");
         graphTab.setMinimizeVisible(true);
         graphTab.setMaximizeVisible(true);
 
@@ -244,45 +242,13 @@ public class HomeGUI extends JFrame implements KeyListener {
         composite = new Composite(tabFolder, SWT.NONE);
         composite.setLayout(new FillLayout());
 
-        CTabFolder propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+        propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER);		//CTabFolder for visualization
         propertyTab.setData("Property");
         propertyTab.setMinimizeVisible(true);
         propertyTab.setMaximizeVisible(true);
-
+	
         tbtmPropertyInfos = new CTabItem(propertyTab, SWT.NONE);
-        tbtmPropertyInfos.setText("Property Infos");
-//		
-                /*
-         this is property table row sample
-         */
-        table = new Table(propertyTab, SWT.BORDER | SWT.FULL_SELECTION);
-        tbtmPropertyInfos.setControl(table);
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-        /*
-         this is first coloumn
-         */
-        tblclmnProperty = new TableColumn(table, SWT.NONE);
-        tblclmnProperty.setWidth(100);
-        tblclmnProperty.setText("Property");
-        /*
-         second coloumn
-         */
-        tblclmnValue = new TableColumn(table, SWT.NONE);
-        tblclmnValue.setWidth(100);
-        tblclmnValue.setText("Value");
-
-        /*
-         table holder for scrolling purpose
-         */
-        tableCursor = new TableCursor(table, SWT.NONE);
-
-        tableItem = new TableItem(table, SWT.NONE, 0);
-        tableItem.setText("New TableItem");
-
-        tableItem_1 = new TableItem(table, SWT.NONE, 1);
-        tableItem_1.setText("New TableItem");
-//		
+        HomeGUI.tbtmPropertyInfos.setText("Information");
         graphTapHolder.setWeights(new int[]{749, 271});
 
         addEditMenuPopUpMenu();
@@ -296,10 +262,13 @@ public class HomeGUI extends JFrame implements KeyListener {
 
         graphTab.addCTabFolder2Listener(ctfCTF2L);
         graphTab.addMouseListener(ctfML);
+        
+        propertyTab.addCTabFolder2Listener(ctfCTF2L);
+        propertyTab.addMouseListener(ctfML);
 
         graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
-        graphtabItem.setText("Graph");
-
+        graphtabItem.setText("Graph");      
+        
         addEditMenuPopUpMenu();
         //create ToolBar and ToolItems
 //                final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);

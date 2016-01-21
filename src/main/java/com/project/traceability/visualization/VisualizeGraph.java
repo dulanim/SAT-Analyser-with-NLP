@@ -1,11 +1,19 @@
 package com.project.traceability.visualization;
 
 import com.project.traceability.GUI.HomeGUI;
+import static com.project.traceability.GUI.HomeGUI.projectPath;
+import static com.project.traceability.GUI.HomeGUI.table;
+import static com.project.traceability.GUI.HomeGUI.tblclmnProperty;
+import static com.project.traceability.GUI.HomeGUI.tbtmPropertyInfos;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
+import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
+import static com.project.traceability.visualization.GraphMouseListener.nodeData;
+import static com.project.traceability.visualization.GraphMouseListener.tableCursor;
+import static com.project.traceability.visualization.GraphMouseListener.tblclmnValue;
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.Color;
+import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
@@ -13,14 +21,30 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.filters.api.FilterController;
@@ -72,9 +96,9 @@ public class VisualizeGraph {
     private GraphModel graphModel;
     private PApplet applet;
     private CTabItem tabItem;
-    private Composite composite;
+    private Composite composite, composite2, composite3;
     private ProcessingTarget target;
-    private Frame frame;
+    private Frame frame, frame2;
     private static VisualizeGraph visual = new VisualizeGraph();
 
     private VisualizeGraph() {
@@ -132,6 +156,10 @@ public class VisualizeGraph {
         return frame;
     }
 
+    public Frame getFrame2() {
+        return frame2;
+    }
+
     public void setFrame(Frame frame) {
         this.frame = frame;
     }
@@ -149,7 +177,7 @@ public class VisualizeGraph {
         applet.init();
 
         try {
-            Thread.sleep(10);//wait for 10ms to render graph properly in tool
+            Thread.sleep(10000);//wait for 10ms to render graph properly in tool
         } catch (InterruptedException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -450,7 +478,7 @@ public class VisualizeGraph {
         setPreview();
         setLayout();
         target = getTarget();
-        
+
         HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
         composite = new Composite(HomeGUI.graphTab,
                 SWT.EMBEDDED);
@@ -463,6 +491,185 @@ public class VisualizeGraph {
         composite.setLayoutData(spec);
 
         frame = SWT_AWT.new_Frame(composite);
+
+        composite2 = new Composite(HomeGUI.propertyTab, SWT.NONE);
+        composite2.setLayout(new GridLayout(1, false));
+
+        composite3 = new Composite(composite2, SWT.RIGHT);
+        composite3.setLayout(new FillLayout());
+
+        table = new Table(composite2, SWT.BORDER | SWT.FULL_SELECTION);
+
+        GridData data = new GridData();
+        data.horizontalAlignment = GridData.FILL;
+        data.grabExcessHorizontalSpace = true;
+        data.verticalAlignment = GridData.FILL;
+        data.grabExcessVerticalSpace = true;
+
+        table.setHeaderVisible(true);
+        table.setLinesVisible(false);
+        table.setLayoutData(data);
+
+        /*
+         this is first coloumn
+         */
+        tblclmnProperty = new TableColumn(table, SWT.FILL);
+        tblclmnProperty.setWidth(100);
+        tblclmnProperty.setText("Property");
+
+        /*
+         second coloumn
+         */
+        tblclmnValue = new TableColumn(table, SWT.FILL);
+        tblclmnValue.setWidth(100);
+        tblclmnValue.setText("Value");
+
+
+        /*
+         table holder for scrolling purpose
+         */
+        tableCursor = new TableCursor(table, SWT.NONE);
+
+        final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        updateBtn.setText("Update");
+
+        final org.eclipse.swt.widgets.Button deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        deleteBtn.setText("Delete");
+
+        updateBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent se) {
+                GraphDBEdit gbEditor = new GraphDBEdit();
+                System.out.println("Selected Upate :" + nodeData);
+                gbEditor.storeUpdatedNode(nodeData);
+                System.out.println("Heliio");
+                transferDataToDBFromXML(projectPath, true);
+                VisualizeGraph visual = VisualizeGraph.getInstance();
+                visual.importFile();//import the generated graph file into Gephi toolkit API workspace
+                GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
+                visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+                HomeGUI.isComaparing = false;
+                visual.setPreview();
+                visual.setLayout();
+                HomeGUI.table.clearAll();
+                HomeGUI.table.deselectAll();
+                HomeGUI.table.removeAll();
+                nodeData.clear();
+                nodeData = new HashMap<>();
+            }
+        });
+
+        deleteBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent se) {
+                GraphDBDelete gbDeletor = new GraphDBDelete();
+                System.out.println("Selected Dele :" + nodeData);
+                gbDeletor.deleteNodeAndRelations(nodeData);                
+                System.out.println("Heliio");
+                transferDataToDBFromXML(projectPath, false);
+
+                VisualizeGraph visual = VisualizeGraph.getInstance();
+                visual.importFile();//import the generated graph file into Gephi toolkit API workspace
+                GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
+                visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+                HomeGUI.isComaparing = false;
+                visual.setPreview();
+                visual.setLayout();
+                HomeGUI.table.clearAll();
+                HomeGUI.table.deselectAll();
+                HomeGUI.table.removeAll();
+                nodeData.clear();
+                nodeData = new HashMap<>();
+            }
+
+        });
+
+        final TableEditor editor = new TableEditor(table);
+        editor.horizontalAlignment = SWT.LEFT;
+        editor.grabHorizontal = true;
+
+        table.addListener(SWT.MouseDown, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                Rectangle clientArea = table.getClientArea();
+                Point pt = new Point(event.x, event.y);
+                int index = table.getTopIndex();
+                while (index < table.getItemCount()) {
+                    boolean visible = false;
+                    final TableItem item = table.getItem(index);
+                    item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+
+                    Rectangle rect = item.getBounds(1);
+                    if (rect.contains(pt)) {
+                        final Text text = new Text(table, SWT.NONE);
+                        Listener textListener = new Listener() {
+                            @Override
+                            public void handleEvent(Event e) {
+                                switch (e.type) {
+                                    case SWT.KeyUp:
+                                        item.setText(1, text.getText());
+                                        System.out.println("Replacing1: " + item.getText(0) + ":" + item.getText(1));
+                                        nodeData.replace(item.getText(0), item.getText(1));
+                                    case SWT.KeyDown:
+                                        item.setText(1, text.getText());
+                                        System.out.println("Replacing2: " + item.getText(0) + ":" + item.getText(1));
+                                        nodeData.replace(item.getText(0), item.getText(1));
+                                    case SWT.MouseEnter:
+                                        item.setText(1, text.getText());
+                                        System.out.println("Replacing3: " + item.getText(0) + ":" + item.getText(1));
+                                        nodeData.replace(item.getText(0), item.getText(1));
+                                    case SWT.MouseDown:
+                                        item.setText(1, text.getText());
+                                        System.out.println("Replacing4: " + item.getText(0) + ":" + item.getText(1));
+                                        nodeData.replace(item.getText(0), item.getText(1));
+                                    case SWT.FOCUSED:
+                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+
+                                    case SWT.FocusOut:
+                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+                                        item.setText(1, text.getText());
+                                        System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
+                                        nodeData.replace(item.getText(0), item.getText(1));
+                                        //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
+                                        text.dispose();
+                                        break;
+                                    case SWT.Traverse:
+                                        switch (e.detail) {
+                                            case SWT.TRAVERSE_RETURN:
+                                                item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
+                                                item.setText(1, text.getText());
+                                            case SWT.TRAVERSE_ESCAPE:
+                                                text.dispose();
+                                                e.doit = false;
+                                        }
+                                        break;
+                                }
+
+                            }
+
+                        };
+                        text.addListener(SWT.FocusOut, textListener);
+                        text.addListener(SWT.Traverse, textListener);
+                        editor.setEditor(text, item, 1);
+                        text.setText(item.getText(1));
+                        text.selectAll();
+                        text.setFocus();
+                        return;
+                    }
+                    if (!visible && rect.intersects(clientArea)) {
+                        visible = true;
+                    }
+                    if (!visible) {
+                        return;
+                    }
+                    index++;
+                }
+
+            }
+
+        });
+
+        tbtmPropertyInfos.setControl(composite2);
 
         //add refresh button to graph panel
         Button refresh = new Button("Refresh");
@@ -494,6 +701,8 @@ public class VisualizeGraph {
         frame.add(panel);
         composite.setData(panel);
         HomeGUI.graphtabItem.setControl(composite);
+        //set the table visible when the visualization is active
+
         frame.revalidate();
         // }
         //});
