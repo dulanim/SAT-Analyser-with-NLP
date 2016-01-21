@@ -145,18 +145,29 @@ public class AttributeIdentification {
         //attributes.remove("system");
         System.out.println("designElements: "+designElements);
         //System.out.println(": "+attributes.get(0).toString());
+        
         if(!attributes.isEmpty()){
-            for(int i=0;i< attributes.size();i++){
-                //t.add(attributes.get(i).toString());
-                if(designElements.contains(attributes.get(i).toString())){
+            for(int attrCount =0; attrCount < attributes.size(); attrCount++ ){
+                String[] attrSplit = attributes.get(attrCount).toString().split(" ");
+                for(int spliter =0; spliter < attrSplit.length ; spliter++){
+                    if(designElements.contains(attrSplit[spliter])){
+                        System.out.println("Design element found in attributes..");
+                        attributes.remove(attributes.get(attrCount));
+                        break;
+                    }
+                }
+                if(attrSplit.length ==0){
+                    if(designElements.contains(attributes.get(attrCount).toString())){
                     System.out.print("found");
-                    attributes.remove(attributes.get(i));
+                    attributes.remove(attributes.get(attrCount));
 
                 }
-
-
+                }
+                
             }
         }
+        
+        
         /*String s =attributes.get(0).toString();
         if(String.valueOf(s).equals("system"))
                 System.out.println("sdfsfsdfs");
