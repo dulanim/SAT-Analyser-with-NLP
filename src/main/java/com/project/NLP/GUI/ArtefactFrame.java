@@ -5,10 +5,7 @@
  */
 package com.project.NLP.GUI;
 
-/**
- *
- * @author S. Shobiga
- */
+
 import com.project.NLP.Requirement.ClassRelation;
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.awt.BorderLayout;
@@ -35,6 +32,10 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+/**
+ *
+ * @author S. Shobiga
+ */
 public class ArtefactFrame extends JFrame {
 
     private static final int DEFAULT_WIDTH = 350;
