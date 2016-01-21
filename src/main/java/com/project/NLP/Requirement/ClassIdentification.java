@@ -9,6 +9,7 @@ package com.project.NLP.Requirement;
 import edu.stanford.nlp.trees.Tree;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -185,6 +186,9 @@ public class ClassIdentification {
         
         
         return classList;
+    }
+    public HashMap getClassWithAttr(){
+        return np.getClassWithAttr();
     }
     public ArrayList getClassesTemp(){
         return afterRules;

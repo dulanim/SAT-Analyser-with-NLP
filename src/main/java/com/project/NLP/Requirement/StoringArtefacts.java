@@ -19,8 +19,8 @@ public class StoringArtefacts {
     private HashSet methods=new HashSet();
     private HashSet relationships=new HashSet();
     
-    StoringArtefacts(){
-        
+    public StoringArtefacts(){
+    
     }
     
     public void setClassName(HashSet clName){

@@ -18,6 +18,8 @@ import edu.stanford.nlp.trees.WordStemmer;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -41,9 +43,9 @@ public class PhrasesIdentification {
     private ArrayList designEleList;
     private GrammaticalRelation grammaticalRelation;
     private Morphology morphology;
+    private HashMap<String, HashSet> storingClassWithAttr; // to store classes and attributes when noun + noun exists
 
     //static StanfordCoreNLPModified stanford;
-
     PhrasesIdentification() {
 
     }
@@ -61,9 +63,9 @@ public class PhrasesIdentification {
         designElement = new DesignElementClass();
         designEleList = designElement.getDesignElementsList();
         morphology = new Morphology();
-        
-        System.out.println(sTree+ "***************************************"+ sTree.toString());
-        
+
+        System.out.println(sTree + "***************************************" + sTree.toString());
+
     }
 
     private int getTreeCount() {
@@ -71,9 +73,9 @@ public class PhrasesIdentification {
     }
 
     /*method to get the negative characters from the sentence
-    *input: none
-    *output: list of words denoted by RB and CC in a sentence
-    */
+     *input: none
+     *output: list of words denoted by RB and CC in a sentence
+     */
     public ArrayList NegativeSentenceDetection() {
         List<Tree> leaves;
         String phraseNotation = "RB|CC";//@" + phrase + "! << @" + phrase;
@@ -96,44 +98,44 @@ public class PhrasesIdentification {
     }
 
     /*method to check whethere a sentence is active voice or passive voice
-    *input: none
-    *output: boolean value
-    */
-    public boolean checkActiveOrPassive(){
+     *input: none
+     *output: boolean value
+     */
+    public boolean checkActiveOrPassive() {
         String phraseNotation = "RB|CC";//@" + phrase + "! << @" + phrase;
         TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
         TregexMatcher matcher = VBpattern.matcher(sTree);
-        
-        System.out.println("passive : "+ AUX_PASSIVE_MODIFIER.toPrettyString());
+
+        System.out.println("passive : " + AUX_PASSIVE_MODIFIER.toPrettyString());
         SemanticHeadFinder semanticHeadFinder = new SemanticHeadFinder();
-        System.out.println("verbal auxilary: "+semanticHeadFinder.isVerbalAuxiliary(sTree));
-        
-        
+        System.out.println("verbal auxilary: " + semanticHeadFinder.isVerbalAuxiliary(sTree));
+
         ArrayList negativeLists = new ArrayList();
         while (matcher.findNextMatchingNode()) {
             Tree match = matcher.getMatch();
-            
+
         }
         return true;
     }
-            
-    
+
     public ArrayList getClassList() {
         nounList = new ArrayList();
         attributeLists = new ArrayList();
         int adjectiveExist = 0;
         int adjectiveNoun = 0;
         String adj = "";
-        
-        List<Tree> leaves;
-        String phraseNotation = "(NP([<NNS|NN]$VP))";//@" + phrase + "! << @" + phrase;
+        String storingClass = "";
+        HashSet classWithAttr = new HashSet();
+        storingClassWithAttr = new HashMap<String, HashSet>();
 
-        
+        List<Tree> leaves;
+        String phraseNotation = "(NP([<NNS|NN|NNP]$VP))";//@" + phrase + "! << @" + phrase;
+
         /*For the single Tree */
-        
         //wordStemmer.visitTree(sTree);
         TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
         TregexMatcher matcher = VBpattern.matcher(sTree);
+        String tempClass = "";
 
         while (matcher.findNextMatchingNode()) {
             Tree match = matcher.getMatch();
@@ -142,10 +144,13 @@ public class PhrasesIdentification {
             System.out.println("innerChild length: " + innerChild.length);
             adjectiveExist = 0;
             adjectiveNoun = 0;
-
+            int separator = 0;
             if (innerChild.length > 1) {
                 int count = 1;
                 for (Tree inChild : innerChild) {
+                    if (inChild.value().equals("CC")) {
+                        separator = 1;
+                    }
                     if ((inChild.value().equals("JJ")) || (inChild.value().equals("VBG"))) {
                         adjectiveExist++;
                         leaves = inChild.getLeaves();
@@ -163,30 +168,47 @@ public class PhrasesIdentification {
                                 className = leaves.get(0).yieldWords().get(0).word();
                                 System.out.println("added...." + className);
                                 nounList.add(adj + " " + className);
-                        
-                            }
-                            /*if (adjectiveNoun > 1 && adjectiveNoun != inChild.size()) {
-                                nounList.remove(className);
-                                className += " " + leaves.get(0).yieldWords().get(0).word();
-                                nounList.add(className);
-                                System.out.println("added and removed ." + className);
-                            }*/
-                            else{
+
+                            } /*if (adjectiveNoun > 1 && adjectiveNoun != inChild.size()) {
+                             nounList.remove(className);
+                             className += " " + leaves.get(0).yieldWords().get(0).word();
+                             nounList.add(className);
+                             System.out.println("added and removed ." + className);
+                             }*/ else {
                                 attributeLists.add(leaves.get(0).yieldWords().get(0).word());
                                 System.out.println("attribute is added..");
                             }
-                            
+
                         }
                     } else {
-                        if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
+                        if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
-                            
+
                             if (count != 1) {
-                                attributeLists.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
+                                String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
+                                //attributeLists.add(word);
+                                nounList.remove(tempClass);
+                                nounList.add(word);
                                 System.out.println("count == inn");
+                                if (!storingClass.isEmpty()) {
+                                    classWithAttr.add(word);
+                                    //nounList.add(word);
+                                    storingClassWithAttr.put(storingClass, classWithAttr);
+
+                                }
                             } else {
-                                nounList.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
+                                String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                String word = "";
+                                /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                if (identifiedWord.contains("_")) {
+                                    word = identifiedWord;
+                                } else {
+                                    word = morphology.stem(identifiedWord);
+                                }
+                                nounList.add(word);
+                                tempClass = word;
+                                storingClass = word;
                                 System.out.println(">2 else");
                             }
                             count++;
@@ -197,17 +219,23 @@ public class PhrasesIdentification {
             } else {
                 for (Tree inChild : innerChild) {
                     System.out.println("\n--innerChild  " + inChild + "-------\n");
-                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))){
+                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //phraseLists.add(leaves.get(0 ).yieldWords());
-                        nounList.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
-                        
+                        String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                        if (!identifiedWord.contains("_")) {
+                            nounList.add(morphology.stem(identifiedWord));
+
+                        } else {
+                            nounList.add(identifiedWord);
+                        }
+
                         System.out.println("maingjshfkjs");
                     }
-                    if(inChild.value().equals("JJ")) {
+                    if (inChild.value().equals("JJ")) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         nounList.add(((leaves.get(0).yieldWords()).get(0).word()));
-                        
+
                     }
 
                 }
@@ -227,7 +255,7 @@ public class PhrasesIdentification {
         ArrayList adjAtt = new ArrayList();
         int separator = 0;
         List<Tree> leaves;
-        String phraseNotation = "NP([<NNS|NN]![<JJ|VBG])!$VP";// !<VBG";//@" + phrase + "! << @" + phrase;
+        String phraseNotation = "NP([<NNS|NN|NNP]![<JJ|VBG])!$VP";// !<VBG";//@" + phrase + "! << @" + phrase;
 
         /*For the Single Tree */
         //wordStemmer.visitTree(sTree);
@@ -251,7 +279,7 @@ public class PhrasesIdentification {
                     if (inChild.value().equals("CC")) {
                         separator = 1;
                     }
-                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
+                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("NNP"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
 
@@ -260,19 +288,41 @@ public class PhrasesIdentification {
                             attribute = leaves.get(0).yieldWords().get(0).word();
 
                             if (!designEleList.contains(attribute)) {
-                                attributeLists.add(morphology.stem(attribute));
+                                String identifiedWord = attribute;
+                                if (!identifiedWord.contains("_")) {
+                                    attributeLists.add(morphology.stem(identifiedWord));
+
+                                } else {
+                                    attributeLists.add(identifiedWord);
+                                }
+
+                                //attributeLists.add(morphology.stem(attribute));
                                 System.out.println("count == inn");
 
                             }
 
                         } else if (count >= 2 && separator == 0) {
-                            attributeLists.remove(morphology.stem(attribute));
+                            if (!attribute.contains("_")) {
+                                attributeLists.remove(morphology.stem(attribute));
+
+                            } else {
+                                attributeLists.remove(attribute);
+                            }
+
+                            //attributeLists.remove(morphology.stem(attribute));
                             attribute += " " + (leaves.get(0).yieldWords()).get(0).word();
                             attributeLists.add(attribute);
                             System.out.println(">2 else");
                         } else if (count >= 2 && separator == 1) {
                             attribute = (leaves.get(0).yieldWords()).get(0).word();
-                            attributeLists.add(morphology.stem(attribute));
+                            if (!attribute.contains("_")) {
+                                attributeLists.add(morphology.stem(attribute));
+
+                            } else {
+                                attributeLists.add(attribute);
+                            }
+
+                            // attributeLists.add(morphology.stem(attribute));
                         }
 
                         count++;
@@ -285,7 +335,15 @@ public class PhrasesIdentification {
                     if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //phraseLists.add(leaves.get(0 ).yieldWords());
-                        attributeLists.add(morphology.stem(((leaves.get(0).yieldWords()).get(0).word())));
+                        String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                        //attributeLists.add(morphology.stem());
+                        if (!identifiedWord.contains("_")) {
+                            attributeLists.add(morphology.stem(identifiedWord));
+
+                        } else {
+                            attributeLists.add(identifiedWord);
+                        }
+
                         System.out.println("maingjshfkjs");
                     }
 
@@ -487,6 +545,10 @@ public class PhrasesIdentification {
 
     }
 
+    public HashMap getClassWithAttr() {
+        return storingClassWithAttr;
+    }
+
     public ArrayList getIdentifiedVPPhrases2(String phrase) {
         phraseLists = new ArrayList();
         attributeLists = new ArrayList();
@@ -673,30 +735,22 @@ public class PhrasesIdentification {
      parameters are the POS.
      for example: NP, VB, NNP and etc.*/
 
-    
-    private void replaceUsingStemming(Tree sTree, List leaves){
+    private void replaceUsingStemming(Tree sTree, List leaves) {
         System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
         List leavesOfTree = sTree.getChildrenAsList().get(0).getLeaves();
-        System.out.println("Leaves:" +leaves+"  chumma:   "+sTree.contains(leaves));
-        for(int leavesCount =0; leavesCount <leavesOfTree.size(); leavesCount++){
+        System.out.println("Leaves:" + leaves + "  chumma:   " + sTree.contains(leaves));
+        for (int leavesCount = 0; leavesCount < leavesOfTree.size(); leavesCount++) {
             System.out.println(leavesOfTree.get(leavesCount));
-            int index =leavesOfTree.indexOf("won");
+            int index = leavesOfTree.indexOf("won");
             System.out.println(index);
-            
-         
-            
-            
+
         }
-        
-        
-        System.out.println("Stree to array:"+sTree.getChildrenAsList().get(0).getLeaves().get(0));
-        System.out.println("Stree to array:"+sTree.getChildrenAsList().equals("won"));
-        
-        
+
+        System.out.println("Stree to array:" + sTree.getChildrenAsList().get(0).getLeaves().get(0));
+        System.out.println("Stree to array:" + sTree.getChildrenAsList().equals("won"));
+
     }
-    
-    
-    
+
     public ArrayList getIdentifiedPhrases1(String phrase) {
         phraseLists = new ArrayList();
         String phraseNotation = phrase;
