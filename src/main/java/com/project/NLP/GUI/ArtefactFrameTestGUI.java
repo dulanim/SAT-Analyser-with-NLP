@@ -5,6 +5,11 @@
  */
 package com.project.NLP.GUI;
 
+/**
+ *
+ * @author S. Shobiga
+ */
+
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -25,12 +30,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-/**
- * This program demonstrates tree editing.
- *
- * @version 1.03 2007-08-01
- * @author Cay Horstmann
- */
+
 public class ArtefactFrameTestGUI {
 
     HashMap output = new HashMap();
