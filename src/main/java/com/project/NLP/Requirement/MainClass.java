@@ -6,6 +6,7 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.GUI.ArtefactFrameTestGUI;
 import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.Dependencies;
@@ -15,7 +16,10 @@ import com.project.traceability.model.Parameter;
 import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,13 +27,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 public class MainClass {
-    
-    private static String requirementDocument="";
+
+    private static String requirementDocument = "";
     private static HashMap requirementObjects = new HashMap();
-    private static HashSet<ClassRelation> requirementObjectRelations=new HashSet<>();
+    private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();
 
     public static void main(String args[]) {
-
 
         HashSet classList = new HashSet();
         HashSet attrList = new HashSet();
@@ -46,17 +49,19 @@ public class MainClass {
         boolean passiveCheck = false;
         HashMap passiveMap;
         HashSet tempList;
+        HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("OrderRequirement.txt");
+            requirementDocument = readFromTextFile("io/BankRequirement1.txt");
 
-            System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
+            //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
+            System.setProperty("wordnet.database.dir", "C://Program Files (x86)/WordNet/2.1/dict");
 
             if ("".equals(requirementDocument)) {
                 System.out.println("Error : There is no input document !!!");
             } else {
-                AnaphoraAnalyzer analyzer=new AnaphoraAnalyzer(requirementDocument);
-                requirementDocument=analyzer.doPronounResolving();
+                AnaphoraAnalyzer analyzer = new AnaphoraAnalyzer(requirementDocument);
+                requirementDocument = analyzer.doPronounResolving();
                 ParserTreeGenerator parser = new ParserTreeGenerator(requirementDocument);
                 trees = parser.getSentenceParseTree();
                 // ParserTreeGenerator p = new ParserTreeGenerator();
@@ -72,6 +77,8 @@ public class MainClass {
                         /*noun pharase identification */
                         ClassIdentification np = new ClassIdentification(tree);
                         classList = np.getClasses();
+                        classWithAttr = np.getClassWithAttr();
+
                         ArrayList attributesFromClass = np.getAttributeFromClass();
                         System.out.println("CLASS LIST:" + classList);
 
@@ -83,9 +90,9 @@ public class MainClass {
                             System.out.println("ATTRIBUTE LIST: " + attrList);
 
                             /*if the sentence is passive swipe the attributes and methods*/
-                            // passiveVoiceHandling(parser, classList, attrList);
+                            //passiveVoiceHandling(parser, classList, attrList);
                             passiveMap = parser.getPassiveSentenceMap();
-                            
+
                             if (passiveMap.containsKey(tree)) {
                                 tempList = classList;
                                 classList = attrList;
@@ -100,81 +107,82 @@ public class MainClass {
                             //ClassRelationIdentifier crId = new ClassRelationIdentifier(classList, requirementObjects.keySet());
                             //relationList = crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
                             //relationList.addAll(crId.identifyGenaralizationByHypernym(classList, requirementObjects.keySet()));
-
                             if (classList.size() > 1) {
 
-                                multipleClassListHandlingDemo = new MultipleClassListHandlingDemo(classList, attrList, methodList);
-                                multiClassWithAttribute = multipleClassListHandlingDemo.getClassWithAttribute();
-                                multiClassWithMethod = multipleClassListHandlingDemo.getClassWithMethod();
+                                /*Storing Class details  */
+                                Iterator iterator = classList.iterator();
+                                while (iterator.hasNext()) {
+                                    className = (String) iterator.next();
+                                    className = className.toLowerCase();
+                                    if (requirementObjects.containsKey(className)) {
+                                        StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
+                                        storeArt.addAttributes(attrList);
+                                        storeArt.addMethods(methodList);
+                                        storeArt.addRelationships(relationList);
 
-                                /*loop to control opening multiple frames*/
-                                while (MultipleClassListHandlingGUI.lock) {
-                                    Thread.sleep(100);
-                                }
-
-                                Iterator classIterator = classList.iterator();
-                                for (int countClass = 0; countClass < classList.size(); countClass++) {
-                                    attributeMulti = new HashSet();
-                                    methodMulti = new HashSet();
-                                    if (classIterator.hasNext()) {
-                                        String classNameMulti = classIterator.next().toString();
-                                        HashSet classListMulti = new HashSet();
-                                        if (multiClassWithAttribute.containsKey(classNameMulti)) {
-                                            attributeMulti = multiClassWithAttribute.get(classNameMulti);
-                                            classListMulti.add(classNameMulti);
-                                            System.out.println("--------------------------------------------------------------------------------------attribute :" + attributeMulti);
-                                        }
-                                        if (multiClassWithMethod.containsKey(classNameMulti)) {
-                                            methodMulti = multiClassWithMethod.get(classNameMulti);
-                                            classListMulti.add(classNameMulti);
-                                            System.out.println("--------------------------------------------------------------------------------------method :" + methodMulti);
-                                        }
-                                        //storeClassDetails(classNameMulti, attributeMulti, methodMulti, relationList);
-                                        if (!attributeMulti.isEmpty() || !methodMulti.isEmpty()) {
-                                            if (requirementObjects.containsKey(classNameMulti)) {
-                                                StoringArtefacts storeArt=(StoringArtefacts) requirementObjects.get(classNameMulti);
-                                                storeArt.addAttributes(attributeMulti);
-                                                storeArt.addMethods(methodMulti);
-                                                storeArt.addRelationships(relationList);
-                                            }
-                                            else {
-                                                /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                                                storingArtefacts = new StoringArtefacts();
-                                                storingArtefacts.addClassName(classListMulti);
-                                                storingArtefacts.addAttributes(attributeMulti);
-                                                storingArtefacts.addMethods(methodMulti);
-                                                storingArtefacts.addRelationships(relationList);
-                                                requirementObjects.put(classNameMulti, storingArtefacts);
-                                                //System.out.println("cl :"+ classNameMulti+"\nAttr :"+ attributes +"\nMethod :"+methods);
-
-                                            }
-                                        }
+                                    } else {
+                                        /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
+                                        storingArtefacts = new StoringArtefacts();
+                                        storingArtefacts.addClassName(classList);
+                                        storingArtefacts.addAttributes(attrList);
+                                        storingArtefacts.addMethods(methodList);
+                                        storingArtefacts.addRelationships(relationList);
+                                        requirementObjects.put(className, storingArtefacts);
                                     }
 
                                 }
+
                             } else if (classList.size() == 1) {
 
                                 /*Storing Class details  */
                                 Iterator iterator = classList.iterator();
-                                if(iterator.hasNext()){
-                                    className=(String) iterator.next();
-                                    className=className.toLowerCase();
+                                if (iterator.hasNext()) {
+                                    className = (String) iterator.next();
+                                    className = className.toLowerCase();
                                 }
-                                if(requirementObjects.containsKey(className)){
-                                    StoringArtefacts storeArt=(StoringArtefacts) requirementObjects.get(className);
+                                if (requirementObjects.containsKey(className)) {
+                                    StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
                                     storeArt.addAttributes(attrList);
                                     storeArt.addMethods(methodList);
                                     storeArt.addRelationships(relationList);
 
-                                }
-                                else{
+                                } else {
                                     /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
                                     storingArtefacts = new StoringArtefacts();
                                     storingArtefacts.addClassName(classList);
                                     storingArtefacts.addAttributes(attrList);
                                     storingArtefacts.addMethods(methodList);
                                     storingArtefacts.addRelationships(relationList);
-                                    requirementObjects.put(className,storingArtefacts);
+                                    requirementObjects.put(className, storingArtefacts);
+                                }
+
+                            }
+                            /*to handle class with attribute map (noun + noun)*/
+                            if (!classWithAttr.isEmpty()) {
+                                HashSet classListWithAttr = new HashSet();
+                                HashSet attributeList = new HashSet();
+                                int sizeOfMap = classWithAttr.size();
+                                Iterator classWithAttrIterator = classWithAttr.keySet().iterator();
+                                while (classWithAttrIterator.hasNext()) {
+                                    String classN = classWithAttrIterator.next().toString();
+                                    classListWithAttr.add(classN);
+                                    attributeList = (HashSet) classWithAttr.get(classN);
+                                    System.out.println("CLASS from classWith attributes :" + classN);
+                                    System.out.println("Attributes from classwith attributes: " + attributeList);
+
+                                    if (requirementObjects.containsKey(classN)) {
+                                        StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(classN);
+                                        storeArt.addAttributes(attributeList);
+
+                                    } else {
+                                        /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
+                                        storingArtefacts = new StoringArtefacts();
+                                        storingArtefacts.addClassName(classListWithAttr);
+                                        storingArtefacts.addAttributes(attributeList);
+
+                                        requirementObjects.put(classN, storingArtefacts);
+                                    }
+
                                 }
 
                             }
@@ -183,29 +191,36 @@ public class MainClass {
 
                 }
                 /*After finding all classes in the document identifying relationships betweenm them.
-                *
-                */
-                HashSet relationSet=new HashSet();
-                ClassRelationIdentifier crid=new ClassRelationIdentifier();
+                 *
+                 */
+                HashSet relationSet = new HashSet();
+                ClassRelationIdentifier crid = new ClassRelationIdentifier();
                 //relationSet=crid.identifyGeneralizationRelations(requirementObjects.keySet());
                 requirementObjectRelations.addAll(crid.identifyGeneralizationRelations(requirementObjects.keySet()));
                 //addingRelationsToIdentifiedClasses(relationSet);
-                HashSet associationSet=new HashSet();
-                 for(Object tree:trees){
-                   // associationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
-                   //relationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
-                    requirementObjectRelations.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
-                 }
-                 System.out.println("---Relation set : "+requirementObjectRelations);
-                 //System.out.println("---Associaton set : "+relationSet);
+                HashSet associationSet = new HashSet();
+                for (Object tree : trees) {
+                    // associationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
+                    //relationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
+                    requirementObjectRelations.addAll(crid.identifyAssociation((Tree) tree, requirementObjects.keySet()));
+                }
+                System.out.println("---Relation set : " + requirementObjectRelations);
+                //System.out.println("---Associaton set : "+relationSet);
                 // addingRelationsToIdentifiedClasses(associationSet);
-               // addingRelationsToIdentifiedClasses(relationSet);
-                
+                // addingRelationsToIdentifiedClasses(relationSet);
+
                 /*Writing the information extracted from Requirement to text file  */
                 if (!requirementObjects.isEmpty()) {
+                    /*eliminate the classes which are not having any attributes, methods and relationships*/
+                    HashMap requirementObjectsModified = checkArtefactsExist(requirementObjects, requirementObjectRelations);
+                    ArtefactFrameTestGUI t = new ArtefactFrameTestGUI(requirementObjectsModified, requirementObjectRelations);
 
-                    //WriteRequirementToXML.writeToXMLFile(requirementObjects);
-                    WriteRequirementToXML.writeToXMLFile(requirementObjects,requirementObjectRelations);
+                    while (t.getLock()) {
+                        Thread.sleep(100);
+                    }
+
+                    //writeOutputToTxtFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
+                    WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
 
                 }
             }
@@ -258,16 +273,98 @@ public class MainClass {
         return req_Document;
     }
 
-    public static void addingRelationsToIdentifiedClasses(HashSet relations){
-            Iterator iter=relations.iterator();
-            while(iter.hasNext()){
-                ClassRelation classRelation=(ClassRelation)iter.next();
-                String parent=classRelation.getParentElement();
-                String child=classRelation.getChildElement();
-                StoringArtefacts storingArtefacts=(StoringArtefacts)requirementObjects.get(parent);
-                storingArtefacts.addRelationships(classRelation);
-                storingArtefacts=(StoringArtefacts)requirementObjects.get(child);
-                storingArtefacts.addRelationships(classRelation);
-            }
+    public static void addingRelationsToIdentifiedClasses(HashSet relations) {
+        Iterator iter = relations.iterator();
+        while (iter.hasNext()) {
+            ClassRelation classRelation = (ClassRelation) iter.next();
+            String parent = classRelation.getParentElement();
+            String child = classRelation.getChildElement();
+            StoringArtefacts storingArtefacts = (StoringArtefacts) requirementObjects.get(parent);
+            storingArtefacts.addRelationships(classRelation);
+            storingArtefacts = (StoringArtefacts) requirementObjects.get(child);
+            storingArtefacts.addRelationships(classRelation);
         }
+    }
+
+    public static void writeOutputToTxtFile(HashMap output, HashSet outputRelations) {
+        //write to file : "Requirement Output"
+        try {
+
+            StringBuffer sbf = new StringBuffer();
+            Iterator it = output.keySet().iterator();
+            while (it.hasNext()) {
+
+                String className = it.next().toString();
+                StoringArtefacts store = (StoringArtefacts) output.get(className);
+                HashSet attributes = store.getAttributes();
+                HashSet methods = store.getMethods();
+                HashSet relations = store.getRelationships();
+
+                sbf.append("\nClass : " + className + "\n");
+                sbf.append("\tAttributes : ");
+                for (Object attribute : attributes) {
+                    sbf.append(attribute.toString() + ",");
+                }
+                sbf.append("\tMethods : ");
+                for (Object method : methods) {
+                    sbf.append(method.toString() + ",");
+                }
+                sbf.append("\tRelations : ");
+                Iterator relIterator = outputRelations.iterator();
+                while (relIterator.hasNext()) {
+                    Object clRelation = relIterator.next();
+                    ClassRelation rel = (ClassRelation) clRelation;
+                    System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+                    sbf.append("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+
+                }
+
+            }
+
+            System.out.println(sbf.toString());
+
+            BufferedWriter bwr = new BufferedWriter(new FileWriter("Requirement_Output.txt"));
+
+            //write contents of StringBuffer to a file
+            bwr.write(sbf.toString());
+
+            //flush the stream
+            bwr.flush();
+
+            //close the stream
+            bwr.close();
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    private static HashMap checkArtefactsExist(HashMap output, HashSet outputRelations) {
+        boolean status = false;
+        boolean statusRelation = false;
+        Iterator outputIterator = output.keySet().iterator();
+        while (outputIterator.hasNext()) {
+            String className = outputIterator.next().toString();
+            StoringArtefacts storeArt = (StoringArtefacts) output.get(className);
+
+            Iterator relIterator = outputRelations.iterator();
+            while (relIterator.hasNext()) {
+
+                ClassRelation rel = (ClassRelation) relIterator.next();
+                if (rel.getChildElement().equalsIgnoreCase(className) || rel.getParentElement().equalsIgnoreCase(className)) {
+                    statusRelation = true;
+                    break;
+                }
+            }
+
+            if (storeArt.getAttributes().isEmpty() && storeArt.getMethods().isEmpty() && !statusRelation) {
+                status = true;
+                outputIterator.remove();
+            }
+
+        }
+
+        return output;
+    }
 }
