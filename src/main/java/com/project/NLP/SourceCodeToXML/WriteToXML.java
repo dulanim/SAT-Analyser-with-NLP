@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -100,6 +101,8 @@ public class WriteToXML {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
             DOMSource source = new DOMSource(document);
             fos = createXmlFile();
             StreamResult result = new StreamResult(fos);

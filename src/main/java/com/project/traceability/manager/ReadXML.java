@@ -63,7 +63,7 @@ public class ReadXML {
         ReadFiles.readFiles(projectPath);
         Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
         Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
-        List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
+        Map<String, ArtefactElement> requirementsAretefactElements = RequirementsManger.requirementArtefactElements;
 
         if (!op) {
             File f = new File(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
@@ -77,11 +77,11 @@ public class ReadXML {
         graphDB.initiateGraphDB();
 
         System.out.println("Entering UML.....");
-        graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
+        graphDB.addNodeToGraphDB("UML",UMLAretefactElements);//add UML artefact elements to db
         System.out.println("Entering Req.....");
-        graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
+        graphDB.addNodeToGraphDB("REQ",requirementsAretefactElements);//add requirement artefact elements to db
         System.out.println("Entering SourceCode.....");
-        graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
+        graphDB.addNodeToGraphDB("SRC",sourceCodeAretefactElements);//add source code artefact elements to db
 
         //trace class links between UML & source code
         relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
@@ -115,7 +115,9 @@ public class ReadXML {
     }
 
     public static void deleteNodeFromSourceFile(Set<org.neo4j.graphdb.Node> deleteNodeProps, Set<Relationship> relProps, String xml) {
+        String path = xml.substring(xml.lastIndexOf(File.separator));
         try {
+
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(xml);
@@ -132,20 +134,20 @@ public class ReadXML {
                 for (int x = 0, size = nodeList.getLength(); x < size; x++) {
                     NodeList subNodeList = nodeList.item(x).getChildNodes();
                     //System.out.println("" + nodeList.item(x));
-                    if (nodeList.item(x) != null) {
+                    if (null != nodeList.item(x)) {
                         if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
                             System.out.println("Donesc");
                             //System.out.println(""+nodeList.item(x).getAttributes().toString());
                             nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
                             found = true;
+                            
                             break;
                         }
-
                     }
                 }
 
                 if (!found) {
-                    for (int y = 1, sizeSb = subList.getLength(); y < sizeSb; y = y + 2) {
+                    for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
                         if (subList.item(y) != null) {
                             //System.out.println(""+subNodeList.item(y).getAttributes().toString());
                             if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
@@ -162,7 +164,7 @@ public class ReadXML {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
             String xmlpath = HomeGUI.projectPath + File.separator + XML;
-            File file = new File(xmlpath, FilePropertyName.SOURCE_ARTIFACT_NAME);
+            File file = new File(xmlpath, path);
 
             System.out.println("file: " + file.getAbsolutePath());
             StreamResult result = new StreamResult(file.getPath());
@@ -182,7 +184,12 @@ public class ReadXML {
     public static void readSourceFile(HashMap<String, Object> nodeProps, String id, String xmlFile) throws TransformerException {
 
         System.out.println(xmlFile);
+        String xml = xmlFile.substring(xmlFile.lastIndexOf(File.separator));
+        System.out.println("XML:" + xml);
         try {
+            for (String key : nodeProps.keySet()) {
+                System.out.println("Key: " + key + " Value: " + nodeProps.get(key));
+            }
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(xmlFile);
@@ -202,7 +209,14 @@ public class ReadXML {
                             keyval = "id";
                         }
                         Node nodeAttr = attr.getNamedItem(keyval);
-                        nodeAttr.setTextContent(nodeProps.get(key).toString());
+                        if (null == nodeAttr) {
+                            System.out.println("Null ITme");
+                        } else if (null == nodeProps.get(key) || nodeProps.get(key).toString().isEmpty()) {
+                            nodeAttr.setTextContent("");
+                        } else {
+                            nodeAttr.setTextContent(nodeProps.get(key).toString());
+                        }
+
                     }
                     break;
                 }
@@ -224,6 +238,9 @@ public class ReadXML {
                             }
                              */
                             for (String key : nodeProps.keySet()) {
+                                System.out.println("" + key);
+                            }
+                            for (String key : nodeProps.keySet()) {
                                 String keyval = key.replaceAll("\\s", "");
                                 char a = keyval.charAt(0);
                                 keyval = keyval.replace(a, keyval.toLowerCase().charAt(0));
@@ -231,7 +248,17 @@ public class ReadXML {
                                     keyval = "id";
                                 }
                                 Node attrItem = attr.getNamedItem(keyval);
-                                attrItem.setNodeValue(nodeProps.get(key).toString());
+                                System.out.println("Item: " + attrItem + " " + keyval);
+                                System.out.println("val " + nodeProps.get(key));
+
+                                if (null == attrItem) {
+                                    System.out.println("Null atrITme");
+                                } else if (null == nodeProps.get(key) || nodeProps.get(key).toString().isEmpty()) {
+                                    attrItem.setNodeValue("");
+                                } else {
+                                    attrItem.setNodeValue(nodeProps.get(key).toString());
+                                }
+
                                 System.out.println(keyval + " " + nodeProps.get(key).toString() + " " + key);
                             }
 
@@ -246,7 +273,7 @@ public class ReadXML {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
             String xmlpath = HomeGUI.projectPath + File.separator + XML;
-            File file = new File(xmlpath, FilePropertyName.SOURCE_ARTIFACT_NAME);
+            File file = new File(xmlpath, xml);
             StreamResult result = new StreamResult(file.getPath());
             transformer.transform(source, result);
 

@@ -57,6 +57,7 @@ public class Word {
 			this.property = aProperty;
 		}
 	}
+
 	public void setPropertyName(String aProperty){
 		if(!aProperty.equals("")){
 			this.property = new ArrayList<>();

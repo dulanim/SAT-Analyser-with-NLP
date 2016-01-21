@@ -1,17 +1,28 @@
 package com.project.traceability.GUI;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+
+
+import scala.collection.immutable.HashSet;
 
 class InputDialog extends Dialog {
   private String message;
@@ -20,6 +31,7 @@ class InputDialog extends Dialog {
   public static String selectedValue;
   public static Display display;
   public static Shell shell;
+  public static String type;
 
   public static void main(String args[]){
 	  
@@ -65,7 +77,7 @@ class InputDialog extends Dialog {
 
   public String open() {
     Shell shell = new Shell(getParent(), getStyle());
-    shell.setSize(390, 93);
+    shell.setSize(500, 200);
     shell.setText(getText());
     createContents(shell);
     shell.pack();
@@ -109,8 +121,49 @@ class InputDialog extends Dialog {
 		     messageBox.open();
         }else{
         	selectedValue = input;
+            
+        	if(type.equals("Parent")){
+        		
+        		setUpValue(WordExpWindows.combo_parent,"Add Custom Parent Value");
+        		
+        	}else if(type.equals("Property")){
+        		
+        		setUpValue(WordExpWindows.combo_proeprty, "Add Custom Property");
+
+        		WordExpWindows windows = WordExpWindows.getWindowInstance();
+        		windows.setPropertyNames(selectedValue);
+        	}else if(type.equals("Value")){
+        		setUpValue(WordExpWindows.combo_values, "Add Custom Value");
+        	}
+            shell.dispose();
         }
       }
+
+	private void setUpValue(Combo combo,String type) {
+		// TODO Auto-generated method stub
+		String items[] = combo.getItems();
+		List<String> list = new ArrayList<>(Arrays.asList(items));
+		list.add(selectedValue);
+		list.remove("<<---------------------------->>");
+		list.remove(type);
+		
+		java.util.Set<String> set = new java.util.HashSet<>(list);
+		
+		combo.removeAll();
+		Iterator<String> iterator = set.iterator();
+		int pos = 0;
+		while(iterator.hasNext()){
+			combo.add(iterator.next(),pos++);
+		}
+		combo.add("<<---------------------------->>");
+		combo.add(type);
+		
+		String newItem[] = combo.getItems();
+		pos = getItemPosition(newItem,selectedValue);
+		if(pos>=0){
+			combo.select(pos);
+		}
+	}
     });
 
     Button cancel = new Button(shell, SWT.PUSH);
@@ -125,5 +178,18 @@ class InputDialog extends Dialog {
     });
 
     shell.setDefaultButton(ok);
+  }
+  
+  private int getItemPosition(String arr[],String item){
+	  int position = 0;
+	  
+	  List<String> list = new ArrayList<String>(Arrays.asList(arr));
+	  
+	  if(list.contains(item)){
+		  position = list.indexOf(item);
+	  }else{
+		  position = -1;
+	  }
+	  return position;
   }
 }

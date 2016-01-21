@@ -5,9 +5,13 @@ import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.staticdata.StaticData;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
 import org.eclipse.swt.widgets.Display;
@@ -27,8 +31,8 @@ public class WorkspaceSelectionWindow {
 	protected Shell shell;
 	Button btnOk;
 	String path;
-        String workspacePath = "";
-        Combo combo;
+    String workspacePath = "";
+    Combo combo;
 	/**
 	 * Launch the application.
 	 * @param args
@@ -68,7 +72,7 @@ public class WorkspaceSelectionWindow {
 		shell.setText("SAT Workspace Selection Window");
 		
 		
-                Dimension.toCenter(shell);
+        Dimension.toCenter(shell);
                
 		Group grpWorkspacePath = new Group(shell, SWT.NONE);
 		grpWorkspacePath.setText("workspace Path");
@@ -78,26 +82,18 @@ public class WorkspaceSelectionWindow {
 		lblWork.setBounds(3, 34, 118, 29);
 		lblWork.setText("Workspace Path");
 		
-                combo = new Combo(grpWorkspacePath, SWT.NONE);
+        combo = new Combo(grpWorkspacePath, SWT.NONE);
 		combo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				int index = combo.getSelectionIndex();
-                                ArrayList<String> pathList = 
-                                            new ArrayList<String>(StaticData.paths);
-			        if(index >= 0){
-			            workspacePath = pathList.get(index);
-			        }else{
-			            workspacePath = "";
-			        }
-			        btnOk.setEnabled(true);
+				selectItem();
 			}
                         @Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
                 
-                combo.setBounds(121, 34, 345, 29);
+        combo.setBounds(121, 34, 345, 29);
 		Button btnBrowse = new Button(grpWorkspacePath, SWT.NONE);
 		btnBrowse.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -111,8 +107,8 @@ public class WorkspaceSelectionWindow {
 		        // disable the "All files" option.
 		        //
 		        // 
-                        String wrkspce= directory.open();
-		        if (!wrkspce.equals("")) {
+                String wrkspce= directory.open();
+		        if (wrkspce != null) {
 		              String path = wrkspce;
 		              File file = new File(path);
 		              if(file.isDirectory()){
@@ -120,10 +116,26 @@ public class WorkspaceSelectionWindow {
 		                  writer.createWorkspaceNode(path, Boolean.toString(false));
 		                  createContentData();
 		                  workspacePath = path;
+		                  setSelectedItem(path);
 		              }
 		          }else {
                             System.out.println("No Selection ");
+                            shell.setActive();
 		          }
+			}
+
+			private void setSelectedItem(String workspacePath) {
+				// TODO Auto-generated method stub
+				
+				String items[]= combo.getItems();
+				List<String> itemList = Arrays.asList(items);
+				
+				if(itemList.contains(workspacePath)){
+					int pos = itemList.indexOf(workspacePath);
+					combo.select(pos);
+					selectItem();
+				}
+				
 			}
 		});
 		btnBrowse.setBounds(472, 34, 91, 29);
@@ -183,7 +195,21 @@ public class WorkspaceSelectionWindow {
 
 	}
         
-        private void createContentData(){
+        protected void selectItem() {
+		// select combo item and enable ok button 
+        	int index = combo.getSelectionIndex();
+            ArrayList<String> pathList = new ArrayList<String>(StaticData.paths);
+			if(index >= 0){
+			    workspacePath = pathList.get(index);
+			}else{
+			    workspacePath = "";
+			}
+			btnOk.setEnabled(true);
+        }
+
+
+
+		private void createContentData(){
             
              XMLReader reader = new XMLReader();
              reader.readWorkspaces();

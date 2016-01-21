@@ -41,6 +41,7 @@ import com.project.traceability.staticdata.StaticData;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
+import com.project.traceability.common.ErrorFinder;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import com.project.traceability.visualization.GraphDB;
@@ -100,6 +101,7 @@ public class HomeGUI extends JFrame implements KeyListener {
     public SashForm workSF;
     private CTabFolder2Listener ctfCTF2L;
     private MouseListener ctfML;
+    public static CTabFolder propertyTab ;
 
     static TreeViewer treeViewer;
 
@@ -120,12 +122,12 @@ public class HomeGUI extends JFrame implements KeyListener {
     static XMLReader reader;
     static XMLWriter writer;
 
-    private CTabItem tbtmPropertyInfos;
-    private Table table;
-    private TableColumn tblclmnProperty;
-    private TableColumn tblclmnValue;
-    private TableCursor tableCursor;
-    private TableItem tableItem;
+    public static CTabItem tbtmPropertyInfos;
+    public static Table table;
+    public static TableColumn tblclmnProperty;
+    public static TableColumn tblclmnValue;
+    public static TableCursor tableCursor;
+    public static TableItem tableItem;
     private TableItem tableItem_1;
     private SashForm graphTapHolder;
 
@@ -144,7 +146,10 @@ public class HomeGUI extends JFrame implements KeyListener {
             window.open();
             window.eventLoop(Display.getDefault());
         } catch (Exception e) {
+            displayError(e.toString());
             e.printStackTrace();
+            HomeGUI.closeMain(shell);
+            HomeGUI.main(null);
         }
     }
 
@@ -222,15 +227,12 @@ public class HomeGUI extends JFrame implements KeyListener {
 //        graphTab.setMaximizeVisible(true);
 
         composite = new Composite(tabFolder, SWT.NONE);
-        composite.setLayout(new FillLayout());
-
-        
+        composite.setLayout(new FillLayout());        
 
         //final ToolBar bar = new ToolBar(tabFolder, SWT.HORIZONTAL);
         graphTapHolder = new SashForm(workSF, SWT.HORIZONTAL | SWT.SMOOTH);
         graphTapHolder.setVisible(true);
         graphTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
-        graphTab.setData("Graph");
         graphTab.setMinimizeVisible(true);
         graphTab.setMaximizeVisible(true);
 
@@ -244,45 +246,13 @@ public class HomeGUI extends JFrame implements KeyListener {
         composite = new Composite(tabFolder, SWT.NONE);
         composite.setLayout(new FillLayout());
 
-        CTabFolder propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER | SWT.NONE);		//CTabFolder for visualization
+        propertyTab = new CTabFolder(graphTapHolder, SWT.BORDER);		//CTabFolder for visualization
         propertyTab.setData("Property");
         propertyTab.setMinimizeVisible(true);
         propertyTab.setMaximizeVisible(true);
-
+	
         tbtmPropertyInfos = new CTabItem(propertyTab, SWT.NONE);
-        tbtmPropertyInfos.setText("Property Infos");
-//		
-                /*
-         this is property table row sample
-         */
-        table = new Table(propertyTab, SWT.BORDER | SWT.FULL_SELECTION);
-        tbtmPropertyInfos.setControl(table);
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-        /*
-         this is first coloumn
-         */
-        tblclmnProperty = new TableColumn(table, SWT.NONE);
-        tblclmnProperty.setWidth(100);
-        tblclmnProperty.setText("Property");
-        /*
-         second coloumn
-         */
-        tblclmnValue = new TableColumn(table, SWT.NONE);
-        tblclmnValue.setWidth(100);
-        tblclmnValue.setText("Value");
-
-        /*
-         table holder for scrolling purpose
-         */
-        tableCursor = new TableCursor(table, SWT.NONE);
-
-        tableItem = new TableItem(table, SWT.NONE, 0);
-        tableItem.setText("New TableItem");
-
-        tableItem_1 = new TableItem(table, SWT.NONE, 1);
-        tableItem_1.setText("New TableItem");
-//		
+        HomeGUI.tbtmPropertyInfos.setText("Information");
         graphTapHolder.setWeights(new int[]{749, 271});
 
         addEditMenuPopUpMenu();
@@ -296,10 +266,13 @@ public class HomeGUI extends JFrame implements KeyListener {
 
         graphTab.addCTabFolder2Listener(ctfCTF2L);
         graphTab.addMouseListener(ctfML);
+        
+        propertyTab.addCTabFolder2Listener(ctfCTF2L);
+        propertyTab.addMouseListener(ctfML);
 
         graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
-        graphtabItem.setText("Graph");
-
+        graphtabItem.setText("Graph");      
+        
         addEditMenuPopUpMenu();
         //create ToolBar and ToolItems
 //                final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);
@@ -429,32 +402,37 @@ public class HomeGUI extends JFrame implements KeyListener {
                 String parent = "";
                 TreeItem[] selection = tree.getSelection();
                 TreeItem paret = trtmNewTreeitem.getParentItem();
-                TreeItem topParent = paret.getParentItem();
+                TreeItem topParent = null;
+                
+                string = selection[0].getText();
+                if(paret != null)
+                	 topParent = paret.getParentItem();
 
-                if (topParent == null) {
-                    string = selection[0].getText();
+                if (paret != null && topParent == null) {
                     parent = paret.getText();
-                } else {
-                    string = selection[0].getText();
+                } else if(topParent != null){
                     parent = topParent.getText() + File.separator + paret.getText();
                 }
 
-                //String projectDir = projectPath;
-                //Tree tree = (Tree) event.getSource();
-                //ITreeSelection selection1 = ((ITreeSelection)event.getSelection());
-                for (int i = 0; i < selection.length; i++) {
-//					string += selection[i] + " ";
-//					parent += selection[i].getParent() + " ";
-//					trtmNewTreeitem = selection[i];
-
+                if(!string.contains(".")){
+                	if(!selection[0].getExpanded())
+                		selection[0].setExpanded(true);
+                	else
+                		selection[0].setExpanded(false);
+                	return;
                 }
-
                 if (selection[0].getItems().length == 0) {
                     //string = string.substring(10, string.length() - 2);
                     //parent = parent.substring(14, parent.length() - 2);
                     String projectName;
                     int count = 0;
-                    NewFileWindow.localFilePath = StaticData.workspace + File.separator + parent
+                    int begin = StaticData.workspace.lastIndexOf(File.separator);
+                    int end = StaticData.workspace.length();
+                    String type= StaticData.workspace.substring(begin, end);
+                    if(!type.equals(File.separator)){
+                    	StaticData.workspace +=File.separator;
+                    }
+                    NewFileWindow.localFilePath = StaticData.workspace+ parent
                             + File.separator;
 
                     if (parent.contains(File.separator)) {
@@ -462,10 +440,13 @@ public class HomeGUI extends JFrame implements KeyListener {
                     } else {
                         projectName = parent;
                     }
-                    NewFileWindow.selectedProjectPath = StaticData.workspace + File.separator
+                    
+                    
+                    NewFileWindow.selectedProjectPath = StaticData.workspace 
                             + projectName;
 
-                    if (!NewFileWindow.openedFiles.contains(NewFileWindow.localFilePath + string)) {
+                    String fileName =NewFileWindow.localFilePath.concat(string);
+                    if (!NewFileWindow.openedFiles.contains(fileName)) {
                         NewFileWindow.createTabLayout(string, true);
 
                     } else {
@@ -871,11 +852,18 @@ public class HomeGUI extends JFrame implements KeyListener {
                 CTabItem item = HomeGUI.tabFolder.getItem(pt);
                 XMLWriter writer = XMLWriter.getXMLWriterInstance();
                 if (item != null) {
-                    HomeGUI.activeTab.put(true, item.getToolTipText().toString());
+                    
+                 //   String itemTitle = item.getText();
+                    if(HomeGUI.activeTab != null){
+                        String itemTitle = item.getText();
+                        if(!itemTitle.contains("Compare")){
+                            HomeGUI.activeTab.put(true, item.getToolTipText());
+                             String filePath = item.getToolTipText();
+                             writer.setVisibleFilePath(StaticData.workspace, filePath);
+                        }
+                    }
 
-                    String filePath = item.getToolTipText();
-
-                    writer.setVisibleFilePath(StaticData.workspace, filePath);
+                   
                 } else {
                     writer.setVisibleFilePath(StaticData.workspace, "");
                 }
@@ -934,7 +922,9 @@ public class HomeGUI extends JFrame implements KeyListener {
                 CTabFolder ctf = (CTabFolder) e.getSource();
                 String ctfname = (String) ctf.getData();
                 CTabItem item = ctf.getSelection();
-                item.dispose();
+                
+                if(item != null)
+                    item.dispose();
                 //ctf.dispose();
                 workSF.layout();
                 sidebarSF.layout();
@@ -1013,6 +1003,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         };
     }
 
+   
     public static void deleteFiles(String projectPath) {
 
         TreeItem parent = trtmNewTreeitem.getParentItem();
@@ -1288,62 +1279,6 @@ public class HomeGUI extends JFrame implements KeyListener {
 
     public static void setUpNewProject() {
 
-////      tree = new Tree(newTab, SWT.BORDER|SWT.BORDER | SWT.V_SCROLL
-////        | SWT.H_SCROLL);
-//            try{
-//                    File project_root_folder = new File(path);
-//                    ArrayList<String> project_sub_folder = new ArrayList<String>(
-//                    Arrays.asList(project_root_folder.list()));
-//                    
-//                    for(String name:project_sub_folder){//Anduril Shaym Uni 
-//                        TreeItem rootNewTreeitem = null;
-////                        rootNewTreeitem.set
-//                        if(tag.equals("Initial State")){
-//                             rootNewTreeitem = new TreeItem(tree, SWT.NONE);
-//                             rootNewTreeitem.setImage(new Image(display, FilePropertyName.IMAGE_PATH.concat("folder.gif")));
-//                        }else{
-//                            rootNewTreeitem = new TreeItem(ProjectCreateWindow.trtmNewTreeitem,SWT.NONE);
-//                        }
-//                        rootNewTreeitem.setText(name);
-//                       
-//                        File temp_file = new File(path + File.separator+name);//name:Anduril
-//                        ArrayList<String> internal_folders = new ArrayList<String>(
-//                            Arrays.asList(temp_file.list()));//Anduril's file / folder list
-//                        
-//                        
-//                        for(String tempInternalFolderName:internal_folders){//xml uml 
-//                            
-//                            File tempInternalFolder = new File(temp_file.getPath() + File.separator + tempInternalFolderName);
-//                            
-//                            if(tempInternalFolder.isDirectory()){
-//                                TreeItem trtmNewTreeitem = new TreeItem(rootNewTreeitem, SWT.NONE);
-//                                trtmNewTreeitem.setText(tempInternalFolderName);
-//                                trtmNewTreeitem.setImage(new Image(display,
-//                                            FilePropertyName.IMAGE_PATH.concat("folder.gif")));
-//                                
-//                                ArrayList<String> internal_files = new ArrayList<String>(
-//                                Arrays.asList(tempInternalFolder.list()));
-//                                for(String tempFileName:internal_files){
-//                                    TreeItem fileTreeItem = new TreeItem(trtmNewTreeitem, SWT.NONE);
-//                                    fileTreeItem.setText(tempFileName);
-//                                    fileTreeItem.setImage(new Image(display,
-//                                            FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
-//                                }
-//                            }else{
-//                                TreeItem fileTreeItem = new TreeItem(rootNewTreeitem, SWT.NONE);
-//                                fileTreeItem.setText(tempInternalFolderName);
-//                                fileTreeItem.setImage(new Image(display,FilePropertyName.IMAGE_PATH.concat("file_txt.png")));
-//                            }
-//                        }
-//                        
-//                    }
-//                    }catch(Exception e){
-//                        JOptionPane.showMessageDialog(null,"Selected Path Has some unrelated File\nSelect New Empty Workspace", "File Open Error", JOptionPane.ERROR_MESSAGE);
-//                        shell.dispose();
-//                        WorkspaceSelectionWindow window = new WorkspaceSelectionWindow();
-//                        window.main(null);
-//                        
-//                    }
         File workspace = new File(StaticData.workspace);
         String projectName[] = workspace.list();
 
@@ -1366,9 +1301,32 @@ public class HomeGUI extends JFrame implements KeyListener {
             }
         }
 
-        showExpandedProject();///show expanded projects     
+        showExpandedProject();///show expanded projects 
+        checkForError();
     }
 
+    private static void checkForError(){
+        
+        /*
+        this method load all project in workspace and check weather 
+        it has error or not
+        */
+        TreeItem items[] = tree.getItems();
+        
+        if(items != null && items.length>0){
+            
+            String wrkspace = HomeGUI.tree.getToolTipText();
+            for(TreeItem item1:items){
+                TreeItem subItem[] = item1.getItems();
+                
+                for(TreeItem itm:subItem){
+                    String subFolder = itm.getText();
+                    String root = subFolder + File.separator;
+                    ErrorFinder.lookUpForFiles(root, subFolder);
+                }
+            }
+        }
+    }
     public void keyPressed(KeyEvent e) {
         // Listen to CTRL+Z for Undo, to CTRL+Y or CTRL+SHIFT+Z for Redo
         boolean isCtrl = (e.stateMask & SWT.CTRL) > 0;

@@ -102,7 +102,7 @@ public class NewProjectWindow {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 String projectName = text.getText();
-                projectPath = PropertyFile.filePath + projectName + File.separator;
+                projectPath = PropertyFile.filePath + projectName;
                 PropertyFile.setProjectName(projectName);
                 PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".graphdb");
                 PropertyFile.setGeneratedGexfFilePath(projectPath+ File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".gexf");
