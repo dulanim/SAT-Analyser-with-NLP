@@ -63,7 +63,7 @@ public class ReadXML {
         ReadFiles.readFiles(projectPath);
         Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
         Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
-        List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
+        Map<String, ArtefactElement> requirementsAretefactElements = RequirementsManger.requirementArtefactElements;
 
         if (!op) {
             File f = new File(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
@@ -77,11 +77,11 @@ public class ReadXML {
         graphDB.initiateGraphDB();
 
         System.out.println("Entering UML.....");
-        graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
+        graphDB.addNodeToGraphDB("UML",UMLAretefactElements);//add UML artefact elements to db
         System.out.println("Entering Req.....");
-        graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
+        graphDB.addNodeToGraphDB("REQ",requirementsAretefactElements);//add requirement artefact elements to db
         System.out.println("Entering SourceCode.....");
-        graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
+        graphDB.addNodeToGraphDB("SRC",sourceCodeAretefactElements);//add source code artefact elements to db
 
         //trace class links between UML & source code
         relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
