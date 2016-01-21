@@ -112,7 +112,7 @@ public class DummyGUIInput {
         
         
         
-        ArtefactFrameTestGUI t = new ArtefactFrameTestGUI(requirementObj);
+        //ArtefactFrameTestGUI t = new ArtefactFrameTestGUI(requirementObj);
         //DeleteNodes t = new DeleteNodes(requirementObj);
         
     }
