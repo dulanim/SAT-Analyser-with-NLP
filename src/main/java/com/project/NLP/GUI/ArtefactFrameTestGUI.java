@@ -34,30 +34,42 @@ import javax.swing.tree.TreePath;
 public class ArtefactFrameTestGUI {
 
     HashMap output = new HashMap();
-    HashMap requirementObjects = new HashMap(); 
+    HashMap requirementObjects = new HashMap();
+    HashSet requirementRelationsObjects = new HashSet();
     ArtefactFrame artefactFrame;
-    public ArtefactFrameTestGUI(final HashMap output) {
+
+    public ArtefactFrameTestGUI(final HashMap output, final HashSet outputRelations) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 //JFrame frame = new TreeEditFrame(output);
-                ArtefactFrame artefactFrame = new ArtefactFrame(output);
-                JFrame frame = artefactFrame;
+                final ArtefactFrame artefactFrame = new ArtefactFrame(output,outputRelations);
+                final JFrame frame = artefactFrame;
                 requirementObjects = artefactFrame.getRequirementobjects();
+                requirementRelationsObjects = artefactFrame.getRequirementRelationsObject();
                 frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-                
+
+                frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                        artefactFrame.storeItems();
+                        ArtefactFrame.lock = false;
+                        frame.dispose();    
+                    }
+                });
                 frame.setVisible(true);
             }
         });
     }
-    
-    public HashMap getRequirementobjects(){
+
+    public HashMap getRequirementobjects() {
         return requirementObjects;
     }
-    
-    public boolean getLog(){
-        return ArtefactFrame.log;
+    public HashSet getRequirementRelationsObject(){
+        return requirementRelationsObjects;
     }
-    
 
-   
+    public boolean getLock() {
+        return ArtefactFrame.lock;
+    }
+
 }
