@@ -345,7 +345,7 @@ public class ImportProjectWindow {
 		
 		Label lblSelectADirectory = new Label(shell, SWT.NONE);
 		lblSelectADirectory.setBounds(10, 10, 490, 29);
-		lblSelectADirectory.setText("Select a directory to search for existing Eclipse projects.");
+		lblSelectADirectory.setText("Select a directory to search for existing SAT projects.");
 
 	}
       
@@ -412,20 +412,20 @@ public class ImportProjectWindow {
                                     root.setText(projectName);
                                 }
 				root.setImage(new Image(display,
-                        FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
+                                FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
                                 
                                 if(importFiles != null)
                                     importFiles.add(file);
-			}else{
+                       }else{
 				root = new TreeItem(tree, SWT.NONE);
 				root.setText("DefaultProject");
-			}
+                        }
 			for(int i =0;i<listFile.length;i++){
 				String subFolderName = getSubFolder(listFile[i].getAbsolutePath());
 				TreeItem child = new TreeItem(root, SWT.NONE);
 				child.setText(subFolderName);
 				child.setImage(new Image(display,
-                        FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
+                                FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
 				
 				File f = new File(listFile[i].getAbsolutePath());
 				File files[] = f.listFiles();

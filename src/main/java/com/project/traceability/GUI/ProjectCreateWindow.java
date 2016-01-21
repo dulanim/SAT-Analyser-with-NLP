@@ -51,7 +51,7 @@ public class ProjectCreateWindow {
         public Label lalProjectWrkspace;
         
         public static String projectName;
-	protected Shell shell;
+	public static Shell shell;
 	private Text textWrkspace;
 	private Text txtProjectName;
 	private Text txtRequirementPath;
