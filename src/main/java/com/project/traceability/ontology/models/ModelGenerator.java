@@ -63,7 +63,7 @@ public class ModelGenerator {
 			 System.out.println("Failled in adding new node of model.owl file ");
 		 }
 		 
-		 if(model_creator.isMatchingWords("SafariCar", "Father")){
+		 if(model_creator.isMatchingWords("SafariCar", "Maruthi")){
 			 System.out.println("Matched");
 		 }else{
 			 System.out.println("Not Matched");

@@ -66,8 +66,8 @@ public class NavigationModel {
 		
 		
 		List<String> allProperties = this.getAllProperties();
-		allProperties.remove("<<*************************>>");
-		allProperties.remove("Add Custom Value");
+		allProperties.remove("<<---------------------------->>");
+		allProperties.remove("Add Custom Property");
 		
 		for(int i=0;i<ontClassLst.size();i++){
 			OntClass tempClass = ontClassLst.get(i);
@@ -106,6 +106,9 @@ public class NavigationModel {
 					+ "not null");
 		}
 		System.out.println(queue.size());
+                
+                queue.add("<<---------------------------->>");
+                queue.add("Add Custom Parent Value");
 		return queue;
 		
 	}
@@ -121,8 +124,8 @@ public class NavigationModel {
 				properties.add(prop.getLocalName());
 		}
 		
-		this.properties.add("<<*************************>>");
-		properties.add("Add Custom Value");
+		this.properties.add("<<---------------------------->>");
+		properties.add("Add Custom Property");
 		return this.properties;
 	}
 	public List<String> getAllValues1(String propsName){
@@ -161,7 +164,7 @@ public class NavigationModel {
 		}
 		
 		List<String> listValues = new ArrayList<>(values);
-		listValues.add("<<*************************>>");
+		listValues.add("<<---------------------------->>");
 		listValues.add("Add Custom Value");
 		return listValues;
 	}
@@ -199,21 +202,21 @@ public class NavigationModel {
 		
 		OntClass cls = classSpec;
 		for(int i=0;i<allProperties.size();i++){
-					propURI += allProperties.get(i);
-					OntProperty ontProperty = model.getOntProperty(propURI);
+                    propURI += allProperties.get(i);
+                    OntProperty ontProperty = model.getOntProperty(propURI);
 					
-					StmtIterator it = cls.listProperties(ontProperty);
-					while(it != null && it.hasNext()){
+                    StmtIterator it = cls.listProperties(ontProperty);
+                    while(it != null && it.hasNext()){
 						
-						String propertyName =allProperties.get(i);
-						String propertyValue = getValueFor(cls, propertyName);
-						it.nextStatement();
-						list.add(propertyName+":" + propertyValue);
-						System.out.println("PROPERTY FOR " + classSpec.getLocalName()  + "   " + 
+                        String propertyName =allProperties.get(i);
+			String propertyValue = getValueFor(cls, propertyName);
+			it.nextStatement();
+			list.add(propertyName+":" + propertyValue);
+			System.out.println("PROPERTY FOR " + classSpec.getLocalName()  + "   " + 
 								allProperties.get(i));
-					}
-					propURI = StaticData.OWL_ROOT_URI + "#";
-			}
+                    }
+                    propURI = StaticData.OWL_ROOT_URI + "#";
+		}
 		
 		
 		map.put(classSpec.getLocalName(), list);
