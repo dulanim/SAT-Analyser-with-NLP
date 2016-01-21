@@ -52,7 +52,7 @@ public class MainClass {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("io/OrderRequirement.txt");
+            requirementDocument = readFromTextFile("io/BankRequirement1.txt");
 
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", "C://Program Files (x86)/WordNet/2.1/dict");
@@ -94,9 +94,12 @@ public class MainClass {
                             passiveMap = parser.getPassiveSentenceMap();
 
                             if (passiveMap.containsKey(tree)) {
-                                tempList = classList;
-                                classList = attrList;
-                                attrList = tempList;
+                                System.out.println("passive sentence detected");
+                               // if (!attrList.isEmpty()) {
+                                    tempList = classList;
+                                    classList = attrList;
+                                    attrList = tempList;
+                               // }
                             }
 
                             /* methods identification */
@@ -253,6 +256,14 @@ public class MainClass {
                 /*if the sentence is having hyphen, then it is replaced by a space*/
                 if (sCurrentLine.contains("-")) {
                     sCurrentLine = sCurrentLine.replace("-", " ");
+                }
+                /*if the sentence if having underscore, then it is replace by a space*/
+                if (sCurrentLine.contains("_")) {
+                    //sCurrentLine = sCurrentLine.replace("_", " ");
+                }
+                /*if the sentence is having 's, then it is replaced by space EX: employee's -> employee*/
+                if (sCurrentLine.contains("'s")) {
+                    sCurrentLine = sCurrentLine.replace("'s", " ");
                 }
 
                 req_Document += " " + sCurrentLine;
