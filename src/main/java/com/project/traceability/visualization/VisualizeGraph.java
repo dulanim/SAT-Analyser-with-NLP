@@ -32,6 +32,7 @@ import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -41,6 +42,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -53,6 +55,7 @@ import org.gephi.filters.api.Query;
 import org.gephi.filters.plugin.partition.PartitionBuilder.EdgePartitionFilter;
 import org.gephi.filters.plugin.partition.PartitionBuilder.NodePartitionFilter;
 import org.gephi.graph.api.DirectedGraph;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
@@ -66,19 +69,27 @@ import org.gephi.layout.plugin.forceAtlas2.ForceAtlas2;
 import org.gephi.layout.plugin.labelAdjust.LabelAdjust;
 import org.gephi.partition.api.EdgePartition;
 import org.gephi.partition.api.NodePartition;
+import org.gephi.partition.api.Part;
 import org.gephi.partition.api.PartitionController;
 import org.gephi.partition.plugin.EdgeColorTransformer;
 import org.gephi.partition.plugin.NodeColorTransformer;
+import org.gephi.preview.api.Item;
 import org.gephi.preview.api.PreviewController;
 import org.gephi.preview.api.PreviewModel;
+import org.gephi.preview.api.PreviewProperties;
 import org.gephi.preview.api.PreviewProperty;
 import org.gephi.preview.api.ProcessingTarget;
 import org.gephi.preview.api.RenderTarget;
+import org.gephi.preview.plugin.items.EdgeItem;
+import org.gephi.preview.plugin.items.EdgeLabelItem;
+import org.gephi.preview.plugin.items.NodeItem;
+import org.gephi.preview.plugin.items.NodeLabelItem;
 import org.gephi.preview.types.DependantColor;
 import org.gephi.preview.types.DependantOriginalColor;
 import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
+import org.neo4j.kernel.impl.nioneo.store.labels.NodeLabels;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
@@ -97,10 +108,11 @@ public class VisualizeGraph {
     private GraphModel graphModel;
     private PApplet applet;
     private CTabItem tabItem;
-    private Composite composite, composite2, composite3;
+    private Composite composite, composite2, composite3, composite4;
     private ProcessingTarget target;
     private Frame frame, frame2;
     private static VisualizeGraph visual = new VisualizeGraph();
+    private static HashMap<String, Color> edgeColoring = new HashMap<>();
 
     private VisualizeGraph() {
     }
@@ -386,6 +398,38 @@ public class VisualizeGraph {
         previewController.refreshPreview();
     }
 
+    public void printEdgeColorDetails() {
+        AttributeModel attributeModel = Lookup.getDefault()
+                .lookup(AttributeController.class).getModel();
+        PartitionController partitionController = Lookup.getDefault().lookup(
+                PartitionController.class);
+
+        // See if graph is well imported
+        DirectedGraph graph = graphModel.getDirectedGraph();
+
+        EdgePartition edge_partition = (EdgePartition) partitionController
+                .buildPartition(
+                        attributeModel.getEdgeTable().getColumn(
+                                "Neo4j Relationship Type"), graph);
+
+        /*for (GraphDB.RelTypes type : GraphDB.RelTypes.values()) {
+            Part<Edge> part = edge_partition.getPartFromValue(type.name());
+            String edgeType = type.name();
+            if (part != null ) {
+                Color color = part.getColor();
+                System.out.println(" Color: " + color);
+                edgeColoring.put(edgeType, color);
+            }
+
+        }
+        */
+        Part<Edge>[] edges = edge_partition.getParts();
+        for(Part<Edge> edge: edges){
+            edgeColoring.put(edge.getDisplayName(), edge.getColor());
+        }
+
+    }
+
     /**
      * Method to set Gephi preview layout option
      *
@@ -479,7 +523,7 @@ public class VisualizeGraph {
         setPreview();
         setLayout();
         target = getTarget();
-
+        printEdgeColorDetails();
         HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
         composite = new Composite(HomeGUI.graphTab,
                 SWT.EMBEDDED);
@@ -508,8 +552,9 @@ public class VisualizeGraph {
         data.grabExcessVerticalSpace = true;
 
         table.setHeaderVisible(true);
-        table.setLinesVisible(false);
+        table.setLinesVisible(true);
         table.setLayoutData(data);
+        table.setItemCount(10);
 
         /*
          this is first coloumn
@@ -530,11 +575,13 @@ public class VisualizeGraph {
          table holder for scrolling purpose
          */
         tableCursor = new TableCursor(table, SWT.NONE);
+        
+          
 
         final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         updateBtn.setText("Update");
 
-        final org.eclipse.swt.widgets.Button deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        final org.eclipse.swt.widgets.Button deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.POP_UP | SWT.VERTICAL);
         deleteBtn.setText("Delete");
 
         updateBtn.addSelectionListener(new SelectionAdapter() {
@@ -609,11 +656,10 @@ public class VisualizeGraph {
                                 switch (e.type) {
                                     case SWT.CR:
                                         item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {                                            
-                                        }
-                                        else{
+                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
+                                        } else {
                                             item.setText(1, text.getText());
-                                        }                                        
+                                        }
                                         System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
                                         //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
@@ -621,11 +667,10 @@ public class VisualizeGraph {
                                         break;
                                     case SWT.FocusOut:
                                         item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {                                            
-                                        }
-                                        else{
+                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
+                                        } else {
                                             item.setText(1, text.getText());
-                                        }                                        
+                                        }
                                         System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
                                         //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
@@ -668,6 +713,26 @@ public class VisualizeGraph {
         });
 
         tbtmPropertyInfos.setControl(composite2);
+        
+        composite4 = new Composite(composite2, SWT.RIGHT);
+        composite4.setLayout(new GridLayout(2, false));
+        
+        /*for (String type : edgeColoring.keySet()) {
+            Label edgeDetailLabel = new Label(composite4, SWT.NONE);
+            org.eclipse.swt.widgets.Button btn = new org.eclipse.swt.widgets.Button(composite4, SWT.PUSH);
+            
+            edgeDetailLabel.setText(type);
+            int green = edgeColoring.get(type).getGreen();
+            int blue = edgeColoring.get(type).getBlue();
+            int red = edgeColoring.get(type).getRed();
+            RGB rgb =  new RGB(red, green, blue);
+            //edgeColoring.get(type).
+            btn.setBackground(new org.eclipse.swt.graphics.Color(Display.getCurrent(),rgb));
+            btn.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(),rgb));
+            
+        }*/
+ 
+                
 
         //add refresh button to graph panel
         Button refresh = new Button("Refresh");
