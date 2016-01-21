@@ -465,11 +465,15 @@ public class ProjectCreateWindow {
 					//PropertyFile.setRelationshipXMLPath(xmlFolder + File.separator + FilePropertyName.RELATION_NAME);
 					
                                         RelationManager.createXML(projectAbsoulutePath.substring(0,projectAbsoulutePath.length()-1));
+					//RelationManager.createXML(projectAbsoulutePath+FilePropertyName.XML);
 					
+                                        
 					File propertyFolder = new File(projectAbsoulutePath+FilePropertyName.PROPERTY);
 					propertyFolder.mkdir();
                                         
-                                projectPath = PropertyFile.filePath  + File.separator;
+                                //projectPath = PropertyFile.filePath  + File.separator;
+                                projectPath = PropertyFile.filePath;
+                                System.out.println("---Project create window : line473 : "+projectPath);
                                 PropertyFile.setProjectName(projectName);
                                 PropertyFile.setGraphDbPath(projectPath + File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".graphdb");
                                 PropertyFile.setGeneratedGexfFilePath(projectPath+ File.separator + FilePropertyName.PROPERTY +File.separator+ projectName + ".gexf");
@@ -479,8 +483,9 @@ public class ProjectCreateWindow {
                                 HomeGUI.shell.setText("SAT- " + projectName);
                                 HomeGUI.newTab.setVisible(true);
                                 HomeGUI.tree.setVisible(true);
-
-                                RelationManager.createXML(projectPath);
+                                
+                                System.out.println("---Project create window : line486 : "+projectPath);
+                                RelationManager.createXML(projectPath+projectName);
                                 
                                 
                                  /*
@@ -503,8 +508,11 @@ public class ProjectCreateWindow {
                                             ,false);
                                 }
                                 
-                                
-                                
+                                String[] names=reqFilePath.split(""+File.separator);
+                                String requirementFileName=names[names.length-1];
+                                StaticData.requirementFilePath=projectAbsoulutePath+FilePropertyName.REQUIREMENT+File.separator+requirementFileName;
+                                System.out.println("----------Requirement file path--------- "+StaticData.requirementFilePath);
+                                XMLConversion.convertRequirementFile();
                                 XMLConversion.convertUMLFile();
                                 XMLConversion.convertJavaFiles();
                                 shell.dispose();

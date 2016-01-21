@@ -5,6 +5,7 @@
  */
 package com.project.property.config.xml.writer;
 
+import com.project.NLP.Requirement.NLPRequirementMain;
 import com.project.NLP.SourceCodeToXML.AST;
 import com.project.NLP.UMLToXML.jsonreader.JSONReader;
 import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
@@ -29,6 +30,7 @@ public class XMLConversion {
        if(StaticData.umlFilePath.contains("mdj")){
             JSONReader reader = new JSONReader();
             reader.readJson();
+            WriteToXML.type="UMLDiagram";
             xmlWriter.createXML();
             isSuccess = true;
           
@@ -54,5 +56,19 @@ public class XMLConversion {
                                 
     }
     
+    public static boolean convertRequirementFile() throws Exception{
+        
+        boolean isSuccess = false;
+        if(StaticData.requirementFilePath.contains("txt")){
+            NLPRequirementMain.extractRequirement();
+            isSuccess=true;
+        }
+        
+        
+        
+        
+        return isSuccess;
+                                
+    }
         
 }
