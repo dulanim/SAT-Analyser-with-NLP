@@ -5,11 +5,6 @@
  */
 package com.project.NLP.GUI;
 
-/**
- *
- * @author S. Shobiga
- */
-
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -30,6 +25,10 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+/**
+ *
+ * @author S. Shobiga
+ */
 
 public class ArtefactFrameTestGUI {
 
