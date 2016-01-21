@@ -1,0 +1,7 @@
+Customer may be candidate or employer. 
+transactions exist. 
+Bank client and staff can have an account in the bank.
+Each department is not having an employee.
+The bank client must be able to deposit an amount to and withdraw an amount from his or her accounts using the bank application. 
+
+ 
