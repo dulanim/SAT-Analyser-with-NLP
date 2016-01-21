@@ -100,6 +100,7 @@ public class WriteToXML {
                    
                      //putting INTRACONNECTION
                 }
+                
                 Element intraConnectionElement = doc.createElement(StaticData.INTRACONNECTION_ROOT);
                 artifact.appendChild(intraConnectionElement);//append an artifact main Artifact
                 
@@ -270,11 +271,11 @@ public class WriteToXML {
 
 		Element typeElement = doc.createElement(StaticData.TYPE_CONNECTION_ROOT);
 		typeElement.appendChild(doc.createTextNode(dependencies.getDependency_type()));
-		connectionElement.appendChild(typeElement);
+                connectionElement.appendChild(typeElement);
                 
                 Element startPonintElement = doc.createElement(StaticData.STARTPOINT_ROOT);
                 String id = getCurrentDesignId(dependencies.getSource_id());
-		startPonintElement.appendChild(doc.createTextNode(id));
+                startPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(startPonintElement);
                 
                 Element multiplicitySrcElement = doc.createElement(StaticData.MULTIPLICITY_ROOT);
@@ -284,7 +285,7 @@ public class WriteToXML {
                 
                 Element endPonintElement = doc.createElement(StaticData.ENDPOINT_ROOT);
                 id = getCurrentDesignId(dependencies.getTaget_id());
-		endPonintElement.appendChild(doc.createTextNode(id));
+                endPonintElement.appendChild(doc.createTextNode(id));
 		connectionElement.appendChild(endPonintElement);
                 
                 Element multiplicityTargetElement = doc.createElement(StaticData.MULTIPLICITY_ROOT);

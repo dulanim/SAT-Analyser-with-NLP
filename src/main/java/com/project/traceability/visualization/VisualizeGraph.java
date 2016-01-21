@@ -494,6 +494,7 @@ public class VisualizeGraph {
         frame.add(panel);
         composite.setData(panel);
         HomeGUI.graphtabItem.setControl(composite);
+        frame.revalidate();
         // }
         //});
 

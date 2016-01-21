@@ -1,3 +1,4 @@
+
 package com.project.traceability.ontology.models;
 
 import java.io.FileNotFoundException;

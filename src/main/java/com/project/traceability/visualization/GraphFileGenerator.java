@@ -181,6 +181,7 @@ public class GraphFileGenerator {
         graph.getAttributeLists().add(nodeAttrList);
 
         HashMap<String, Attribute> val = new HashMap<>();
+        System.out.println("gg "+graphDb);
 
         try (Transaction tx = graphDb.beginTx()) {
 

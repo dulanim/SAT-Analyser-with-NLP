@@ -129,7 +129,7 @@ public class GraphDB {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                 + ".graphdb").newGraphDatabase();
         Transaction tx = graphDb.beginTx();
-
+        
         try {
             tx.success();
 
@@ -154,7 +154,7 @@ public class GraphDB {
         for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
             IndexHits<Node> subElement_hits = artefacts.get("ID", artefactsSubElement.getSubElementId());
             Node subNode = subElement_hits.getSingle();
-            ArtefactSubElement temp = artefactsSubElement;
+            ArtefactSubElement temp = artefactsSubElement;           
             if (subNode == null) {
                 addNewSubNodeToDB(temp, artefacts, n, edges);
             } else {
@@ -251,26 +251,35 @@ public class GraphDB {
             //System.out.println("Node visibility updated " + artefactElement.getType());
         }
         //Identifies if any changes (new/update) hve occured in the sub artefact element of the given artefact element
-        Iterator<Relationship> relations = node
-                .getRelationships(RelTypes.SUB_ELEMENT)
-                .iterator();
+        
         List<ArtefactSubElement> artefactsSubElements = artefactElement
                 .getArtefactSubElements();
 
         boolean subElementExist = false;
+        System.out.println("Sbnode");
+        parent:
         for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
+            System.out.print("sb-"+artefactsSubElement.getSubElementId());
+            Iterator<Relationship> relations = node
+                .getRelationships(RelTypes.SUB_ELEMENT)
+                .iterator();
+            child:
             while (relations.hasNext()) {
                 Node test = relations.next().getOtherNode(node);
                 if (test.getProperty("ID").equals(artefactsSubElement.getSubElementId())) {
+                    System.out.print("Entere");
                     updateSubNodeToDB(test, artefactsSubElement);
                     subElementExist = true;
                     //System.out.println("SubElement exists in db.....");
+                    break;
                 }
             }
             if (!subElementExist) {
+                System.out.print("noentree@");
                 //addNewSubNodeToDB(ArtefactSubElement temp, Index<Node> artefacts, Node n, Index<Relationship> edges)
                 addNewSubNodeToDB(artefactsSubElement, artefacts, node, edges);
             }
+            subElementExist = false;
         }
         //System.out.println("Node already exists.....");
 
@@ -386,7 +395,7 @@ public class GraphDB {
                 IndexHits<Node> hits = artefacts.get("ID",
                         artefactElement.getArtefactElementId());
                 Node node = hits.getSingle();
-                if (node == null) {
+                if (node == null) {                     
                     addNewNodeToDB(myLabel, artefacts, edges, artefactElement);
                 } else {
                     updateNodeToDB(node, artefactElement);
@@ -399,7 +408,9 @@ public class GraphDB {
         }
     }
 
-    /*public void checkDB() {
+    public void checkDB() {
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                + ".graphdb").newGraphDatabase();
         try (Transaction tx = graphDb.beginTx()) {
             System.out.println("Entered db...");
             for (Node n : GlobalGraphOperations.at(graphDb).getAllNodes()) {
@@ -407,8 +418,15 @@ public class GraphDB {
                     System.out.println("" + m + " : " + n.getProperty(m));
                 }
             }
+            for (Relationship r : GlobalGraphOperations.at(graphDb).getAllRelationships()) {
+                System.out.println(""+r.getStartNode().getProperty("ID")+"-"+r.getEndNode().getProperty("ID")+":"+r.getType().name());
+            }
         }
-    }*/
+        finally{
+            graphDb.shutdown();
+        
+        }
+    }
 
     /**
      * Method to add relationships to db
