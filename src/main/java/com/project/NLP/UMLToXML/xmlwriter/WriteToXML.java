@@ -35,7 +35,10 @@ import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
+import java.io.IOException;
 import javax.swing.JOptionPane;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 public class WriteToXML {
     
    
@@ -113,15 +116,23 @@ public class WriteToXML {
                 
 
                 File xmlFile = new File(getFileDir());
+                
+                if(!xmlFile.exists())
+                    xmlFile.createNewFile();
                 StreamResult result = new StreamResult(xmlFile.getPath());
 
                 transformer.transform(source, result);
 
                 System.out.println("XML File saved @ " + xmlFile.getPath());
 
-	  } catch(ParserConfigurationException | TransformerException pce) {
+	  } catch(ParserConfigurationException | TransformerException |IOException pce) {
 		
-                 JOptionPane.showMessageDialog(null, pce.toString());
+                MessageBox box = new MessageBox(ProjectCreateWindow.shell,
+                SWT.ERROR);
+                box.setText("File Not Found Error");
+                box.setMessage(pce.toString());
+                box.open();
+                
 	  }
 	}
         
@@ -132,7 +143,7 @@ public class WriteToXML {
         try{
             String root = HomeGUI.tree.getToolTipText() + File.separator + 
                             ProjectCreateWindow.projectName;
-            File f = new File(File.separator +FilePropertyName.XML);
+            File f = new File(root + File.separator +FilePropertyName.XML);
             if(!f.exists())
                     f.mkdir();
             if(type.equals("Requirement")){
