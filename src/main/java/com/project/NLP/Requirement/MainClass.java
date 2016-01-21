@@ -52,7 +52,7 @@ public class MainClass {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("io/BankRequirement1.txt");
+            requirementDocument = readFromTextFile("io/OrderRequirement.txt");
 
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", "C://Program Files (x86)/WordNet/2.1/dict");
