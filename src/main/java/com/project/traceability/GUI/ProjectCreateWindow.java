@@ -441,7 +441,7 @@ public class ProjectCreateWindow {
 				File srcFile = new File(srcFilePath);
 				
 				String projectAbsoulutePath = projectRoot.getAbsolutePath() ;
-				
+				                        System.out.println("!234");
 				if(!(projectAbsoulutePath.lastIndexOf(File.separator) == projectAbsoulutePath.length()-1))
 					projectAbsoulutePath += (File.separator);
 					
@@ -507,9 +507,11 @@ public class ProjectCreateWindow {
                                     Adapter.changeExistingWrkspaceStatus(StaticData.workspace
                                             ,false);
                                 }
-                                
-                                String[] names=reqFilePath.split(""+File.separator);
-                                String requirementFileName=names[names.length-1];
+                                    System.out.println("Name: "+reqFilePath);
+                                //String[] names=reqFilePath.split(""+File.separator);
+                                //String requirementFileName=names[names.length-1];
+                                String requirementFileName = reqFilePath.substring(reqFilePath.lastIndexOf(File.separator));
+                                    System.out.println("Re: "+requirementFileName);
                                 StaticData.requirementFilePath=projectAbsoulutePath+FilePropertyName.REQUIREMENT+File.separator+requirementFileName;
                                 System.out.println("----------Requirement file path--------- "+StaticData.requirementFilePath);
                                 XMLConversion.convertRequirementFile();

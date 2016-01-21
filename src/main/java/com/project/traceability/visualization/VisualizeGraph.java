@@ -10,6 +10,7 @@ import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
 import static com.project.traceability.visualization.GraphMouseListener.nodeData;
 import static com.project.traceability.visualization.GraphMouseListener.tableCursor;
+import static com.project.traceability.visualization.GraphMouseListener.tableItem;
 import static com.project.traceability.visualization.GraphMouseListener.tblclmnValue;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -564,7 +565,7 @@ public class VisualizeGraph {
             public void widgetSelected(SelectionEvent se) {
                 GraphDBDelete gbDeletor = new GraphDBDelete();
                 System.out.println("Selected Dele :" + nodeData);
-                gbDeletor.deleteNodeAndRelations(nodeData);                
+                gbDeletor.deleteNodeAndRelations(nodeData);
                 System.out.println("Heliio");
                 transferDataToDBFromXML(projectPath, false);
 
@@ -606,28 +607,25 @@ public class VisualizeGraph {
                             @Override
                             public void handleEvent(Event e) {
                                 switch (e.type) {
-                                    case SWT.KeyUp:
-                                        item.setText(1, text.getText());
-                                        System.out.println("Replacing1: " + item.getText(0) + ":" + item.getText(1));
+                                    case SWT.CR:
+                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {                                            
+                                        }
+                                        else{
+                                            item.setText(1, text.getText());
+                                        }                                        
+                                        System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
-                                    case SWT.KeyDown:
-                                        item.setText(1, text.getText());
-                                        System.out.println("Replacing2: " + item.getText(0) + ":" + item.getText(1));
-                                        nodeData.replace(item.getText(0), item.getText(1));
-                                    case SWT.MouseEnter:
-                                        item.setText(1, text.getText());
-                                        System.out.println("Replacing3: " + item.getText(0) + ":" + item.getText(1));
-                                        nodeData.replace(item.getText(0), item.getText(1));
-                                    case SWT.MouseDown:
-                                        item.setText(1, text.getText());
-                                        System.out.println("Replacing4: " + item.getText(0) + ":" + item.getText(1));
-                                        nodeData.replace(item.getText(0), item.getText(1));
-                                    case SWT.FOCUSED:
-                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
+                                        //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
+                                        text.dispose();
+                                        break;
                                     case SWT.FocusOut:
                                         item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-                                        item.setText(1, text.getText());
+                                        if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {                                            
+                                        }
+                                        else{
+                                            item.setText(1, text.getText());
+                                        }                                        
                                         System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
                                         //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));

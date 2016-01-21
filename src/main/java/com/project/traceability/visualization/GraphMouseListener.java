@@ -11,10 +11,8 @@ import static com.project.traceability.GUI.HomeGUI.projectPath;
 import java.awt.GridLayout;
 import java.util.HashMap;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
@@ -36,24 +34,13 @@ import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
 import com.project.traceability.common.PropertyFile;
-import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
-import java.awt.Component;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.JFrame;
-import javax.xml.transform.TransformerException;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.neo4j.graphdb.Relationship;
 
 /**
  *
@@ -72,8 +59,7 @@ public class GraphMouseListener implements PreviewMouseListener {
     public static TableColumn tblclmnValue;
     public static TableCursor tableCursor;
     public static TableItem tableItem;
-    private TableItem tableItem_1;
-
+    
     private static String Id;
     public static HashMap<String, Object> nodeData = new HashMap<>();
     public static boolean update = false;
@@ -220,7 +206,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                 for (String key : nodeProps.keySet()) {
                     Object val = nodeProps.get(key);
                     if (null != val) {
-                        tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);
+                        tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);                        
                         tableItem.setText(0, key);
                         tableItem.setText(1, val.toString());
                         //field = new JTextField(nodeProps.get(key).toString());

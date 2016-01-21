@@ -10,7 +10,6 @@ import com.project.NLP.SourceCodeToXML.AST;
 import com.project.NLP.UMLToXML.jsonreader.JSONReader;
 import com.project.NLP.UMLToXML.xmiumlreader.XMLReader;
 import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.staticdata.StaticData;
 
 /**
@@ -39,7 +38,7 @@ public class XMLConversion {
                 reader.readUMLXMI();
                 isSuccess = true;
         }
-       
+        System.out.println("Success");
        return isSuccess;
     }
     
