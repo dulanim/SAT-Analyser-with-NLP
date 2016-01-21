@@ -78,7 +78,7 @@ public class WorkspaceSelectionWindow {
 		lblWork.setBounds(3, 34, 118, 29);
 		lblWork.setText("Workspace Path");
 		
-                combo = new Combo(grpWorkspacePath, SWT.NONE);
+        combo = new Combo(grpWorkspacePath, SWT.NONE);
 		combo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -111,8 +111,8 @@ public class WorkspaceSelectionWindow {
 		        // disable the "All files" option.
 		        //
 		        // 
-                        String wrkspce= directory.open();
-		        if (!wrkspce.equals("")) {
+                String wrkspce= directory.open();
+		        if (wrkspce != null) {
 		              String path = wrkspce;
 		              File file = new File(path);
 		              if(file.isDirectory()){
@@ -123,6 +123,7 @@ public class WorkspaceSelectionWindow {
 		              }
 		          }else {
                             System.out.println("No Selection ");
+                            shell.setActive();
 		          }
 			}
 		});
