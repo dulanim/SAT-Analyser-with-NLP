@@ -7,19 +7,11 @@
 package com.project.NLP.Requirement;
 
 import com.project.NLP.GUI.ArtefactFrameTestGUI;
-import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
-import com.project.traceability.model.Attribute;
-import com.project.traceability.model.Dependencies;
-import com.project.traceability.model.ModelData;
-import com.project.traceability.model.Operation;
-import com.project.traceability.model.Parameter;
-import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,18 +20,19 @@ import java.util.Iterator;
 
 public class NLPRequirementMain {
 
-    private static String requirementDocument = "";
-    private static HashMap requirementObjects = new HashMap();
-    private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();
+    private static final String REQUIREMENT_INPUT_FILE = "io/OrderRequirement.txt"; // input file
+    private static String requirementDocument = ""; //variable to hold the input document 
+    private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
+    private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
 
-    public static void main(String args[]) {
+    public static void extractRequirement() {
 
-        HashSet classList = new HashSet();
-        HashSet attrList = new HashSet();
-        HashSet methodList = new HashSet();
-        HashSet relationList = new HashSet();
-        StoringArtefacts storingArtefacts;
-        String className = null;
+        HashSet classList = new HashSet(); //to store the identified class list by applying rules
+        HashSet attrList = new HashSet(); //to store the identified attribute list by applying rules
+        HashSet methodList = new HashSet(); //to store the identified method list by applying rules
+        HashSet relationList = new HashSet(); //to store the identified relations ship list by applying rules
+        StoringArtefacts storingArtefacts= new StoringArtefacts(); //variable to hold the storing artefacts
+        String className = ""; 
         ArrayList trees = new ArrayList();
         HashMap<String, HashSet> multiClassWithAttribute;
         HashMap<String, HashSet> multiClassWithMethod;
@@ -52,8 +45,7 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile("io/BankRequirement1.txt");
-
+            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", "C://Program Files (x86)/WordNet/2.1/dict");
 
@@ -64,8 +56,6 @@ public class NLPRequirementMain {
                 requirementDocument = analyzer.doPronounResolving();
                 ParserTreeGenerator parser = new ParserTreeGenerator(requirementDocument);
                 trees = parser.getSentenceParseTree();
-                // ParserTreeGenerator p = new ParserTreeGenerator();
-                //passiveCheck = parser.isPassiveSentence();
                 /*For individual sentence in the requirement Document */
                 for (int countTree = 0; countTree < trees.size(); countTree++) {
                     Tree tree = (Tree) trees.get(countTree);
@@ -90,74 +80,26 @@ public class NLPRequirementMain {
                             System.out.println("ATTRIBUTE LIST: " + attrList);
 
                             /*if the sentence is passive swipe the attributes and methods*/
-                            //passiveVoiceHandling(parser, classList, attrList);
                             passiveMap = parser.getPassiveSentenceMap();
 
                             if (passiveMap.containsKey(tree)) {
                                 System.out.println("passive sentence detected");
-                               // if (!attrList.isEmpty()) {
-                                    tempList = classList;
-                                    classList = attrList;
-                                    attrList = tempList;
-                               // }
+                                tempList = classList;
+                                classList = attrList;
+                                attrList = tempList;
                             }
 
                             /* methods identification */
                             MethodIdentifier mId = new MethodIdentifier(tree, classList);
                             methodList = mId.identifyCandidateMethods(tree);
 
-                            /* relations identificaton */
-                            //ClassRelationIdentifier crId = new ClassRelationIdentifier(classList, requirementObjects.keySet());
-                            //relationList = crId.identifyGenaralizationByComparing(classList, requirementObjects.keySet());
-                            //relationList.addAll(crId.identifyGenaralizationByHypernym(classList, requirementObjects.keySet()));
+                            /* if the rule detects multiple classes for a sentence add all the artefacts for each of the class */
                             if (classList.size() > 1) {
-
                                 /*Storing Class details  */
-                                Iterator iterator = classList.iterator();
-                                while (iterator.hasNext()) {
-                                    className = (String) iterator.next();
-                                    className = className.toLowerCase();
-                                    if (requirementObjects.containsKey(className)) {
-                                        StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
-                                        storeArt.addAttributes(attrList);
-                                        storeArt.addMethods(methodList);
-                                        storeArt.addRelationships(relationList);
-
-                                    } else {
-                                        /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                                        storingArtefacts = new StoringArtefacts();
-                                        storingArtefacts.addClassName(classList);
-                                        storingArtefacts.addAttributes(attrList);
-                                        storingArtefacts.addMethods(methodList);
-                                        storingArtefacts.addRelationships(relationList);
-                                        requirementObjects.put(className, storingArtefacts);
-                                    }
-
-                                }
-
+                                storingClassDetails(classList, className,requirementObjects, storingArtefacts, attrList, methodList, relationList );
                             } else if (classList.size() == 1) {
-
                                 /*Storing Class details  */
-                                Iterator iterator = classList.iterator();
-                                if (iterator.hasNext()) {
-                                    className = (String) iterator.next();
-                                    className = className.toLowerCase();
-                                }
-                                if (requirementObjects.containsKey(className)) {
-                                    StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
-                                    storeArt.addAttributes(attrList);
-                                    storeArt.addMethods(methodList);
-                                    storeArt.addRelationships(relationList);
-
-                                } else {
-                                    /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
-                                    storingArtefacts = new StoringArtefacts();
-                                    storingArtefacts.addClassName(classList);
-                                    storingArtefacts.addAttributes(attrList);
-                                    storingArtefacts.addMethods(methodList);
-                                    storingArtefacts.addRelationships(relationList);
-                                    requirementObjects.put(className, storingArtefacts);
-                                }
+                                storingClassDetails(classList, className,requirementObjects, storingArtefacts, attrList, methodList, relationList );
 
                             }
                             /*to handle class with attribute map (noun + noun)*/
@@ -234,6 +176,29 @@ public class NLPRequirementMain {
         }
     }
 
+    /*method to store the class details in the map*/
+    private static void storingClassDetails(HashSet classList, String className,HashMap requirementObjects, StoringArtefacts storingArtefacts, HashSet attrList, HashSet methodList, HashSet relationList ) {
+        Iterator iterator = classList.iterator();
+        while (iterator.hasNext()) {
+            className = (String) iterator.next();
+            className = className.toLowerCase();
+
+            if (requirementObjects.containsKey(className)) {
+                StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(className);
+                storeArt.addAttributes(attrList);
+                storeArt.addMethods(methodList);
+                storeArt.addRelationships(relationList);
+            } else {
+                /*calling storingArtefacts class store the results inorder to find the class- attri - metho -relation */
+                storingArtefacts = new StoringArtefacts();
+                storingArtefacts.addClassName(classList);
+                storingArtefacts.addAttributes(attrList);
+                storingArtefacts.addMethods(methodList);
+                storingArtefacts.addRelationships(relationList);
+                requirementObjects.put(className, storingArtefacts);
+            }
+        }
+    }
 
     /* Reading the input Natural Language Requirement File 
      *Input : text file
