@@ -717,7 +717,7 @@ public class VisualizeGraph {
         composite4 = new Composite(composite2, SWT.RIGHT);
         composite4.setLayout(new GridLayout(2, false));
         
-        /*for (String type : edgeColoring.keySet()) {
+        for (String type : edgeColoring.keySet()) {
             Label edgeDetailLabel = new Label(composite4, SWT.NONE);
             org.eclipse.swt.widgets.Button btn = new org.eclipse.swt.widgets.Button(composite4, SWT.PUSH);
             
@@ -730,7 +730,7 @@ public class VisualizeGraph {
             btn.setBackground(new org.eclipse.swt.graphics.Color(Display.getCurrent(),rgb));
             btn.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(),rgb));
             
-        }*/
+        }
  
                 
 

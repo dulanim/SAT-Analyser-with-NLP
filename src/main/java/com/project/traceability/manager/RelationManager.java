@@ -26,7 +26,9 @@ import org.xml.sax.SAXException;
 
 import com.project.traceability.GUI.HomeGUI;
 import java.io.FileWriter;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.openide.util.Exceptions;
+import org.w3c.dom.DOMException;
 
 public class RelationManager {
 
@@ -105,42 +107,50 @@ public class RelationManager {
 
         File file = new File(filePath);
 
-        if (!file.exists()) {
-
+        if (file.exists()) {
+            addRelationsXML(filePath);
+        } else {
             try {
-                DocumentBuilderFactory documentFactory = DocumentBuilderFactory
-                        .newInstance();
-                DocumentBuilder documentBuilder = documentFactory
-                        .newDocumentBuilder();
-
-                Document document = documentBuilder.newDocument();
-                Element rootElement = document.createElement("Relations");
-                document.appendChild(rootElement);
-                System.out.println("start");
-
-                // creating and writing to xml file
-                TransformerFactory transformerFactory = TransformerFactory
-                        .newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                DOMSource domSource = new DOMSource(document);
-                StreamResult streamResult = new StreamResult(filePath);
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                transformer.setOutputProperty(
-                        "{http://xml.apache.org/xslt}indent-amount", "4");
-                transformer.transform(domSource, streamResult);
-
-                System.out.println("File saved to specified path!");
-
-            } catch (ParserConfigurationException pce) {
-                pce.printStackTrace();
-            } catch (TransformerConfigurationException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (TransformerException ex) {
+                file.createNewFile();
+            } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
-        } else {
-            return;
+            addRelationsXML(filePath);
+        }
+    }
+
+    public static void addRelationsXML(String filePath) throws IllegalArgumentException, DOMException, TransformerFactoryConfigurationError {
+        try {
+            DocumentBuilderFactory documentFactory = DocumentBuilderFactory
+                    .newInstance();
+            DocumentBuilder documentBuilder = documentFactory
+                    .newDocumentBuilder();
+            
+            Document document = documentBuilder.newDocument();
+            Element rootElement = document.createElement("Relations");
+            document.appendChild(rootElement);
+            System.out.println("start");
+            
+            // creating and writing to xml file
+            TransformerFactory transformerFactory = TransformerFactory
+                    .newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource domSource = new DOMSource(document);
+            StreamResult streamResult = new StreamResult(filePath);
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(
+                    "{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.transform(domSource, streamResult);
+            
+            System.out.println("File saved to specified path!");
+            
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerConfigurationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }
 
