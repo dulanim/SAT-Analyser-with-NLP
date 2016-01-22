@@ -184,19 +184,35 @@ public class PhrasesIdentification {
                         if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
+                            if (separator == 0) {
 
-                            if (count != 1) {
-                                String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
-                                //attributeLists.add(word);
-                                nounList.remove(tempClass);
-                                nounList.add(word);
-                                System.out.println("count == inn");
-                                if (!storingClass.isEmpty()) {
-                                    classWithAttr.add(word);
-                                    //nounList.add(word);
-                                    storingClassWithAttr.put(storingClass, classWithAttr);
+                                if (count != 1) {
+                                    String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
+                                    //attributeLists.add(word);
+                                    nounList.remove(tempClass);
+                                    nounList.add(word);
+                                    System.out.println("count == inn");
+                                    if (!storingClass.isEmpty()) {
+                                        classWithAttr.add(word);
+                                        //nounList.add(word);
+                                        storingClassWithAttr.put(storingClass, classWithAttr);
 
+                                    }
+                                } else {
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    String word = "";
+                                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                    if (identifiedWord.contains("_")) {
+                                        word = identifiedWord;
+                                    } else {
+                                        word = morphology.stem(identifiedWord);
+                                    }
+                                    nounList.add(word);
+                                    tempClass = word;
+                                    storingClass = word;
+                                    System.out.println(">2 else");
                                 }
+                                count++;
                             } else {
                                 String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
                                 String word = "";
@@ -211,8 +227,8 @@ public class PhrasesIdentification {
                                 storingClass = word;
                                 System.out.println(">2 else");
                             }
-                            count++;
                         }
+
                     }
 
                 }

@@ -83,7 +83,6 @@ public class NLPRequirementMain {
 
                             /*if the sentence is passive swipe the attributes and methods*/
                             passiveMap = parser.getPassiveSentenceMap();
-
                             if (passiveMap.containsKey(tree)) {
                                 System.out.println("passive sentence detected");
                                 tempList = classList;
@@ -95,15 +94,12 @@ public class NLPRequirementMain {
                             MethodIdentifier mId = new MethodIdentifier(tree, classList);
                             methodList = mId.identifyCandidateMethods(tree);
 
-                            /* if the rule detects multiple classes for a sentence add all the artefacts for each of the class */
-                            if (classList.size() > 1) {
-                                /*Storing Class details  */
-                                storingClassDetails(classList, className,requirementObjects, storingArtefacts, attrList, methodList, relationList );
-                            } else if (classList.size() == 1) {
-                                /*Storing Class details  */
-                                storingClassDetails(classList, className,requirementObjects, storingArtefacts, attrList, methodList, relationList );
-
-                            }
+                            /* if the rule detects multiple classes for a sentence add all the artefacts for each of the class 
+                            *and if it has only one class, execute it normal way
+                            */
+                            /*Storing Class details  */
+                            storingClassDetails(classList, className,requirementObjects, storingArtefacts, attrList, methodList, relationList );
+                            
                             /*to handle class with attribute map (noun + noun)*/
                             if (!classWithAttr.isEmpty()) {
                                 HashSet classListWithAttr = new HashSet();
@@ -114,9 +110,9 @@ public class NLPRequirementMain {
                                     String classN = classWithAttrIterator.next().toString();
                                     classListWithAttr.add(classN);
                                     attributeList = (HashSet) classWithAttr.get(classN);
-                                    System.out.println("CLASS from classWith attributes :" + classN);
-                                    System.out.println("Attributes from classwith attributes: " + attributeList);
-
+                                    System.out.println("class from classWith attributes :" + classN);
+                                    System.out.println("attributes from classwith attributes: " + attributeList);
+                                
                                     if (requirementObjects.containsKey(classN)) {
                                         StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(classN);
                                         storeArt.addAttributes(attributeList);
@@ -126,36 +122,21 @@ public class NLPRequirementMain {
                                         storingArtefacts = new StoringArtefacts();
                                         storingArtefacts.addClassName(classListWithAttr);
                                         storingArtefacts.addAttributes(attributeList);
-
                                         requirementObjects.put(classN, storingArtefacts);
                                     }
-
                                 }
-
                             }
                         }
                     }
-
                 }
-                /*After finding all classes in the document identifying relationships betweenm them.
-                 *
-                 */
-                HashSet relationSet = new HashSet();
+                /*After finding all classes in the document identifying relationships between them.*/                HashSet relationSet = new HashSet();
                 ClassRelationIdentifier crid = new ClassRelationIdentifier();
-                //relationSet=crid.identifyGeneralizationRelations(requirementObjects.keySet());
                 requirementObjectRelations.addAll(crid.identifyGeneralizationRelations(requirementObjects.keySet()));
-                //addingRelationsToIdentifiedClasses(relationSet);
                 HashSet associationSet = new HashSet();
                 for (Object tree : trees) {
-                    // associationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
-                    //relationSet.addAll(crid.identifyAssociation((Tree)tree,requirementObjects.keySet()));
                     requirementObjectRelations.addAll(crid.identifyAssociation((Tree) tree, requirementObjects.keySet()));
                 }
                 System.out.println("---Relation set : " + requirementObjectRelations);
-                //System.out.println("---Associaton set : "+relationSet);
-                // addingRelationsToIdentifiedClasses(associationSet);
-                // addingRelationsToIdentifiedClasses(relationSet);
-
                 /*Writing the information extracted from Requirement to text file  */
                 if (!requirementObjects.isEmpty()) {
                     /*eliminate the classes which are not having any attributes, methods and relationships*/
@@ -165,16 +146,13 @@ public class NLPRequirementMain {
                     while (t.getLock()) {
                         Thread.sleep(100);
                     }
-
                     //writeOutputToTxtFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
                     WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
-
                 }
             }
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
-
         }
     }
 
@@ -214,8 +192,6 @@ public class NLPRequirementMain {
             String sCurrentLine;
             br = new BufferedReader(new FileReader(file));
             while ((sCurrentLine = br.readLine()) != null) {
-                System.out.println("Current Line: " + sCurrentLine);
-
                 /*start a new sentence if the sentence contains but */
                 if (sCurrentLine.contains("but")) {
                     sCurrentLine = sCurrentLine.replace("but", ". But");
@@ -232,7 +208,6 @@ public class NLPRequirementMain {
                 if (sCurrentLine.contains("'s")) {
                     sCurrentLine = sCurrentLine.replace("'s", " ");
                 }
-
                 req_Document += " " + sCurrentLine;
             }
 
@@ -247,7 +222,6 @@ public class NLPRequirementMain {
                 ex.printStackTrace();
             }
         }
-
         return req_Document;
     }
 
@@ -267,7 +241,6 @@ public class NLPRequirementMain {
     public static void writeOutputToTxtFile(HashMap output, HashSet outputRelations) {
         //write to file : "Requirement Output"
         try {
-
             StringBuffer sbf = new StringBuffer();
             Iterator it = output.keySet().iterator();
             while (it.hasNext()) {
@@ -294,22 +267,15 @@ public class NLPRequirementMain {
                     ClassRelation rel = (ClassRelation) clRelation;
                     System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
                     sbf.append("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-
                 }
-
             }
-
             System.out.println(sbf.toString());
-
             BufferedWriter bwr = new BufferedWriter(new FileWriter("Requirement_Output.txt"));
-
-            //write contents of StringBuffer to a file
+            /*write contents of StringBuffer to a file*/
             bwr.write(sbf.toString());
-
-            //flush the stream
+            /*flush the stream*/
             bwr.flush();
-
-            //close the stream
+            /*close the stream*/
             bwr.close();
 
         } catch (Exception e) {
