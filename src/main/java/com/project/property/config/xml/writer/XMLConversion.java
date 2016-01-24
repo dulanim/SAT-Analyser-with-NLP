@@ -48,7 +48,7 @@ public class XMLConversion {
         AST ast = new AST();
         ast.startSourceCodeConversion(StaticData.sourceFilePath);
         
-        new AST().startSourceCodeConversion(StaticData.sourceFilePath);
+        //new AST().startSourceCodeConversion(StaticData.sourceFilePath);
         isSuccess = true;
         
         return isSuccess;

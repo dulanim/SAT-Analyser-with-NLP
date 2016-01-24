@@ -51,6 +51,7 @@ public class ReadXML {
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
             GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
             visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+            visual.setGraph(model);
             visual.showGraph();//show the graph visualization in tool
 
         } catch (Exception e) {

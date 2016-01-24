@@ -7,9 +7,11 @@
 package com.project.NLP.Requirement;
 
 import com.project.NLP.GUI.ArtefactFrameTestGUI;
+import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,9 +47,10 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
-            System.setProperty("wordnet.database.dir", "C://Program Files (x86)/WordNet/2.1/dict");
+            System.setProperty("wordnet.database.dir", System.getProperty("user.home")+File.separator+"WordNet"+File.separator+"dict");
 
             if ("".equals(requirementDocument)) {
                 System.out.println("Error : There is no input document !!!");
