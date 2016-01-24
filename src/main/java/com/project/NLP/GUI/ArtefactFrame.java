@@ -295,6 +295,7 @@ public class ArtefactFrame extends JFrame {
                     Object n = pathSelected.getLastPathComponent();
                     System.out.println("new node:" + node.toString());
                     ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                    updateAss_Gen_Edit(selectedType, node);
 
                 } catch (Exception e) {
                     System.out.println("Exception occurs in GUI: (ignore it)" + e);
@@ -303,6 +304,43 @@ public class ArtefactFrame extends JFrame {
             }
         }
 
+    }
+    /*method to update the changes in both classes when edit is pressed in any of the relationship type*/
+
+    protected void updateAss_Gen_Edit(String selectedType, DefaultMutableTreeNode node) {
+        Object newClass = null;
+        Object currentParentClass = node.getParent(); // parent class of the selected node -> className
+        int relCount = node.getChildCount();
+        for (int rCount = 0; rCount < relCount; rCount++) {
+
+            Object leaf = node.getChildAt(rCount);
+            newClass = leaf.toString().split("->")[1];
+            Object newClassNode = getObjectNode(newClass);
+            int childClassCount = tree.getModel().getChildCount(newClassNode);
+            for (int cCount = 0; cCount < childClassCount; cCount++) {
+
+                System.out.println(tree.getModel().getChild(newClassNode, cCount).toString());
+                if (tree.getModel().getChild(newClassNode, cCount).toString().equalsIgnoreCase("Relationships")) {
+
+                    Object relationShipsNode = tree.getModel().getChild(newClassNode, cCount);
+                    System.out.println(relationShipsNode.toString());
+                    int assGenCount = tree.getModel().getChildCount(relationShipsNode);
+                    System.out.println(assGenCount);
+                    for (int aCount = 0; aCount < assGenCount; aCount++) {
+                        Object typeNode = tree.getModel().getChild(relationShipsNode, aCount);
+                        System.out.println("typeNode " + typeNode.toString() + "  node: " + node.toString());
+                        if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
+                            System.out.println("typeNode " + typeNode.toString());
+                            DefaultMutableTreeNode typeNodeChange = (DefaultMutableTreeNode) (typeNode);
+
+                            typeNodeChange.setUserObject(selectedType);
+                            ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     protected void validateRelations_Edit(DefaultMutableTreeNode node) {
@@ -373,7 +411,6 @@ public class ArtefactFrame extends JFrame {
         String currentRelationClass = nodeArray[1];
         Object currentRelationClass_object = null;
 
-        String newNodeArray = "";
         Object currentParentClass = node.getParent().getParent().getParent();
         /*traverse to the class where the the selected node's class exist*/
         System.out.println("ddddddddddddddddddddddddd");
@@ -436,7 +473,7 @@ public class ArtefactFrame extends JFrame {
 
         //currentparentClass
         int childCountOfClass = tree.getModel().getChildCount(currentRelationClass_object);
-     
+
         System.out.println("childCountOfClass: " + childCountOfClass);
 
         if (selectedType.equalsIgnoreCase("Parent")) {
@@ -492,7 +529,7 @@ public class ArtefactFrame extends JFrame {
             rel = tree.getModel().getChild(clNode, childCountOfClass);
             System.out.println(rel);
             addItems(rel, node.getParent().toString(), 0);
-            
+
             //add the leaf
             relType = tree.getModel().getChild(rel, 0);
             addItems(relType, selectedType + " ->" + currentParentClass, 0);
