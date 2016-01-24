@@ -1,8 +1,6 @@
 package com.project.property.config.xml.writer;
 
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.common.PropertyFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +26,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.PropertyFile;
 
 public class XMLWriter {
         private static XMLWriter writer;
@@ -60,30 +61,25 @@ public class XMLWriter {
             return writer;
         }
         private void init(){
-            
-            
             try{
-		File file = new File(filepath);
-		if(!file.exists()){
-                    file.createNewFile();
-                    docFactory = DocumentBuilderFactory.newInstance();
-                    docBuilder = docFactory.newDocumentBuilder();
-                    doc = docBuilder.newDocument();
-                    create_root();
-					
-                }
-                docFactory = DocumentBuilderFactory.newInstance();
-                docBuilder = docFactory.newDocumentBuilder();
-                doc = docBuilder.parse(filepath);
-                        
-                                
+				File file = new File(filepath);
+				if(!file.exists()){
+		             file.createNewFile();
+		             docFactory = DocumentBuilderFactory.newInstance();
+		             docBuilder = docFactory.newDocumentBuilder();
+		             doc = docBuilder.newDocument();
+		             create_root();
+		       }
+		       docFactory = DocumentBuilderFactory.newInstance();
+		       docBuilder = docFactory.newDocumentBuilder();
+		       doc = docBuilder.parse(filepath);                    
 		}catch(IOException e){
 			e.printStackTrace();
 		}catch(SAXException e){
-                        e.printStackTrace();
-                }catch(ParserConfigurationException e){
-                    e.printStackTrace();
-                }
+			e.printStackTrace();
+		}catch(ParserConfigurationException e){
+             e.printStackTrace();
+        }
            
         }
 	private void create_root(){
@@ -599,25 +595,25 @@ public class XMLWriter {
 		
 		return openedFiles;
 	}
-	public static void main(String args[]){
-		XMLWriter writer = new XMLWriter();
-//		writer.createProjectWorksapce("/home/shiyam");
-//		writer.createProject("/home/shiyam/RamProject");
-//		writer.setProjectStatus("/home/shiyam/RamProject", "src", true);
-//		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
-//		writer.changeFileStatus("/home/shiyam/RamProject/sat_config.xml",true);
-//		
-//		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
-//		
-//		writer.createProject("/home/shiyam/12/SRR");
-//		writer.createFileNode("/home/shiyam/SRR", "/home/shiyam/RamProject/sat_config.xml");
-                
-//                List<String> files = writer.retriveOpenedFiles();
+//	public static void main(String args[]){
+//		XMLWriter writer = new XMLWriter();
+////		writer.createProjectWorksapce("/home/shiyam");
+////		writer.createProject("/home/shiyam/RamProject");
+////		writer.setProjectStatus("/home/shiyam/RamProject", "src", true);
+////		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
+////		writer.changeFileStatus("/home/shiyam/RamProject/sat_config.xml",true);
+////		
+////		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
+////		
+////		writer.createProject("/home/shiyam/12/SRR");
+////		writer.createFileNode("/home/shiyam/SRR", "/home/shiyam/RamProject/sat_config.xml");
 //                
-//                for(String file:files){
-//                    System.out.println(file);
-//                }
-	}
+////                List<String> files = writer.retriveOpenedFiles();
+////                
+////                for(String file:files){
+////                    System.out.println(file);
+////                }
+//	}
         
         
 }
