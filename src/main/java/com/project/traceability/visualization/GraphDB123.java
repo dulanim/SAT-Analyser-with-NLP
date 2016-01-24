@@ -1,19 +1,11 @@
 package com.project.traceability.visualization;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
-import com.project.traceability.model.ArtefactElement;
-import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.model.AttributeModel;
-import com.project.traceability.model.MethodModel;
-import com.project.traceability.model.ParameterModel;
-import com.project.traceability.model.RequirementModel;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -25,6 +17,15 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.GUI.HomeGUI;
+import com.project.traceability.model.ArtefactElement;
+import com.project.traceability.model.ArtefactSubElement;
+import com.project.traceability.model.AttributeModel;
+import com.project.traceability.model.MethodModel;
+import com.project.traceability.model.ParameterModel;
+import com.project.traceability.model.RequirementModel;
 
 /**
  * Model to add data to Neo4j graph DB.

@@ -27,8 +27,6 @@ import com.project.traceability.model.RequirementModel;
 import com.project.traceability.utils.Constants;
 import com.project.traceability.utils.Constants.ArtefactSubElementType;
 import com.project.traceability.utils.Constants.ArtefactType;
-import com.project.traceability.visualization.GraphDB;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 public class RequirementsManger {
 
@@ -41,6 +39,8 @@ public class RequirementsManger {
 
     /**
      * read requirement Xml file and store data in a map
+     * @param projectPath
+     * @return 
      */
     public static Map<String, ArtefactElement> readXML(String projectPath) {
         AttributeModel attributeElement = null;

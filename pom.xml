@@ -41,7 +41,16 @@
         </plugins>
     </build>
     <repositories>
-        
+        <repository>
+            <id>gephi-snapshots</id>
+            <name>Gephi Snapshots</name>
+            <url>http://nexus.gephi.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>gephi-releases</id>
+            <name>Gephi Releases</name>
+            <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
+        </repository>
         <repository>
             <id>swt-repo</id>
             <url>https://swt-repo.googlecode.com/svn/repo/</url>
@@ -83,12 +92,12 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>2.1.8</version>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>2.1.8</version>
+            <version>2.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -118,12 +127,12 @@
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
-            <version>3.5.2</version>
+            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
-            <version>3.5.2</version>
+            <version>3.4.1</version>
             <classifier>models</classifier>
         </dependency>
         <dependency>
@@ -167,36 +176,13 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
-            <version>4.4</version>
-            <type>jar</type>
-        </dependency>
-        <!--<dependency>
-            <groupId>org.eclipse.swt</groupId>
             <artifactId>swt-package</artifactId>
             <version>1.0</version>
-        </dependency>-->
-        <dependency>
-            <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
-            <version>4.4</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.swt.gtk.linux</groupId>
-            <artifactId>x86_64</artifactId>
-            <version>3.3.0-v3346</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
             <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.atom.sat</groupId>
-            <artifactId>sat</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
 </project>
