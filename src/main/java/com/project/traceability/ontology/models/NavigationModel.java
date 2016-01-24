@@ -11,10 +11,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -34,7 +39,7 @@ public class NavigationModel {
 	List<OntProperty> ontProps;
 	private NavigationModel(){
 		generator = ModelCreator.getModelInstance();
-		generator.setPath("/home/shiyam/");
+		generator.setPath("/home/shiyam");
 		model = generator.getCreatedModel();
 		
 		if(model == null){
@@ -72,6 +77,7 @@ public class NavigationModel {
 		
 		for(int i=0;i<ontClassLst.size();i++){
 			OntClass tempClass = ontClassLst.get(i);
+			
 			map = getProperty(tempClass, map,allProperties);
 		}
 		return map;
@@ -143,9 +149,6 @@ public class NavigationModel {
 					 * get specific property from model
 					 */
 					Iterator<OntClass> rdfPrimer = model.listClasses();
-				    
-
-
 				    System.out.println( "\n== The Properties ==" );
 				    
 				    while(rdfPrimer.hasNext() ) {
@@ -174,17 +177,17 @@ public class NavigationModel {
 		/*
 		 * this method return value for specific class and specific property name
 		 */
-		String result = "";
-		
 		  model.read(generator.getInputStream(),null);
 		  String propURI = StaticData.OWL_ROOT_URI + "#" + propertyName;//building property uri
 		  OntProperty property = model.getOntProperty(propURI);//get OntProperty from model.wl
-	      
-	      StmtIterator it = className.listProperties(property);
-	      while(it != null &&it.hasNext()){
-	    	  Statement stmt = it.nextStatement();
-		      result = stmt.getObject().toString();
-	      }
+		  String result = "";
+		  RDFNode value = className.getPropertyValue(property);
+		  if(value != null)
+			 result = value.toString().split("#")[1];
+//	      while(it != null &&it.hasNext()){
+//	    	  Statement stmt = it.nextStatement();
+//		      result = stmt.getObject().toString();
+//	      }
 	      
 	      return result;
 	}
@@ -198,28 +201,23 @@ public class NavigationModel {
 		 */
 		
 		List<String> list = new ArrayList<>();
-		model.read(generator.getInputStream(),null);
-		String propURI = StaticData.OWL_ROOT_URI + "#";
-		
-		OntClass cls = classSpec;
-		for(int i=0;i<allProperties.size();i++){
-                    propURI += allProperties.get(i);
-                    OntProperty ontProperty = model.getOntProperty(propURI);
-					
-                    StmtIterator it = cls.listProperties(ontProperty);
-                    while(it != null && it.hasNext()){
-						
-                        String propertyName =allProperties.get(i);
-			String propertyValue = getValueFor(cls, propertyName);
-			it.nextStatement();
-			list.add(propertyName+":" + propertyValue);
-			System.out.println("PROPERTY FOR " + classSpec.getLocalName()  + "   " + 
-								allProperties.get(i));
-                    }
-                    propURI = StaticData.OWL_ROOT_URI + "#";
+		StmtIterator propIt = classSpec.listProperties();
+		while(propIt!= null && propIt.hasNext()){
+			Statement stmnt = propIt.next();
+			Property p = stmnt.getPredicate();
+			String propsString = p.toString();
+			if(propsString.contains(StaticData.OWL_ROOT_URI)){
+				
+				RDFNode value = classSpec.getPropertyValue(p);
+				System.out.println("Our Class is-----------" + classSpec.getLocalName() + "  ");	
+				System.out.println(p.toString() + " Value is " + value.toString());
+				
+				String property = p.getLocalName();
+				String propValue = value.toString();
+				list.add(property+ ":" +propValue);
+				
+			}
 		}
-		
-		
 		map.put(classSpec.getLocalName(), list);
 		return map;
 	}
@@ -243,6 +241,17 @@ public class NavigationModel {
 //		}
 //		
 //	}
+	public List<String> getParentClassFor(OntClass className){
+		//we gather super class for className
+		ExtendedIterator<OntClass>superClassIt = className.listSuperClasses();
+		List<String> superClassNames = new ArrayList<>();
+		while(superClassIt != null && superClassIt.hasNext()){
+			OntClass temp = superClassIt.next();
+			superClassNames.add(temp.getLocalName());
+		}
+		
+		return superClassNames;
+	}
 	
 	public List<OntProperty> getSpecPropertyFor(Individual ind){
 		List<OntProperty> props = new ArrayList<>();
