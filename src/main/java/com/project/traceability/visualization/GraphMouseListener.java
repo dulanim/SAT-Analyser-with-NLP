@@ -37,6 +37,7 @@ import com.project.traceability.common.PropertyFile;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
 import java.io.File;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
@@ -54,12 +55,11 @@ public class GraphMouseListener implements PreviewMouseListener {
     private GraphDatabaseService graphDb;
     private ExecutionEngine engine;
     private ExecutionResult result;
-    
 
     public static TableColumn tblclmnValue;
     public static TableCursor tableCursor;
     public static TableItem tableItem;
-    
+
     private static String Id;
     public static HashMap<String, Object> nodeData = new HashMap<>();
     public static boolean update = false;
@@ -97,7 +97,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                     }
                     System.out.println("Node: " + nodeProps);
                     HashMap<String, Object> values = showPopup(nodeProps, node);
-                    int value = -1;
+                    /* int value = -1;
                     final String id = values.get("ID").toString();
                     if (values.containsKey("Value")) {
                         value = Integer.parseInt(values.get("Value").toString());
@@ -128,21 +128,19 @@ public class GraphMouseListener implements PreviewMouseListener {
                         visual.setPreview();
                         visual.setLayout();
                         tx.success();
-                    }
+                    }*/
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
                     System.out.println(e.toString());
                 } finally {
                     tx.finish();
                     System.out.println("shutiing");
-                    graphDb.shutdown();    
-                    try{
+                    graphDb.shutdown();
+                    try {
                         Thread.sleep(5);
-                    } catch(Exception e){
+                    } catch (Exception e) {
                         System.out.println("Error in thread sleeping");
                     }
-                           
-                    return;
                 }
             }
         }
@@ -206,7 +204,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                 for (String key : nodeProps.keySet()) {
                     Object val = nodeProps.get(key);
                     if (null != val) {
-                        tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);                        
+                        tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);
                         tableItem.setText(0, key);
                         tableItem.setText(1, val.toString());
                         //field = new JTextField(nodeProps.get(key).toString());
@@ -242,12 +240,12 @@ public class GraphMouseListener implements PreviewMouseListener {
         // returnVal.put("Value", 1);
         return returnVal;
     }
-    
+
     /**
      * Updates the relevant XML file when data changes
      *
      * @param id
-     * @return 
+     * @return
      */
     public static String updateXMLFiles(String id) {
         String xml = "";
@@ -269,7 +267,7 @@ public class GraphMouseListener implements PreviewMouseListener {
         return xml;
     }
 
-     /*public void checkRel(String id) {
+    /*public void checkRel(String id) {
         IndexManager index = graphDb.index();
         Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
         IndexHits<Relationship> relHits = edges.get("ID", id);
