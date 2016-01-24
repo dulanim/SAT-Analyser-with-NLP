@@ -19,7 +19,7 @@ public class PropertyFile {
     public static String requirementXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"RequirementArtefactFile.xml";
     public static String umlXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"UMLArtefactFile.xml";
     public static String sourceXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"SourceCodeArtefactFile.xml";
-    public static final String wordNetDbDirectory = System.getProperty("user.home")+"WordNet"+File.separator+"dict";
+    public static final String wordNetDbDirectory = System.getProperty("user.home")+File.separator + "WordNet"+File.separator+"dict";
     public static String filePath = StaticData.workspace;
     public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
     public static String docsFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator;
