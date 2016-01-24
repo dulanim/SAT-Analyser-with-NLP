@@ -2,9 +2,7 @@
 package com.project.traceability.ontology.models;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class Word {
@@ -118,13 +116,9 @@ public class Word {
 		return this.value;
 	}
 	
-	public String getParentName(){
-		Set<String> set = new HashSet<>(this.parent);
-		String str = "";
-		if(set.size() == 1){
-			str = set.iterator().next();
-		}
-		return str;
+	public List<String> getParentName(){
+		
+		return this.parent;
 	}
 	
 	
