@@ -305,29 +305,28 @@ public class ArtefactFrame extends JFrame {
 
     protected void updateAss_Gen_Edit(String selectedType, DefaultMutableTreeNode node) {
         Object newClass = null;
-        Object currentParentClass = node.getParent(); // parent class of the selected node -> className
         Object selectedNodeParentClass = node.getParent().getParent();
-
-        int relCount = node.getChildCount();
-        boolean relationshipExist = false;
-        boolean relationshipTypeExist = false;
-        boolean relLeafExist = false;
         Object relationShipsNode = null;
-        int assGenCount = 0;
         Object typeNode = null;
         Object type = null;
         Object newClassNode = null;
         Object leafNode = null;
+        int assGenCount = 0;
+        int relCount = node.getChildCount();
+        boolean relationshipExist = false;
+        boolean relationshipTypeExist = false;
+        boolean relLeafExist = false;
         DefaultMutableTreeNode typeNodeChange = null;
+        
         for (int rCount = 0; rCount < relCount; rCount++) {
 
             Object leaf = node.getChildAt(rCount);
             newClass = leaf.toString().split("->")[1];
             newClassNode = getObjectNode(newClass);
+            
             int childClassCount = tree.getModel().getChildCount(newClassNode);
             for (int cCount = 0; cCount < childClassCount; cCount++) {
 
-                System.out.println(tree.getModel().getChild(newClassNode, cCount).toString());
                 if (tree.getModel().getChild(newClassNode, cCount).toString().equalsIgnoreCase("Relationships")) {
                     relationshipExist = true;
                     relationShipsNode = tree.getModel().getChild(newClassNode, cCount);
@@ -337,12 +336,9 @@ public class ArtefactFrame extends JFrame {
             }
             if (relationshipExist) {
                 assGenCount = tree.getModel().getChildCount(relationShipsNode);
-                System.out.println(assGenCount);
                 for (int aCount = 0; aCount < assGenCount; aCount++) {
                     typeNode = tree.getModel().getChild(relationShipsNode, aCount);
-                    System.out.println("typeNode " + typeNode.toString() + "  node: " + node.toString());
                     if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
-                        System.out.println("typeNode " + typeNode.toString());
                         type = tree.getModel().getChild(typeNode, aCount);
                         typeNodeChange = (DefaultMutableTreeNode) (typeNode);
 
@@ -354,14 +350,11 @@ public class ArtefactFrame extends JFrame {
             if (relationshipTypeExist) {
                 int leafCount = tree.getModel().getChildCount(typeNode);
                 if (leafCount == 1) {
-                    System.out.println("relationship found");
                     typeNodeChange.setUserObject(node.toString());
                 } else {
                     for (int lCount = 0; lCount < leafCount; lCount++) {
                         leafNode = tree.getModel().getChild(typeNode, lCount);
                         String[] leafString = leafNode.toString().split("->");
-                        System.out.println("leaf String: " + leafString[1]);
-                        System.out.println("new classNode: " + selectedNodeParentClass.toString());
                         if (leafString[1].equalsIgnoreCase(selectedNodeParentClass.toString())) {
                             relLeafExist = true;
                             break;
@@ -372,19 +365,16 @@ public class ArtefactFrame extends JFrame {
             if (relLeafExist) {
                 /*remove the node*/
                 DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
-                System.out.println("nodess 3: " + nodess);
-                ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+               ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
                 /*add the node with the type*/
                 addItems(relationShipsNode, node.toString(), 0);
                 Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
-                System.out.println("newleafNode: " + newLeafNode);
                 addItems(newLeafNode, leafNode.toString(), 0);
 
             }
 
             ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
-            System.out.println("typeNode: " + typeNodeChange);
-
+           
         }
     }
 
