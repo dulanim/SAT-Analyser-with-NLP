@@ -307,7 +307,7 @@ public class ArtefactFrame extends JFrame {
         Object newClass = null;
         Object currentParentClass = node.getParent(); // parent class of the selected node -> className
         Object selectedNodeParentClass = node.getParent().getParent();
-                
+
         int relCount = node.getChildCount();
         boolean relationshipExist = false;
         boolean relationshipTypeExist = false;
@@ -317,6 +317,7 @@ public class ArtefactFrame extends JFrame {
         Object typeNode = null;
         Object type = null;
         Object newClassNode = null;
+        Object leafNode = null;
         DefaultMutableTreeNode typeNodeChange = null;
         for (int rCount = 0; rCount < relCount; rCount++) {
 
@@ -344,7 +345,7 @@ public class ArtefactFrame extends JFrame {
                         System.out.println("typeNode " + typeNode.toString());
                         type = tree.getModel().getChild(typeNode, aCount);
                         typeNodeChange = (DefaultMutableTreeNode) (typeNode);
-                        
+
                         relationshipTypeExist = true;
                         break;
                     }
@@ -357,28 +358,32 @@ public class ArtefactFrame extends JFrame {
                     typeNodeChange.setUserObject(node.toString());
                 } else {
                     for (int lCount = 0; lCount < leafCount; lCount++) {
-                        Object leafNode = tree.getModel().getChild(typeNode, lCount);
+                        leafNode = tree.getModel().getChild(typeNode, lCount);
                         String[] leafString = leafNode.toString().split("->");
-                        System.out.println("leaf String: "+ leafString[1]);
-                        System.out.println("new classNode: "+ selectedNodeParentClass.toString());
+                        System.out.println("leaf String: " + leafString[1]);
+                        System.out.println("new classNode: " + selectedNodeParentClass.toString());
                         if (leafString[1].equalsIgnoreCase(selectedNodeParentClass.toString())) {
-                            /*remove the node*/
-                            DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
-                            System.out.println("nodess 3: " + nodess);
-                            ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
-                            /*add the node with the type*/
-                            addItems(relationShipsNode, node.toString(), 0);
-                            Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
-                            System.out.println("newleafNode: "+ newLeafNode);
-                            addItems(newLeafNode, leafNode.toString(), 0);
+                            relLeafExist = true;
                             break;
                         }
                     }
                 }
-                
-                ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
-                System.out.println("typeNode: "+ typeNodeChange);
             }
+            if (relLeafExist) {
+                /*remove the node*/
+                DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
+                System.out.println("nodess 3: " + nodess);
+                ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+                /*add the node with the type*/
+                addItems(relationShipsNode, node.toString(), 0);
+                Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
+                System.out.println("newleafNode: " + newLeafNode);
+                addItems(newLeafNode, leafNode.toString(), 0);
+
+            }
+
+            ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
+            System.out.println("typeNode: " + typeNodeChange);
 
         }
     }
