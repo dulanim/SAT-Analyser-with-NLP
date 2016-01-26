@@ -9,6 +9,7 @@ package com.project.NLP.UMLToXML.xmlwriter;
  * @author shiyam
  */
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.writer.Adapter;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -142,8 +143,7 @@ public class WriteToXML {
         String dir = System.getProperty("user.home") + File.separator + "RequirementArtefactFile.xml";//default
         
         try{
-            String root = HomeGUI.tree.getToolTipText() + File.separator + 
-                            ProjectCreateWindow.projectName;
+            String root = Adapter.projectPath;
              System.out.println("------Writing Requirement XML -- root--:  "+ root);
             File f = new File(root+File.separator +FilePropertyName.XML);
              System.out.println("------Writing Requirement XML -- XML folder path --:  "+ f.getPath());
