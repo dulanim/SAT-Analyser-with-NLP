@@ -79,7 +79,7 @@ public class AttributeIdentification {
         /*rule 6*/
         removeRedundancy();
         /*rule 7*/
-        findAttributeAssociatedWithLocation();
+       // findAttributeAssociatedWithLocation();
         /*rule 8*/
         removeClassesFromAttributes();
         
@@ -103,7 +103,6 @@ public class AttributeIdentification {
         ArrayList newAtt;
         newAtt=phrase.getAttributeList();
         //newAtt=phrase.getAttribute();
-        
         //add the new attributes to the attributes list
         if(!newAtt.isEmpty()){
             for(int i=0;i<newAtt.size();i++){
@@ -113,7 +112,6 @@ public class AttributeIdentification {
         //attributes = newAtt;
         System.out.println("newwwwwwwwwwwwwww attributes : "+ newAtt);
         System.out.println("TOTAL attributes : "+ attributes);
-        
         
         /*for(int i=0;i<newAtt.size();i++){
             attributes.add(newAtt.get(i));
@@ -179,7 +177,10 @@ public class AttributeIdentification {
    
     /*rule 6*/
     private void removeRedundancy(){
+        System.out.println("attributes size: "+ attributes.size());
+        System.out.println("attr: "+ attributes);
         for(int i =0;i<attributes.size();i++){
+            System.out.println("get element: "+ attributes.get(i));
             attributeFinalList.add(attributes.get(i));
         }
     }
@@ -201,6 +202,7 @@ public class AttributeIdentification {
     }
     
     public HashSet getAttributes(){
+        
         return attributeFinalList;
     }
     
