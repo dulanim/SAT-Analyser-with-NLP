@@ -71,7 +71,14 @@ public class GraphMouseListener implements PreviewMouseListener {
     @SuppressWarnings("finally")
     @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties properties, Workspace workspace) {
-
+        
+        if(event.button== PreviewMouseEvent.Button.LEFT){
+            System.out.println("left Click");
+        } 
+        if(event.button== PreviewMouseEvent.Button.RIGHT){
+            System.out.println("right Click");
+        }
+        
         for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
             if (clickingInNode(node, event)) {
 
@@ -96,39 +103,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                         nodeProps.put(col, val);
                     }
                     System.out.println("Node: " + nodeProps);
-                    HashMap<String, Object> values = showPopup(nodeProps, node);
-                    /* int value = -1;
-                    final String id = values.get("ID").toString();
-                    if (values.containsKey("Value")) {
-                        value = Integer.parseInt(values.get("Value").toString());
-                    }
-
-                    if (value == JOptionPane.NO_OPTION) {
-                        System.out.println("Heliio");
-                        transferDataToDBFromXML(projectPath, false);
-
-                        VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                        HomeGUI.isComaparing = false;
-                        visual.setPreview();
-                        visual.setLayout();
-                        tx.success();
-                    } else if (value == JOptionPane.YES_OPTION) {
-                        //ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
-                        System.out.println("Heliio");
-                        transferDataToDBFromXML(projectPath, true);
-
-                        VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                        HomeGUI.isComaparing = false;
-                        visual.setPreview();
-                        visual.setLayout();
-                        tx.success();
-                    }*/
+                    HashMap<String, Object> values = showPopup(nodeProps, node);                    
                 } catch (Exception e) {
                     Exceptions.printStackTrace(e);
                     System.out.println(e.toString());
@@ -146,19 +121,54 @@ public class GraphMouseListener implements PreviewMouseListener {
         }
         properties.removeSimpleValue("display-label.node.id");
         event.setConsumed(true);
+        
+        
     }
 
     @Override
     public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+        for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(wrkspc).getGraph().getNodes()) {
+            if (clickingInNode(node, pme)) {
 
+                graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
+                        HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                        + ".graphdb");
+                System.out.println("DB path- " + graphDb.toString());
+
+                Transaction tx = graphDb.beginTx();
+                try {
+
+                    IndexManager index = graphDb.index();
+                    Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+                    IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
+                    org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
+
+                    System.out.println(neo4j_node.toString());
+                    
+                    System.out.println("Mouse Pressed : " + neo4j_node.getProperty(ID));
+                } catch (Exception e) {
+                    Exceptions.printStackTrace(e);
+                    System.out.println(e.toString());
+                } finally {
+                    tx.finish();
+                    System.out.println("shutiing");
+                    graphDb.shutdown();
+                    try {
+                        Thread.sleep(5);
+                    } catch (Exception e) {
+                        System.out.println("Error in thread sleeping");
+                    }
+                }
+            }
+        }
     }
 
     @Override
-    public void mouseDragged(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+    public void mouseDragged(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {        
     }
 
     @Override
-    public void mouseReleased(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+    public void mouseReleased(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {        
     }
 
     /**
