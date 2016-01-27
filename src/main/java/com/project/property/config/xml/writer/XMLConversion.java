@@ -16,13 +16,9 @@ import com.project.traceability.staticdata.StaticData;
  *
  * @author shiyam
  */
-public class XMLConversion {
-    
-    
-    
+public class XMLConversion {   
     
     public static boolean convertUMLFile(){
-       
         
        boolean isSuccess = false;
        WriteToXML xmlWriter = new WriteToXML();
