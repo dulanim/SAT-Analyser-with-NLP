@@ -29,7 +29,7 @@ public class NegativeSentenceDetection {
 
     public boolean isNegativeSentence() {
         boolean negativeSentence = false;
-        ArrayList wordsFromDictionary = readFromTextFile("res/negativeWordsDictionary.txt");
+        ArrayList wordsFromDictionary = readFromTextFile("res/NegativeWordsDictionary.txt");
         ArrayList negativeWordList = phrasesIdentification.NegativeSentenceDetection();
         boolean b= phrasesIdentification.checkActiveOrPassive();
         System.out.println("NegativeWordList:" + negativeWordList);
