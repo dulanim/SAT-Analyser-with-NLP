@@ -307,7 +307,6 @@ public class PhrasesIdentification {
                                 String identifiedWord = attribute;
                                 if (!identifiedWord.contains("_")) {
                                     attributeLists.add(morphology.stem(identifiedWord));
-
                                 } else {
                                     attributeLists.add(identifiedWord);
                                 }
@@ -333,7 +332,6 @@ public class PhrasesIdentification {
                             attribute = (leaves.get(0).yieldWords()).get(0).word();
                             if (!attribute.contains("_")) {
                                 attributeLists.add(morphology.stem(attribute));
-
                             } else {
                                 attributeLists.add(attribute);
                             }
@@ -355,7 +353,6 @@ public class PhrasesIdentification {
                         //attributeLists.add(morphology.stem());
                         if (!identifiedWord.contains("_")) {
                             attributeLists.add(morphology.stem(identifiedWord));
-
                         } else {
                             attributeLists.add(identifiedWord);
                         }
@@ -463,7 +460,7 @@ public class PhrasesIdentification {
                     }
 
                 }
-                if (adjectiveExist == 1 && adjectiveNoun == 0) {
+                if (adjectiveExist == 1 && adjectiveNoun == 0 && !adj.isEmpty()) {
                     adjAttributeList.add(adj);
                 }
             }
@@ -471,6 +468,7 @@ public class PhrasesIdentification {
         }
 
         System.out.println("ADJECTVE ATTRIBUTE :" + adjAttributeList);
+        System.out.println("addj attr size: " + adjAttributeList.size());
         return adjAttributeList;
 
     }
