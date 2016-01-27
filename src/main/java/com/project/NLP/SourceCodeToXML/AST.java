@@ -18,7 +18,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.w3c.dom.Attr;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -31,13 +35,12 @@ public class AST {
     private static Element intraConnections;
     private AST ast;
 
-       
-
     /**
-     * Invokes when the user browses the source code project folder 
-     * @param fileName 
+     * Invokes when the user browses the source code project folder
+     *
+     * @param fileName
      */
-    public void startSourceCodeConversion(String filePath) throws Exception{
+    public void startSourceCodeConversion(String filePath) throws Exception {
         ast = new AST();
         scdb = new SourceCodeDB2();
         AccessProject project = new AccessProject();
@@ -46,21 +49,20 @@ public class AST {
             List<File> files = project.getFiles();
             for (File file : files) {
                 System.out.println("File Path - " + file.getAbsolutePath());
-                ast.convertFileToXML(file.getAbsolutePath());     
-                System.out.println("Done for: "+file.getAbsolutePath());
+                ast.convertFileToXML(file.getAbsolutePath());
+                System.out.println("Done for: " + file.getAbsolutePath());
                 ast.exitConverter();
             }
             scdb.shutdownDB();
-            
-        }
-        else{
+
+        } else {
             JOptionPane.showMessageDialog(null, "Incorrect Path. The specified path does not contain any java files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     /**
-     * 
-     * @param fileName 
+     *
+     * @param fileName
      */
     public void convertFileToXML(String fileName) {
         try {
@@ -86,7 +88,6 @@ public class AST {
         System.out.println("Exiting");
         intraConnections = WriteToXML.getDocument().createElement("IntraConnections");
         root.appendChild(intraConnections);
-
         ArrayList<Map> relationshipList = AST.scdb.getInheritanceRelationshipData();
         addRelationsToXML(relationshipList, "Inheritance");
         relationshipList.clear();
@@ -94,13 +95,13 @@ public class AST {
         addRelationsToXML(relationshipList, "Composition");
         WriteToXML.createXML();
         //shutdownDB();
-        
+
     }
 
     /**
-     * 
+     *
      * @param relationshipList
-     * @param type 
+     * @param type
      */
     public void addRelationsToXML(ArrayList<Map> relationshipList, String type) {
         for (Map relation : relationshipList) {
@@ -120,11 +121,8 @@ public class AST {
             connections.setAttributeNode(endAttr);
         }
     }
-    
-    
 
     /*public static void main(String[] args) throws IOException {
         new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
     }*/
-    
 }
