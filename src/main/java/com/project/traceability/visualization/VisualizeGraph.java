@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JOptionPane;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -34,7 +35,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.filters.api.FilterController;
@@ -59,7 +60,6 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.GraphView;
-import org.gephi.graph.api.Node;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.ImportController;
 import org.gephi.io.processor.plugin.DefaultProcessor;
@@ -84,7 +84,6 @@ import org.gephi.preview.types.DependantOriginalColor;
 import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
 
@@ -174,26 +173,27 @@ public class VisualizeGraph {
     /**
      * Method to get Gephi Processing Target
      *
+     * @param waitTime
      * @return ProcessingTarget
      */
-    public ProcessingTarget getTarget() {
+    public ProcessingTarget getTarget(int waitTime) {
         // New Processing target, get the PApplet
         ProcessingTarget target = (ProcessingTarget) previewController
                 .getRenderTarget(RenderTarget.PROCESSING_TARGET);
         this.setApplet(target.getApplet());
         applet.init();
-
-        try {
-            Thread.sleep(10000);//wait for 10ms to render graph properly in tool
-        } catch (InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
+        if (waitTime <= 0) {
+            waitTime = 100;
         }
-
+        try {
+            Thread.sleep(waitTime);//wait for 10ms to render graph properly in tool
+        } catch (InterruptedException ex) {
+            getTarget(waitTime * 10);
+        }
         // Refresh the preview and reset the zoom
         previewController.render(target);
         target.refresh();
         target.resetZoom();
-
         return target;
     }
 
@@ -226,7 +226,7 @@ public class VisualizeGraph {
         // Partition with 'type' column, which is in the data
         NodePartition node_partition = (NodePartition) partitionController
                 .buildPartition(
-                        attributeModel.getNodeTable().getColumn("Type"), graph);
+                        attributeModel.getNodeTable().getColumn("Artefact"), graph);
 
         // Partition with 'Neo4j Relationship Type' column, which is in the data
         EdgePartition edge_partition = (EdgePartition) partitionController
@@ -316,7 +316,7 @@ public class VisualizeGraph {
             File file = new File(PropertyFile.getGeneratedGexfFilePath());
             container = importController.importFile(file);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to import file. Reload the graph.", "Gexf File Import", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -411,7 +411,6 @@ public class VisualizeGraph {
             String edgeType = type.name();
             if (part != null) {
                 Color color = part.getColor();
-                System.out.println("" + edgeType + " Color: " + color);
             }
         }
     }
@@ -479,15 +478,30 @@ public class VisualizeGraph {
         // Partition with 'type' column, which is in the data
         NodePartition node_partition = (NodePartition) partitionController
                 .buildPartition(
-                        attributeModel.getNodeTable().getColumn("Type"), graph);
+                        attributeModel.getNodeTable().getColumn("Artefact"), graph);
 
         // Partition with 'Neo4j Relationship Type' column, which is in the data
         EdgePartition edge_partition = (EdgePartition) partitionController
                 .buildPartition(
                         attributeModel.getEdgeTable().getColumn(
                                 "Neo4j Relationship Type"), graph);
+        
+        for(AttributeColumn col : attributeModel.getNodeTable().getColumns()){
+            System.out.println(" "+col.getId()+" "+col.getTitle());
+        }
+        
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
+        for(Part p: node_partition.getParts()){
+            System.out.println("Node : " + p.getValue());
+            int j=0;
+            for(Object o : p.getObjects()){
+                System.out.print(" "+j+" " + o.toString());
+                j++;
+            }
+            System.out.println("");
+            
+        }
         nodeColorTransformer.randomizeColors(node_partition);
         partitionController.transform(node_partition, nodeColorTransformer);
 
@@ -496,10 +510,8 @@ public class VisualizeGraph {
 
         List<Color> colors = addColors();
         int i = 0;
-        System.out.println("hehehe");
 
         for (Part p : edge_partition.getParts()) {
-            System.out.println(" " + p.getValue() + " " + colors.get(i));
             int green = colors.get(i).getGreen();
             int blue = colors.get(i).getBlue();
             int red = colors.get(i).getRed();
@@ -511,14 +523,19 @@ public class VisualizeGraph {
         partitionController.transform(edge_partition, edgeColorTransformer);
     }
 
+    /**
+     * List specific colors to identify the edges.
+     *
+     * @return
+     */
     public List<Color> addColors() {
         List<Color> colors = new ArrayList<>();
         colors.add(Color.RED);
         colors.add(Color.BLUE);
-        colors.add(Color.CYAN);
+        colors.add(Color.MAGENTA);
         colors.add(Color.GREEN);
         colors.add(Color.YELLOW);
-        colors.add(Color.MAGENTA);
+        colors.add(Color.CYAN);
         colors.add(Color.PINK);
         colors.add(Color.orange);
         colors.add(Color.PINK);
@@ -529,6 +546,21 @@ public class VisualizeGraph {
         return colors;
     }
 
+    private void refreshGraph() {
+        VisualizeGraph visual = VisualizeGraph.getInstance();
+        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
+        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
+        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+        HomeGUI.isComaparing = false;
+        visual.setPreview();
+        visual.setLayout();
+        HomeGUI.table.clearAll();
+        HomeGUI.table.deselectAll();
+        HomeGUI.table.removeAll();
+        nodeData.clear();
+        nodeData = new HashMap<>();
+    }
+
     /**
      * Method to show graph in tool
      *
@@ -537,7 +569,7 @@ public class VisualizeGraph {
         HomeGUI.isComaparing = false;
         setPreview();
         setLayout();
-        target = getTarget();
+        target = getTarget(100);
         HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
         composite = new Composite(HomeGUI.graphTab,
                 SWT.EMBEDDED);
@@ -587,7 +619,7 @@ public class VisualizeGraph {
         /*
          table holder for scrolling purpose
          */
-        tableCursor = new TableCursor(table, SWT.NONE);
+        //tableCursor = new TableCursor(table, SWT.NONE);
 
         final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         updateBtn.setText("Update");
@@ -599,22 +631,10 @@ public class VisualizeGraph {
             @Override
             public void widgetSelected(SelectionEvent se) {
                 GraphDBEdit gbEditor = new GraphDBEdit();
-                System.out.println("Selected Upate :" + nodeData);
+                System.out.println("Selected Update :" + nodeData);
                 gbEditor.storeUpdatedNode(nodeData);
-                System.out.println("Heliio");
                 transferDataToDBFromXML(projectPath, true);
-                VisualizeGraph visual = VisualizeGraph.getInstance();
-                visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                HomeGUI.isComaparing = false;
-                visual.setPreview();
-                visual.setLayout();
-                HomeGUI.table.clearAll();
-                HomeGUI.table.deselectAll();
-                HomeGUI.table.removeAll();
-                nodeData.clear();
-                nodeData = new HashMap<>();
+                refreshGraph();
             }
         });
 
@@ -622,23 +642,10 @@ public class VisualizeGraph {
             @Override
             public void widgetSelected(SelectionEvent se) {
                 GraphDBDelete gbDeletor = new GraphDBDelete();
-                System.out.println("Selected Dele :" + nodeData);
+                System.out.println("Selected Delete :" + nodeData);
                 gbDeletor.deleteNodeAndRelations(nodeData);
-                System.out.println("Heliio");
                 transferDataToDBFromXML(projectPath, false);
-
-                VisualizeGraph visual = VisualizeGraph.getInstance();
-                visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                HomeGUI.isComaparing = false;
-                visual.setPreview();
-                visual.setLayout();
-                HomeGUI.table.clearAll();
-                HomeGUI.table.deselectAll();
-                HomeGUI.table.removeAll();
-                nodeData.clear();
-                nodeData = new HashMap<>();
+                refreshGraph();
             }
 
         });
@@ -720,7 +727,16 @@ public class VisualizeGraph {
             }
 
         });
+        
+        Label space = new Label(composite2, SWT.NONE);
+        GridData spaceData = new GridData();
+        spaceData.heightHint = 10;
+        space.setLayoutData(spaceData);
 
+        Label edgetitle = new Label(composite2, SWT.NONE);
+        edgetitle.setText("Edge-Color Notations:");
+        edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
+        
         tbtmPropertyInfos.setControl(composite2);
 
         composite4 = new Composite(composite2, SWT.RIGHT);
@@ -730,10 +746,10 @@ public class VisualizeGraph {
         for (String type : edgeColoring.keySet()) {
 
             Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
-            GridData oGridData = new GridData();
-            oGridData.widthHint = 20;
-            oGridData.heightHint = 20;
-            edgeColor.setLayoutData(oGridData);
+            GridData gridData = new GridData();
+            gridData.widthHint = 20;
+            gridData.heightHint = 20;
+            edgeColor.setLayoutData(gridData);
             edgeColor.setText("");
             Label edgeDetailLabel = new Label(composite4, SWT.NONE);
             edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
@@ -765,12 +781,9 @@ public class VisualizeGraph {
         panel.add(refresh, BorderLayout.PAGE_START);
         frame.add(panel);
         composite.setData(panel);
-        HomeGUI.graphtabItem.setControl(composite);
-        //set the table visible when the visualization is active
+        HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
 
         frame.revalidate();
-        // }
-        //});
 
     }
 
