@@ -29,7 +29,6 @@ public class ModelCreator {
     public static OntClass parentClass;
 
     private ModelCreator() {
-
     }
 
     public static ModelCreator getModelInstance() {
@@ -37,14 +36,16 @@ public class ModelCreator {
         if (creator == null) {
             creator = new ModelCreator();
         }
+        creator.initModel();
         return creator;
     }
 
-    public boolean initModel() {
+    public  boolean initModel() {
         /*
 		 * this method is for initiating the .owl file that 
 		 * which is internally created by system when ontology model requires once
          */
+    	setPath("");
     	File f = new File(filePath + File.separator +  filename);
     	if(f.exists())
     		return true;
@@ -108,6 +109,8 @@ public class ModelCreator {
     }
 
     public void setPath(String projectPath) {
+        
+        projectPath = System.getProperty("user.dir")+File.separator+"res";
         this.filePath = projectPath;
     }
 
@@ -347,6 +350,8 @@ public class ModelCreator {
 
     private PrintWriter getOWLWriter() throws FileNotFoundException, IOException, Exception {
 
+        
+        filePath = getFilePath();
         FileOutputStream fos = new FileOutputStream(this.filePath + File.separator
                 + filename, false);
         PrintWriter writer = new PrintWriter(fos);
@@ -372,8 +377,7 @@ public class ModelCreator {
     }
 
     public InputStream getInputStream() {
-        // Use the FileManager to find the input file
-        //filePath = System.getProperty("user.dir")+File.separator+"res"; 
+        // Use the FileManager to find the input file 
         InputStream in = FileManager.get().open(filePath + File.separator + filename);
         if (in == null) {
             throw new IllegalArgumentException("File: " + filename + " not found");
