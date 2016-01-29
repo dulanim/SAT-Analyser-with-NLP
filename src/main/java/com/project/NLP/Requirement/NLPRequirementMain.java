@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "io/OrderRequirement.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "io/BankRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -311,5 +311,9 @@ public class NLPRequirementMain {
         }
 
         return output;
+    }
+    
+    public static void main(String[] args){
+    	extractRequirement();
     }
 }
