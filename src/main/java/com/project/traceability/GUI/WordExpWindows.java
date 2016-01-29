@@ -79,10 +79,10 @@ public class WordExpWindows {
 	 */
 	public static void main(String[] args) {
 		try {
-			word1 = "Cocnut";
-			word2 = "CocounantTree";
-			word = new Word();
-			word.setWordType(StaticData.OWL_CLASS);
+//			word1 = "Cocnut";
+//			word2 = "CocounantTree";
+//			word = new Word();
+//			word.setWordType(StaticData.OWL_CLASS);
 			
 			parents = new ArrayList<>();
 			properties = new ArrayList<>();
