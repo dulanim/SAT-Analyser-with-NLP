@@ -93,6 +93,10 @@ public class XMLWriter {
 	}
 	public void modifyStatus(Boolean active,String path){
 		//switch project path
+            int x = path.lastIndexOf(File.separator);
+            if(x == path.length() -1){
+                path = path.substring(0,x);
+            }
             boolean modified = false;
 		try {
 			NodeList nList = doc.getElementsByTagName("Workspace");
