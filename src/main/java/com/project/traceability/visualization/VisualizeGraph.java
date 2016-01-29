@@ -1,5 +1,6 @@
 package com.project.traceability.visualization;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.HomeGUI;
 import static com.project.traceability.GUI.HomeGUI.projectPath;
 import static com.project.traceability.GUI.HomeGUI.table;
@@ -9,7 +10,6 @@ import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
 import static com.project.traceability.visualization.GraphMouseListener.nodeData;
-import static com.project.traceability.visualization.GraphMouseListener.tableCursor;
 import static com.project.traceability.visualization.GraphMouseListener.tblclmnValue;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,7 +20,10 @@ import java.awt.Frame;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +32,6 @@ import javax.swing.JOptionPane;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -44,6 +46,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -101,11 +105,14 @@ public class VisualizeGraph {
     private GraphModel graphModel;
     private PApplet applet;
     private CTabItem tabItem;
-    private Composite composite, composite2, composite3, composite4;
+    private static Composite composite, composite2, composite3, composite4;
     private ProcessingTarget target;
     private Frame frame, frame2;
     private static VisualizeGraph visual = new VisualizeGraph();
     private static HashMap<String, org.eclipse.swt.graphics.Color> edgeColoring = new HashMap<>();
+    static Menu popupMenu, insertLinkPopUp, removeLinkPopUp;
+    static MenuItem removeLink, newLink;
+    static Composite comp;
 
     private VisualizeGraph() {
     }
@@ -485,22 +492,22 @@ public class VisualizeGraph {
                 .buildPartition(
                         attributeModel.getEdgeTable().getColumn(
                                 "Neo4j Relationship Type"), graph);
-        
-        for(AttributeColumn col : attributeModel.getNodeTable().getColumns()){
-            System.out.println(" "+col.getId()+" "+col.getTitle());
+
+        for (AttributeColumn col : attributeModel.getNodeTable().getColumns()) {
+            System.out.println(" " + col.getId() + " " + col.getTitle());
         }
-        
+
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
-        for(Part p: node_partition.getParts()){
+        for (Part p : node_partition.getParts()) {
             System.out.println("Node : " + p.getValue());
-            int j=0;
-            for(Object o : p.getObjects()){
-                System.out.print(" "+j+" " + o.toString());
+            int j = 0;
+            for (Object o : p.getObjects()) {
+                System.out.print(" " + j + " " + o.toString());
                 j++;
             }
             System.out.println("");
-            
+
         }
         nodeColorTransformer.randomizeColors(node_partition);
         partitionController.transform(node_partition, nodeColorTransformer);
@@ -546,19 +553,85 @@ public class VisualizeGraph {
         return colors;
     }
 
-    private void refreshGraph() {
-        VisualizeGraph visual = VisualizeGraph.getInstance();
-        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-        HomeGUI.isComaparing = false;
-        visual.setPreview();
-        visual.setLayout();
-        HomeGUI.table.clearAll();
-        HomeGUI.table.deselectAll();
-        HomeGUI.table.removeAll();
-        nodeData.clear();
-        nodeData = new HashMap<>();
+    public static void refreshGraph() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                VisualizeGraph visual = VisualizeGraph.getInstance();
+                addNewLinkstoGraph();
+                deleteRemovalLinkstoGraph();
+
+                visual.importFile();//import the generated graph file into Gephi toolkit API workspace
+                GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
+
+                visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
+                visual.setGraph(model);
+                HomeGUI.isComaparing = false;
+                visual.setPreview();
+                visual.setLayout();
+                /*HomeGUI.table.clearAll();
+                HomeGUI.table.deselectAll();
+                HomeGUI.table.removeAll();
+                nodeData.clear();
+                nodeData = new HashMap<>();*/
+            }
+
+        });
+
+    }
+
+    public static void addNewLinkstoGraph() {
+        String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "NewGraphLinks.txt";
+        //String source = start + " " + end + " " + relType + "\n";
+        File file = new File(newLinkFile);
+        try (FileReader reader = new FileReader(file)) {
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] newLink = line.split(" ");
+                if (newLink.length > 2) {
+                    String id =line.substring(0, line.indexOf(":"));
+                    line = line.replaceAll(line.substring(0, line.indexOf(":")+1),"");
+                    String start = line.substring(0, line.indexOf(" ")).trim();
+                    line = line.replaceAll(start, "").trim();
+                    String end = line.substring(0, line.indexOf(" "));
+                    String type = line.substring(line.indexOf(" ")).trim();
+                    System.out.println("Entering "+ start + " " + end + " " + type);
+                    if(Integer.parseInt(id)!=-1){
+                        if(!GraphMouseListener.getIDFromGexf(Integer.parseInt(id)))
+                            GraphMouseListener.addToGEXF(start, end, type);
+                    }
+                    //GraphMouseListener.addToGEXF(start, end, type);
+                }
+            }
+            bufferedReader.close();
+            reader.close();        
+            
+        } catch (IOException e) {
+        }
+    }
+
+    public static void deleteRemovalLinkstoGraph() {
+        String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "DeletedGraphLinks.txt";
+        //String source = start + " " + end + " " + relType + "\n";
+        File file = new File(newLinkFile);
+        try {
+            FileReader reader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.length() > 1) {
+                    String ids [] = line.split(" ");
+                    System.out.println("NumberL "+ids.length);
+                    for(String id :ids){
+                        GraphMouseListener.removeEdgeFromGexf(Integer.parseInt(id));
+                    }                    
+                }
+            }
+            bufferedReader.close();
+            reader.close();
+        } catch (IOException e) {
+        }
     }
 
     /**
@@ -570,25 +643,108 @@ public class VisualizeGraph {
         setPreview();
         setLayout();
         target = getTarget(100);
-        HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
-        composite = new Composite(HomeGUI.graphTab,
-                SWT.EMBEDDED);
-        composite.setLayout(new GridLayout(1, false));
-        GridData spec = new GridData();
-        spec.horizontalAlignment = GridData.FILL;
-        spec.grabExcessHorizontalSpace = true;
-        spec.verticalAlignment = GridData.FILL;
-        spec.grabExcessVerticalSpace = true;
-        composite.setLayoutData(spec);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
+                composite = new Composite(HomeGUI.graphTab,
+                        SWT.EMBEDDED);
+                composite.setLayout(new GridLayout(1, false));
+                GridData spec = new GridData();
+                spec.horizontalAlignment = GridData.FILL;
+                spec.grabExcessHorizontalSpace = true;
+                spec.verticalAlignment = GridData.FILL;
+                spec.grabExcessVerticalSpace = true;
+                composite.setLayoutData(spec);
 
-        frame = SWT_AWT.new_Frame(composite);
+                createPopUpMenu();
 
-        composite2 = new Composite(HomeGUI.propertyTab, SWT.H_SCROLL | SWT.V_SCROLL);
-        composite2.setLayout(new GridLayout(1, false));
+                frame = SWT_AWT.new_Frame(composite);
 
-        composite3 = new Composite(composite2, SWT.RIGHT);
-        composite3.setLayout(new FillLayout());
+                composite2 = new Composite(HomeGUI.propertyTab, SWT.H_SCROLL | SWT.V_SCROLL);
+                composite2.setLayout(new GridLayout(1, false));
 
+                composite3 = new Composite(composite2, SWT.RIGHT);
+                composite3.setLayout(new FillLayout());
+
+                createTableComponents();
+
+                Label space = new Label(composite2, SWT.NONE);
+                GridData spaceData = new GridData();
+                spaceData.heightHint = 10;
+                space.setLayoutData(spaceData);
+
+                Label edgetitle = new Label(composite2, SWT.NONE);
+                edgetitle.setText("Edge-Color Notations:");
+                edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
+
+                tbtmPropertyInfos.setControl(composite2);
+
+                composite4 = new Composite(composite2, SWT.RIGHT);
+                composite4.setLayout(new GridLayout(2, false));
+                composite4.setRedraw(true);
+
+                for (String type : edgeColoring.keySet()) {
+                    Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
+                    GridData gridData = new GridData();
+                    gridData.widthHint = 20;
+                    gridData.heightHint = 20;
+                    edgeColor.setLayoutData(gridData);
+                    edgeColor.setText("");
+                    Label edgeDetailLabel = new Label(composite4, SWT.NONE);
+                    edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
+                    edgeDetailLabel.setText(type);
+                    edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
+                    edgeColor.setBackground(edgeColoring.get(type));
+                }
+
+                //add refresh button to graph panel
+                Button refresh = new Button("Refresh");
+                refresh.addActionListener(new ActionListener() {
+                    final String type = PropertyFile.getGraphType();
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
+                    }
+                });
+
+                Panel btnPanel = new Panel();
+                btnPanel.setLayout(new FlowLayout());
+                btnPanel.setBackground(Color.LIGHT_GRAY);
+                btnPanel.add(refresh);
+
+                Panel panel = new Panel();
+                panel.setLayout(new BorderLayout());
+                panel.add(applet, BorderLayout.CENTER);
+                panel.add(refresh, BorderLayout.PAGE_START);
+                frame.add(panel);
+                composite.setData(panel);
+                HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
+
+                frame.revalidate();
+
+            }
+        });
+    }
+
+    public void createColorDetails() {
+        for (String type : edgeColoring.keySet()) {
+            Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
+            GridData gridData = new GridData();
+            gridData.widthHint = 20;
+            gridData.heightHint = 20;
+            edgeColor.setLayoutData(gridData);
+            edgeColor.setText("");
+            Label edgeDetailLabel = new Label(composite4, SWT.NONE);
+            edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
+            edgeDetailLabel.setText(type);
+            edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
+            edgeColor.setBackground(edgeColoring.get(type));
+        }
+    }
+
+    public void createTableComponents() {
         table = new Table(composite2, SWT.BORDER);
         GridData data = new GridData();
         data.horizontalAlignment = GridData.FILL;
@@ -603,24 +759,23 @@ public class VisualizeGraph {
         table.setRedraw(true);
 
         /*
-         this is first coloumn
+        this is first coloumn
          */
         tblclmnProperty = new TableColumn(table, SWT.NULL);
         tblclmnProperty.setWidth(100);
         tblclmnProperty.setText("Property");
 
         /*
-         second coloumn
+        second coloumn
          */
         tblclmnValue = new TableColumn(table, SWT.FILL);
         tblclmnValue.setWidth(100);
         tblclmnValue.setText("Value");
 
         /*
-         table holder for scrolling purpose
+        table holder for scrolling purpose
          */
         //tableCursor = new TableCursor(table, SWT.NONE);
-
         final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         updateBtn.setText("Update");
 
@@ -727,64 +882,13 @@ public class VisualizeGraph {
             }
 
         });
-        
-        Label space = new Label(composite2, SWT.NONE);
-        GridData spaceData = new GridData();
-        spaceData.heightHint = 10;
-        space.setLayoutData(spaceData);
-
-        Label edgetitle = new Label(composite2, SWT.NONE);
-        edgetitle.setText("Edge-Color Notations:");
-        edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
-        
-        tbtmPropertyInfos.setControl(composite2);
-
-        composite4 = new Composite(composite2, SWT.RIGHT);
-        composite4.setLayout(new GridLayout(2, false));
-        composite4.setRedraw(true);
-
-        for (String type : edgeColoring.keySet()) {
-
-            Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
-            GridData gridData = new GridData();
-            gridData.widthHint = 20;
-            gridData.heightHint = 20;
-            edgeColor.setLayoutData(gridData);
-            edgeColor.setText("");
-            Label edgeDetailLabel = new Label(composite4, SWT.NONE);
-            edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
-            edgeDetailLabel.setText(type);
-            edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
-
-            edgeColor.setBackground(edgeColoring.get(type));
-        }
-
-        //add refresh button to graph panel
-        Button refresh = new Button("Refresh");
-        refresh.addActionListener(new ActionListener() {
-            final String type = PropertyFile.getGraphType();
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
-            }
-        });
-
-        Panel btnPanel = new Panel();
-        btnPanel.setLayout(new FlowLayout());
-        btnPanel.setBackground(Color.LIGHT_GRAY);
-        btnPanel.add(refresh);
-
-        Panel panel = new Panel();
-        panel.setLayout(new BorderLayout());
-        panel.add(applet, BorderLayout.CENTER);
-        panel.add(refresh, BorderLayout.PAGE_START);
-        frame.add(panel);
-        composite.setData(panel);
-        HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
-
-        frame.revalidate();
-
     }
 
+    public void createPopUpMenu() {
+        popupMenu = new Menu(composite);
+        newLink = new MenuItem(popupMenu, SWT.CASCADE);
+        newLink.setText("Add a Link");
+        removeLink = new MenuItem(popupMenu, SWT.NONE);
+        removeLink.setText("Remove a Link");
+    }
 }
