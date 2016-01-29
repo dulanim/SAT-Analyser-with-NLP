@@ -566,11 +566,37 @@ public class HomeGUI extends JFrame implements KeyListener {
         mntmClose.setText("Close");
 
         mntmCloseAll = new MenuItem(menu_1, SWT.NONE);
+        mntmCloseAll.setEnabled(false);
         mntmCloseAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
 
-                new FileSave().saveFile();
+                String windw = HomeGUI.activeTab.get(true);
+            	if(windw.contains(".txt") || windw.contains(".docs")){
+                    
+                    
+                MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
+                | SWT.YES | SWT.NO);
+
+                messageBox.setMessage("Do you really want to Save " + windw
+                + " ?");
+                File f = new File(windw);
+                messageBox.setText("Saving " + f.getName());
+                int response = messageBox.open();
+                if (response == SWT.YES){
+                     //save the text or doc file after modification 
+                     new FileSave().saveFile();
+                     
+                }
+               }
+                
+               CTabItem items[] = tabFolder.getItems();
+               for(CTabItem item:items){
+                    if(item.getToolTipText().equals(windw)){
+                             //close visible file 
+                             item.dispose();
+                    }
+                }
             }
         });
 

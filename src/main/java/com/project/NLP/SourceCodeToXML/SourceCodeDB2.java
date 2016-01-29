@@ -87,18 +87,19 @@ public class SourceCodeDB2 {
 
     public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType) {
         try (Transaction tx = graphDb.beginTx()) {
-
+            String attrID = classID1+"_F"+ ExtractInterfaceListener.attrId;
+            ExtractInterfaceListener.attrId++;
             firstNode = getNode(class1);
             Relationship relation;
             if (firstNode != null) {
                 String id = firstNode.getProperty("class_id").toString();
                 if (id.isEmpty()) {
-                    firstNode.setProperty("class_id", classID1);
+                    firstNode.setProperty("class_id", attrID);
                 }
             } else {
                 firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
                 firstNode.setProperty("className", class1);
-                firstNode.setProperty("class_id", classID1);
+                firstNode.setProperty("class_id", attrID);
             }
             if (!class2.isEmpty()) {
                 secondNode = getNode(class2);

@@ -185,20 +185,22 @@ public class PhrasesIdentification {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
                             if (separator == 0) {
-
-                                if (count != 1) {
+                                System.out.println("innerChild length:"+ innerChild.length);
+                                System.out.println("count: "+ count);
+                                if (count == innerChild.length) {
                                     String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
                                     //attributeLists.add(word);
                                     nounList.remove(tempClass);
                                     nounList.add(word);
+                                    System.out.println("2 "+ nounList);
                                     System.out.println("count == inn");
                                     if (!storingClass.isEmpty()) {
                                         classWithAttr.add(word);
                                         //nounList.add(word);
                                         storingClassWithAttr.put(storingClass, classWithAttr);
-
+                                        System.out.println("3 "+storingClassWithAttr);
                                     }
-                                } else {
+                                }else if(count ==1){
                                     String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
                                     String word = "";
                                     /*if the identified word is having underscore skips the stemming part . ex: user_id*/
@@ -208,10 +210,81 @@ public class PhrasesIdentification {
                                         word = morphology.stem(identifiedWord);
                                     }
                                     nounList.add(word);
+                                    System.out.println("1 "+ nounList);
                                     tempClass = word;
+                                    System.out.println("1: "+ tempClass);
                                     storingClass = word;
                                     System.out.println(">2 else");
+                                } 
+                                else {
+                                    //nounList.remove(tempClass);
+                                    //String word = "";
+                                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                    System.out.println("before temp: "+ tempClass);
+                                    if (tempClass.contains("_")) {
+                                        nounList.remove(tempClass);
+                                        //word = identifiedWord;
+                                    } else {
+                                        nounList.remove(morphology.stem(tempClass));
+                                        nounList.remove(tempClass);
+                                        //word = morphology.stem(identifiedWord);
+                                    }
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    tempClass += " "+ identifiedWord;
+                                    nounList.add(tempClass);
+                                    System.out.println("tempClass: "+ tempClass);
+                                    System.out.println("idenifiedWord: "+ identifiedWord);
+                                    System.out.println("4: "+ nounList);
+                                   
+                                    storingClass = tempClass;
+                                    System.out.println(">2 else");
                                 }
+//                                if (count == innerChild.length) {
+//                                    System.out.println("count == inner length");
+//                                    String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
+//                                    //nounList.remove(tempClass);
+//                                    
+//                                    //tempClass +=" "+ morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
+//                                    
+//                                    attributeLists.add(word);
+//                                    //nounList.add(tempClass);
+//                                    System.out.println("count == inn");
+////                                    if (!storingClass.isEmpty()) {
+////                                        classWithAttr.add(tempClass);
+////                                        //nounList.add(word);
+////                                        storingClassWithAttr.put(storingClass, classWithAttr);
+////
+////                                    }
+//                                }
+//                                
+//                                else {
+//                                    String identifiedWord = "";//((leaves.get(0).yieldWords()).get(0).word());
+//                                    String word = "";
+//                                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+//                                    if (identifiedWord.contains("_")) {
+//                                        //word = identifiedWord;
+//                                        nounList.remove(word);
+//                                    } else {
+//                                        //word = morphology.stem(word);
+//                                        nounList.remove(word);
+//                                        nounList.remove(morphology.stem(word));
+//                                    }
+//                                    if(count ==1 ){
+//                                        nounList.add(word);
+//                                        System.out.println(word);
+//                                        System.out.println("1" + nounList);
+//                                    }
+//                                    else{
+//                                        word += " " + ((leaves.get(0).yieldWords()).get(0).word());;
+//                                        nounList.add(word);
+//                                        System.out.println(word);
+//                                        System.out.println("2" + nounList);
+//                                    }
+//                                    tempClass = word;
+//                                    storingClass = word;
+//                                    System.out.println(">2 else");
+//                                }
+
                                 count++;
                             } else {
                                 String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
@@ -219,9 +292,13 @@ public class PhrasesIdentification {
                                 /*if the identified word is having underscore skips the stemming part . ex: user_id*/
                                 if (identifiedWord.contains("_")) {
                                     word = identifiedWord;
+                                //    nounList.remove(word);
                                 } else {
                                     word = morphology.stem(identifiedWord);
+                                //    nounList.remove(morphology.stem(word));
+                                //    nounList.remove(word);
                                 }
+                                
                                 nounList.add(word);
                                 tempClass = word;
                                 storingClass = word;
@@ -307,9 +384,11 @@ public class PhrasesIdentification {
                                 String identifiedWord = attribute;
                                 if (!identifiedWord.contains("_")) {
                                     attributeLists.add(morphology.stem(identifiedWord));
-
+                                    System.out.println("1");
+                                    System.out.println("attr: "+ attributeLists);
                                 } else {
                                     attributeLists.add(identifiedWord);
+                                    System.out.println("2");
                                 }
 
                                 //attributeLists.add(morphology.stem(attribute));
@@ -319,25 +398,30 @@ public class PhrasesIdentification {
 
                         } else if (count >= 2 && separator == 0) {
                             if (!attribute.contains("_")) {
+                                
                                 attributeLists.remove(morphology.stem(attribute));
-
+                                attributeLists.remove(attribute);
+                                System.out.println("attr: "+ attributeLists);
                             } else {
                                 attributeLists.remove(attribute);
+                                System.out.println("4");
                             }
 
                             //attributeLists.remove(morphology.stem(attribute));
                             attribute += " " + (leaves.get(0).yieldWords()).get(0).word();
                             attributeLists.add(attribute);
+                            System.out.println("attrs: "+ attributeLists);
                             System.out.println(">2 else");
                         } else if (count >= 2 && separator == 1) {
                             attribute = (leaves.get(0).yieldWords()).get(0).word();
                             if (!attribute.contains("_")) {
                                 attributeLists.add(morphology.stem(attribute));
-
+                                System.out.println("5");
                             } else {
                                 attributeLists.add(attribute);
+                                System.out.println("6");
                             }
-
+                            separator =0;
                             // attributeLists.add(morphology.stem(attribute));
                         }
 
@@ -355,7 +439,6 @@ public class PhrasesIdentification {
                         //attributeLists.add(morphology.stem());
                         if (!identifiedWord.contains("_")) {
                             attributeLists.add(morphology.stem(identifiedWord));
-
                         } else {
                             attributeLists.add(identifiedWord);
                         }
@@ -463,7 +546,7 @@ public class PhrasesIdentification {
                     }
 
                 }
-                if (adjectiveExist == 1 && adjectiveNoun == 0) {
+                if (adjectiveExist == 1 && adjectiveNoun == 0 && !adj.isEmpty()) {
                     adjAttributeList.add(adj);
                 }
             }
@@ -471,6 +554,7 @@ public class PhrasesIdentification {
         }
 
         System.out.println("ADJECTVE ATTRIBUTE :" + adjAttributeList);
+        System.out.println("addj attr size: " + adjAttributeList.size());
         return adjAttributeList;
 
     }

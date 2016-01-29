@@ -184,5 +184,11 @@
             <artifactId>jena-core</artifactId>
             <version>3.0.0</version>
         </dependency>
+       <dependency>
+		<groupId>info.debatty</groupId>
+		<artifactId>java-string-similarity</artifactId>
+		<version>0.10</version>
+	  </dependency>
+       
     </dependencies>
 </project>

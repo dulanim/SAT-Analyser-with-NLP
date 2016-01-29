@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.filters.api.FilterController;
@@ -181,13 +182,13 @@ public class VisualizeGraph {
                 .getRenderTarget(RenderTarget.PROCESSING_TARGET);
         this.setApplet(target.getApplet());
         applet.init();
-        if(waitTime <=0){
+        if (waitTime <= 0) {
             waitTime = 100;
         }
         try {
             Thread.sleep(waitTime);//wait for 10ms to render graph properly in tool
         } catch (InterruptedException ex) {
-            getTarget(waitTime*10);
+            getTarget(waitTime * 10);
         }
         // Refresh the preview and reset the zoom
         previewController.render(target);
@@ -225,7 +226,7 @@ public class VisualizeGraph {
         // Partition with 'type' column, which is in the data
         NodePartition node_partition = (NodePartition) partitionController
                 .buildPartition(
-                        attributeModel.getNodeTable().getColumn("Type"), graph);
+                        attributeModel.getNodeTable().getColumn("Artefact"), graph);
 
         // Partition with 'Neo4j Relationship Type' column, which is in the data
         EdgePartition edge_partition = (EdgePartition) partitionController
@@ -477,15 +478,30 @@ public class VisualizeGraph {
         // Partition with 'type' column, which is in the data
         NodePartition node_partition = (NodePartition) partitionController
                 .buildPartition(
-                        attributeModel.getNodeTable().getColumn("Type"), graph);
+                        attributeModel.getNodeTable().getColumn("Artefact"), graph);
 
         // Partition with 'Neo4j Relationship Type' column, which is in the data
         EdgePartition edge_partition = (EdgePartition) partitionController
                 .buildPartition(
                         attributeModel.getEdgeTable().getColumn(
                                 "Neo4j Relationship Type"), graph);
+        
+        for(AttributeColumn col : attributeModel.getNodeTable().getColumns()){
+            System.out.println(" "+col.getId()+" "+col.getTitle());
+        }
+        
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
+        for(Part p: node_partition.getParts()){
+            System.out.println("Node : " + p.getValue());
+            int j=0;
+            for(Object o : p.getObjects()){
+                System.out.print(" "+j+" " + o.toString());
+                j++;
+            }
+            System.out.println("");
+            
+        }
         nodeColorTransformer.randomizeColors(node_partition);
         partitionController.transform(node_partition, nodeColorTransformer);
 
@@ -516,10 +532,10 @@ public class VisualizeGraph {
         List<Color> colors = new ArrayList<>();
         colors.add(Color.RED);
         colors.add(Color.BLUE);
-        colors.add(Color.CYAN);
+        colors.add(Color.MAGENTA);
         colors.add(Color.GREEN);
         colors.add(Color.YELLOW);
-        colors.add(Color.MAGENTA);
+        colors.add(Color.CYAN);
         colors.add(Color.PINK);
         colors.add(Color.orange);
         colors.add(Color.PINK);
@@ -603,7 +619,7 @@ public class VisualizeGraph {
         /*
          table holder for scrolling purpose
          */
-        tableCursor = new TableCursor(table, SWT.NONE);
+        //tableCursor = new TableCursor(table, SWT.NONE);
 
         final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         updateBtn.setText("Update");
@@ -619,7 +635,7 @@ public class VisualizeGraph {
                 gbEditor.storeUpdatedNode(nodeData);
                 transferDataToDBFromXML(projectPath, true);
                 refreshGraph();
-            }            
+            }
         });
 
         deleteBtn.addSelectionListener(new SelectionAdapter() {
@@ -711,11 +727,16 @@ public class VisualizeGraph {
             }
 
         });
+        
+        Label space = new Label(composite2, SWT.NONE);
+        GridData spaceData = new GridData();
+        spaceData.heightHint = 10;
+        space.setLayoutData(spaceData);
 
-        Label edgetitle = new Label(composite2, SWT.BORDER);
+        Label edgetitle = new Label(composite2, SWT.NONE);
         edgetitle.setText("Edge-Color Notations:");
         edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
-
+        
         tbtmPropertyInfos.setControl(composite2);
 
         composite4 = new Composite(composite2, SWT.RIGHT);
@@ -725,10 +746,10 @@ public class VisualizeGraph {
         for (String type : edgeColoring.keySet()) {
 
             Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
-            GridData oGridData = new GridData();
-            oGridData.widthHint = 20;
-            oGridData.heightHint = 20;
-            edgeColor.setLayoutData(oGridData);
+            GridData gridData = new GridData();
+            gridData.widthHint = 20;
+            gridData.heightHint = 20;
+            edgeColor.setLayoutData(gridData);
             edgeColor.setText("");
             Label edgeDetailLabel = new Label(composite4, SWT.NONE);
             edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));

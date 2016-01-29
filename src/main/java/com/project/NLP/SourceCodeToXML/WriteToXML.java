@@ -6,6 +6,7 @@
 package com.project.NLP.SourceCodeToXML;
 
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.writer.Adapter;
 import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.common.PropertyFile;
@@ -50,8 +51,8 @@ public class WriteToXML {
     }
 
     public static void getFilePath(){
-        String root = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName;
-        //System.out.println("Root: "+root);
+        String root = Adapter.projectPath;
+        System.out.println("Root: "+root);
         File f = new File(root + File.separator +FilePropertyName.XML);
         if(!f.exists())
             f.mkdir();
@@ -66,8 +67,9 @@ public class WriteToXML {
     }
 
     public static Document createDocument() {
-        getFilePath();
+        
         try {
+            getFilePath();
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             if (checkFileExist()) {

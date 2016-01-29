@@ -86,83 +86,84 @@ public class ArtefactFrame extends JFrame {
         HashSet relationSet = null;
         HashSet relationGenSet = new HashSet();
         HashSet relationAssSet = new HashSet();
+        if (!output.isEmpty()) {
+            Iterator outputIterator = output.keySet().iterator();
+            while (outputIterator.hasNext()) {
+                String classNameString = outputIterator.next().toString();
+                StoringArtefacts store = (StoringArtefacts) output.get(classNameString);
+                attributeSet = store.getAttributes();
+                methodSet = store.getMethods();
+                relationSet = store.getRelationships();
 
-        Iterator outputIterator = output.keySet().iterator();
-        while (outputIterator.hasNext()) {
-            String classNameString = outputIterator.next().toString();
-            StoringArtefacts store = (StoringArtefacts) output.get(classNameString);
-            attributeSet = store.getAttributes();
-            methodSet = store.getMethods();
-            relationSet = store.getRelationships();
+                attributes = new DefaultMutableTreeNode("Attributes");
+                methods = new DefaultMutableTreeNode("Methods");
+                relationships = new DefaultMutableTreeNode("Relationships");
+                relationshipsGeneralization = new DefaultMutableTreeNode("Generalization");
+                relationshipsAssociations = new DefaultMutableTreeNode("Association");
 
-            attributes = new DefaultMutableTreeNode("Attributes");
-            methods = new DefaultMutableTreeNode("Methods");
-            relationships = new DefaultMutableTreeNode("Relationships");
-            relationshipsGeneralization = new DefaultMutableTreeNode("Generalization");
-            relationshipsAssociations = new DefaultMutableTreeNode("Association");
-
-            classNames = new DefaultMutableTreeNode(classNameString);
-            for (Object attributeItems : attributeSet) {
-                attributes.add(new DefaultMutableTreeNode(attributeItems));
-                System.out.println("attributes: ..." + attributeItems);
-                classNames.add(attributes);
-
-            }
-
-            for (Object methodItems : methodSet) {
-                methods.add(new DefaultMutableTreeNode(methodItems));
-                System.out.println("methods: ..." + methodItems);
-                classNames.add(methods);
-
-            }
-
-            Iterator relationsIterator = outputRelations.iterator();
-            while (relationsIterator.hasNext()) {
-                boolean status = false;
-                Object relationshipItems = relationsIterator.next();
-                ClassRelation rel = (ClassRelation) relationshipItems;
-                Object childClass = rel.getChildElement();
-                if (childClass.toString().equalsIgnoreCase(classNameString)) {
-
-                    //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
-                    System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-
-                    if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
-                        status = true;
-                        relationshipsGeneralization.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
-                        relationships.add(relationshipsGeneralization);
-
-                    }
-                    if (rel.getRelationType().equalsIgnoreCase("Association")) {
-                        relationshipsAssociations.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
-                        status = true;
-                        relationships.add(relationshipsAssociations);
-
-                    }
+                classNames = new DefaultMutableTreeNode(classNameString);
+                for (Object attributeItems : attributeSet) {
+                    attributes.add(new DefaultMutableTreeNode(attributeItems));
+                    System.out.println("attributes: ..." + attributeItems);
+                    classNames.add(attributes);
 
                 }
-                Object parentClass = rel.getParentElement();
-                if (parentClass.toString().equalsIgnoreCase(classNameString)) {
-                    //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
-                    System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Child -" + rel.getChildElement());
 
-                    if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
-                        status = true;
-                        relationshipsGeneralization.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
-                        relationships.add(relationshipsGeneralization);
+                for (Object methodItems : methodSet) {
+                    methods.add(new DefaultMutableTreeNode(methodItems));
+                    System.out.println("methods: ..." + methodItems);
+                    classNames.add(methods);
+
+                }
+
+                Iterator relationsIterator = outputRelations.iterator();
+                while (relationsIterator.hasNext()) {
+                    boolean status = false;
+                    Object relationshipItems = relationsIterator.next();
+                    ClassRelation rel = (ClassRelation) relationshipItems;
+                    Object childClass = rel.getChildElement();
+                    if (childClass.toString().equalsIgnoreCase(classNameString)) {
+
+                        //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
+                        System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
+
+                        if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                            status = true;
+                            relationshipsGeneralization.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                            relationships.add(relationshipsGeneralization);
+
+                        }
+                        if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                            relationshipsAssociations.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                            status = true;
+                            relationships.add(relationshipsAssociations);
+
+                        }
 
                     }
-                    if (rel.getRelationType().equalsIgnoreCase("Association")) {
-                        relationshipsAssociations.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
-                        relationships.add(relationshipsAssociations);
-                        status = true;
+                    Object parentClass = rel.getParentElement();
+                    if (parentClass.toString().equalsIgnoreCase(classNameString)) {
+                        //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
+                        System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Child -" + rel.getChildElement());
+
+                        if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                            status = true;
+                            relationshipsGeneralization.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                            relationships.add(relationshipsGeneralization);
+
+                        }
+                        if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                            relationshipsAssociations.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                            relationships.add(relationshipsAssociations);
+                            status = true;
+                        }
+                    }
+                    if (status) {
+                        classNames.add(relationships);
                     }
                 }
-                if (status) {
-                    classNames.add(relationships);
-                }
+                root.add(classNames);
             }
-            root.add(classNames);
         }
         tree = new JTree(root);
     }
@@ -317,13 +318,13 @@ public class ArtefactFrame extends JFrame {
         boolean relationshipTypeExist = false;
         boolean relLeafExist = false;
         DefaultMutableTreeNode typeNodeChange = null;
-        
+
         for (int rCount = 0; rCount < relCount; rCount++) {
 
             Object leaf = node.getChildAt(rCount);
             newClass = leaf.toString().split("->")[1];
             newClassNode = getObjectNode(newClass);
-            
+
             int childClassCount = tree.getModel().getChildCount(newClassNode);
             for (int cCount = 0; cCount < childClassCount; cCount++) {
 
@@ -365,7 +366,7 @@ public class ArtefactFrame extends JFrame {
             if (relLeafExist) {
                 /*remove the node*/
                 DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
-               ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+                ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
                 /*add the node with the type*/
                 addItems(relationShipsNode, node.toString(), 0);
                 Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
@@ -374,7 +375,7 @@ public class ArtefactFrame extends JFrame {
             }
 
             ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
-           
+
         }
     }
 

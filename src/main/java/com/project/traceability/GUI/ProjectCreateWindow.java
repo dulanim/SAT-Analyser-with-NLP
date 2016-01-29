@@ -13,8 +13,14 @@ package com.project.traceability.GUI;
  */
 
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.writer.Adapter;
+import com.project.property.config.xml.writer.XMLConversion;
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
-
+import com.project.traceability.common.Dimension;
+import com.project.traceability.common.PropertyFile;
+import com.project.traceability.manager.RelationManager;
+import com.project.traceability.staticdata.StaticData;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,14 +41,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
-
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.property.config.xml.writer.Adapter;
-import com.project.property.config.xml.writer.XMLConversion;
-import com.project.traceability.common.Dimension;
-import com.project.traceability.common.PropertyFile;
-import com.project.traceability.manager.RelationManager;
-import com.project.traceability.staticdata.StaticData;
+import org.eclipse.swt.widgets.ProgressBar;
 
 
 public class ProjectCreateWindow {
@@ -70,8 +69,8 @@ public class ProjectCreateWindow {
 	static Path path;
     String uml_formats[] = { "*.uml*;*.xmi*;*.mdj*"};
     String req_formats[] ={"*.docs*;*.txt*"};
+    ProgressBar progressBar;
     Display display;
-    Label lblStatus;
     
 	/**
 	 * Launch the application.
@@ -419,20 +418,19 @@ public class ProjectCreateWindow {
 		button_2.setText("Cancel");
 		//button_2.setImage(SWTResourceManager.getImage("null"));
 		button_2.setBounds(10, 51, 75, 25);
-		lblStatus = new Label(composite, SWT.NONE);
-		lblStatus.setBounds(10, 10, 523, 17);
-        lblStatus.setText("Statusdfsdgdg");
-        
-        
+		final Label lblStatus = new Label(composite, SWT.NONE);
+		lblStatus.setBounds(10, 30, 523, 17);
 		btnFinish = new Button(composite, SWT.NONE);
 		btnFinish.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				
+				progressBar.setVisible(true);
+				
 				String reqFilePath = PropertyFile.docsFilePath;
 				String umFilePath =  StaticData.umlFilePath;
 				String srcFilePath = StaticData.sourceFilePath;
-				setStatus("Status JSJHFF");
+				
 				String projectName = txtProjectName.getText();
 				
 				if(!(StaticData.workspace.lastIndexOf(File.separator) == StaticData.workspace.length()-1))
@@ -456,42 +454,45 @@ public class ProjectCreateWindow {
 					projectAbsoulutePath += (File.separator);
 					
 				File srcFolder = new File(projectAbsoulutePath + FilePropertyName.SOURCE_CODE);
-				setStatus("Making Source Directory");
+				lblStatus.setText("Making Source Directory");
                                 try {
-				srcFolder.mkdir();
+					srcFolder.mkdir();
                                         
-				setStatus("Copying Java Fieles to" + 
+                                        lblStatus.setText("Copying Java Fieles to" + 
                                                 srcFolder.getAbsolutePath());
-				FilePropertyName.copyFolder(srcFile, srcFolder);
+					FilePropertyName.copyFolder(srcFile, srcFolder);
 					
-					setStatus("Text Source Directory");
+                                        lblStatus.setText("Text Source Directory");
 					File txtFolder = new File(projectAbsoulutePath+FilePropertyName.REQUIREMENT);
 					txtFolder.mkdir();
 					
-					setStatus("Copying Text File to " + reqFile.getAbsolutePath());
+                                        lblStatus.setText("Copying Text File to " + reqFile.getAbsolutePath());
 					FilePropertyName.copyFile(reqFile, txtFolder);
 					
                                         
-					setStatus("Making Uml Directory");
+                                        lblStatus.setText("Making Uml Directory");
 					File umlFolder = new File(projectAbsoulutePath+FilePropertyName.UML);
 					umlFolder.mkdir();
 					
                                         
-					setStatus("Copying Uml Fieles to" + 
+                                        lblStatus.setText("Copying Uml Fieles to" + 
                                                 umlFile.getAbsolutePath());
 					FilePropertyName.copyFile(umlFile, umlFolder);
 					
                                         
-					setStatus("Making Directory");
+                                        lblStatus.setText("Making Directory");
 					File xmlFolder = new File(projectAbsoulutePath+FilePropertyName.XML);
 					xmlFolder.mkdir();
 					//PropertyFile.setRelationshipXMLPath(xmlFolder + File.separator + FilePropertyName.RELATION_NAME);
 					
-					setStatus("Making Relation.xml Fieles to" + 
+                                        lblStatus.setText("Making Relation.xml Fieles to" + 
                                                 xmlFolder.getAbsolutePath());
                                         RelationManager.createXML(projectAbsoulutePath.substring(0,projectAbsoulutePath.length()-1));
 					//RelationManager.createXML(projectAbsoulutePath+FilePropertyName.XML);
-					setStatus("Making Property Directory" + 
+					
+                                        
+                                        
+                                        lblStatus.setText("Making Property Directory" + 
                                                 projectAbsoulutePath);
 					File propertyFolder = new File(projectAbsoulutePath+FilePropertyName.PROPERTY);
 					propertyFolder.mkdir();
@@ -541,18 +542,18 @@ public class ProjectCreateWindow {
                                 System.out.println("----------Requirement file path--------- "+StaticData.requirementFilePath);
                                 
                                 
-                                setStatus("Making RequirementArtefact.xml Fiele to" + 
+                                lblStatus.setText("Making RequirementArtefact.xml Fiele to" + 
                                                 xmlFolder.getAbsolutePath());
                                 XMLConversion.convertRequirementFile();
                                 
-                                setStatus("Making UmlArtefact.xml Fiele to" + 
+                                lblStatus.setText("Making UmlArtefact.xml Fiele to" + 
                                                 xmlFolder.getAbsolutePath());
                                 XMLConversion.convertUMLFile();
-                                setStatus("Making SourcecodeArtefact.xml Fiele to" + 
+                                lblStatus.setText("Making SourcecodeArtefact.xml Fiele to" + 
                                                 xmlFolder.getAbsolutePath());
                                 XMLConversion.convertJavaFiles();
                                 
-                                setStatus("Now completed project creation please wait...");
+                                lblStatus.setText("Now completed project creation please wait...");
                                 shell.dispose();
                                 HomeGUI.closeMain(HomeGUI.shell);
                                 HomeGUI.main(null);
@@ -577,17 +578,20 @@ public class ProjectCreateWindow {
 		btnFinish.setEnabled(false);
 		btnFinish.setBounds(493, 51, 75, 25);
 		
+		progressBar = new ProgressBar(composite, SWT.NONE);
+		progressBar.setBounds(10, 10, 558, 14);
+		progressBar.setVisible(false);
+		
 		
 		
 		Label label_6 = new Label(shell, SWT.NONE);
 		label_6.setText("New Project Will be created ");
 		label_6.setBounds(20, 10, 189, 17);
 		
+		
+
 	}
 	
-	private void setStatus(String status){
-		lblStatus.setText(status);
-;	}
 	private boolean isNameValid(String aName){
 		/*
 		 * have to write name validation here

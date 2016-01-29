@@ -60,6 +60,7 @@ public class XMLWriter {
                 writer = new XMLWriter(status);
             return writer;
         }
+        
         private void init(){
             try{
 				File file = new File(filepath);
@@ -82,7 +83,8 @@ public class XMLWriter {
         }
            
         }
-	private void create_root(){
+	
+        private void create_root(){
 		
 		//FileWriter reader = new F
                 Element root_element_configs = doc.createElement("Configs");
@@ -91,7 +93,8 @@ public class XMLWriter {
                 root_element_configs.appendChild(wrkspacesElmnt);
                 createDefaultNode();//adding default to configs node
 	}
-	public void modifyStatus(Boolean active,String path){
+	
+        public void modifyStatus(Boolean active,String path){
 		//switch project path
             int x = path.lastIndexOf(File.separator);
             if(x == path.length() -1){
@@ -169,7 +172,8 @@ public class XMLWriter {
                 call_done();
            
         }
-	public void createWorkspaceNode(String path,String active){
+	
+        public void createWorkspaceNode(String path,String active){
 		//create main project path
 		//Node root = doc.getElementsByTagName("Configs").item(0);
 	
@@ -193,7 +197,8 @@ public class XMLWriter {
         
         call_done();
 	}
-	public void deleteProjectFolder(String path,String folderName){
+	
+        public void deleteProjectFolder(String path,String folderName){
 		try {
 			NodeList nList = doc.getElementsByTagName("Config");
 			for(int i=0;i<nList.getLength();i++){
@@ -270,7 +275,6 @@ public class XMLWriter {
 		}
 	}
 	
-	
 	public void createProjectWorksapce(String path){
 		/*
 		 * create a projects node like this 
@@ -294,9 +298,6 @@ public class XMLWriter {
 		    call_done();
 	}
 	
-        
-       
-        
         public void setVisibleFilePath(String wrkspace,String path){
             
              NodeList wrkspaceList = doc.getElementsByTagName("Projects");
@@ -317,7 +318,8 @@ public class XMLWriter {
                 }
              }
         }
-	public boolean isWorkspaceExists(String wrkspace){
+	
+        public boolean isWorkspaceExists(String wrkspace){
 		/*
 		 * @wrkspace /home/shiyam/wrkspace
 		 * check it exists or not in projects node in sat_configuration.xml
@@ -352,7 +354,8 @@ public class XMLWriter {
 		String wrkspace = projectPath.substring(0,end);
 		return wrkspace;
 	}
-	public void createProject(String projectPath){
+	
+        public void createProject(String projectPath){
 			/*
 			 * @projectPath is /home/documents/workspace/Anduril
 			 * it actually create a project node inside the workspace
@@ -498,7 +501,8 @@ public class XMLWriter {
 			}
 		}
 	}
-	public void setProjectStatus(String projectPath,String sub,boolean status){
+	
+        public void setProjectStatus(String projectPath,String sub,boolean status){
 		
 		NodeList projects = doc.getElementsByTagName("Project");
 		
@@ -518,7 +522,8 @@ public class XMLWriter {
 		}
 		
 	}
-	public void call_done(){
+	
+        public void call_done(){
 		try{
 			
 		// write the content into xml file
@@ -599,25 +604,5 @@ public class XMLWriter {
 		
 		return openedFiles;
 	}
-//	public static void main(String args[]){
-//		XMLWriter writer = new XMLWriter();
-////		writer.createProjectWorksapce("/home/shiyam");
-////		writer.createProject("/home/shiyam/RamProject");
-////		writer.setProjectStatus("/home/shiyam/RamProject", "src", true);
-////		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
-////		writer.changeFileStatus("/home/shiyam/RamProject/sat_config.xml",true);
-////		
-////		writer.createFileNode("/home/shiyam/RamProject", "/home/shiyam/RamProject/sat_config.xml");
-////		
-////		writer.createProject("/home/shiyam/12/SRR");
-////		writer.createFileNode("/home/shiyam/SRR", "/home/shiyam/RamProject/sat_config.xml");
-//                
-////                List<String> files = writer.retriveOpenedFiles();
-////                
-////                for(String file:files){
-////                    System.out.println(file);
-////                }
-//	}
-        
         
 }
