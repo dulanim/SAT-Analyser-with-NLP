@@ -8,8 +8,8 @@ package com.project.traceability.GUI;
  * Dec 4, 2014
  */
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.EditManager;
 import com.project.traceability.manager.ReadFiles;
@@ -53,7 +54,6 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.ontology.models.Word;
 import com.project.traceability.utils.Constants.ImageType;
-import java.io.File;
 
 public class CompareWindow {
 
@@ -298,7 +298,7 @@ public class CompareWindow {
                                                                                         
                                                                                         //WordExp Window pops up
                                                                                         
-                                                                                        showWordExpWindow(element1.getName(), element2.getName(), "Class");
+                                       showWordExpWindow(element1.getName(), element2.getName(), "Class");
 										}
 									} else if (subElements != null) {			// map new sub element
 										if (confirmMapping(
@@ -436,7 +436,7 @@ public class CompareWindow {
 		style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 		stText.setStyleRange(style);		
 	}
-        private void showWordExpWindow(String word1,String word2,String type){
+    private void showWordExpWindow(String word1,String word2,String type){
             /*
             Pop up our ontology for required 
             two words
