@@ -131,6 +131,8 @@ public class HomeGUI extends JFrame implements KeyListener {
     public static TableItem tableItem;
     private TableItem tableItem_1;
     private SashForm graphTapHolder;
+    MenuItem mntmClose;
+    MenuItem mntmCloseAll;
 
     /**
      * Launch the application.
@@ -526,17 +528,44 @@ public class HomeGUI extends JFrame implements KeyListener {
         //  Create the first separator
         new MenuItem(menu_1, SWT.SEPARATOR);
 
-        MenuItem mntmClose = new MenuItem(menu_1, SWT.NONE);
+        mntmClose = new MenuItem(menu_1, SWT.NONE);
+        mntmClose.setEnabled(false);
         mntmClose.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new FileSave().saveFile();
+            	
+            	String windw = HomeGUI.activeTab.get(true);
+            	if(windw.contains(".txt") || windw.contains(".docs")){
+                    
+                    
+                MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
+                | SWT.YES | SWT.NO);
+
+                messageBox.setMessage("Do you really want to Save " + windw
+                + " ?");
+                File f = new File(windw);
+                messageBox.setText("Saving " + f.getName());
+                int response = messageBox.open();
+                if (response == SWT.YES){
+                     //save the text or doc file after modification 
+                     new FileSave().saveFile();
+                     
+                }
+               }
+                
+               CTabItem items[] = tabFolder.getItems();
+               for(CTabItem item:items){
+                    if(item.getToolTipText().equals(windw)){
+                             //close visible file 
+                             item.dispose();
+                    }
+                }
             }
         });
 
         mntmClose.setText("Close");
 
-        MenuItem mntmCloseAll = new MenuItem(menu_1, SWT.NONE);
+        mntmCloseAll = new MenuItem(menu_1, SWT.NONE);
         mntmCloseAll.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -858,9 +887,14 @@ public class HomeGUI extends JFrame implements KeyListener {
                     if(HomeGUI.activeTab != null){
                         String itemTitle = item.getText();
                         if(!itemTitle.contains("Compare")){
-                            HomeGUI.activeTab.put(true, item.getToolTipText());
+                             mntmClose.setEnabled(true);
+                             mntmCloseAll.setEnabled(true);
+                             HomeGUI.activeTab.put(true, item.getToolTipText());
                              String filePath = item.getToolTipText();
                              writer.setVisibleFilePath(StaticData.workspace, filePath);
+                        }else{
+                        	mntmClose.setEnabled(false);
+                        	mntmCloseAll.setEnabled(false);
                         }
                     }
 
@@ -1007,15 +1041,28 @@ public class HomeGUI extends JFrame implements KeyListener {
    
     public static void deleteFiles(String projectPath) {
 
-        TreeItem parent = trtmNewTreeitem.getParentItem();
+        TreeItem[] selection = tree.getSelection();
+        TreeItem paret = trtmNewTreeitem.getParentItem();
+        TreeItem topParent = null;
+        String parent = "";
+                
+        string = selection[0].getText();
+        if(paret != null)
+                topParent = paret.getParentItem();
+
+         if (paret != null && topParent == null) {
+                    parent = paret.getText();
+         } else if(topParent != null){
+                    parent = topParent.getText() + File.separator + paret.getText();
+          }
 
         MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
                 | SWT.YES | SWT.NO);
 
         File filePath = new File(projectPath);
         if (!filePath.isDirectory()) {
-            projectPath = PropertyFile.filePath + parent.getText() + "/"
-                    + trtmNewTreeitem.getText();
+            projectPath = StaticData.workspace + File.separator + parent + File.separator
+                    + selection[0].getText();
         }
         messageBox.setMessage("Do you really want to delete " + projectPath
                 + " ?");
@@ -1039,6 +1086,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             File file = new File(projectPath);
             try {
                 FilePropertyName.delete(file);
+                ErrorFinder.checkEachProject();
             } catch (IOException e) {
                 messageBox = new MessageBox(shell, SWT.ICON_ERROR
                         | SWT.ERROR_IO);
@@ -1090,7 +1138,8 @@ public class HomeGUI extends JFrame implements KeyListener {
         refreshItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                composite.pack(true);
+                initWindow();
+                setUpNewProject();
             }
         });
         refreshItem.setText("Refresh");
@@ -1128,8 +1177,17 @@ public class HomeGUI extends JFrame implements KeyListener {
                 for (int i = 0; i < selection.length; i++) {
                     string += selection[i] + " ";
                 }
+                
+                boolean isAllFileExists = 
+                        ErrorFinder.lookUpForFiles(projectPath,
+                                FilePropertyName.XML);
                 string = string.substring(10, string.length() - 2);
-                window.open(string);
+                if(isAllFileExists){
+                    window.open(string);
+                }else{
+                    displayError("Project does not have rquired files." +"\nHelp:=>"
+                            + " press resolve on error folders");
+                }
             }
         });
         compareItem.setText("Compare Files");
@@ -1179,8 +1237,9 @@ public class HomeGUI extends JFrame implements KeyListener {
         MenuItem deleteProItem = new MenuItem(projectMenu, SWT.NONE);
         deleteProItem.addSelectionListener(new SelectionAdapter() {
 
+            //Resolve method going to here 
         });
-        deleteProItem.setText("Delete");
+        deleteProItem.setText("Resolve");
 
         Menu visualMenu = new Menu(popupMenu);
         graphItem.setMenu(visualMenu);
@@ -1280,6 +1339,7 @@ public class HomeGUI extends JFrame implements KeyListener {
 
     public static void setUpNewProject() {
 
+        tree.removeAll();
         File workspace = new File(StaticData.workspace);
         String projectName[] = workspace.list();
 
@@ -1302,8 +1362,9 @@ public class HomeGUI extends JFrame implements KeyListener {
             }
         }
 
-        showExpandedProject();///show expanded projects 
-        checkForError();
+        showExpandedProject();///show expanded projects ]
+        
+        ErrorFinder.checkEachProject();
     }
 
     private static void checkForError(){
@@ -1506,4 +1567,5 @@ public class HomeGUI extends JFrame implements KeyListener {
             }
         }
     }
+    
 }
