@@ -68,7 +68,10 @@ public class ModelGenerator {
 		 if(model_creator.isMatchingWords("Cocnut", "CocounantTree")){
 			 System.out.println("Matched");
 		 }else{
-			 System.out.println("Not Matched");
+			 if(MatchWords.compareStrings("Cocnut", "CocounantTree"))
+				 System.out.println("Matched");
+			 else
+				 System.out.println("Not Matched");
 		 }
 		 
 //		 NavigationModel navigator = NavigationModel.getNavigatorInstane();
