@@ -83,14 +83,14 @@ public class NLPRequirementMain {
                             System.out.println("ATTRIBUTE LIST: " + attrList);
 
                             /*if the sentence is passive swipe the attributes and methods*/
-                            passiveMap = parser.getPassiveSentenceMap();
-                            if (passiveMap.containsKey(tree)) {
-                                System.out.println("passive sentence detected");
-                                tempList = classList;
-                                classList = attrList;
-                                attrList = tempList;
-
-                            }
+//                            passiveMap = parser.getPassiveSentenceMap();
+//                            if (passiveMap.containsKey(tree)) {
+//                                System.out.println("passive sentence detected");
+//                                tempList = classList;
+//                                classList = attrList;
+//                                attrList = tempList;
+//
+//                            }
                             if (!classList.isEmpty()) {
                                 /* methods identification */
                                 System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
