@@ -1,6 +1,5 @@
 package com.project.traceability.manager;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,13 +13,15 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.model.WordsMap;
+import com.project.traceability.ontology.models.MatchWords;
+import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
 public class UMLSourceClassManager {
@@ -41,7 +42,7 @@ public class UMLSourceClassManager {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unused" })
 	public static List<String> compareClassNames(String projectPath) {
 		UMLSourceClassManager.projectPath = projectPath;
 		UMLClasses = ClassManager.getUmlClassName(projectPath);
@@ -75,8 +76,8 @@ public class UMLSourceClassManager {
 			ArtefactElement UMLArtefactElement = (ArtefactElement) pairs
 					.getValue(); // get an UML artefact element
 			String name = UMLArtefactElement.getName();
-			List<ArtefactSubElement> UMLAttributeElements = UMLArtefactElement
-					.getArtefactSubElements();
+//			List<ArtefactSubElement> UMLAttributeElements = UMLArtefactElement
+//					.getArtefactSubElements();
 			if (UMLArtefactElement.getType().equalsIgnoreCase("Class")) {
 
 				sourceIterator = artefactMap.entrySet().iterator(); // create an
@@ -89,9 +90,23 @@ public class UMLSourceClassManager {
 					ArtefactElement sourceArtefactElement = (ArtefactElement) pairs1
 							.getValue(); // get sourceartefact element
                                         WordsMap w1 = new WordsMap();
-                                        w1 = SynonymWords.checkSymilarity(
-									sourceArtefactElement.getName(), name,
-									sourceArtefactElement.getType());
+                         w1 = SynonymWords.checkSymilarity(
+                        		 sourceArtefactElement.getName(), name,
+								sourceArtefactElement.getType());
+                         String name1 = sourceArtefactElement.getName();
+                         boolean isMatched = w1.isIsMatched();
+                         if(!isMatched){
+                             //wordNet dictionary does not have any matching word
+                             //call our dictionary model.owl 
+                             ModelCreator model = ModelCreator.getModelInstance();
+                             isMatched = model.isMatchingWords(name1, name);
+                             if(!isMatched){
+                             	//if it is not match by our dictionary 
+                             	//call the check similarity algorithm or edit distance
+                             	//based on edit distance we find out the similarity
+                             	isMatched = MatchWords.compareStrings(name1, name);
+                             }	
+                         }
 					if (sourceArtefactElement.getType().equalsIgnoreCase(
 							"Class")
 							&& w1.isIsMatched()) {
@@ -165,8 +180,8 @@ public class UMLSourceClassManager {
 
 				countSourceClass++;
 			}
-			List<ArtefactSubElement> artefactSubElements = artefactElement
-					.getArtefactSubElements();
+//			List<ArtefactSubElement> artefactSubElements = artefactElement
+//					.getArtefactSubElements();
 			it.remove(); // avoids a ConcurrentModificationException
 		}
 		Iterator it1 = UMLArtefactManager.UMLAretefactElements.entrySet()
@@ -179,8 +194,8 @@ public class UMLSourceClassManager {
 			if (artefactElement.getType().equalsIgnoreCase("Class")) {
 				countUMLClass++;
 			}
-			List<ArtefactSubElement> artefactSubElements = artefactElement
-					.getArtefactSubElements();
+//			List<ArtefactSubElement> artefactSubElements = artefactElement
+//					.getArtefactSubElements();
 			it1.remove(); // avoids a ConcurrentModificationException
 		}
 
@@ -235,11 +250,26 @@ public class UMLSourceClassManager {
 			for (int j = 0; j < sourceAttributeElements.size(); j++) {
 				ArtefactSubElement sourceElement = sourceAttributeElements
 						.get(j);
-                                WordsMap w2 = new WordsMap();
-                                w2 = SynonymWords.checkSymilarity(UMLAttribute.getName(),
+                 WordsMap w2 = new WordsMap();
+                 w2 = SynonymWords.checkSymilarity(UMLAttribute.getName(),
 						sourceElement.getName(), sourceElement.getType(),UMLAttribute.getType(),
 						UMLClasses);
-				if (w2.isIsMatched()) {
+                 String name1 = sourceElement.getName();
+                 String name2 = UMLAttribute.getName();
+                 boolean isMatched = w2.isIsMatched();
+                 if(!isMatched){
+                     //wordNet dictionary does not have any matching word
+                     //call our dictionary model.owl 
+                     ModelCreator model = ModelCreator.getModelInstance();
+                     isMatched = model.isMatchingWords(name1, name2);
+                     if(!isMatched){
+                     	//if it is not match by our dictionary 
+                     	//call the check similarity algorithm or edit distance
+                     	//based on edit distance we find out the similarity
+                     	isMatched = MatchWords.compareStrings(name1, name2);
+                     }	
+                 }
+				if (isMatched) {
 					relationNodes.add(UMLAttribute.getSubElementId());
                                         relationNodes.add(UMLAttribute.getType()+" To Source "+sourceElement.getType());
 					relationNodes.add(sourceElement.getSubElementId());

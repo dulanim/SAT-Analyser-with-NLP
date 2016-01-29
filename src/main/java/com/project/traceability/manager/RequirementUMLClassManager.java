@@ -1,6 +1,5 @@
 package com.project.traceability.manager;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,13 +13,15 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.model.WordsMap;
+import com.project.traceability.ontology.models.MatchWords;
+import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
 public class RequirementUMLClassManager {
@@ -77,12 +78,29 @@ public class RequirementUMLClassManager {
 					Map.Entry pairs1 = umlIterator.next();
 					ArtefactElement UMLArtefactElement = (ArtefactElement) pairs1
 							.getValue();
-                                        WordsMap w1 = new WordsMap();
-                                        w1 = SynonymWords.checkSymilarity(UMLArtefactElement.getName(), name,
+                    WordsMap w1 = new WordsMap();
+                    String umlName = UMLArtefactElement.getName();
+                    String requirementName = name;
+                    w1 = SynonymWords.checkSymilarity(UMLArtefactElement.getName(), name,
 									reqArtefactElement.getType());
+                    boolean isMatched = w1.isIsMatched();
+                    if(!isMatched){
+                    	//wordNet dictionary does not have any matching word
+                    	//call our dictionary model.owl 
+                    	ModelCreator model = ModelCreator.getModelInstance();
+                        model.setPath("");
+                    	isMatched = model.isMatchingWords(requirementName, umlName);
+                    	
+                    	if(!isMatched){
+                    		//if it is not match by our dictionary 
+                    		//call the check similarity algorithm or edit distance
+                    		//based on edit distance we find out the similarity
+                    		isMatched = MatchWords.compareStrings(requirementName, umlName);
+                    	}
+                    }
 					if (UMLArtefactElement.getType().equalsIgnoreCase("Class")
 							&& (UMLArtefactElement.getName().equalsIgnoreCase(
-									name) | w1.isIsMatched())) {
+									name) | isMatched)) {
 
 						compareSubElements(classItem, reqArtefactElement, UMLArtefactElement);
 						UMLMap.remove(UMLArtefactElement.getArtefactElementId());
@@ -224,14 +242,29 @@ public class RequirementUMLClassManager {
 			for (int j = 0; j < reqAttributeElements.size(); j++) {
 				ArtefactSubElement reqElement = reqAttributeElements
 						.get(j);
-                                WordsMap w2 = new WordsMap();
-                                w2 = SynonymWords.checkSymilarity(
+				WordsMap w2 = new WordsMap();
+				String requirementArtName = reqElement.getName();
+				String umlArtName = UMLAttribute.getName();
+                w2 = SynonymWords.checkSymilarity(
 								UMLAttribute.getName(),
 								reqElement.getName(),
 								reqElement.getType(),UMLAttribute.getType(),requirementClasses);
+                boolean isMatched = w2.isIsMatched();
+                if(!isMatched){
+                    //wordNet dictionary does not have any matching word
+                    //call our dictionary model.owl 
+                    ModelCreator model = ModelCreator.getModelInstance();
+                    isMatched = model.isMatchingWords(requirementArtName, umlArtName);
+                    if(!isMatched){
+                    	//if it is not match by our dictionary 
+                    	//call the check similarity algorithm or edit distance
+                    	//based on edit distance we find out the similarity
+                    	//isMatched = MatchWords.compareStrings(requirementArtName, umlArtName);
+                    }	
+                }
 				if (UMLAttribute.getName().equalsIgnoreCase(
 						reqElement.getName())
-						| w2.isIsMatched()) {
+						| isMatched) {
 					relationNodes.add(reqElement
 							.getSubElementId().substring(
 									reqElement
