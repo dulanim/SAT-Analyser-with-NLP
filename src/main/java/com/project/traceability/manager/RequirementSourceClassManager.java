@@ -4,6 +4,7 @@
 package com.project.traceability.manager;
 
 import com.project.NLP.file.operations.FilePropertyName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.model.WordsMap;
+import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
 import com.project.traceability.utils.Constants.ImageType;
 
@@ -130,6 +132,12 @@ public class RequirementSourceClassManager {
                        //require the ontology data 
                         ModelCreator modelCreator = ModelCreator.getModelInstance();
                         isWordMatchd = modelCreator.isMatchingWords(sourceName, name);
+                        if(!isWordMatchd){
+                        	//if it is not match by our dictionary 
+                        	//call the check similarity algorithm or edit distance
+                        	//based on edit distance we find out the similarity
+                        	isWordMatchd = MatchWords.compareStrings(sourceName, name);
+                        }	
                     }
                     if (sourceArtefactElement.getType().equalsIgnoreCase(
                             "Class")
@@ -304,7 +312,13 @@ public class RequirementSourceClassManager {
                     //call ontology method to compare
                      ModelCreator modelCreator = ModelCreator.getModelInstance();
                      isMatched = modelCreator.isMatchingWords(name1, name2);
-                    
+                     if(!isMatched){
+                     	//if it is not match by our dictionary 
+                     	//call the check similarity algorithm or edit distance
+                     	//based on edit distance we find out the similarity
+                     	isMatched = MatchWords.compareStrings(name1, name1);
+                     }
+                     
                 }
                 if (isMatched) {
                 	if(requElement.getSubElementId().contains("RQ"))
