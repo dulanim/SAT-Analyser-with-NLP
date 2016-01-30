@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "io/PaymentSystemRequirement.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "io/ModifiedPrescribingMedication.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -47,8 +47,8 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 
@@ -153,7 +153,7 @@ public class NLPRequirementMain {
                         Thread.sleep(100);
                     }
                     writeOutputToTxtFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
-                    //WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
+                    WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
                     // }
                 }
             }
@@ -274,13 +274,13 @@ public class NLPRequirementMain {
                 for (Object attribute : attributes) {
                     sbf.append(attribute.toString() + ",");
                 }
-                sbf.append("\tMethods : ");
+                sbf.append("\n\tMethods : ");
                 for (Object method : methods) {
                     sbf.append(method.toString() + ",");
                 }
 
             }
-            sbf.append("\tRelations : ");
+            sbf.append("\n\tRelations : ");
             Iterator relIterator = outputRelations.iterator();
             while (relIterator.hasNext()) {
                 Object clRelation = relIterator.next();
