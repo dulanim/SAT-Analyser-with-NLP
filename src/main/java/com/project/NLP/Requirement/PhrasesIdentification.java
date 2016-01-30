@@ -40,7 +40,9 @@ public class PhrasesIdentification {
     private ArrayList adjAttributeList;
     private WordStemmer wordStemmer = new WordStemmer();
     private DesignElementClass designElement;
+    private DictionaryForClass dictionaryForClass;
     private ArrayList designEleList;
+    private ArrayList dictionaryForClassList;
     private GrammaticalRelation grammaticalRelation;
     private Morphology morphology;
     private HashMap<String, HashSet> storingClassWithAttr; // to store classes and attributes when noun + noun exists
@@ -62,6 +64,8 @@ public class PhrasesIdentification {
         this.sTree = tree;
         designElement = new DesignElementClass();
         designEleList = designElement.getDesignElementsList();
+        dictionaryForClass = new DictionaryForClass();
+        dictionaryForClassList = dictionaryForClass.getDictionaryForClass();
         morphology = new Morphology();
 
         //System.out.println(sTree + "***************************************" + sTree.toString());
@@ -155,7 +159,7 @@ public class PhrasesIdentification {
                         adjectiveExist++;
                         leaves = inChild.getLeaves();
                         adj = leaves.get(0).yieldWords().get(0).word();
-                        if (designEleList.contains(adj)) {
+                        if (dictionaryForClassList.contains(adj)) {
                             adj = "";
                         }
                     }
@@ -604,7 +608,7 @@ public class PhrasesIdentification {
                         //if the phrase contatins NN followed by adjectives then NN will be considered as class
                         if (inChild.value().equals("JJ")) {
                             adjectiveExist++;
-                            if (!designEleList.contains(adj)) {
+                            if (!dictionaryForClassList.contains(adj)) {
                                 leaves = inChild.getLeaves();
                                 //System.out.println("LLLLLLLLEaves:" + leaves.size() + " " + leaves.get(0) + "  ..." + leaves);
                                 adj = leaves.get(0).toString();
