@@ -231,9 +231,20 @@ public class ArtefactFrame extends JFrame {
     }
 
     protected void deleteSelectedItems() {
-        DefaultMutableTreeNode node;
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+                .getLastSelectedPathComponent();
         DefaultTreeModel model = (DefaultTreeModel) (tree.getModel());
         TreePath[] paths = tree.getSelectionPaths();
+        if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
+//            changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent() ,node);
+//            node.setUserObject(selectedType + " ->" + newArtefactName);
+//            TreePath pathSelected = tree.getSelectionPath();
+//            Object n = pathSelected.getLastPathComponent();
+//            ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+//
+//            update_Edit(selectedType, newArtefactName, node);
+
+        }
         for (int i = 0; i < paths.length; i++) {
             node = (DefaultMutableTreeNode) (paths[i].getLastPathComponent());
             model.removeNodeFromParent(node);
@@ -261,7 +272,7 @@ public class ArtefactFrame extends JFrame {
         if (node.toString().equalsIgnoreCase("Generalization") || (node.toString().equalsIgnoreCase("Association"))) {
             validateAss_Gen_Edit(node);
         }
-        if(node.getParent().toString().equalsIgnoreCase("Attributes") || node.getParent().toString().equalsIgnoreCase("Methods")){
+        if (node.getParent().toString().equalsIgnoreCase("Attributes") || node.getParent().toString().equalsIgnoreCase("Methods")) {
             openEditFrame(node);
         }
         JFrame frame = new JFrame("Edit Window");
@@ -269,7 +280,7 @@ public class ArtefactFrame extends JFrame {
     }
 
     /* edit frame for the leaf nodes of attributes and methods*/
-    protected void openEditFrame(DefaultMutableTreeNode node){
+    protected void openEditFrame(DefaultMutableTreeNode node) {
         // prompt the user to enter their name
         String newArtefactName = JOptionPane.showInputDialog(null, "New Artefact name...");
 
@@ -291,6 +302,7 @@ public class ArtefactFrame extends JFrame {
     }
     /*method to handle when the association or generalization type is clicked for changes
      */
+
     protected void validateAss_Gen_Edit(DefaultMutableTreeNode node) {
         TreePath path = tree.getSelectionPath();
         Object nodes = path.getLastPathComponent();
