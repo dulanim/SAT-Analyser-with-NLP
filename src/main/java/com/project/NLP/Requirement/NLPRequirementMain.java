@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "/home/vino-pc/FYP/Input Files/PrescribingMedication.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "io/PaymentSystemRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -47,8 +47,8 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 
@@ -57,13 +57,13 @@ public class NLPRequirementMain {
             } else {
                 AnaphoraAnalyzer analyzer = new AnaphoraAnalyzer(requirementDocument);
                 requirementDocument = analyzer.doPronounResolving();
-                System.out.println("Pronoun resolved.: "+requirementDocument);
+                //System.out.println("Pronoun resolved.: "+requirementDocument);
                 ParserTreeGenerator parser = new ParserTreeGenerator(requirementDocument);
                 trees = parser.getSentenceParseTree();
                 /*For individual sentence in the requirement Document */
                 for (int countTree = 0; countTree < trees.size(); countTree++) {
                     Tree tree = (Tree) trees.get(countTree);
-                    System.out.println("Tree: " + tree);
+                    //System.out.println("Tree: " + tree);
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
                     if (!negativeSentence.isNegativeSentence()) {
@@ -94,7 +94,6 @@ public class NLPRequirementMain {
 //                            }
                             if (!classList.isEmpty()) {
                                 /* methods identification */
-                                System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                                 MethodIdentifier mId = new MethodIdentifier(tree, classList);
                                 methodList = mId.identifyCandidateMethods(tree);
 
@@ -153,8 +152,8 @@ public class NLPRequirementMain {
                     while (t.getLock()) {
                         Thread.sleep(100);
                     }
-                    //writeOutputToTxtFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
-                    WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
+                    writeOutputToTxtFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
+                    //WriteRequirementToXML.writeToXMLFile(t.getRequirementobjects(), t.getRequirementRelationsObject());
                     // }
                 }
             }
@@ -270,7 +269,7 @@ public class NLPRequirementMain {
                 HashSet methods = store.getMethods();
                 HashSet relations = store.getRelationships();
 
-                sbf.append("\n\nClass : "+className);
+                sbf.append("Class : "+className);
                     sbf.append("\n\tAttributes : ");
                     for (Object attribute : attributes) {
                         sbf.append(attribute.toString()+",");
@@ -279,17 +278,18 @@ public class NLPRequirementMain {
                     for (Object method : methods) {
                         sbf.append(method.toString()+",");
                     }
+                    sbf.append("\n");
                 }
                 sbf.append("\nRelations : \n");
                     Iterator relationsIter=outputRelations.iterator();
                     while (relationsIter.hasNext()) {
                         ClassRelation rel=(ClassRelation)relationsIter.next();
-                        sbf.append("\n Type : "+rel.getRelationType()+", Parent : "+rel.getParentElement()+", Child : "+rel.getChildElement()+"\n");
+                        sbf.append("\n Type : "+rel.getRelationType()+", Parent : "+rel.getParentElement()+", Child : "+rel.getChildElement());
                         
                     }
 
                
-            System.out.println(sbf.toString());
+            //System.out.println(sbf.toString());
             BufferedWriter bwr = new BufferedWriter(new FileWriter("Requirement_Output.txt"));
             /*write contents of StringBuffer to a file*/
             bwr.write(sbf.toString());
