@@ -186,12 +186,10 @@ public class WriteToXML {
 
     private String getAttributeID() {
         String ID;
-        if (type.equals("Requirement")) {
-            count++;
+        if (type.equals("Requirement")) {            
             ID = "RQ".concat(Integer.toString(count)).concat("_F").concat(Integer.toString(attrId));
 
-        } else {
-            count++;
+        } else {           
             ID = "D".concat(Integer.toString(count)).concat("_F").concat(Integer.toString(attrId));
 
         }
@@ -201,12 +199,10 @@ public class WriteToXML {
 
     private String getMethodID() {        
         String ID;
-        if (type.equals("Requirement")) {
-            count++;
+        if (type.equals("Requirement")) {            
             ID = "RQ".concat(Integer.toString(count)).concat("_M").concat(Integer.toString(methodId));
 
         } else {
-            count++;
             ID = "D".concat(Integer.toString(count)).concat("_M").concat(Integer.toString(methodId));
 
         }
