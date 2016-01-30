@@ -30,7 +30,8 @@ public class ClassIdentification {
     private PhrasesIdentification np;
     private ArrayList attributeFromClass = new ArrayList();
     private DesignElementClass designEleClass = new DesignElementClass();
-
+    private DictionaryForClass dictionaryForClass = new DictionaryForClass();
+    
     ClassIdentification() {
 
     }
@@ -95,21 +96,23 @@ public class ClassIdentification {
      */
     
     private void checksWhetherDesignElementExits(ArrayList className) {
-        ArrayList designElements = designEleClass.getDesignElementsList();
-        className.removeAll(designElements);
+        //ArrayList designElements = designEleClass.getDesignElementsList();
+        ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
+        className.removeAll(dictionaryElements);
         afterRules = className;
         //System.out.println("cl: "+className);
              
     }
     private void checksWhetherDesignElementExits1(Object className, Object attribute) {
-        ArrayList designElements = designEleClass.getDesignElementsList();
+        //ArrayList designElements = designEleClass.getDesignElementsList();
+        ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
         
-        if (!designElements.contains(className)) {
+        if (!dictionaryElements.contains(className)) {
             //System.out.println("design class... :" + String.valueOf(className));
             afterRules.add(String.valueOf(className));
 
         }
-        if (!designElements.contains(attribute)) {
+        if (!dictionaryElements.contains(attribute)) {
             //System.out.println("design attribute... :" + String.valueOf(attribute));
             attributeFromClass.add(String.valueOf(attribute));
 
