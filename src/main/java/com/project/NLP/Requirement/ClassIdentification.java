@@ -98,19 +98,19 @@ public class ClassIdentification {
         ArrayList designElements = designEleClass.getDesignElementsList();
         className.removeAll(designElements);
         afterRules = className;
-        System.out.println("cl: "+className);
+        //System.out.println("cl: "+className);
              
     }
     private void checksWhetherDesignElementExits1(Object className, Object attribute) {
         ArrayList designElements = designEleClass.getDesignElementsList();
         
         if (!designElements.contains(className)) {
-            System.out.println("design class... :" + String.valueOf(className));
+            //System.out.println("design class... :" + String.valueOf(className));
             afterRules.add(String.valueOf(className));
 
         }
         if (!designElements.contains(attribute)) {
-            System.out.println("design attribute... :" + String.valueOf(attribute));
+            //System.out.println("design attribute... :" + String.valueOf(attribute));
             attributeFromClass.add(String.valueOf(attribute));
 
         }
@@ -156,7 +156,7 @@ public class ClassIdentification {
     */
     private void attributesEliminationFromClass(ArrayList list){
         ArrayList attributeFromClass  = np.getAttributeLists();
-        System.out.println("attributes: "+attributeFromClass);
+        //System.out.println("attributes: "+attributeFromClass);
     }
     
     /*rule 6
@@ -215,9 +215,9 @@ public class ClassIdentification {
         //Boolean status= false;
 
         for (int i = 0; i < innerPhraseList.size(); i++) {
-            System.out.println("prp.... :" + innerPhraseList);
+            //System.out.println("prp.... :" + innerPhraseList);
             if (innerPhraseList.get(i).equals("PRP")) {
-                System.out.println("prp.... :" + innerPhraseList.get(i));
+                //System.out.println("prp.... :" + innerPhraseList.get(i));
                 attributeFromClass.add(innerPhraseList.get(i + 1));
                 break;
             }
