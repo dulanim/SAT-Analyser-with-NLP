@@ -230,8 +230,15 @@ public class PhrasesIdentification {
                                         //word = morphology.stem(identifiedWord);
                                     }
                                     String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    
                                     tempClass += " "+ identifiedWord;
                                     nounList.add(tempClass);
+                                    if (!storingClass.isEmpty()) {
+                                        classWithAttr.add(identifiedWord);
+                                        //nounList.add(word);
+                                        storingClassWithAttr.put(storingClass, classWithAttr);
+                                        System.out.println("3 "+storingClassWithAttr);
+                                    }
                                     System.out.println("tempClass: "+ tempClass);
                                     System.out.println("idenifiedWord: "+ identifiedWord);
                                     System.out.println("4: "+ nounList);
