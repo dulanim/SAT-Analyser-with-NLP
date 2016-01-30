@@ -743,23 +743,22 @@ public class ArtefactFrame extends JFrame {
                                 Object genName = classTreeModel.getChild(relName, gCount);
                                 String[] genNameArray = genName.toString().split("->");
                                 System.out.println("string[0]: " + genNameArray[0] + " String [1]: " + genNameArray[1]);
-                                String type = genNameArray[0].trim();
+                                String type = relName.toString(); //genNameArray[0].trim();
                                 String parent = genNameArray[1].trim();
                                 String childs = className.toString();
-                                if (type.equalsIgnoreCase("Parent")) {
+                               // if (type.equalsIgnoreCase("Parent")) {
                                     ClassRelation clRelation = new ClassRelation(type, childs, parent);
                                     System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
                                     requirementRelationsObjects.add(clRelation);
                                 }
 
                             }
-                        }
                         if (relName.toString().equalsIgnoreCase("Association")) {
                             int assCount = classTreeModel.getChildCount(relName);
                             for (int aCount = 0; aCount < assCount; aCount++) {
                                 Object assName = classTreeModel.getChild(relName, aCount);
                                 String[] assNameArray = assName.toString().split("->");
-                                System.out.println("string[0]: " + assNameArray[0] + " String [1]: " + assNameArray[1]);
+                                System.out.println("string[0]: " + relName.toString() + " String [1]: " + assNameArray[1]);
 
                                 if (assNameArray[0].equalsIgnoreCase("Parent")) {
                                     ClassRelation clRelation = new ClassRelation(assNameArray[0], className.toString(), assNameArray[1]);
