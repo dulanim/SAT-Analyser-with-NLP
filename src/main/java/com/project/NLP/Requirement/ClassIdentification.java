@@ -30,7 +30,8 @@ public class ClassIdentification {
     private PhrasesIdentification np;
     private ArrayList attributeFromClass = new ArrayList();
     private DesignElementClass designEleClass = new DesignElementClass();
-
+    private DictionaryForClass dictionaryForClass = new DictionaryForClass();
+    
     ClassIdentification() {
 
     }
@@ -95,22 +96,24 @@ public class ClassIdentification {
      */
     
     private void checksWhetherDesignElementExits(ArrayList className) {
-        ArrayList designElements = designEleClass.getDesignElementsList();
-        className.removeAll(designElements);
+        //ArrayList designElements = designEleClass.getDesignElementsList();
+        ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
+        className.removeAll(dictionaryElements);
         afterRules = className;
-        System.out.println("cl: "+className);
+        //System.out.println("cl: "+className);
              
     }
     private void checksWhetherDesignElementExits1(Object className, Object attribute) {
-        ArrayList designElements = designEleClass.getDesignElementsList();
+        //ArrayList designElements = designEleClass.getDesignElementsList();
+        ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
         
-        if (!designElements.contains(className)) {
-            System.out.println("design class... :" + String.valueOf(className));
+        if (!dictionaryElements.contains(className)) {
+            //System.out.println("design class... :" + String.valueOf(className));
             afterRules.add(String.valueOf(className));
 
         }
-        if (!designElements.contains(attribute)) {
-            System.out.println("design attribute... :" + String.valueOf(attribute));
+        if (!dictionaryElements.contains(attribute)) {
+            //System.out.println("design attribute... :" + String.valueOf(attribute));
             attributeFromClass.add(String.valueOf(attribute));
 
         }
@@ -156,7 +159,7 @@ public class ClassIdentification {
     */
     private void attributesEliminationFromClass(ArrayList list){
         ArrayList attributeFromClass  = np.getAttributeLists();
-        System.out.println("attributes: "+attributeFromClass);
+        //System.out.println("attributes: "+attributeFromClass);
     }
     
     /*rule 6
@@ -215,9 +218,9 @@ public class ClassIdentification {
         //Boolean status= false;
 
         for (int i = 0; i < innerPhraseList.size(); i++) {
-            System.out.println("prp.... :" + innerPhraseList);
+            //System.out.println("prp.... :" + innerPhraseList);
             if (innerPhraseList.get(i).equals("PRP")) {
-                System.out.println("prp.... :" + innerPhraseList.get(i));
+                //System.out.println("prp.... :" + innerPhraseList.get(i));
                 attributeFromClass.add(innerPhraseList.get(i + 1));
                 break;
             }

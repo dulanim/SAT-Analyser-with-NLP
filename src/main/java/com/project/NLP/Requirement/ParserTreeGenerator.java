@@ -79,7 +79,7 @@ public class ParserTreeGenerator {
             /*Get the sentences in the document  and store each individual sentence as a element in the ArrayList  */
             documentSentences.add(sentence.toString());
 
-            System.out.println("tree annotation: " + tree);
+            //System.out.println("tree annotation: " + tree);
             passiveSentenceIdentification(sentence, tree);
 
             lemmatize(sentence);
@@ -119,9 +119,8 @@ public class ParserTreeGenerator {
         // Iterate over all tokens in a sentence
         for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
             // Retrieve and add the lemma for each word into the list of lemmas
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             String s =token.get(LemmaAnnotation.class);
-            System.out.println(s);
+            //System.out.println(s);
             lemmas.add(s);
         }
 

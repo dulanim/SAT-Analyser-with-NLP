@@ -92,7 +92,7 @@ public class AttributeIdentification {
     */
     public void setAttributesFromClass(ArrayList attributesFromClass){
         attributes = attributesFromClass;
-        System.out.println("attributes from class: "+ attributes);
+        //System.out.println("attributes from class: "+ attributes);
         
     }
     /*rule 3
@@ -110,8 +110,8 @@ public class AttributeIdentification {
             }
         }
         //attributes = newAtt;
-        System.out.println("newwwwwwwwwwwwwww attributes : "+ newAtt);
-        System.out.println("TOTAL attributes : "+ attributes);
+        //System.out.println("newwwwwwwwwwwwwww attributes : "+ newAtt);
+        //System.out.println("TOTAL attributes : "+ attributes);
         
         /*for(int i=0;i<newAtt.size();i++){
             attributes.add(newAtt.get(i));
@@ -141,7 +141,7 @@ public class AttributeIdentification {
     public void checksWhetherDesignElementExits() {
         ArrayList designElements = designEleClass.getDesignElementsList();
         //attributes.remove("system");
-        System.out.println("designElements: "+designElements);
+        //System.out.println("designElements: "+designElements);
         //System.out.println(": "+attributes.get(0).toString());
         
         if(!attributes.isEmpty()){
@@ -149,14 +149,14 @@ public class AttributeIdentification {
                 String[] attrSplit = attributes.get(attrCount).toString().split(" ");
                 for(int spliter =0; spliter < attrSplit.length ; spliter++){
                     if(designElements.contains(attrSplit[spliter])){
-                        System.out.println("Design element found in attributes..");
+                        //System.out.println("Design element found in attributes..");
                         attributes.remove(attributes.get(attrCount));
                         break;
                     }
                 }
                 if(attrSplit.length ==0){
                     if(designElements.contains(attributes.get(attrCount).toString())){
-                    System.out.print("found");
+                    //System.out.print("found");
                     attributes.remove(attributes.get(attrCount));
 
                 }
@@ -171,16 +171,16 @@ public class AttributeIdentification {
                 System.out.println("sdfsfsdfs");
         */
         //t.removeAll(designElements);
-        System.out.println("after removing design elements: "+attributes);
+        //System.out.println("after removing design elements: "+attributes);
        
     }
    
     /*rule 6*/
     private void removeRedundancy(){
-        System.out.println("attributes size: "+ attributes.size());
-        System.out.println("attr: "+ attributes);
+        //System.out.println("attributes size: "+ attributes.size());
+        //System.out.println("attr: "+ attributes);
         for(int i =0;i<attributes.size();i++){
-            System.out.println("get element: "+ attributes.get(i));
+            //System.out.println("get element: "+ attributes.get(i));
             attributeFinalList.add(attributes.get(i));
         }
     }
@@ -210,15 +210,15 @@ public class AttributeIdentification {
         Object[] arrayAtt = attr.toArray();
         Object[] attFinalList = attributeFinalList.toArray();
         String[] stringArray = Arrays.copyOf(arrayAtt, arrayAtt.length, String[].class);
-        System.out.println("            "+stringArray[0]);
+        //System.out.println("            "+stringArray[0]);
         for(int i=0;i<arrayAtt.length;i++){
-            System.out.println("666666666");
+            //System.out.println("666666666");
             for(int j=0;j<attFinalList.length;j++){
-                System.out.println(".."+attFinalList[j]+".."+arrayAtt[i]+"..."+ attFinalList[j].toString().equals("account")+"...."+arrayAtt[i].toString().equals("account"));
+                //System.out.println(".."+attFinalList[j]+".."+arrayAtt[i]+"..."+ attFinalList[j].toString().equals("account")+"...."+arrayAtt[i].toString().equals("account"));
                     
                 if(attFinalList[j].toString().equalsIgnoreCase(arrayAtt[i].toString())){
-                    System.out.println(".."+attFinalList[j]+".."+arrayAtt[i]);
-                    System.out.println("foundddddddddddddd");
+                    //System.out.println(".."+attFinalList[j]+".."+arrayAtt[i]);
+                    //System.out.println("foundddddddddddddd");
                     attributeFinalList.remove(arrayAtt[i]);
                 }
             }
