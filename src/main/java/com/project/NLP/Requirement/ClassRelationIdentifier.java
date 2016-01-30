@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Set;
 import edu.smu.tspell.wordnet.*;
 import edu.stanford.nlp.trees.WordStemmer;
+import java.util.HashMap;
 
 /**
  *
@@ -129,54 +130,6 @@ public class ClassRelationIdentifier {
         return classRelations;
     }
 
-    ArrayList identifyCandidateRelations(String document) {
-        ArrayList sentenceTree = new ArrayList();
-        ArrayList intialRelations = new ArrayList();
-        ParserTreeGenerator treeGen = new ParserTreeGenerator(document);
-        sentenceTree = treeGen.getSentenceParseTree();
-        System.out.println("--------Identified relations are:---------");
-        intialRelations = getPhrase(sentenceTree);
-
-        return null;
-
-    }
-
-    ArrayList getPhrase(ArrayList<Tree> sentenceTree) {
-
-        String phraseNotation = "NN";  //"NP<(NP $++ (CC $++ NP))";
-        ArrayList vpList = new ArrayList();
-        for (Tree tree : sentenceTree) {
-            System.out.print("\n---tree_sen----" + tree + "----\n");
-
-            TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
-            TregexMatcher matcher = VBpattern.matcher((Tree) tree);
-            while (matcher.findNextMatchingNode()) {
-                Tree match = matcher.getMatch();
-                String noun = Sentence.listToString(match.yield());
-                if (noun.contains("-")) {
-                    String nouns[] = noun.split("-");
-                    if (classes.contains(nouns[nouns.length - 1])) {
-                        vpList.add(noun);
-                    }
-
-                } else if (noun.contains("_")) {
-                    String nouns[] = noun.split("_");
-                    if (classes.contains(nouns[nouns.length - 1])) {
-                        if (!vpList.contains(noun)) {
-                            vpList.add(noun);
-                        }
-                    }
-
-                }
-
-                System.out.print("\n---phrase match----" + match + "----\n");
-
-            }
-        }
-        System.out.print("\n---VPList----" + vpList + "----\n");
-        return vpList;
-    }
-    
     
     /*  Comparing a class with other class for relation using their names
      * ex: saving account and account -> Generalization parent: account child: saving account
@@ -333,5 +286,34 @@ public class ClassRelationIdentifier {
         return classRelations;
     }
     
+    /*Identifying Associations between classes using their atributes 
+    *For example Car has four wheels.
+    * Car is a class and Wheel is class. Car has the wheel as its attribute. 
+    */
+    
+    public HashSet identifyAssociationUsingAttribute(HashMap classMap){
+        HashSet relatonSet=new HashSet();
+        Iterator it;
+        it = classMap.keySet().iterator();
+        while(it.hasNext()){
+            
+            String parent=it.next().toString();
+            StoringArtefacts sa =(StoringArtefacts)classMap.get(parent);
+            HashSet attributes=sa.getAttributes();
+            Iterator itSet=attributes.iterator();
+            while(itSet.hasNext()){
+                String child=itSet.next().toString();
+                if(classMap.containsKey(child)){
+                    ClassRelation cr=new ClassRelation("Association",child,parent);
+                    System.out.println("------Association Attribute ----: "+cr.getParentElement()+" "+cr.getChildElement());
+                    relatonSet.add(cr);
+                }
+            }
+            
+        }
+        
+        
+        return relatonSet;
+    }
 
 }
