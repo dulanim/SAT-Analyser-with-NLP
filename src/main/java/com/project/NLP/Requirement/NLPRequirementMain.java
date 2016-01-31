@@ -22,9 +22,9 @@ import java.util.Iterator;
 
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "io/CoachTourRequirement.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "/home/vino-pc/FYP/Input Files/OrderRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
-    private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
+    public static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
 
     public static void extractRequirement() {
@@ -63,7 +63,7 @@ public class NLPRequirementMain {
                 /*For individual sentence in the requirement Document */
                 for (int countTree = 0; countTree < trees.size(); countTree++) {
                     Tree tree = (Tree) trees.get(countTree);
-                    //System.out.println("Tree: " + tree);
+                    System.out.println("Tree: " + tree);
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
                     if (!negativeSentence.isNegativeSentence()) {
