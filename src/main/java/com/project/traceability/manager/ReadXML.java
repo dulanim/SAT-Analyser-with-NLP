@@ -7,6 +7,7 @@ import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.RequirementModel;
 import com.project.traceability.staticdata.StaticData;
+import com.project.traceability.visualization.AccessLinksTextFile;
 import com.project.traceability.visualization.GraphDB;
 import com.project.traceability.visualization.VisualizeGraph;
 import java.io.File;
@@ -48,8 +49,8 @@ public class ReadXML {
             transferDataToDBFromXML(projectPath, true);
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
-            VisualizeGraph.addNewLinkstoGraph();
-            VisualizeGraph.deleteRemovalLinkstoGraph();
+            AccessLinksTextFile.addNewLinkstoGraph();
+            AccessLinksTextFile.deleteRemovalLinkstoGraph();
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
             GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
             visual.setGraph(model, PropertyFile.getGraphType());//set the graph type

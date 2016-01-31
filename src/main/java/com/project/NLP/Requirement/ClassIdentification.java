@@ -198,8 +198,16 @@ public class ClassIdentification {
     }
     /*method to get the lists of attributes*/
     public ArrayList getAttributeFromClass() {
-       attributeFromClass= np.getAttributeLists();
-        return attributeFromClass;
+       ArrayList attribute= np.getAttributeLists();
+       String att;
+       for(int attrCount = 0; attrCount < attribute.size(); attrCount++){
+           att = attribute.get(attrCount).toString();
+           if(!att.isEmpty() || !att.equals("")){
+               attributeFromClass.add(att);
+           }
+       } 
+       
+       return attributeFromClass;
     }
 
     

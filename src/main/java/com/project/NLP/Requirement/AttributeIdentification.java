@@ -21,7 +21,7 @@ public class AttributeIdentification {
     /*For single tree */
     private Tree sTree;
     private PhrasesIdentification phrase;
-    private ArrayList attributes;
+    private ArrayList attributes = new ArrayList();
     private ArrayList attr; // store attributes derived from classIdentification 
     private DesignElementClass designEleClass = new DesignElementClass();
     private ClassIdentification attrFromClass;
@@ -92,7 +92,14 @@ public class AttributeIdentification {
      parameter - attributes generated from class Identification
      */
     public void setAttributesFromClass(ArrayList attributesFromClass) {
-        attributes = attributesFromClass;
+        String attr;
+        for(int attrCount =0; attrCount< attributesFromClass.size() ; attrCount++){
+            attr = attributesFromClass.get(attrCount).toString();
+            if(!attr.isEmpty()|| !attr.equals("")){
+                attributes.add(attributesFromClass.get(attrCount).toString());
+            }
+        }
+        //attributes = attributesFromClass;
         //System.out.println("attributes from class: "+ attributes);
 
     }
@@ -106,7 +113,7 @@ public class AttributeIdentification {
         newAtt = phrase.getAttributeList();
         //newAtt=phrase.getAttribute();
         //add the new attributes to the attributes list
-        if (!newAtt.isEmpty()) {
+        if (!newAtt.isEmpty()|| !newAtt.equals("")) {
             for (int i = 0; i < newAtt.size(); i++) {
                 attributes.add(newAtt.get(i));
             }

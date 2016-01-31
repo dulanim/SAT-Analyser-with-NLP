@@ -603,8 +603,8 @@ public class VisualizeGraph {
 
     public static void refreshGraph() {
         VisualizeGraph visual = VisualizeGraph.getInstance();
-        addNewLinkstoGraph();
-        deleteRemovalLinkstoGraph();
+        AccessLinksTextFile.addNewLinkstoGraph();
+        AccessLinksTextFile.deleteRemovalLinkstoGraph();
 
         visual.importFile();//import the generated graph file into Gephi toolkit API workspace
         GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
@@ -614,71 +614,12 @@ public class VisualizeGraph {
         HomeGUI.isComaparing = false;
         visual.setPreview();
         visual.setLayout();
-        /* Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-         */
- /*HomeGUI.table.clearAll();
-                HomeGUI.table.deselectAll();
-                HomeGUI.table.removeAll();
-                nodeData.clear();
-                nodeData = new HashMap<>();*/
-    }
-
-    //});
-    public static void addNewLinkstoGraph() {
-        String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "NewGraphLinks.txt";
-        //String source = start + " " + end + " " + relType + "\n";
-        File file = new File(newLinkFile);
-        try (FileReader reader = new FileReader(file)) {
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                String[] newLink = line.split(" ");
-                if (newLink.length > 2) {
-                    String id = line.substring(0, line.indexOf(":"));
-                    line = line.replaceAll(line.substring(0, line.indexOf(":") + 1), "");
-                    String start = line.substring(0, line.indexOf(" ")).trim();
-                    line = line.replaceAll(start, "").trim();
-                    String end = line.substring(0, line.indexOf(" "));
-                    String type = line.substring(line.indexOf(" ")).trim();
-                    System.out.println("Entering " + start + " " + end + " " + type);
-                    if (Integer.parseInt(id) != -1) {
-                        if (!GraphMouseListener.getIDFromGexf(Integer.parseInt(id))) {
-                            GraphMouseListener.addToGEXF(start, end, type);
-                        }
-                    }
-                    //GraphMouseListener.addToGEXF(start, end, type);
-                }
-            }
-            bufferedReader.close();
-            reader.close();
-
-        } catch (IOException e) {
-        }
-    }
-
-    public static void deleteRemovalLinkstoGraph() {
-        String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "DeletedGraphLinks.txt";
-        //String source = start + " " + end + " " + relType + "\n";
-        File file = new File(newLinkFile);
-        try {
-            FileReader reader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.length() > 1) {
-                    String ids[] = line.split(" ");
-                    System.out.println("NumberL " + ids.length);
-                    for (String id : ids) {
-                        GraphMouseListener.removeEdgeFromGexf(Integer.parseInt(id));
-                    }
-                }
-            }
-            bufferedReader.close();
-            reader.close();
-        } catch (IOException e) {
-        }
+        
+        HomeGUI.table.clearAll();
+        HomeGUI.table.deselectAll();
+        HomeGUI.table.removeAll();
+        nodeData.clear();
+        nodeData = new HashMap<>();
     }
 
     /**
@@ -868,32 +809,37 @@ public class VisualizeGraph {
                             public void handleEvent(Event e) {
                                 switch (e.type) {
                                     case SWT.CR:
-                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
                                         if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
-                                        } else {
+                                        } else if(item.getText(0).equalsIgnoreCase("Visibility")){
+                                            
+                                            item.setText(1, text.getText());
+                                        }else {
                                             item.setText(1, text.getText());
                                         }
-                                        System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
+                                        //System.out.println("Replacing4: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
-                                        //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
+                                        //System.out.println("Key: " + item.getText(0) + " Value: " + item.getText(1));
                                         text.dispose();
                                         break;
                                     case SWT.FocusOut:
-                                        item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
                                         if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
                                         } else {
                                             item.setText(1, text.getText());
                                         }
-                                        System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
+                                        //System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
                                         nodeData.replace(item.getText(0), item.getText(1));
-                                        //System.out.println("Key: "+ item.getText(0)+" Value: "+item.getText(1));
+                                        //System.out.println("Key: " + item.getText(0) + " Value: " + item.getText(1));
                                         text.dispose();
                                         break;
                                     case SWT.Traverse:
                                         switch (e.detail) {
-                                            case SWT.TRAVERSE_RETURN:
-                                                item.setBackground(1, Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
-                                                item.setText(1, text.getText());
+                                            case SWT.TRAVERSE_RETURN:                                                
+                                                if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
+                                                } else {
+                                                    item.setText(1, text.getText());
+                                                }
+                                                nodeData.replace(item.getText(0), item.getText(1));
+
                                             case SWT.TRAVERSE_ESCAPE:
                                                 text.dispose();
                                                 e.doit = false;
@@ -937,7 +883,6 @@ public class VisualizeGraph {
             @Override
             public void widgetSelected(SelectionEvent se) {
 
-
                 // User is asked for details in creating a new link
                 System.out.println("Adding a Link");
                 nodeRelations = new ArrayList<>();
@@ -971,7 +916,7 @@ public class VisualizeGraph {
                     modelArtefact.addElement(comboBoxItems2.get(i));
                 }
                 artefactCombo.setModel(modelArtefact);
-                
+
                 Vector comboBoxItems1 = new Vector();
                 comboBoxItems1.add("");
                 comboBoxItems1.add("Class");
@@ -1215,15 +1160,15 @@ public class VisualizeGraph {
                                     }
                                     break;
                             }
-                        }                        
-                        int count = GraphMouseListener.addToGEXF(start, end, relType);
+                        }
+                        int count = AccessGexfFile.addToGEXF(start, end, relType);
                         if (count != -1) {
                             addNewLinksFile(count, start, end, relType);
                         }
                         VisualizeGraph.refreshGraph();
                         nodeSelected = "";
                         typeSelected = "";
-                        artefactSelected = "";                        
+                        artefactSelected = "";
                     }
 
                     private void addNewLinksFile(int count, String start, String end, String relType) {
@@ -1294,8 +1239,8 @@ public class VisualizeGraph {
                 removePanel.removeAll();
                 removePanel.revalidate();
                 removePanel.repaint();
-                
-                removePanel.add(cbList);                
+
+                removePanel.add(cbList);
                 removePanel.add(panelRemoveButton);
                 removePanel.revalidate();
                 removePanel.repaint();
@@ -1304,9 +1249,9 @@ public class VisualizeGraph {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         boolean delete = false;
-                        
+
                         frameRemoval.dispose();
-                        List<JCheckBox> selectedList = cbList.getSelectedValuesList();                        
+                        List<JCheckBox> selectedList = cbList.getSelectedValuesList();
                         ids = new ArrayList<>();
                         System.out.println("IDS " + ids.size());
                         if (edgesList.size() > 0) {
@@ -1319,7 +1264,7 @@ public class VisualizeGraph {
                                 }
                             }
                             for (String id : ids) {
-                                GraphMouseListener.removeEdgeFromGexf(Integer.parseInt(id));
+                                AccessGexfFile.removeEdgeFromGexf(Integer.parseInt(id));
                                 addDeleteLinksFile(id);
                             }
                             //ReadXML.initApp(projectPath, graphType);
@@ -1408,7 +1353,7 @@ public class VisualizeGraph {
         removePanel.setLayout(new java.awt.GridLayout(2, 1));
         panelRemoveButton.add(btnRemoveDelete);
         panelRemoveButton.add(btnRemoveCancel);
-        
+
         System.out.println("Done new lik");
 
         frameRemoval.pack();
