@@ -87,6 +87,15 @@ public class StoringArtefacts {
         relationships.addAll(rel);  
         
     }
+    
+    public boolean removeAttribute(String name){
+        if(attributes.contains(name)){
+            attributes.remove(name);
+            return true;
+        }
+        return false;
+        
+    }
 /*    private void removeRedundant(HashSet setItems){
         Iterator iterator = setItems.iterator();
         while(iterator.hasNext()){

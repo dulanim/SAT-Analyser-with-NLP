@@ -24,7 +24,7 @@ public class NLPRequirementMain {
 
     private static final String REQUIREMENT_INPUT_FILE = "/home/vino-pc/FYP/Input Files/OrderRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
-    private static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
+    public static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
 
     public static void extractRequirement() {
