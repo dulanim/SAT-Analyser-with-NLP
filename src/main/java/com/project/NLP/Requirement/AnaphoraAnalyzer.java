@@ -34,6 +34,7 @@ public class AnaphoraAnalyzer {
     */
     public AnaphoraAnalyzer(String documnet){
         this.document=documnet;
+        System.out.println("document --- :\n"+documnet );
         getCoreferenChains();
         this.wordsFromDoc=splitSentence(sentencesFromDoc);
     }
@@ -82,13 +83,23 @@ public class AnaphoraAnalyzer {
                             CorefChain.CorefMention cm=(CorefMention) itC.next();
                             String mentionPronoun=cm.mentionSpan;
                             //mentionPronoun.replace(mentionPronoun,mentionSpan)
-                            System.out.println("--- cm.mentionSpan---  "+mentionPronoun+ " int pair : "+ip);
+                            //System.out.println("---Sentences ------- :"+sentencesFromDoc);
+                            //System.out.println("---Words ------- :"+wordsFromDoc);
+                            //for(String[] str:wordsFromDoc){
+                            //     System.out.println("---Words from array ------- :"+str[0] + " "+str[1]);
+                            //}
+                            
+                            //System.out.println("--- cm.mentionSpan---  "+mentionPronoun+ " int pair : "+ip);
                             int sentenceIndex=ip.getSource()-1;
                             int wordIndex=ip.getTarget()-1;
-                            String docWord=wordsFromDoc.get(sentenceIndex)[wordIndex];
-                            System.out.println("From arraylist : "+docWord);
-                            if(mentionPronoun.equalsIgnoreCase(docWord)){
-                                wordsFromDoc.get(sentenceIndex)[wordIndex]=mentionSpan;
+                                try{
+                                String docWord=wordsFromDoc.get(sentenceIndex)[wordIndex];
+                                System.out.println("From arraylist : "+docWord);
+                                if(mentionPronoun.equalsIgnoreCase(docWord)){
+                                    wordsFromDoc.get(sentenceIndex)[wordIndex]=mentionSpan;
+                                }
+                                        }catch(ArrayIndexOutOfBoundsException e){
+                                        System.err.println("----- AnaphoraAnalyzer ------- : "+e.getMessage());
                             }
                         }
                     }

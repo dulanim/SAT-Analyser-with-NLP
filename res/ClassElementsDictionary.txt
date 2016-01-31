@@ -1,9 +1,10 @@
-company
+address
+individual
+telephone
+number
 application
-computer
 data
 information
-organization
 system
 type
 different
@@ -11,10 +12,8 @@ related
 ability
 perform
 include
-do
 give
 many
 multiple
 way
 digit
-
