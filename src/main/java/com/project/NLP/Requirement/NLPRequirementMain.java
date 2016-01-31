@@ -63,7 +63,7 @@ public class NLPRequirementMain {
                 /*For individual sentence in the requirement Document */
                 for (int countTree = 0; countTree < trees.size(); countTree++) {
                     Tree tree = (Tree) trees.get(countTree);
-                    //System.out.println("Tree: " + tree);
+                    System.out.println("Tree: " + tree);
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
                     if (!negativeSentence.isNegativeSentence()) {
