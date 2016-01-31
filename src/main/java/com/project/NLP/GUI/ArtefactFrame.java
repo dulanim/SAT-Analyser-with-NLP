@@ -795,38 +795,60 @@ public class ArtefactFrame extends JFrame {
                         Object relName = classTreeModel.getChild(artefactName, rCount);
                         if (relName.toString().equalsIgnoreCase("Generalization")) {
                             int genCount = classTreeModel.getChildCount(relName);
+                            String type = relName.toString();
                             for (int gCount = 0; gCount < genCount; gCount++) {
                                 Object genName = classTreeModel.getChild(relName, gCount);
                                 String[] genNameArray = genName.toString().split("->");
-                                // System.out.println("string[0]: " + genNameArray[0] + " String [1]: " + genNameArray[1]);
-                                String type = relName.toString(); //genNameArray[0].trim();
-                                String parent = genNameArray[1].trim();
-                                String childs = className.toString();
-                                // if (type.equalsIgnoreCase("Parent")) {
-                                ClassRelation clRelation = new ClassRelation(type, childs, parent);
-                                //System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
+
+                                System.out.println("string[0]: " + genNameArray[0] + " String [1]: " + genNameArray[1]);
+                                 
+                                String parentClass;
+                                String childClass;
+                                if(genNameArray[0].equalsIgnoreCase("parent")){
+                                    parentClass = genNameArray[1].trim();
+                                    childClass = className.toString();
+                                }else{
+                                    parentClass=className.toString();
+                                    childClass=genNameArray[1].trim();
+
+                                }
+                               
+                                ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
+                                System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
                                 requirementRelationsObjects.add(clRelation);
                             }
 
                         }
                         if (relName.toString().equalsIgnoreCase("Association")) {
                             int assCount = classTreeModel.getChildCount(relName);
+                            String type = relName.toString();
                             for (int aCount = 0; aCount < assCount; aCount++) {
                                 Object assName = classTreeModel.getChild(relName, aCount);
                                 String[] assNameArray = assName.toString().split("->");
-                                //System.out.println("string[0]: " + relName.toString() + " String [1]: " + assNameArray[1]);
 
-                                if (assNameArray[0].equalsIgnoreCase("Parent")) {
-                                    ClassRelation clRelation = new ClassRelation(assNameArray[0], className.toString(), assNameArray[1]);
-                                    //System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
-                                    requirementRelationsObjects.add(clRelation);
+                                System.out.println("string[0]: " + assNameArray[0] + " String [1]: " + assNameArray[1]);
+                                
+                                String parentClass="";
+                                String childClass="";
+                                if(assNameArray[0].equalsIgnoreCase("Parent")){
+                                    parentClass = assNameArray[1].trim();
+                                    childClass = className.toString();
+                                }else if(assNameArray[0].equalsIgnoreCase("Child")){
+                                    parentClass=className.toString();
+                                    childClass=assNameArray[1].trim();
+
                                 }
 
+                                ClassRelation clRelation = new ClassRelation(type, childClass,parentClass );
+                                System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
+                                requirementRelationsObjects.add(clRelation);
                             }
 
                         }
 
                     }
+
+                }
 
 //                    for(int  rCount = 0; rCount < relationCount; rCount++) {
 //                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
@@ -842,7 +864,7 @@ public class ArtefactFrame extends JFrame {
 //                    }
                 }
 
-            }
+            
             StoringArtefacts storingArtefacts = new StoringArtefacts();
             storingArtefacts.addClassName(classNameSet);
             storingArtefacts.addAttributes(attributeSet);
