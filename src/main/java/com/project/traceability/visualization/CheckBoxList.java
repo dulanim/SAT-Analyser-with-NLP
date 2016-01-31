@@ -23,12 +23,17 @@ import javax.swing.border.EmptyBorder;
  */
 public class CheckBoxList extends JList {
     
-    static int[] checklist;
+    int[] checklist;
+    int size;
 
     protected static Border noFocusBorder
             = new EmptyBorder(1, 1, 1, 1);
+    public CheckBoxList(){
+        
+    }
 
-    public CheckBoxList(int size) {
+    public CheckBoxList(int count) {
+        size = count;
         checklist = new int[size];
         for(int i=0;i<size;i++){
             checklist[i] = -1;
@@ -49,7 +54,7 @@ public class CheckBoxList extends JList {
                     else 
                         checklist[index] = 1;
                     System.out.println(""+index);
-                    repaint();
+                    //repaint();
                     System.out.println("2");
                 }
             }
@@ -57,6 +62,13 @@ public class CheckBoxList extends JList {
         );
 
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    }
+    
+    public int getCount(){
+        return size;
+    }
+    public int[] getCheckList(){
+        return checklist;
     }
 
     protected class CellRenderer implements ListCellRenderer {
