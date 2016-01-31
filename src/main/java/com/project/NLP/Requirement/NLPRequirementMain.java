@@ -137,7 +137,8 @@ public class NLPRequirementMain {
                     /*After finding all classes in the document identifying relationships between them.*/ HashSet relationSet = new HashSet();
                     ClassRelationIdentifier crid = new ClassRelationIdentifier();
                     requirementObjectRelations.addAll(crid.identifyGeneralizationRelations(requirementObjects.keySet()));
-                    HashSet associationSet = new HashSet();
+                    requirementObjectRelations.addAll(crid.identifyAssociationUsingAttribute(requirementObjects));
+                    
                     for (Object tree : trees) {
                         requirementObjectRelations.addAll(crid.identifyAssociation((Tree) tree, requirementObjects.keySet()));
                     }
