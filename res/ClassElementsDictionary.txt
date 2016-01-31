@@ -17,3 +17,4 @@ many
 multiple
 way
 digit
+detail
