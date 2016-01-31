@@ -1,4 +1,3 @@
-company
 application
 computer
 data
@@ -17,4 +16,7 @@ many
 multiple
 way
 digit
-
+individual
+kilometer
+meter
+inches
