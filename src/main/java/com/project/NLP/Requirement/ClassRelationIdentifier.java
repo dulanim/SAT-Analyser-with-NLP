@@ -149,22 +149,25 @@ public class ClassRelationIdentifier {
                     String classFromSet = set.next().toString();
                     System.out.println("----Class2 name------"+classFromSet+" -------");
                     if(!(classFromSet.equals(classFromlist))){
-                        System.out.println("----Same class name -------");
+                        boolean isRelationIdentified=false;
+                        System.out.println("----not Same class name -------");
                         if (classFromSet.matches(".+" + classFromlist + ".*")) {
                             System.out.println("--------Success --1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromSet, classFromlist);
                             classRelations.add(general);
+                            isRelationIdentified=true;
                         } else if (classFromlist.matches(".+" + classFromSet + ".*")) {
                             System.out.println("--------Success --1-1-- Generalization -----");
                             ClassRelation general = new ClassRelation("Generalization", classFromlist, classFromSet);
                             classRelations.add(general);
-
+                            isRelationIdentified=true;
                         }
+                        if(isRelationIdentified){
                         StoringArtefacts storeArt1=(StoringArtefacts)NLPRequirementMain.requirementObjects.get(classFromSet);
                         storeArt1.removeAttribute(classFromlist);
                         StoringArtefacts storeArt2=(StoringArtefacts)NLPRequirementMain.requirementObjects.get(classFromlist);
-                        storeArt1.removeAttribute(classFromSet);
-                        
+                        storeArt2.removeAttribute(classFromSet);
+                        }
                     }
 
                 }
@@ -180,9 +183,9 @@ public class ClassRelationIdentifier {
     public HashSet identifyGenaralizationByHypernym(Set documentClassSet) {
         
         HashSet classRelations = new HashSet();
-        HashSet hypernymSet=new HashSet();
-        HashSet hyponymSet=new HashSet();
-        HypernymHyponym hyps=new HypernymHyponym();
+       HashSet hypernymSet;
+       HashSet hyponymSet;
+       HypernymHyponym hyps=new HypernymHyponym();
         
         if (documentClassSet.isEmpty()) {
             System.out.println("Info : There is no class found in the sentence. -Relations identifier");
@@ -190,31 +193,35 @@ public class ClassRelationIdentifier {
             Iterator it=documentClassSet.iterator();
             while(it.hasNext()){
                 String className=(String) it.next();
-                // System.out.println("----Class name------"+className+" -------");
+                System.out.println("----Class name------"+className+" -------");
                 hypernymSet=hyps.getHypernymsForWord(className);
-                hyponymSet=hyps.getHyponymsForWord(className);
+                
+                //System.out.println("----Class name------"+className+" --hypernymset-----"+hypernymSet+"---hyponymset---"+hyponymSet);
                 Iterator iter=hypernymSet.iterator();
                     while(iter.hasNext()){
                         String hypernymClass=(String) iter.next();
-                        //System.out.println("----------"+hypernymClass+" -------");
+                        System.out.println("----------"+hypernymClass+" -------");
                         if(documentClassSet.contains(hypernymClass)){
-                           // System.out.println("----general------"+hypernymClass+" -------");
+                        System.out.println("----general--hypernym----"+hypernymClass+" -------");
                             ClassRelation general = new ClassRelation("Generalization",className,hypernymClass);
                             classRelations.add(general);
                         }
 
                     }
-                    iter=hyponymSet.iterator();
-                    while(iter.hasNext()){
-                        String hyponymClass=(String) iter.next();
+                hyponymSet=hyps.getHyponymsForWord(className);    
+                Iterator iter2=hyponymSet.iterator();
+                    while(iter2.hasNext()){
+                        String hyponymClass=(String) iter2.next();
                     
                         if(documentClassSet.contains(hyponymClass)){
-                            // System.out.println("----general------"+hyponymClass+" -------");
+                          System.out.println("----general--hyponym----"+hyponymClass+" -------");
                             ClassRelation general = new ClassRelation("Generalization",hyponymClass,className);
                             classRelations.add(general);
                         }
 
                     }
+                    hypernymSet.clear();
+                    hyponymSet.clear();
             }
         }
         return classRelations;
