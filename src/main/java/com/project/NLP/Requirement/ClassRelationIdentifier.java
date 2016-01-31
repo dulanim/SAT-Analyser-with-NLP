@@ -160,6 +160,11 @@ public class ClassRelationIdentifier {
                             classRelations.add(general);
 
                         }
+                        StoringArtefacts storeArt1=(StoringArtefacts)NLPRequirementMain.requirementObjects.get(classFromSet);
+                        storeArt1.removeAttribute(classFromlist);
+                        StoringArtefacts storeArt2=(StoringArtefacts)NLPRequirementMain.requirementObjects.get(classFromlist);
+                        storeArt1.removeAttribute(classFromSet);
+                        
                     }
 
                 }
