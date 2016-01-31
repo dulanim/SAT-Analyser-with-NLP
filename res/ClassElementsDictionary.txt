@@ -1,5 +1,4 @@
 address
-individual
 telephone
 number
 application
