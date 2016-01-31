@@ -744,17 +744,15 @@ public class ArtefactFrame extends JFrame {
                                 Object genName = classTreeModel.getChild(relName, gCount);
                                 String[] genNameArray = genName.toString().split("->");
 
-                                System.out.println("string[0]: " + genNameArray[0] + " String [1]: " + genNameArray[1]);
-                                 
                                 String parentClass;
                                 String childClass;
-                                if(genNameArray[0].equalsIgnoreCase("parent")){
+                                if((genNameArray[0].trim()).equalsIgnoreCase("parent")){
                                     parentClass = genNameArray[1].trim();
                                     childClass = className.toString();
                                 }else{
                                     parentClass=className.toString();
                                     childClass=genNameArray[1].trim();
-
+                                    
                                 }
                                
                                 ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
@@ -769,15 +767,14 @@ public class ArtefactFrame extends JFrame {
                             for (int aCount = 0; aCount < assCount; aCount++) {
                                 Object assName = classTreeModel.getChild(relName, aCount);
                                 String[] assNameArray = assName.toString().split("->");
-
-                                System.out.println("string[0]: " + assNameArray[0] + " String [1]: " + assNameArray[1]);
-                                
-                                String parentClass="";
-                                String childClass="";
-                                if(assNameArray[0].equalsIgnoreCase("Parent")){
+                                String class1=assNameArray[0].toLowerCase().trim();
+                                String class2=assNameArray[1].toLowerCase().trim();
+                                String parentClass;
+                                String childClass;
+                                if(class1.equals("parent")){
                                     parentClass = assNameArray[1].trim();
                                     childClass = className.toString();
-                                }else if(assNameArray[0].equalsIgnoreCase("Child")){
+                                }else {
                                     parentClass=className.toString();
                                     childClass=assNameArray[1].trim();
 
@@ -852,7 +849,6 @@ public class ArtefactFrame extends JFrame {
         add(panel, BorderLayout.SOUTH);
 
     }
-
     protected void print(HashMap output) {
         System.out.println("PRINTING........");
         Iterator it = output.keySet().iterator();
