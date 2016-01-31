@@ -453,7 +453,8 @@ public class PhrasesIdentification {
 
                 for (Tree inChild : innerChild) {
                     //System.out.println("\n--innerChild  " + inChild + "-------\n");
-                    if (inChild.value().equals("CC")) {
+                    
+                    if (inChild.value().equals("CC") || inChild.value().equals(",")) {
                         separator = 1;
                     }
                     if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("NNP"))) {
@@ -538,8 +539,13 @@ public class PhrasesIdentification {
         adjAtt = getAdjectiveAttribute();
 
         if (!adjAtt.isEmpty()) {
+            String att = "";
             for (int i = 0; i < adjAtt.size(); i++) {
-                attributeLists.add(adjAtt.get(i));
+                att = adjAtt.get(i).toString();
+                if(!att.isEmpty()|| !att.equals("")|| !(att.equals(" "))){
+                    System.out.println("attribute in adj "+ att);
+                    attributeLists.add(att.trim());
+                }
             }
         }
 
@@ -613,12 +619,13 @@ public class PhrasesIdentification {
                                 //System.out.println("added...." + attribute);
                                 attribute = adj + " " + leaves.get(0).yieldWords().get(0).word();
                                 //adjClassList.add(cl);
-                                adjAttributeList.add(attribute);
-
+                                adjAttributeList.add(morphology.stem(attribute));
+                                
                             }
                             if (adjectiveNoun > 1) {
 
                                 //adjAttributeList.remove(adj + " " + cl);
+                                adjAttributeList.remove(morphology.stem(attribute));
                                 adjAttributeList.remove(attribute);
                                 attribute += " " + leaves.get(0).yieldWords().get(0).word();
                                 adjAttributeList.add(attribute);
