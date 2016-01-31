@@ -32,30 +32,28 @@ import org.openide.util.lookup.ServiceProvider;
 
 import static com.project.traceability.visualization.VisualizeGraph.popupMenu;
 import java.io.File;
-import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *
  * @author Thanu
+ *
+ */
+/**
+ * Listens to the mouse clicks on the graph
+ *
+ * @author Thanu
+ * @author Aarthika <>
  */
 @ServiceProvider(service = PreviewMouseListener.class)
 public class GraphMouseListener implements PreviewMouseListener {
@@ -76,6 +74,7 @@ public class GraphMouseListener implements PreviewMouseListener {
 
     static Workspace wkspace;
     static String id;
+    CCombo combo = null;
 
     public void shutDB() {
         graphDb.shutdown();
@@ -111,15 +110,22 @@ public class GraphMouseListener implements PreviewMouseListener {
                             Object val = neo4j_node.getProperty(col);
                             nodeProps.put(col, val);
                         }
-                        System.out.println("Node: " + nodeProps);
+
                         HashMap<String, Object> values = showPopup(nodeProps, node);
                     } catch (Exception e) {
                         Exceptions.printStackTrace(e);
                         System.out.println(e.toString());
                     } finally {
                         tx.finish();
-                        System.out.println("shutiing");
                         graphDb.shutdown();
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                //combo.setVisible(false);
+                                //combo.dispose();
+                            }
+                        });
+
                         try {
                             Thread.sleep(5);
                         } catch (Exception e) {
@@ -143,8 +149,6 @@ public class GraphMouseListener implements PreviewMouseListener {
             }
             id = val;
             if (null != myNode) {
-
-                System.out.println("entre");
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -153,7 +157,6 @@ public class GraphMouseListener implements PreviewMouseListener {
                     }
                 });
             }
-            System.out.println("entre ");
 
         }
 
@@ -163,181 +166,16 @@ public class GraphMouseListener implements PreviewMouseListener {
     }
 
     @Override
-    public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc
-    ) {
-
-    }
-
-    public static void removeEdgeFromGexf(int id) {
-        String gexfXML = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".gexf";
-
-        try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(gexfXML);
-            System.out.println("" + gexfXML);
-
-            NodeList nlParent = document.getElementsByTagName("edges");
-            System.out.println("" + nlParent.getLength());
-            System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
-            int count = Integer.parseInt(nlParent.item(0).getAttributes().item(0).getNodeValue());
-            System.out.println("Gexf dleting :" + id);
-
-            NodeList nlChild = document.getElementsByTagName("edge");
-            parent:
-            for (int i = 0; i < nlChild.getLength(); i++) {
-                if (null != nlChild.item(i)) {
-                    child:
-                    for (int j = 0; j < nlChild.item(i).getAttributes().getLength(); j++) {
-                        if (nlChild.item(i).getAttributes().item(j).getNodeName().equalsIgnoreCase("id")) {
-
-                            if (nlChild.item(i).getAttributes().item(j).getNodeValue().equalsIgnoreCase(String.valueOf(id))) {
-                                nlChild.item(i).getParentNode().removeChild(nlChild.item(i));
-                                count--;
-                                nlParent.item(0).getAttributes().item(0).setNodeValue(String.valueOf(count));
-                                System.out.println("Gexf suc3 :" + id);
-                                break parent;
-                            }
-                        }
-                    }
+    public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                if(null != combo){
+                combo.setVisible(false);
+                combo = null;
                 }
             }
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(document);
-            String xmlpath = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY;
-            File file = new File(xmlpath, HomeGUI.projectName + ".gexf");
-
-            System.out.println("file: " + file.getAbsolutePath());
-            StreamResult result = new StreamResult(file.getPath());
-            transformer.transform(source, result);
-
-            System.out.println("Done nod");
-            //VisualizeGraph.refreshGraph();
-
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (TransformerConfigurationException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (TransformerException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }
-
-    public static boolean getIDFromGexf(int id) {
-        String gexfXML = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".gexf";
-
-        try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(gexfXML);
-            System.out.println("" + gexfXML);
-
-            NodeList nlChild = document.getElementsByTagName("edge");
-            for (int i = 0; i < nlChild.getLength(); i++) {
-                String childID = nlChild.item(i).getAttributes().item(0).getNodeValue();
-                if (childID.equalsIgnoreCase(String.valueOf(id))) {
-                    System.out.println(childID + " " + id);
-                    return true;
-                }
-            }
-
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        return false;
-    }
-
-    public static int addToGEXF(String start, String end, String relType) {
-        String relation = "";
-        if (start.isEmpty() || end.isEmpty() || relType.isEmpty()) {
-            return -1;
-        } else {
-            for (GraphDB.RelTypes rel : GraphDB.RelTypes.values()) {
-                if (rel.getValue().equalsIgnoreCase(relType)) {
-                    relation = rel.name();
-                    break;
-                }
-            }
-            String gexfXML = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".gexf";
-            int count = -1;
-            try {
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                Document document = documentBuilder.parse(gexfXML);
-                System.out.println("" + gexfXML);
-
-                NodeList nlParent = document.getElementsByTagName("edges");
-                System.out.println("" + nlParent.getLength());
-                System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
-                count = Integer.parseInt(nlParent.item(0).getAttributes().item(0).getNodeValue());
-
-                NodeList nlChild = document.getElementsByTagName("edge");
-
-                Element edge = document.createElement("edge");
-                nlChild.item(0).getParentNode().appendChild(edge);
-                count++;
-                nlParent.item(0).getAttributes().item(0).setNodeValue(Integer.toString(count));
-                Attr idAttr = document.createAttribute("id");
-                idAttr.setValue(String.valueOf(count));
-                edge.setAttributeNode(idAttr);
-                Attr labelAttr = document.createAttribute("label");
-                labelAttr.setValue(relation);
-                edge.setAttributeNode(labelAttr);
-                Attr sourceAttr = document.createAttribute("source");
-                sourceAttr.setValue(start);
-                edge.setAttributeNode(sourceAttr);
-                Attr targetAttr = document.createAttribute("target");
-                targetAttr.setValue(end);
-                edge.setAttributeNode(targetAttr);
-                Attr typeAttr = document.createAttribute("type");
-                typeAttr.setValue("Directed");
-                edge.setAttributeNode(typeAttr);
-                Element edgeSub = document.createElement("attvalues");
-                edge.appendChild(edgeSub);
-
-                Element edgeSubVal1 = document.createElement("attvalue");
-                edgeSub.appendChild(edgeSubVal1);
-                Attr forAttr1 = document.createAttribute("for");
-                forAttr1.setValue("message");
-                edgeSubVal1.setAttributeNode(forAttr1);
-                Attr valueAttr1 = document.createAttribute("value");
-                valueAttr1.setValue(relType);
-                edgeSubVal1.setAttributeNode(valueAttr1);
-
-                Element edgeSubVal2 = document.createElement("attvalue");
-                edgeSub.appendChild(edgeSubVal2);
-                Attr forAttr2 = document.createAttribute("for");
-                forAttr2.setValue("neo4j_rt");
-                edgeSubVal2.setAttributeNode(forAttr2);
-                Attr valueAttr2 = document.createAttribute("value");
-                valueAttr2.setValue(relation);
-                edgeSubVal2.setAttributeNode(valueAttr2);
-
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                DOMSource source = new DOMSource(document);
-                String xmlpath = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY;
-                File file = new File(xmlpath, HomeGUI.projectName + ".gexf");
-
-                System.out.println("file: " + file.getAbsolutePath());
-                StreamResult result = new StreamResult(file.getPath());
-                transformer.transform(source, result);
-
-                System.out.println("Done nod");
-                //VisualizeGraph.refreshGraph();
-
-            } catch (ParserConfigurationException | SAXException | IOException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (TransformerConfigurationException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (TransformerException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            return count;
-        }
-
+        });
     }
 
     @Override
@@ -370,9 +208,6 @@ public class GraphMouseListener implements PreviewMouseListener {
      * @return
      */
     public HashMap<String, Object> showPopup(final HashMap<String, Object> nodeProps, final Node node) {
-        //JTextField field;
-        //graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(/*PropertyFile.getGraphDbPath()*/HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY);
-
         engine = new ExecutionEngine(graphDb);
         final HashMap<String, Object> node_props = nodeProps;
         final JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -384,25 +219,72 @@ public class GraphMouseListener implements PreviewMouseListener {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                combo = new CCombo(HomeGUI.table, SWT.NONE);
+                combo.setVisible(true);
+
                 HomeGUI.table.clearAll();
                 HomeGUI.table.deselectAll();
                 HomeGUI.table.removeAll();
+                combo.removeAll();
                 nodeData.clear();
                 nodeData = new HashMap<>();
                 int i = 0;
                 for (String key : nodeProps.keySet()) {
                     Object val = nodeProps.get(key);
+                    final TableEditor editor = new TableEditor(HomeGUI.table);
                     if (null != val) {
                         tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);
                         tableItem.setText(0, key);
                         tableItem.setText(1, val.toString());
-                        //field = new JTextField(nodeProps.get(key).toString());
-                        //field.setName(key);
-                        /*if (key.equalsIgnoreCase(ID) || key.equalsIgnoreCase(TYPE)) {
-                    field.setEditable(false);
-                }
-                panel.add(new JLabel(key + ": "));
-                panel.add(field);*/
+                        if (key.equalsIgnoreCase("Visibility")) {
+                            combo.add("");
+                            combo.add("Default");
+                            combo.add("Public");
+                            combo.add("Private");
+                            combo.add("Protected");
+                            combo.add("Default");
+                            int index = 0;
+                            System.out.println("Item count " + combo.getItemCount());
+                            for (int j = 0; j < combo.getItemCount(); j++) {
+                                if (combo.getItem(j).equalsIgnoreCase(val.toString())) {
+                                    combo.deselectAll();
+                                    System.out.println("Item " + val.toString() + " " + combo.getItem(j));
+                                    combo.setText(combo.getItem(j));
+                                    editor.grabHorizontal = true;
+                                    editor.setEditor(combo, tableItem, 1);
+                                    index = j;
+                                    break;
+                                }
+                            }
+
+                            combo.addSelectionListener(new SelectionListener() {
+                                @Override
+                                public void widgetSelected(SelectionEvent se) {
+                                    int t = ((CCombo) se.getSource()).getSelectionIndex();
+                                    //System.out.println("elected " + combo.getItem(t));
+                                    nodeData.replace("Visibility", combo.getItem(t));
+                                    combo.setText(combo.getItem(t));
+                                    for (TableItem it : HomeGUI.table.getItems()) {
+                                        if (it.getText(0).equalsIgnoreCase("Visibility")) {
+                                            editor.setEditor(combo, it, 1);
+                                            nodeData.replace("Visibility", combo.getItem(t));
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void widgetDefaultSelected(SelectionEvent se) {
+
+                                }
+                            });
+                            //combo.setText(combo.getItem(index));
+
+                        } else {
+                            //combo.setVisible(false);
+                        }
+
                         i++;
                     }
                     nodeData.put(key, val);
@@ -411,22 +293,6 @@ public class GraphMouseListener implements PreviewMouseListener {
             }
         });
 
-        /*int response = JOptionPane.showOptionDialog(VisualizeGraph.getInstance().getFrame(), panel, "Node properties", JOptionPane.YES_NO_OPTION,
-                JOptionPane.PLAIN_MESSAGE, null, options, null);//options[0]);
-
-        if (response == JOptionPane.YES_OPTION) {
-            storeUpdatedNode(panel, nodeProps, id);
-        } else if (response == JOptionPane.NO_OPTION) {
-            int confirm = JOptionPane.showConfirmDialog(VisualizeGraph.getInstance().getFrame(), "Are you sure you want to delete?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (confirm == JOptionPane.YES_OPTION) {
-                deleteNodeAndRelations(id, nodeProps, confirm);
-            }
-            if (confirm == JOptionPane.NO_OPTION) {
-
-            }
-        }*/
-        //if(update)
-        // returnVal.put("Value", 1);
         return returnVal;
     }
 
