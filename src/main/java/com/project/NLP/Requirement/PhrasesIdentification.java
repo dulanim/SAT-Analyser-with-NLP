@@ -191,12 +191,13 @@ public class PhrasesIdentification {
                             if (separator == 0) {
                                 //System.out.println("innerChild length:"+ innerChild.length);
                                 //System.out.println("count: "+ count);
+                                System.out.println("count: "+ count);
                                 if (count == innerChild.length) {
                                     String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
                                     //attributeLists.add(word);
                                     nounList.remove(tempClass);
                                     nounList.add(word);
-                                    //System.out.println("2 "+ nounList);
+                                    System.out.println("2 "+ nounList);
                                     //System.out.println("count == inn");
                                     if (!storingClass.isEmpty()) {
                                         classWithAttr.add(word);
@@ -214,7 +215,7 @@ public class PhrasesIdentification {
                                         word = morphology.stem(identifiedWord);
                                     }
                                     nounList.add(word);
-                                    //System.out.println("1 "+ nounList);
+                                    System.out.println("1 "+ nounList);
                                     tempClass = word;
                                     //System.out.println("1: "+ tempClass);
                                     storingClass = word;
@@ -224,7 +225,7 @@ public class PhrasesIdentification {
                                     //nounList.remove(tempClass);
                                     //String word = "";
                                     /*if the identified word is having underscore skips the stemming part . ex: user_id*/
-                                    //System.out.println("before temp: "+ tempClass);
+                                    System.out.println("before temp: "+ tempClass);
                                     if (tempClass.contains("_")) {
                                         nounList.remove(tempClass);
                                         //word = identifiedWord;
@@ -241,7 +242,7 @@ public class PhrasesIdentification {
                                         classWithAttr.add(identifiedWord);
                                         //nounList.add(word);
                                         storingClassWithAttr.put(storingClass, classWithAttr);
-                                        //System.out.println("3 "+storingClassWithAttr);
+                                        System.out.println("3 "+storingClassWithAttr);
                                     }
                                     //System.out.println("tempClass: "+ tempClass);
                                     //System.out.println("idenifiedWord: "+ identifiedWord);
