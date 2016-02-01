@@ -165,7 +165,7 @@ public class PhrasesIdentification {
                         }
                     }
                     if (adjectiveExist == 1) {
-                        if ((inChild.value().equals("NN"))) {
+                        if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("NNP"))) {
                             leaves = inChild.getLeaves();
                             adjectiveNoun++;
                             String className = "";
@@ -187,7 +187,7 @@ public class PhrasesIdentification {
                         }
                     } else {
                         if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
-                            
+
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
                             System.out.println("loopCount: " + loopCount);
                             System.out.println("innerChild lenght:" + innerChild.length);
@@ -198,7 +198,15 @@ public class PhrasesIdentification {
                                 //System.out.println("count: "+ count);
                                 System.out.println("count: " + count);
                                 if (loopCount == innerChild.length) {
-                                    String word = morphology.stem(((leaves.get(0).yieldWords()).get(0).word()));
+
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    String word = "";
+                                    if (identifiedWord.contains("_")) {
+                                        word = identifiedWord;
+                                    } else {
+                                        word = morphology.stem(identifiedWord);
+                                    }
+
                                     //attributeLists.add(word);
                                     nounList.remove(tempClass);
                                     nounList.add(word);
@@ -396,7 +404,7 @@ public class PhrasesIdentification {
             } else {
                 for (Tree inChild : innerChild) {
                     //System.out.println("\n--innerChild  " + inChild + "-------\n");
-                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS"))) {
+                    if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("NNP"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //phraseLists.add(leaves.get(0 ).yieldWords());
                         String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
@@ -444,7 +452,8 @@ public class PhrasesIdentification {
             //System.out.println("\n--Matching Tree  " + match + "-------\n");
             Tree[] innerChild = match.children();
             //System.out.println("innerChild length: " + innerChild.length);
-
+            int adjectiveExist = 0;
+            String adj = "";
             String attribute = "";
             String b = "";
 
@@ -453,17 +462,35 @@ public class PhrasesIdentification {
 
                 for (Tree inChild : innerChild) {
                     //System.out.println("\n--innerChild  " + inChild + "-------\n");
-                    
+
                     if (inChild.value().equals("CC") || inChild.value().equals(",")) {
                         separator = 1;
                     }
+                    if ((inChild.value().equals("JJ")) || (inChild.value().equals("VBG"))) {
+                        adjectiveExist++;
+                        System.out.println("2222222222222222222222222222");
+                        leaves = inChild.getLeaves();
+                        //System.out.println("LLLLLLLLEaves:" + leaves.size() + " " + leaves.get(0) + "  ..." + leaves);
+                        adj = leaves.get(0).toString();
+                        //System.out.println("adj: " + adj);
+                        if (designEleList.contains(adj)) {
+                            adj = "";
+                        }
+
+                    }
+
                     if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS")) || (inChild.value().equals("NNP"))) {
                         leaves = inChild.getLeaves(); //leaves correspond to the tokens
                         //System.out.println("leaves: " + leaves.size() + " value: " + leaves.get(0));
 
                         if (count == 1) {
                             //attributeLists.add((leaves.get(0).yieldWords()));
-                            attribute = leaves.get(0).yieldWords().get(0).word();
+                            if (adjectiveExist == 1) {
+                                attribute = adj + " " + leaves.get(0).yieldWords().get(0).word();
+                                System.out.println("attr.............." + attribute);
+                            } else {
+                                attribute = leaves.get(0).yieldWords().get(0).word();
+                            }
 
                             if (!designEleList.contains(attribute)) {
                                 String identifiedWord = attribute;
@@ -542,8 +569,8 @@ public class PhrasesIdentification {
             String att = "";
             for (int i = 0; i < adjAtt.size(); i++) {
                 att = adjAtt.get(i).toString();
-                if(!att.isEmpty()|| !att.equals("")|| !(att.equals(" "))){
-                    System.out.println("attribute in adj "+ att);
+                if (!att.isEmpty() || !att.equals("") || !(att.equals(" "))) {
+                    System.out.println("attribute in adj " + att);
                     attributeLists.add(att.trim());
                 }
             }
@@ -619,8 +646,10 @@ public class PhrasesIdentification {
                                 //System.out.println("added...." + attribute);
                                 attribute = adj + " " + leaves.get(0).yieldWords().get(0).word();
                                 //adjClassList.add(cl);
-                                adjAttributeList.add(morphology.stem(attribute));
+                                System.out.println("at: " + attribute);
                                 
+                                adjAttributeList.add(attribute);
+
                             }
                             if (adjectiveNoun > 1) {
 
