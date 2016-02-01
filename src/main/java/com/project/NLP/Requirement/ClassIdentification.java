@@ -149,7 +149,7 @@ public class ClassIdentification {
         //HashSet withoutDuplicateClass = new HashSet();
         /*add the list data to the hashset to eliminate the redundancy*/
         for(int i=0;i<list.size();i++){
-            classList.add(list.get(i));
+            classList.add(list.get(i).toString().trim());
         }
         
     }
