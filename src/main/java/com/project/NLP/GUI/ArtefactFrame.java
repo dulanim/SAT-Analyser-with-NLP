@@ -319,7 +319,7 @@ public class ArtefactFrame extends JFrame {
         Object[] relOptions = {"Select the type", "Association", "Generalization"};
         JComboBox typeField = new JComboBox(relOptions);
         Object[] message = {
-            "Enter the type (Parent/Child):", typeField,};
+            "Enter the type (Association/Generalization):", typeField,};
         /* get the user's input. note that if they press Cancel, 'name' will be null*/
 
         int option = JOptionPane.showConfirmDialog(null, message, "Enter the type", JOptionPane.OK_CANCEL_OPTION);
