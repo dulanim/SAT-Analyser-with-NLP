@@ -13,6 +13,19 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.project.traceability.GUI.StartUpProject</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
@@ -22,12 +35,10 @@
                     <maxmem>1024m</maxmem>
                     <source>1.7</source>
                     <target>1.7</target>
-                    <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.project.traceability.GUI.HomeGUI</mainClass>
+                            <mainClass>com.project.traceability.GUI.StartUpProject</mainClass>
                         </manifest>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -175,7 +186,7 @@
             <groupId>org.eclipse.swt</groupId>
             <artifactId>swt-package</artifactId>
             <version>1.0</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>org.eclipse.swt</groupId>
             <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
@@ -186,7 +197,7 @@
             <groupId>org.eclipse.swt.gtk.linux</groupId>
             <artifactId>x86_64</artifactId>
             <version>3.3.0-v3346</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
