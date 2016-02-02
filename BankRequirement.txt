@@ -1,0 +1,46 @@
+
+If the saving-account balance is insufficient to cover the
+requested withdrawal amount and dumm account, the application should
+inform the user and terminate the transaction. 
+
+ the transaction must include the
+date, time, transaction type, amount and account
+balance after the transactions. 
+
+
+The bank client must be able to deposit an amount to and withdraw an amount from his or her accounts using the bank application. 
+
+
+the client must have the ability to
+review all transactions performed against a given
+account. 
+
+A bank client can have two types of accounts.
+
+A checking account and a saving account. 
+
+Neither a checking-account nor a saving-account can
+have a negative balance. 
+
+
+The application should
+automatically withdraw funds from a related saving account
+if the requested withdrawal amount on the
+checking account is more than its current balance. 
+
+The items should be disposed from the store.
+Be the first one to like this page.
+
+
+Each transactions must be recorded the transaction entered.
+
+
+Each saving account must be recorded the saving accounts entered
+
+Each department is not having an employee.
+Each department is having a student but each staffs is not having an employee.
+checking account hasn't  a saving account.  
+
+The application must not verify that a client can
+gain access to his or her account by identification via
+a personal identification number (PIN) code.

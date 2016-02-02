@@ -41,7 +41,8 @@ public class StaticData {
     public static List<Dependencies> depencyList;
     public static String umlFilePath = "";
     public static String sourceFilePath = "";
-    public static String workspace = System.getProperty("user.home")+ File.separator+ "SATAnalyzer"+File.separator+"Workspace"+File.separator;
+    public static String requirementFilePath="";
+    public static String workspace=System.getProperty("user.home")+ File.separator+ "SATAnalyzer"+File.separator+"Workspace"+File.separator;
     public static String rootPathName; //propety file it is the project root directory
     public static HashMap<String,List<String>> folderNames = new HashMap<String, List<String>>();//project folder list
     public static Set<String> paths = new HashSet<String>();
@@ -54,5 +55,8 @@ public class StaticData {
     */
     public static final String PROJECT_WINDOW_TOOL_TIP = "It contains project folders\n"
             + "you can open using double press on that folder";
+    
+    
+    public static String statusString;
 
 }

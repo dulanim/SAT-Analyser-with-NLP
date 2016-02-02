@@ -6,20 +6,17 @@
 package com.project.NLP.SourceCodeToXML;
 
 import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.GUI.ProjectCreateWindow;
-import com.project.traceability.common.PropertyFile;
-import java.io.BufferedReader;
+import com.project.property.config.xml.writer.Adapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -33,14 +30,13 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Creates the xml
  * @author AARTHIKA
  */
 public class WriteToXML {
 
     public static Document document;
     private static String destinationPath;
-    //AST.file.replaceAll(".java", "");
     private static File file;
     public static Element artefacts, artefactType, fileLocation;
 
@@ -48,8 +44,11 @@ public class WriteToXML {
         return document;
     }
 
+    /**
+     * Returns the file Path
+     */
     public static void getFilePath(){
-        String root = HomeGUI.tree.getToolTipText() + File.separator + ProjectCreateWindow.projectName;
+        String root = Adapter.projectPath;
         //System.out.println("Root: "+root);
         File f = new File(root + File.separator +FilePropertyName.XML);
         if(!f.exists())
@@ -64,9 +63,13 @@ public class WriteToXML {
         return file.exists();
     }
 
-    public static Document createDocument() {
-        getFilePath();
+    /**
+     * Creates a document for xml
+     * @return 
+     */
+    public static Document createDocument() {        
         try {
+            getFilePath();
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             if (checkFileExist()) {
@@ -95,16 +98,21 @@ public class WriteToXML {
         return document;
     }
 
+    /**
+     * Creates the final xml
+     */
     public static void createXML() {
         FileOutputStream fos;        
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
             DOMSource source = new DOMSource(document);
             fos = createXmlFile();
             StreamResult result = new StreamResult(fos);
             transformer.transform(source, result);
-            System.out.println("File saved!");
+            //System.out.println("File saved!");
         } catch (TransformerConfigurationException ex) {
             Logger.getLogger(WriteToXML.class.getName()).log(Level.SEVERE, null, ex);
         } catch (TransformerException ex) {
@@ -114,36 +122,25 @@ public class WriteToXML {
         }
     }
 
+    /**
+     * Creates the instance of fileoutputstream based on the existence of xml
+     * @return
+     * @throws FileNotFoundException 
+     */
     private static FileOutputStream createXmlFile() throws FileNotFoundException{
         FileOutputStream fos = null;
         
         if (!file.exists()) {
             fos = new FileOutputStream(destinationPath,false);
         } else {
-            fos = new FileOutputStream(destinationPath,false);
-            /*System.out.println("Source code xml file for the project exissts already.\nDo you waant to create a new version or update the file?\n(Enter Yes to create a new version) ");
-            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-            String response;
-            try {
-                response = bufferRead.readLine();
-                if (response.equalsIgnoreCase("Yes")) {
-                    System.out.println("Enter new file name: ");
-                    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                    String newName = br.readLine();
-                    fos = new FileOutputStream(destinationPath + "\\" + newName + ".xml");
-                } else {
-                    fos = new FileOutputStream(destinationPath);
-                }
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }*/
+            fos = new FileOutputStream(destinationPath,false);            
         }
         return fos;
     }
 
-    public static void main(String args[]) {
+    /*public static void main(String args[]) {
         createDocument();
         createXML();
-    }
+    }*/
 
 }

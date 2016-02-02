@@ -33,7 +33,7 @@ public class ReadFiles{
         SourceCodeArtefactManager.readXML(projectPath);
         UMLArtefactManager.readXML(projectPath);
         RequirementsManger.readXML(projectPath);
-        DefaultWords.getDefaultWords();
+        //DefaultWords.getDefaultWords();
     }
 
     /**

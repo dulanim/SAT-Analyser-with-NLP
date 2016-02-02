@@ -25,17 +25,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import org.openide.util.Exceptions;
+import org.w3c.dom.DOMException;
 
 public class RelationManager {
 
-    
-
     public static void createXML(List<String> relationNodes) {
         try {
-            
+
             List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
             System.out.println(hasToaddRelationBodes.toString());
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory
@@ -84,8 +83,8 @@ public class RelationManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(document);
             StreamResult streamResult = new StreamResult(
-                   new File(
-            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml").getPath());
+                    new File(
+                            HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -102,37 +101,56 @@ public class RelationManager {
     }
 
     public static void createXML(String projectPath) {
-        try {
 
+        String filePath = projectPath
+                + File.separator + FilePropertyName.XML + File.separator + "Relations.xml";
+
+        File file = new File(filePath);
+
+        if (file.exists()) {
+            addRelationsXML(filePath);
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            addRelationsXML(filePath);
+        }
+    }
+
+    public static void addRelationsXML(String filePath) throws IllegalArgumentException, DOMException, TransformerFactoryConfigurationError {
+        try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory
                     .newInstance();
             DocumentBuilder documentBuilder = documentFactory
                     .newDocumentBuilder();
-
+            
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("Relations");
             document.appendChild(rootElement);
             System.out.println("start");
-
+            
             // creating and writing to xml file
             TransformerFactory transformerFactory = TransformerFactory
                     .newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource domSource = new DOMSource(document);
-            StreamResult streamResult = new StreamResult(projectPath
-                    + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
+            StreamResult streamResult = new StreamResult(filePath);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(domSource, streamResult);
-
+            
             System.out.println("File saved to specified path!");
-
+            
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
-        } catch (TransformerException tfe) {
-            tfe.printStackTrace();
+        } catch (TransformerConfigurationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (TransformerException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }
 
@@ -140,7 +158,8 @@ public class RelationManager {
 
         List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
 //        List<String> hasToaddRelationBodes = relationNodes;
-        File file = new File(HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml");
+        File file = new File(HomeGUI.projectPath + File.separator
+                + FilePropertyName.XML + File.separator + "Relations.xml");
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -211,7 +230,7 @@ public class RelationManager {
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
             StreamResult result = new StreamResult(new File(
-            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator +"Relations.xml").getPath());
+                    HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -232,23 +251,23 @@ public class RelationManager {
     }
 
     public static List<String> readAll() {
-        File file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML +File.separator +  "Relations.xml");
+        File file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
         List<String> existingNodes = new ArrayList<String>();
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         try {
             dBuilder = dbFactory.newDocumentBuilder();
-            
-            if(!file.exists()){
+
+            if (!file.exists()) {
                 file.createNewFile();
                 FileWriter fos = new FileWriter(file);
-                
-                String contents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<Relations/>";
+
+                String contents = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        + "<Relations/>";
                 fos.write(contents);
                 fos.close();
-                
+
             }
             Document doc = (Document) dBuilder.parse(file);
             doc.getDocumentElement().normalize();
@@ -281,16 +300,16 @@ public class RelationManager {
 
                     Node artefactElementNode = null;
                     Element element = null;
-                    if(artefactElementList.getLength()!=0){
+                    if (artefactElementList.getLength() != 0) {
                         artefactElementNode = (Node) artefactElementList
-                            .item(artefactElementList.getLength() - 1);
-                    Element artefact = (Element) artefactElementNode;
-                    String artefact_id = artefact.getAttribute("id");
-                    int numId = Integer.parseInt(artefact_id);
+                                .item(artefactElementList.getLength() - 1);
+                        Element artefact = (Element) artefactElementNode;
+                        String artefact_id = artefact.getAttribute("id");
+                        int numId = Integer.parseInt(artefact_id);
 
-                    relationNode = artefactElementNode.getParentNode();
+                        relationNode = artefactElementNode.getParentNode();
                     }
-                    
+
                 }
             }
             TransformerFactory transformerFactory = TransformerFactory
@@ -299,18 +318,14 @@ public class RelationManager {
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
             StreamResult result = new StreamResult(new File(
-            		HomeGUI.projectPath +File.separator + FilePropertyName.XML +File.separator 
-                                +"Relations.xml").getPath());
+                    HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator
+                    + "Relations.xml").getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(source, result);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();
@@ -326,38 +341,37 @@ public class RelationManager {
         List<String> fullDescOfRelationNode = new ArrayList<>();
         List<String> fullDescOfExistingRelationNode = new ArrayList<>();
         List<String> partial = new ArrayList<>();
-        
-        
+
         //get the full description of rlation "source relationpath target"
         for (int i = 0; i < relationNodes.size(); i += 3) {
-            partial = relationNodes.subList(i, i+3);
-            fullDescOfRelationNode.add((partial.toString().substring(1,partial.toString().length()-1)).replaceAll("\\s", ""));
-            
+            partial = relationNodes.subList(i, i + 3);
+
+            System.out.println(partial.toString());
+            String sub = (partial.toString().substring(1, partial.toString().length() - 1));
+            fullDescOfRelationNode.add(sub.replaceAll("\\s", ""));
 //            System.out.println(partial.toString());
         }
-        
+
         //get the full description of existing relation "source relationpath target"
         for (int i = 0; i < existingRelationNode.size(); i += 3) {
-            partial = existingRelationNode.subList(i, i+3);
-            fullDescOfExistingRelationNode.add((partial.toString().substring(1,partial.toString().length()-1)).replaceAll("\\s", ""));
-            
+            partial = existingRelationNode.subList(i, i + 3);
+            fullDescOfExistingRelationNode.add((partial.toString().substring(1, partial.toString().length() - 1)).replaceAll("\\s", ""));
+
 //            System.out.println(partial.toString());
         }
-        
+
         List<String> intersection = new ArrayList<>(fullDescOfExistingRelationNode);
-        
+
         //get the common relation in both relation list
         intersection.retainAll(fullDescOfRelationNode);
-        
-        
+
         //remove the intersection elements from new Relation list
         fullDescOfRelationNode.removeAll(intersection);
 
-        
         //conver into structured format one by one
         for (int i = 0; i < fullDescOfRelationNode.size(); i++) {
             String[] partialNode = fullDescOfRelationNode.get(i).split(",");
-            for (int j = 0; j < partialNode.length; j++) {     
+            for (int j = 0; j < partialNode.length; j++) {
                 relationNode3.add(partialNode[j]);
             }
         }

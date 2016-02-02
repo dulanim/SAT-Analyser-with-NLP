@@ -1,3 +1,4 @@
+
 package com.project.NLP.file.operations;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -35,6 +36,7 @@ public class FilePropertyName {
     public static final String SOURCE_CODE = "src";
     public static final String PROPERTY = "property";
     public static final String TEMP = "temp";
+    public static final String RELATION_ARTIFACT_NAME = "Relations.xml";
     public static final String UML_ARTIFACT_NAME = "UMLArtefactFile.xml";
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
     public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
@@ -182,4 +184,5 @@ public class FilePropertyName {
     			copyFolder(sourceFile, destFile);
     	}
 }
+
 

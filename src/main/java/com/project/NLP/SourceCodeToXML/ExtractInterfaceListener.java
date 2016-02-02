@@ -13,40 +13,47 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- *
+ * Walks the tree class
  * @author AARTHIKA
  */
 public class ExtractInterfaceListener extends Java8BaseListener {
-    
-    
+
     private Java8Parser parser;
     private String paramType, paramName, paramMod;
     private StringBuffer parameterList = new StringBuffer();
     private String methodReturn, methodName, methodMod, type;
-    private String className, classMod, superClass="";
+    private String className, classMod, superClass = "";
     private String fieldName, fieldMod, fieldType;
     private Element artefactElement;
     public static Node root;
     private List<String> fieldNameList = new ArrayList();
     private List<Java8Parser.InterfaceTypeContext> implementClass = new ArrayList<>();
-    private static int id = 1;
-    private static String INHERITANCE = "INHERITANCE";
-    private static String COMPOSITION = "COMPOSITION";
+    private static int classId = 1;
+    static int attrId = 1;
+    static int methodId = 1;
+
+    private static final String INHERITANCE = "INHERITANCE";
+    private static final String COMPOSITION = "COMPOSITION";
     private String currentClassID = "";
-    public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {        
+
+    public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
         this.parser = parser;
     }
 
+    /**
+     * Enters the field declaration
+     * @param ctx 
+     */
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
         super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
         // ctx.unannType().unannReferenceType().unannClassOrInterfaceType().
         type = "Field";
-        super.enterFieldDeclaration(ctx); 
+        super.enterFieldDeclaration(ctx);
         type = "Variable";
         String associationType = "COMPOSITION";
         if (ctx.unannType().unannPrimitiveType() != null) {
-            fieldType = ctx.unannType().unannPrimitiveType().getText();  
+            fieldType = ctx.unannType().unannPrimitiveType().getText();
             if (ctx.fieldModifier(0) != null) {
                 fieldMod = ctx.fieldModifier(0).getText();
             }
@@ -61,17 +68,35 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             }
         } else if (ctx.unannType().unannReferenceType() != null) {
             fieldType = ctx.unannType().unannReferenceType().getText();
-            
-            try{
-                AST.scdb.createNodeRelationship(className, currentClassID, fieldType,associationType);
-            }catch(Exception e){
-                
+            if (fieldType.equalsIgnoreCase("String") || fieldType.equalsIgnoreCase("Object")) {
+                if (ctx.fieldModifier(0) != null) {
+                    fieldMod = ctx.fieldModifier(0).getText();
+                }
+                List<Java8Parser.VariableDeclaratorContext> variables = ctx.variableDeclaratorList().variableDeclarator();
+                for (Java8Parser.VariableDeclaratorContext variable : variables) {
+                    fieldNameList.add(variable.variableDeclaratorId().getText());
+                }
+
+                for (String nameList : fieldNameList) {
+                    fieldName = nameList;
+                    writeFieldToXML();
+                }
+            } else {
+                try {
+                    AST.scdb.createNodeRelationship(className, currentClassID, fieldType, associationType);
+                } catch (Exception e) {
+
+                }
             }
-        }       
+
+        }
         fieldNameList.clear();
     }
-    public void writeFieldToXML(){
-        
+
+    /**
+     * Writes the field to xml
+     */
+    public void writeFieldToXML() {
 
         Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
         artefactElement.appendChild(artefactSubElement);
@@ -81,8 +106,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         artefactSubElement.setAttributeNode(typeAttr);
 
         Attr idAttr = WriteToXML.getDocument().createAttribute("id");
-        idAttr.setValue("SC" + id);
-        id++;
+        String attrID = currentClassID + "_F" + ExtractInterfaceListener.attrId;
+        ExtractInterfaceListener.attrId++;
+        idAttr.setValue(attrID);
         artefactSubElement.setAttributeNode(idAttr);
 
         Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
@@ -98,85 +124,92 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         artefactSubElement.setAttributeNode(fieldTypeAttr);
     }
 
+    /**
+     * Enters method declaration
+     * @param ctx 
+     */
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
-        super.enterMethodDeclaration(ctx); 
+        super.enterMethodDeclaration(ctx);
 
         if (ctx.methodModifier().isEmpty()) {
             methodMod = "package-private";
-        } else {
-            if (ctx.methodModifier().size() == 2) {
-                if (ctx.methodModifier().get(0).getText().equalsIgnoreCase("Override")) {
-                    //Ignore the method as it is not a class method
-                }
-            } else {
-                methodMod = ctx.methodModifier().get(0).getText();
-
-                System.out.println("Override" + ctx.methodModifier().get(0).getText());
-                type = "Method";
-                parameterList = new StringBuffer();
-                Java8Parser.MethodDeclaratorContext mdc = ctx.methodHeader().methodDeclarator();
-                methodName = mdc.Identifier().getText();
-                System.out.println("Method Name: " + methodName);
-                methodReturn = ctx.methodHeader().result().getText();
-                System.out.println("Method Return: " + methodReturn);
-
-                System.out.println("Method Modifier: " + methodMod);
-
-                if (mdc.formalParameterList() != null) {
-                    if (mdc.formalParameterList().formalParameters() != null) {
-                        List<Java8Parser.FormalParameterContext> param = mdc.formalParameterList().formalParameters().formalParameter();
-
-                        for (Java8Parser.FormalParameterContext par : param) {
-                            paramType = "";
-                            paramName = "";
-                            paramMod = "";
-                            getParameter(par);
-                            System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
-                            parameterList.append(paramName + ":" + paramType + ", ");
-                        }
-                    }
-
-                    paramType = "";
-                    paramName = "";
-                    paramMod = "";
-                    getParameter(mdc.formalParameterList().lastFormalParameter().formalParameter());
-                    System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
-                    parameterList.append(paramName + ":" + paramType);
-                    System.out.println(parameterList.toString());
-                }
-                Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
-                artefactElement.appendChild(artefactSubElement);
-
-                Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
-                typeAttr.setValue(type);
-                artefactSubElement.setAttributeNode(typeAttr);
-
-                Attr idAttr = WriteToXML.getDocument().createAttribute("id");
-                idAttr.setValue("SC" + id);
-                id++;
-                artefactSubElement.setAttributeNode(idAttr);
-
-                Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
-                nameAttr.setValue(methodName);
-                artefactSubElement.setAttributeNode(nameAttr);
-
-                Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");
-                visibilityAttr.setValue(methodMod);
-                artefactSubElement.setAttributeNode(visibilityAttr);
-
-                Attr fieldTypeAttr = WriteToXML.getDocument().createAttribute("returnType");
-                fieldTypeAttr.setValue(methodReturn);
-                artefactSubElement.setAttributeNode(fieldTypeAttr);
-
-                Attr parameterAttr = WriteToXML.getDocument().createAttribute("parameters");
-                parameterAttr.setValue(parameterList.toString());
-                artefactSubElement.setAttributeNode(parameterAttr);
+        } else if (ctx.methodModifier().size() == 2) {
+            if (ctx.methodModifier().get(0).getText().equalsIgnoreCase("Override")) {
+                //Ignore the method as it is not a class method
             }
+        } else {
+            methodMod = ctx.methodModifier().get(0).getText();
+
+            //System.out.println("Override" + ctx.methodModifier().get(0).getText());
+            type = "Method";
+            parameterList = new StringBuffer();
+            Java8Parser.MethodDeclaratorContext mdc = ctx.methodHeader().methodDeclarator();
+            methodName = mdc.Identifier().getText();
+            //System.out.println("Method Name: " + methodName);
+            methodReturn = ctx.methodHeader().result().getText();
+            //System.out.println("Method Return: " + methodReturn);
+
+            System.out.println("Method Modifier: " + methodMod);
+
+            if (mdc.formalParameterList() != null) {
+                if (mdc.formalParameterList().formalParameters() != null) {
+                    List<Java8Parser.FormalParameterContext> param = mdc.formalParameterList().formalParameters().formalParameter();
+
+                    for (Java8Parser.FormalParameterContext par : param) {
+                        paramType = "";
+                        paramName = "";
+                        paramMod = "";
+                        getParameter(par);
+                        //System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
+                        parameterList.append(paramName + ":" + paramType + ", ");
+                    }
+                }
+
+                paramType = "";
+                paramName = "";
+                paramMod = "";
+                getParameter(mdc.formalParameterList().lastFormalParameter().formalParameter());
+                //System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
+                parameterList.append(paramName + ":" + paramType);
+                //System.out.println(parameterList.toString());
+            }
+            Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
+            artefactElement.appendChild(artefactSubElement);
+
+            Attr typeAttr = WriteToXML.getDocument().createAttribute("type");
+            typeAttr.setValue(type);
+            artefactSubElement.setAttributeNode(typeAttr);
+
+            Attr idAttr = WriteToXML.getDocument().createAttribute("id");
+            String methodID = currentClassID + "_M" + ExtractInterfaceListener.methodId;
+            ExtractInterfaceListener.methodId++;
+            idAttr.setValue(methodID);
+            artefactSubElement.setAttributeNode(idAttr);
+
+            Attr nameAttr = WriteToXML.getDocument().createAttribute("name");
+            nameAttr.setValue(methodName);
+            artefactSubElement.setAttributeNode(nameAttr);
+
+            Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");
+            visibilityAttr.setValue(methodMod);
+            artefactSubElement.setAttributeNode(visibilityAttr);
+
+            Attr fieldTypeAttr = WriteToXML.getDocument().createAttribute("returnType");
+            fieldTypeAttr.setValue(methodReturn);
+            artefactSubElement.setAttributeNode(fieldTypeAttr);
+
+            Attr parameterAttr = WriteToXML.getDocument().createAttribute("parameters");
+            parameterAttr.setValue(parameterList.toString());
+            artefactSubElement.setAttributeNode(parameterAttr);
         }
 
     }
 
+    /**
+     * Returns the paramter
+     * @param par 
+     */
     private void getParameter(Java8Parser.FormalParameterContext par) {
         int children = par.getChildCount();
         if (children == 2) {
@@ -192,12 +225,17 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     @Override
     public void exitClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
 
-             
     }
 
+    /**
+     * Enters the class declaration
+     * @param ctx 
+     */
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
         type = "Class";
+        attrId = 1;
+        methodId = 1;
         String inheritanceType = "INHERITANCE";
         className = ctx.normalClassDeclaration().Identifier().getText();
 
@@ -207,7 +245,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             classMod = ctx.normalClassDeclaration().classModifier().get(0).getText();
         }
 
-        System.out.println("Class: " + className + " Modifier: " + classMod);
+        //System.out.println("Class: " + className + " Modifier: " + classMod);
 
         if (ctx.normalClassDeclaration().superclass() != null) {
             superClass = ctx.normalClassDeclaration().superclass().getChild(1).getText();
@@ -215,27 +253,14 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         if (ctx.normalClassDeclaration().superinterfaces() != null) {
             implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
         }
-        currentClassID = "SC" + id;
-        try{
-            AST.scdb.createNodeRelationship(className, currentClassID, superClass,inheritanceType);
-        }catch(Exception e){
+        currentClassID = "SC" + classId;
+        try {
+            AST.scdb.createNodeRelationship(className, currentClassID, superClass, inheritanceType);
+        } catch (Exception e) {
         }
-        id++;
+        classId++;
 
-//implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
-
-        //
-        
-        /*Element artefact  = WriteToXML.getDocument().createElement("Artefact");
-        AST.artefacts.appendChild(artefact);
-        Attr rootType = WriteToXML.getDocument().createAttribute("type");
-        rootType.setValue("SourceCode");
-        artefactElement.setAttributeNode(rootType);        
-        */
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
-        //AST.artefact.appendChild(artefactElement);
-       // artefact.appendChild(artefactElement);
-
         root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0).getParentNode();
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root.appendChild(artefactElement);
@@ -249,7 +274,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
         Attr idAttr = WriteToXML.getDocument().createAttribute("id");
         idAttr.setValue(currentClassID);
-        
+
         artefactElement.setAttributeNode(idAttr);
 
         Attr visibilityAttr = WriteToXML.getDocument().createAttribute("visibility");

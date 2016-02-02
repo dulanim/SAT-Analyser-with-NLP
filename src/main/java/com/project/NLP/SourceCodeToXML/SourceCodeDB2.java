@@ -51,6 +51,9 @@ public class SourceCodeDB2 {
         createNodes();
     }
 
+    /**
+     * Creates the node labels and class nodes 
+     */
     public static void createNodes() {
         try (Transaction tx = graphDb.beginTx()) {
             firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
@@ -60,10 +63,18 @@ public class SourceCodeDB2 {
 
     }
 
+    /**
+     * Shutdowns the graphdb
+     */
     public void shutdownDB() {
         graphDb.shutdown();
     }
 
+    /**
+     * Returns the node with a given name
+     * @param name
+     * @return 
+     */
     public static Node getNode(String name) {
         Node node = null;
         try (Transaction tx = graphDb.beginTx()) {
@@ -85,20 +96,28 @@ public class SourceCodeDB2 {
         return node;
     }
 
+    /**
+     * Creates the node relationship
+     * @param class1
+     * @param classID1
+     * @param class2
+     * @param relationshipType 
+     */
     public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType) {
         try (Transaction tx = graphDb.beginTx()) {
-
+            String attrID = classID1+"_F"+ ExtractInterfaceListener.attrId;
+            ExtractInterfaceListener.attrId++;
             firstNode = getNode(class1);
             Relationship relation;
             if (firstNode != null) {
                 String id = firstNode.getProperty("class_id").toString();
                 if (id.isEmpty()) {
-                    firstNode.setProperty("class_id", classID1);
+                    firstNode.setProperty("class_id", attrID);
                 }
             } else {
                 firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
                 firstNode.setProperty("className", class1);
-                firstNode.setProperty("class_id", classID1);
+                firstNode.setProperty("class_id", attrID);
             }
             if (!class2.isEmpty()) {
                 secondNode = getNode(class2);
@@ -149,6 +168,10 @@ public class SourceCodeDB2 {
         } 
     }
 
+    /**
+     * Gets the inheritance from relationship data
+     * @return 
+     */
     public ArrayList getInheritanceRelationshipData() {
         ArrayList<Map> relationshipList = new ArrayList<>();
         Map<String, String> map;
@@ -169,6 +192,10 @@ public class SourceCodeDB2 {
         return relationshipList;
     }
 
+    /**
+     * Gets the association from relationship data
+     * @return 
+     */
     public ArrayList getAssociationRelationshipData() {
         ArrayList<Map> relationshipList = new ArrayList<>();
         Map<String, String> map;

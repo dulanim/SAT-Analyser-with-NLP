@@ -16,14 +16,14 @@ import java.io.File;
  */
 public class PropertyFile {
 
-    public static String requirementXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\RequirementArtefactFile.xml";
-    public static String umlXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\UMLArtefactFile.xml";
-    public static String sourceXMLPath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\SourceCodeArtefactFile.xml";
-    public static final String wordNetDbDirectory = "C:/Program Files (x86)/WordNet/2.1/dict";
-    public static String filePath = StaticData.workspace+File.separator;
-    public static String xmlFilePath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files";
-    public static String docsFilePath = System.getProperty("user.home")+"\\SATAnalyzer\\XML Files\\";
-    public static final String imagePath = System.getProperty("user.dir")+"\\img"; // img folder in
+    public static String requirementXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"RequirementArtefactFile.xml";
+    public static String umlXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"UMLArtefactFile.xml";
+    public static String sourceXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"SourceCodeArtefactFile.xml";
+    public static final String wordNetDbDirectory = System.getProperty("user.home")+File.separator+"WordNet"+File.separator+"dict";
+    public static String filePath = StaticData.workspace;
+    public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
+    public static String docsFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator;
+    public static final String imagePath = System.getProperty("user.dir")+File.separator+"img"; // img folder in
     public static String configuration_file_path = System.getProperty("user.home")
                 +File.separator + "sat_configuration.xml";
     // project
@@ -33,12 +33,11 @@ public class PropertyFile {
     private static String relationshipXMLPath = null;
     public static String graphType = null;
     private static VisualizeGraph visual = null;
-    public static final String testFilePath = "E:/SATWork/";
-    public static final String testXmlFilePath = "E:/ATOM/test/";
-    public static final String testDb = "E:/SATWork/Test/Test.graphDb";
-    public static final String testGraphFile = "E:/SATWork/Test/Test.gexf";
-    public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator +
-            FilePropertyName.XML;
+    public static final String testFilePath =System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator;
+    public static final String testXmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"test"+File.separator;
+    public static final String testDb = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"Test"+File.separator+"Test.graphdb";
+    public static final String testGraphFile = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"Test"+File.separator+"Test.gexf";
+    public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator + FilePropertyName.XML;
   
     public static String getProjectName() {
         return projectName;
@@ -125,7 +124,8 @@ public class PropertyFile {
     }
 
     public static String getImagePath() {
-        return imagePath;
+//        return imagePath;
+        return "";
     }
 
     public static String getTestFilePath() {

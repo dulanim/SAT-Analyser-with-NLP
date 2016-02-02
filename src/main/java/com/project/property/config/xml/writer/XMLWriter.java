@@ -59,6 +59,7 @@ public class XMLWriter {
                 writer = new XMLWriter(status);
             return writer;
         }
+        
         private void init(){
             
             
@@ -86,7 +87,8 @@ public class XMLWriter {
                 }
            
         }
-	private void create_root(){
+	
+        private void create_root(){
 		
 		//FileWriter reader = new F
                 Element root_element_configs = doc.createElement("Configs");
@@ -95,8 +97,10 @@ public class XMLWriter {
                 root_element_configs.appendChild(wrkspacesElmnt);
                 createDefaultNode();//adding default to configs node
 	}
-	public void modifyStatus(Boolean active,String path){
+	
+        public void modifyStatus(Boolean active,String path){
 		//switch project path
+            boolean modified = false;
 		try {
 			NodeList nList = doc.getElementsByTagName("Workspace");
 			for(int i=0;i<nList.getLength();i++){
@@ -108,15 +112,22 @@ public class XMLWriter {
                                     NamedNodeMap attr = element.getAttributes();
                                     Node nodeAttr = attr.getNamedItem("active");
                                     nodeAttr.setTextContent(Boolean.toString(active));
+                                    modified = true;
                                     call_done();
-                                    
-				}else{
-                                    NamedNodeMap attr = element.getAttributes();
-                                    Node nodeAttr = attr.getNamedItem("active");
-                                    nodeAttr.setTextContent(Boolean.toString(false));
-                                    call_done();
-                                }
-			}	
+				}
+			}
+                        if(!modified){
+//                            nList = doc.getElementsByTagName("Workspace");
+//                            Element element = (Element)nList.item(0);
+//                            
+//                            NamedNodeMap attr = element.getAttributes();
+//                            Node nodeAttr = attr.getNamedItem("active");
+//                            nodeAttr.setTextContent(Boolean.toString(false));
+                            
+                            createWorkspaceNode(path, Boolean.toString(active));
+
+                        }
+                        
 		}catch(Exception e){
 			
 		}
@@ -161,7 +172,8 @@ public class XMLWriter {
                 call_done();
            
         }
-	public void createWorkspaceNode(String path,String active){
+	
+        public void createWorkspaceNode(String path,String active){
 		//create main project path
 		//Node root = doc.getElementsByTagName("Configs").item(0);
 	
@@ -185,7 +197,8 @@ public class XMLWriter {
         
         call_done();
 	}
-	public void deleteProjectFolder(String path,String folderName){
+	
+        public void deleteProjectFolder(String path,String folderName){
 		try {
 			NodeList nList = doc.getElementsByTagName("Config");
 			for(int i=0;i<nList.getLength();i++){
@@ -262,7 +275,6 @@ public class XMLWriter {
 		}
 	}
 	
-	
 	public void createProjectWorksapce(String path){
 		/*
 		 * create a projects node like this 
@@ -286,9 +298,6 @@ public class XMLWriter {
 		    call_done();
 	}
 	
-        
-       
-        
         public void setVisibleFilePath(String wrkspace,String path){
             
              NodeList wrkspaceList = doc.getElementsByTagName("Projects");
@@ -309,7 +318,8 @@ public class XMLWriter {
                 }
              }
         }
-	public boolean isWorkspaceExists(String wrkspace){
+	
+        public boolean isWorkspaceExists(String wrkspace){
 		/*
 		 * @wrkspace /home/shiyam/wrkspace
 		 * check it exists or not in projects node in sat_configuration.xml
@@ -344,7 +354,8 @@ public class XMLWriter {
 		String wrkspace = projectPath.substring(0,end);
 		return wrkspace;
 	}
-	public void createProject(String projectPath){
+	
+        public void createProject(String projectPath){
 			/*
 			 * @projectPath is /home/documents/workspace/Anduril
 			 * it actually create a project node inside the workspace
@@ -490,7 +501,8 @@ public class XMLWriter {
 			}
 		}
 	}
-	public void setProjectStatus(String projectPath,String sub,boolean status){
+	
+        public void setProjectStatus(String projectPath,String sub,boolean status){
 		
 		NodeList projects = doc.getElementsByTagName("Project");
 		
@@ -510,7 +522,8 @@ public class XMLWriter {
 		}
 		
 	}
-	public void call_done(){
+	
+        public void call_done(){
 		try{
 			
 		// write the content into xml file
@@ -591,7 +604,8 @@ public class XMLWriter {
 		
 		return openedFiles;
 	}
-	public static void main(String args[]){
+	
+        public static void main(String args[]){
 		XMLWriter writer = new XMLWriter();
 //		writer.createProjectWorksapce("/home/shiyam");
 //		writer.createProject("/home/shiyam/RamProject");
@@ -610,6 +624,5 @@ public class XMLWriter {
 //                    System.out.println(file);
 //                }
 	}
-        
         
 }

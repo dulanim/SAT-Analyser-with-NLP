@@ -21,7 +21,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 /**
- *
+ * Class for creating the abstract syntax tree
  * @author AARTHIKA
  */
 public class AST {
@@ -31,38 +31,36 @@ public class AST {
     private static Element intraConnections;
     private AST ast;
 
-       
-
     /**
-     * Invokes when the user browses the source code project folder 
-     * @param fileName 
+     * Invokes when the user browses the source code project folder
+     *
+     * @param filePath
+     * @throws java.lang.Exception
      */
-    public void startSourceCodeConversion(String filePath) throws Exception{
+    public void startSourceCodeConversion(String filePath) throws Exception {
         ast = new AST();
         scdb = new SourceCodeDB2();
         AccessProject project = new AccessProject();
         WriteToXML.createDocument();
-        if (project.javaFilesExists(new File(filePath))) {
+        if (AccessProject.javaFilesExists(new File(filePath))) {
             List<File> files = project.getFiles();
-            for (File file : files) {
-                System.out.println("File Path - " + file.getAbsolutePath());
-                ast.convertFileToXML(file.getAbsolutePath());     
-                System.out.println("Done for: "+file.getAbsolutePath());
+            for (File projectFile : files) {
+                //System.out.println("File Path - " + projectFile.getAbsolutePath());
+                ast.sourceCodeTreeWalker(projectFile.getAbsolutePath());
+                //System.out.println("Done for: " + projectFile.getAbsolutePath());
                 ast.exitConverter();
             }
             scdb.shutdownDB();
-            
-        }
-        else{
+        } else {
             JOptionPane.showMessageDialog(null, "Incorrect Path. The specified path does not contain any java files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     /**
-     * 
-     * @param fileName 
+     * creates the tree for walking
+     * @param fileName
      */
-    public void convertFileToXML(String fileName) {
+    public void sourceCodeTreeWalker(String fileName) {
         try {
             Java8Lexer lexer = new Java8Lexer(new ANTLRFileStream(fileName.trim()));
             CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -83,10 +81,9 @@ public class AST {
      * Exits the conversion operation by creating the xml file.
      */
     public void exitConverter() {
-        System.out.println("Exiting");
+        //System.out.println("Exiting");
         intraConnections = WriteToXML.getDocument().createElement("IntraConnections");
         root.appendChild(intraConnections);
-
         ArrayList<Map> relationshipList = AST.scdb.getInheritanceRelationshipData();
         addRelationsToXML(relationshipList, "Inheritance");
         relationshipList.clear();
@@ -94,13 +91,13 @@ public class AST {
         addRelationsToXML(relationshipList, "Composition");
         WriteToXML.createXML();
         //shutdownDB();
-        
+
     }
 
     /**
-     * 
+     *
      * @param relationshipList
-     * @param type 
+     * @param type
      */
     public void addRelationsToXML(ArrayList<Map> relationshipList, String type) {
         for (Map relation : relationshipList) {
@@ -120,11 +117,8 @@ public class AST {
             connections.setAttributeNode(endAttr);
         }
     }
-    
-    
 
     /*public static void main(String[] args) throws IOException {
         new AST().startSourceCodeConversion("D:\\myVirtusa\\src");
     }*/
-    
 }

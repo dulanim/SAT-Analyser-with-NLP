@@ -22,7 +22,6 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -43,37 +42,40 @@ import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.common.PropertyFile;
+import com.project.traceability.staticdata.StaticData;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.swt.custom.CTabFolderAdapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.TableItem;
 
 public class NewFileWindow {
-        public static StyledText codeText;
+    public static StyledText codeText;
 	static Shell shell;
 	private Text text;
 	static Path path;
 	public static String localFilePath;
 	static String[] selectedFiles;
-        String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
+	static int filePostion = 0;
+    String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
 	static String textString;
 	FileDialog fileDialog;
 	private Text text_1;
-        public static String selectedProjectPath;
-        public static Set<String> openedFiles = new HashSet<>();
+    public static String selectedProjectPath;
+    public static Set<String> openedFiles = new HashSet<>();
 
 	/**
 	 * Launch the application.
@@ -257,6 +259,7 @@ public class NewFileWindow {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void createTabLayout(String fileName,boolean flag) {
 		HomeGUI.tabFolder.setVisible(true);
 
@@ -297,7 +300,7 @@ public class NewFileWindow {
                 codeText.setEditable(false);
 		File file = new File(localFilePath + fileName);
                 
-                openedFiles.add(file.getAbsolutePath());
+        openedFiles.add(file.getAbsolutePath());
                 
                 
                 tabItem.setToolTipText(file.getPath());
@@ -317,8 +320,11 @@ public class NewFileWindow {
                                 while(itertor.hasNext()){
                                    String filePath = itertor.next();
                                    if(recentfileCount<6 && !existing.contains(filePath)){
-                                        MenuItem mntmRecents = new MenuItem(HomeGUI.menu_recent, SWT.CASCADE);
+                                        final MenuItem mntmRecents = new MenuItem(HomeGUI.menu_recent, SWT.CASCADE);
                                         mntmRecents.addSelectionListener(new SelectionAdapter() {
+                                            
+                                            String selectedFile = mntmRecents.getText();
+                                           
                                         });
                                         mntmRecents.setText(filePath);
                                         
@@ -372,8 +378,8 @@ public class NewFileWindow {
 		new UndoRedoImpl(codeText);
 		composite.setData(codeText);
 		tabItem.setControl(composite);
-                tabItem.setToolTipText(file.getPath());
-                final CTabItem tabItemFinal = tabItem;
+        tabItem.setToolTipText(file.getPath());
+        final CTabItem tabItemFinal = tabItem;
                 
                 // Add an event listener to write the selected tab to stdout
                 // Add a listener to get the close button on each tab
@@ -381,35 +387,28 @@ public class NewFileWindow {
                   public void itemClosed(CTabFolderEvent event) {
                       
                        Point pt = new Point(event.x, event.y);
-                       
-                      if (event.item.equals(tabItem)) {
                           
-                            event.doit = true;
-                            CTabItem itemsThen[] = HomeGUI.tabFolder.getItems();
-                            
-                            
-                            java.util.List<CTabItem> itemListThen =  Arrays.asList(itemsThen);
-                            java.util.List<String> remainingFiles = new ArrayList<>();
-                            
-                              for(int i=0;i<itemListThen.size();i++){
-                                  
-                                  CTabItem item = itemListThen.get(i);
-                                  String infos = item.getToolTipText();
-                                  remainingFiles.add(infos);
-                              }
-                              
-                             openedFiles.removeAll(remainingFiles);//get removed files
-                             
-                             for(String file:openedFiles){
+                       CTabItem itemsThen[] = HomeGUI.tabFolder.getItems();
+
+                       event.doit = true;
+                       java.util.List<CTabItem> itemListThen =  Arrays.asList(itemsThen);
+                       List<String> remainingFiles = new ArrayList<>();
+                       Set<String> opened = new HashSet<>(openedFiles);
+                       for(int i=0;i<itemListThen.size();i++){
+                             CTabItem item = itemListThen.get(i);
+                             String infos = item.getToolTipText();
+                             remainingFiles.add(infos);
+                       }
+                       opened.removeAll(remainingFiles);//get removed files
+                       openedFiles.removeAll(opened);
+                       for(String file:opened){
                                  //update when file clased
-                                  XMLWriter xmlWriter = XMLWriter.getXMLWriterInstance();
-                                  xmlWriter.changeFileStatus(file, false);
-                             }
-                             openedFiles.clear();
-                             openedFiles.addAll(remainingFiles);
-                           
-                            
-                    }
+                         XMLWriter xmlWriter = XMLWriter.getXMLWriterInstance();
+                         xmlWriter.changeFileStatus(file, false);
+                       }
+//                        openedFiles.clear();
+//                        openedFiles.addAll(remainingFiles);
+
                   }
                   
                   public void itemSelected(CTabFolderEvent event){
@@ -433,8 +432,23 @@ public class NewFileWindow {
                     public void handleEvent(Event event) {
                       Point pt = new Point(event.x, event.y);
                       CTabItem item = HomeGUI.tabFolder.getItem(pt);
-                      if(item != null)
-                        HomeGUI.activeTab.put(true,item.getToolTipText().toString());
+                      XMLWriter writer = XMLWriter.getXMLWriterInstance();
+                    if (item != null) {
+
+                     //   String itemTitle = item.getText();
+                        if(HomeGUI.activeTab != null){
+                            String itemTitle = item.getText();
+                            if(!itemTitle.contains("Compare")){
+                                HomeGUI.activeTab.put(true, item.getToolTipText());
+                                 String filePath = item.getToolTipText();
+                                 writer.setVisibleFilePath(StaticData.workspace, filePath);
+                            }
+                        }
+
+
+                    } else {
+                        writer.setVisibleFilePath(StaticData.workspace, "");
+                    }
                     }
                 });
 	}

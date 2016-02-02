@@ -33,13 +33,18 @@ import org.neo4j.tooling.GlobalGraphOperations;
  * Model to add data to Neo4j graph DB.
  *
  * @author Thanu
+<<<<<<< HEAD
  * @author AARTHIKA
  *
+=======
+ * @author Aarthika
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
  */
 public class GraphDB {
 
     Index<Node> artefacts;
     Index<Relationship> edges;
+    private String fileType;
 
     /**
      * Define relationship type.
@@ -53,6 +58,7 @@ public class GraphDB {
         UML_CLASS_TO_SOURCE_CLASS("UML Class To Source Class"), UML_ATTRIBUTE_TO_SOURCE_FIELD("UMLAttribute To Source Field"), UML_OPERATION_TO_SOURCE_METHOD("UMLOperation To Source Method"),
         REQ_CLASS_TO_SOURCE_CLASS("Req Class To Source Class"), REQ_METHOD_TO_SOURCE_METHOD("Req Method To Source Method"), REQ_FIELD_TO_SOURCE_FIELD("Req Field To Source Field"),
         REQ_CLASS_TO_UML_CLASS("Req Class To UML Class"), REQ_METHOD_TO_UML_METHOD("Req Method To UMLOperation"), REQ_FIELD_TO_UML_ATTRIBUTE("Req Field To UMLAttribute");
+
         private final String value;
 
         private RelTypes(String val) {
@@ -90,6 +96,7 @@ public class GraphDB {
 
         CLASS("Class"), FIELD("Field"), METHOD("Method"), UMLATTRIBUTE(
                 "UMLAttribute"), UMLOPERATION("UMLOperation");
+
         private final String value;
 
         private NodeTypes(String val) {
@@ -116,16 +123,26 @@ public class GraphDB {
             return nodeType;
         }
     }
+    
     GraphDatabaseService graphDb;
     Relationship relationship;
+    
+    public void setGraphDb(GraphDatabaseService db){
+        this.graphDb = db;
+    }
 
     /**
      * Method to create an new Neo4j db or to open an existing Neo4j db
      *
      */
     public void initiateGraphDB() {
+<<<<<<< HEAD
 
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".graphdb").newGraphDatabase();
+=======
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                + ".graphdb").newGraphDatabase();
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
         Transaction tx = graphDb.beginTx();
 
         try {
@@ -137,14 +154,23 @@ public class GraphDB {
         registerShutdownHook(graphDb);
     }
 
+    /**
+     * Creates a new node into the database
+     * @param myLabel
+     * @param artefacts
+     * @param edges
+     * @param artefactElement 
+     */
     public void addNewNodeToDB(Label myLabel, Index<Node> artefacts, Index<Relationship> edges, ArtefactElement artefactElement) {
         Node n = graphDb.createNode();
 
         n.addLabel(myLabel);
-        n.setProperty("ID", artefactElement.getArtefactElementId());
-        n.setProperty("Name", artefactElement.getName());
-        n.setProperty("Type", artefactElement.getType());
-        n.setProperty("Visibility", artefactElement.getVisibility());
+        String lbl = getArtefact(artefactElement.getArtefactElementId());
+        n.setProperty("Artefact", lbl);
+        addID(artefactElement, n);
+        addName(artefactElement, n);
+        addType(artefactElement, n);
+        addVisibility(artefactElement, n);
         artefacts.add(n, "ID", n.getProperty("ID"));
         List<ArtefactSubElement> artefactsSubElements = artefactElement
                 .getArtefactSubElements();
@@ -162,48 +188,103 @@ public class GraphDB {
         }
     }
 
+    /**
+     * Identifies the type of artefact
+     * @param id
+     * @return 
+     */
+    public String getArtefact(String id) {
+        String lbl = "";
+        switch (id.charAt(0)) {
+            case 'R':
+                lbl = "Requirement";
+                break;
+            case 'S':
+                lbl = "Source";
+                break;
+            case 'D':
+                lbl = "Diagram";
+                break;
+            default:
+                break;
+        }
+        return lbl;
+    }
+
+    /**
+     * Adds the visibility of a node
+     * @param artefactElement
+     * @param n 
+     */
+    public void addVisibility(ArtefactElement artefactElement, Node n) {
+        if (null == artefactElement.getVisibility()) {
+            n.setProperty("Visibility", "");
+        } else {
+            n.setProperty("Visibility", artefactElement.getVisibility());
+        }
+    }
+
+    /**
+     * Adds the type of a node
+     * @param artefactElement
+     * @param n 
+     */
+    public void addType(ArtefactElement artefactElement, Node n) {
+        if (null == artefactElement.getType()) {
+            n.setProperty("Type", "");
+        } else {
+            n.setProperty("Type", artefactElement.getType());
+        }
+    }
+
+    /**
+     * Adds the name of a node
+     * @param artefactElement
+     * @param n 
+     */
+    public void addName(ArtefactElement artefactElement, Node n) {
+        if (null == artefactElement.getName()) {
+            n.setProperty("Name", "");
+        } else {
+            n.setProperty("Name", artefactElement.getName());
+        }
+    }
+
+    /**
+     * Adds the id of a node
+     * @param artefactElement
+     * @param n 
+     */
+    public void addID(ArtefactElement artefactElement, Node n) {
+        if (null == artefactElement.getArtefactElementId()) {
+            n.setProperty("ID", "");
+        } else {
+            n.setProperty("ID", artefactElement.getArtefactElementId());
+        }
+    }
+
+    /**
+     * Creates a new sub node into the database
+     * @param temp
+     * @param artefacts
+     * @param n
+     * @param edges 
+     */
     public void addNewSubNodeToDB(ArtefactSubElement temp, Index<Node> artefacts, Node n, Index<Relationship> edges) {
         Label myLabel;
         Node m = graphDb.createNode();
         myLabel = DynamicLabel.label(temp.getType());
         m.addLabel(myLabel);
-        m.setProperty("ID", temp.getSubElementId());
-        m.setProperty("Name", temp.getName());
-        m.setProperty("Type", temp.getType());
-        if (null != temp.getVisibility()) {
-            m.setProperty("Visibility", temp.getVisibility());
-        } else {
-            m.setProperty("Visibility", "");
-        }
+        String lbl = getArtefact(temp.getSubElementId());
+        m.setProperty("Artefact", lbl);      
+        addSubID(temp, m);
+        addSubName(temp, m);
+        addSubType(temp, m);
+        addSubVisibility(temp, m);
         if (temp.getType().equalsIgnoreCase("UMLOperation")
                 || temp.getType().equalsIgnoreCase("Method")) {
-            MethodModel mtemp = (MethodModel) temp;
-            if (null != mtemp.getReturnType()) {
-                m.setProperty("Return Type",
-                        mtemp.getReturnType());
-            } else {
-                m.setProperty("Return Type", "");
-            }
-            if (null != mtemp.getParameters()) {
-                List<ParameterModel> params = mtemp
-                        .getParameters();
-                String parameters = "";
-                for (int p = 0; p < params.size(); p++) {
-                    parameters += params.get(p).getName() + ":"
-                            + params.get(p).getVariableType();
-                    if (p < params.size() - 1) {
-                        parameters += ",";
-                    }
-                }
-                m.setProperty("Parameters", parameters);
-            } else {
-                m.setProperty("Parameters", "");
-            }
-            if (null != mtemp.getContent()) {
-                m.setProperty("Content", mtemp.getContent());
-            } else {
-                m.setProperty("Content", "");
-            }
+            addSubMethod(temp, m);
+
         } else if (temp.getType().equalsIgnoreCase(
                 "UMLAttribute")
                 || temp.getType().equalsIgnoreCase("Field")) {
@@ -225,6 +306,103 @@ public class GraphDB {
     }
 
     /**
+     * Adds the variable of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubVariable(ArtefactSubElement temp, Node m) {
+        AttributeModel mtemp = (AttributeModel) temp;
+        if (null != mtemp.getVariableType()) {
+            m.setProperty("Variable Type",
+                    mtemp.getVariableType());
+        } else {
+            m.setProperty("Variable Type", "");
+        }
+    }
+
+    /**
+     * Adds the method of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubMethod(ArtefactSubElement temp, Node m) {
+        MethodModel mtemp = (MethodModel) temp;
+        if (null != mtemp.getReturnType()) {
+            m.setProperty("Return Type",
+                    mtemp.getReturnType());
+        } else {
+            m.setProperty("Return Type", "");
+        }
+        if (null != mtemp.getParameters()) {
+            List<ParameterModel> params = mtemp
+                    .getParameters();
+            String parameters = "";
+            for (int p = 0; p < params.size(); p++) {
+                parameters += params.get(p).getName() + ":"
+                        + params.get(p).getVariableType();
+                if (p < params.size() - 1) {
+                    parameters += ",";
+                }
+            }
+            m.setProperty("Parameters", parameters);
+        } else {
+            m.setProperty("Parameters", "");
+        }
+    }
+
+    /**
+     * Adds the visibility of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubVisibility(ArtefactSubElement temp, Node m) {
+        if (null != temp.getVisibility()) {
+            m.setProperty("Visibility", temp.getVisibility());
+        } else {
+            m.setProperty("Visibility", "");
+        }
+    }
+
+    /**
+     * Adds the type of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubType(ArtefactSubElement temp, Node m) {
+        if (null == temp.getType()) {
+            m.setProperty("Type", "");
+        } else {
+            m.setProperty("Type", temp.getType());
+        }
+    }
+
+    /**
+     * Adds the name of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubName(ArtefactSubElement temp, Node m) {
+        if (null == temp.getName()) {
+            m.setProperty("Name", "");
+        } else {
+            m.setProperty("Name", temp.getName());
+        }
+    }
+
+    /**
+     * Adds the id of a sub node
+     * @param temp
+     * @param m 
+     */
+    public void addSubID(ArtefactSubElement temp, Node m) {
+        if (null == temp.getSubElementId()) {
+            m.setProperty("ID", "");
+        } else {
+            m.setProperty("ID", temp.getSubElementId());
+        }
+    }
+
+    /**
      * Updates the changes in the artefact element to the database.
      *
      * @param node
@@ -234,71 +412,77 @@ public class GraphDB {
         //Updates if there are any change in the name of the artefact element
         if (!node.getProperty("Name").equals(
                 artefactElement.getName())) {
-            node.setProperty("Name", artefactElement.getName());
-            //System.out.println("Node name updated " + artefactElement.getName());
+            addName(artefactElement, node);
         }//Updates if there are any change in the Type of the artefact element 
         if (!node.getProperty("Type").equals(
                 artefactElement.getType())) {
+<<<<<<< HEAD
             node.setProperty("Type", artefactElement.getType());
             // System.out.println("Node name updated " + artefactElement.getType());
             //System.out.println("Node type updated");
+=======
+            addType(artefactElement, node);
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
         } //Updates if there are any change in the visibility of the artefact element
         if (!node.getProperty("Visibility").equals(
                 artefactElement.getVisibility())) {
-            node.setProperty("Visibility", artefactElement.getVisibility());
-            //System.out.println("Node visibility updated " + artefactElement.getType());
+            addVisibility(artefactElement, node);
         }
         //Identifies if any changes (new/update) hve occured in the sub artefact element of the given artefact element
-        Iterator<Relationship> relations = node
-                .getRelationships(RelTypes.SUB_ELEMENT)
-                .iterator();
+
         List<ArtefactSubElement> artefactsSubElements = artefactElement
                 .getArtefactSubElements();
 
-        while (relations.hasNext()) {
-            Node test = relations.next().getOtherNode(node);
-            for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
+        boolean subElementExist = false;
+        parent:
+        for (ArtefactSubElement artefactsSubElement : artefactsSubElements) {
+            Iterator<Relationship> relations = node
+                    .getRelationships(RelTypes.SUB_ELEMENT)
+                    .iterator();
+            child:
+            while (relations.hasNext()) {
+                Node test = relations.next().getOtherNode(node);
                 if (test.getProperty("ID").equals(artefactsSubElement.getSubElementId())) {
                     updateSubNodeToDB(test, artefactsSubElement);
-                    //System.out.println("SubElement exists in db.....");
-                } else {
-                    //addNewSubNodeToDB(ArtefactSubElement temp, Index<Node> artefacts, Node n, Index<Relationship> edges)
-                    addNewSubNodeToDB(artefactsSubElement, artefacts, node, edges);
+                    subElementExist = true;
+                    break;
                 }
             }
+            if (!subElementExist) {
+                addNewSubNodeToDB(artefactsSubElement, artefacts, node, edges);
+            }
+            subElementExist = false;
         }
-        //System.out.println("Node already exists.....");
-
     }
 
+    /**
+     * Updates the changes in the artefact sub element to the database.
+     * @param subNode
+     * @param temp 
+     */
     public void updateSubNodeToDB(Node subNode, ArtefactSubElement temp) {
         //Updates if there are any change in the Name of the artefact sub element 
-        //System.out.println("Updating.." + subNode.getProperty("Name"));
         if (!subNode.getProperty("Name").equals(
                 temp.getName())) {
-            subNode.setProperty("Name", temp.getName());
-            //System.out.println("Node name updated " + temp.getName());
+            addSubName(temp, subNode);
         }//Updates if there are any change in the Type of the artefact sub element  
         if (!subNode.getProperty("Type").equals(
                 temp.getType())) {
-            subNode.setProperty("Type", temp.getType());
-            //System.out.println("Node name updated " + temp.getType());
-            //System.out.println("Node type updated");
+            addSubType(temp, subNode);
         }//Updates if there are any change in the Visibility of the artefact sub element 
         if (null == subNode.getProperty("Visibility") || !subNode.getProperty("Visibility").equals(
                 temp.getVisibility())) {
             if (null != temp.getVisibility()) {
-                subNode.setProperty("Visibility", temp.getVisibility());
-                //System.out.println("Node visibility updated " + temp.getType());
+                addSubVisibility(temp, subNode);
             }
         }
-
         //Checks if it is a method
         if (temp.getType().equalsIgnoreCase("UMLOperation")
                 || temp.getType().equalsIgnoreCase("Method")) {
             //Updates if there are any change in the parameters of the artefact sub element
-
+            addSubMethod(temp, subNode);
             //Updates if there are any change in the return type of the artefact sub element  
+<<<<<<< HEAD
             if (null == subNode.getProperty("Return Type") || !subNode.getProperty("Return Type").equals(
                     temp.getVisibility())) {
                 if (null != temp.getReturnType()) {
@@ -334,14 +518,16 @@ public class GraphDB {
                 } else {
                     subNode.setProperty("Content", "");
                 }
+=======
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
 
-            }
         }
         //Checks if it is a variable
         if (temp.getType().equalsIgnoreCase(
                 "UMLAttribute")
                 || temp.getType().equalsIgnoreCase("Field")) {
             //Updates if there are any change in the variable type of the artefact sub element 
+<<<<<<< HEAD
             if (null == subNode.getProperty("Variable Type") || !subNode.getProperty("Variable Type").equals(
                     ((AttributeModel) temp).getVariableType())) {
                 if (null != ((AttributeModel) temp).getVariableType()) {
@@ -352,27 +538,31 @@ public class GraphDB {
                 }
 
             }
+=======
+            addSubVariable(temp, subNode);
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
         }
     }
 
     /**
      * Method to add artefact elements to db
      *
+     * @param fileType
      * @param aretefactElements ArtefactElements map
      */
-    public void addNodeToGraphDB(Map<String, ArtefactElement> aretefactElements) {
+    public void addNodeToGraphDB(String fileType, Map<String, ArtefactElement> aretefactElements) {
+        this.fileType = fileType;
         Transaction tx = graphDb.beginTx();
         try {
-
             Iterator<Entry<String, ArtefactElement>> iterator = aretefactElements
                     .entrySet().iterator();
-
             while (iterator.hasNext()) {
 
                 Map.Entry pairs = iterator.next();
                 ArtefactElement artefactElement = (ArtefactElement) pairs
                         .getValue();
-                Label myLabel = DynamicLabel.label(artefactElement.getType());
+                String lbl = getArtfefact(artefactElement);
+                Label myLabel = DynamicLabel.label(lbl);
 
                 IndexManager index = graphDb.index();
                 artefacts = index.forNodes("ArtefactElement");
@@ -388,9 +578,53 @@ public class GraphDB {
                 }
             }
             tx.success();
-
         } finally {
             tx.finish();
+        }
+    }
+
+    /**
+     * Returns the artefact type
+     * @param artefactElement
+     * @return 
+     */
+    public String getArtfefact(ArtefactElement artefactElement) {
+        String lbl = "";
+        switch (artefactElement.getArtefactElementId().charAt(0)) {
+            case 'R':
+                lbl = "Requirement";
+                break;
+            case 'S':
+                lbl = "Source";
+                break;
+            case 'D':
+                lbl = "Diagram";
+                break;
+            default:
+                break;
+        }
+        return lbl;
+    }
+
+    /**
+     * Checking the database
+     */
+    public void checkDB() {
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                + ".graphdb").newGraphDatabase();
+        try (Transaction tx = graphDb.beginTx()) {
+            System.out.println("Entered db...");
+            for (Node n : GlobalGraphOperations.at(graphDb).getAllNodes()) {
+                for (String m : n.getPropertyKeys()) {
+                    System.out.println("" + m + " : " + n.getProperty(m));
+                }
+            }
+            for (Relationship r : GlobalGraphOperations.at(graphDb).getAllRelationships()) {
+                System.out.println("" + r.getStartNode().getProperty("ID") + "-" + r.getEndNode().getProperty("ID") + ":" + r.getType().name());
+            }
+        } finally {
+            graphDb.shutdown();
+
         }
     }
 
@@ -403,36 +637,46 @@ public class GraphDB {
         Transaction tx = graphDb.beginTx();
         try {
             IndexManager index = graphDb.index();
+<<<<<<< HEAD
             Index<Node> artefactsRelation = index.forNodes("ArtefactElement");
             Index<Relationship> edgesRelation = index.forRelationships("SOURCE_TO_TARGET");
             System.out.println("Enetering relationships..." + relation.size());
+=======
+            Index<Node> artefacts = index.forNodes("ArtefactElement");
+            Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
 
             String id;
             for (int i = 0; i < relation.size(); i++) {
+<<<<<<< HEAD
                 IndexHits<Node> hits = artefactsRelation.get("ID", relation.get(i));
                 id = relation.get(i);
                 System.out.println(i + ":ggg: " + relation.get(i));
+=======
+                IndexHits<Node> hits = artefacts.get("ID", relation.get(i));
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 Node source = hits.getSingle();
-                i++;
-                String message = relation.get(i);
+                String message = relation.get(++i);
                 RelTypes relType = RelTypes.parseEnum(message);
+<<<<<<< HEAD
                 System.out.print(" -------- " + message);
                 i++;
                 System.out.println(i + ":ggg: " + relation.get(i));
                 id = relation.get(i);
                 hits = artefactsRelation.get("ID", relation.get(i));
                 System.out.println(" " + hits.toString());
+=======
+                hits = artefacts.get("ID", relation.get(++i));
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 Node target = hits.getSingle();
 
                 if (null != source && null != target) {
-
                     Iterator<Relationship> relations = source.getRelationships()
                             .iterator();
                     boolean exist = false;
                     while (relations.hasNext()) {
                         if (relations.next().getOtherNode(source).equals(target)) {
                             exist = true;
-                            System.out.println("Relationship already exists.....");
                         }
                     }
                     if (!exist) {
@@ -493,7 +737,6 @@ public class GraphDB {
                     while (relations.hasNext()) {
                         if (relations.next().getOtherNode(source).equals(target)) {
                             exist = true;
-                            System.out.println("Relationship already exists.....");
                         }
                     }
                     if (!exist) {
@@ -517,7 +760,6 @@ public class GraphDB {
      * @param graphDb
      */
     private static void registerShutdownHook(final GraphDatabaseService graphDb) {
-
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -554,7 +796,21 @@ public class GraphDB {
 
                 RequirementModel requirement = requirementsAretefactElements.get(i);
 
-                Label myLabel = DynamicLabel.label(requirement.getType());
+                String lbl = "";
+                switch (requirement.getRequirementId().charAt(0)) {
+                    case 'R':
+                        lbl = "Requirement";
+                        break;
+                    case 'S':
+                        lbl = "Source";
+                        break;
+                    case 'D':
+                        lbl = "Diagram";
+                        break;
+                    default:
+                        break;
+                }
+                Label myLabel = DynamicLabel.label(lbl);
 
                 IndexManager index = graphDb.index();
                 Index<Node> artefacts = index.forNodes("ArtefactElement");
@@ -568,20 +824,16 @@ public class GraphDB {
                     n.setProperty("ID", requirement.getRequirementId());
                     n.setProperty("Name", requirement.getName());
                     n.setProperty("Type", requirement.getType());
-                    n.setProperty("Content", requirement.getContent());
+                    //n.setProperty("Content", requirement.getContent());
                     n.setProperty("Priority", requirement.getPriority());
                     n.setProperty("Title", requirement.getTitle());
                     artefacts.add(n, "ID", n.getProperty("ID"));
+                } else if (!node.getProperty("Name").equals(
+                        requirement.getName())) {
+                } else if (!node.getProperty("Type").equals(
+                        requirement.getType())) {
                 } else {
-                    if (!node.getProperty("Name").equals(
-                            requirement.getName())) {
-                        System.out.println("Node name updated");
-                    } else if (!node.getProperty("Type").equals(
-                            requirement.getType())) {
-                        System.out.println("Node type updated");
-                    } else {
-                        System.out.println("Node already exists.....");
-                    }
+                    //Node already exists
                 }
             }
             tx.success();

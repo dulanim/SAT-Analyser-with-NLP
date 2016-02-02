@@ -8,7 +8,11 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
+<<<<<<< HEAD
                 <exec.args>-Xms1024M -Xmx2048M -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+=======
+                <exec.args>-Xmx2048M -J -XX:-UseGCOverheadLimit -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -20,7 +24,11 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
+<<<<<<< HEAD
                 <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms1024M -Xmx2048M -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+=======
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xmx2048M -J -XX:-UseGCOverheadLimit -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -32,7 +40,11 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
+<<<<<<< HEAD
                 <exec.args>-Xms1024M -Xmx2048M -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+=======
+                <exec.args>-Xmx2048M -J -XX:-UseGCOverheadLimit -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
@@ -57,7 +69,11 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
+<<<<<<< HEAD
                 <exec.args>-Xms1024M -Xmx2048M -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+=======
+                <exec.args>-Xmx2048M -J -XX:-UseGCOverheadLimit -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -69,7 +85,11 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
+<<<<<<< HEAD
                 <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms1024M -Xmx2048M -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+=======
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xmx2048M -J -XX:-UseGCOverheadLimit -classpath %classpath com.project.traceability.GUI.HomeGUI</exec.args>
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>

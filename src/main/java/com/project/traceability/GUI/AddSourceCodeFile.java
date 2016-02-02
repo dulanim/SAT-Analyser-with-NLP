@@ -157,7 +157,7 @@ public class AddSourceCodeFile {
                 lblFile.setBounds(10, 90, 300, 25);
                 lblFile.setText("Files Found:");
                 for (int i = 0; i < fileSet.length; i++) {
-                    new AST().convertFileToXML(directory + "\\" + fileSet[i].getName());
+                    new AST().sourceCodeTreeWalker(directory + File.separator + fileSet[i].getName());
                     
                     Label lblFileAdd = new Label(shell, SWT.NONE);
                     lblFileAdd.setBounds(10, (90+25*i), 300, 25);
