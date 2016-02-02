@@ -542,6 +542,8 @@ public class VisualizeGraph {
             edgeColoring.put(p.getValue().toString(), cl);
             edgeColorTransformer.getMap().put(p.getValue(), colors.get(i));
             i++;
+            if(i == colors.size())
+                i =0;
         }
         partitionController.transform(edge_partition, edgeColorTransformer);
     }
@@ -561,10 +563,6 @@ public class VisualizeGraph {
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
         colors.add(Color.orange);
-        colors.add(Color.getColor("10E7C1"));
-        colors.add(Color.getColor("A21DFF"));
-        colors.add(Color.getColor("A25773"));
-        colors.add(Color.PINK);
 
         return colors;
     }
@@ -749,10 +747,10 @@ public class VisualizeGraph {
 
         final org.eclipse.swt.widgets.Button impactBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         impactBtn.setText("Impact");
-        
+
         final org.eclipse.swt.widgets.Button undoBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         undoBtn.setText("Undo");
-        
+
         undoBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent se) {
@@ -1235,6 +1233,8 @@ public class VisualizeGraph {
                     }
                 });
 
+                newLinkFrame.pack();
+                newLinkFrame.revalidate();
                 newLinkFrame.setVisible(true);
 
             }
@@ -1374,9 +1374,12 @@ public class VisualizeGraph {
                         frameRemoval.dispose();
                     }
                 });
+                frameRemoval.pack();
+                frameRemoval.revalidate();
                 frameRemoval.setVisible(true);
             }
         });
+
         createNewLinkFrame();
 
         createRemovalLinkFrame();
@@ -1397,17 +1400,15 @@ public class VisualizeGraph {
 
         System.out.println("Done new lik");
 
-        frameRemoval.pack();
-        frameRemoval.revalidate();
-        frameRemoval.setBounds(new java.awt.Rectangle(50, 50));
-
         frameRemoval.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frameRemoval.setTitle("Links Removal");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frameRemoval.setLocation(dim.width / 2 - frameRemoval.getSize().width / 2, dim.height / 2 - frameRemoval.getSize().height / 2);
         frameRemoval.add(removePanel);
+        //frameRemoval.setSize(300, 400);
+        frameRemoval.setTitle("Links Removal");
+        
         frameRemoval.pack();
-        frameRemoval.setPreferredSize(new Dimension(100, 100));
+        frameRemoval.revalidate();
     }
 
     /**
@@ -1426,16 +1427,17 @@ public class VisualizeGraph {
         panelButton.add(btnCancel);
         newLinkPanel.add(panelButton);
 
-        newLinkFrame.setBounds(new java.awt.Rectangle(50, 50));
+        //newLinkFrame.setBounds(new java.awt.Rectangle(50, 50));
         newLinkFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        newLinkFrame.setTitle("Links Addition");
+        newLinkFrame.setTitle("Add Links");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         newLinkFrame.setLocation(dim.width / 2 - newLinkFrame.getSize().width / 2, dim.height / 2 - newLinkFrame.getSize().height / 2);
+
+        newLinkFrame.add(newLinkPanel);
+        //newLinkFrame.setPreferredSize(new Dimension(100, 100));
+        //newLinkFrame.setSize(300, 400);
         newLinkFrame.pack();
         newLinkFrame.revalidate();
-        newLinkFrame.add(newLinkPanel);
-        newLinkFrame.pack();
-        newLinkFrame.setPreferredSize(new Dimension(100, 100));
     }
 
 }
