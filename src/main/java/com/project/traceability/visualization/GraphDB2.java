@@ -117,7 +117,7 @@ public class GraphDB2 {
      */
     public void initiateGraphDB() {
 
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY).newGraphDatabase();
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".graphdb").newGraphDatabase();
         Transaction tx = graphDb.beginTx();
 
         try {

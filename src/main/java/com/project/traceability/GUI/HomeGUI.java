@@ -88,6 +88,7 @@ public class HomeGUI extends JFrame implements KeyListener{
 	public static boolean isComaparing = false;
 	public static boolean isSelectionForUMLFile = false;
 	public static String projectPath = "";
+        public static String projectName = "";
 	public static TreeItem trtmNewTreeitem;
         public static TreeItem topParent;
         public static CTabItem graphtabItem;
@@ -1207,7 +1208,7 @@ public class HomeGUI extends JFrame implements KeyListener{
     }
     
     public static void setupProject(String graphType){
-          String projectName = trtmNewTreeitem.getText();
+          projectName = trtmNewTreeitem.getText();
                 PropertyFile.setProjectName(projectName);
                 PropertyFile.setGraphDbPath(projectPath +File.separator + FilePropertyName.PROPERTY+ File.separator + projectName
                         + ".graphdb");
