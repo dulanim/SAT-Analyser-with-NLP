@@ -25,6 +25,7 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 
 /**
+ * Consists the methods related to the deletion of node in graph
  *
  * @author Aarthika <>
  */
@@ -35,22 +36,28 @@ public class GraphDBDelete {
     private Set<Relationship> relProps;
     String id;
 
+    public static boolean lock = false;
     public GraphDBDelete() {
-        System.out.println("chk: "+graphDb);
         
     }
 
+    /**
+     * Activates the deletion of nodes and its relations
+     * @param nodeProps
+     */
     public void deleteNodeAndRelations(final HashMap<String, Object> nodeProps) {
-        //delete the node        
+        //delete the node             
+        while(!GraphMouseListener.lock){}
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
                 HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                 + ".graphdb");
         id = nodeProps.get("ID").toString();
+
         try (Transaction tx = graphDb.beginTx()) {
             IndexManager index = graphDb.index();
             Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
             IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", id);
-
+            
             org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
             Iterator<Relationship> nodeRelation = neo4j_node.getRelationships().iterator();
             deleteNodeProps = new HashSet<>();
@@ -58,26 +65,24 @@ public class GraphDBDelete {
             deleteNodeProps.add(neo4j_node);
 
             deleteNode(nodeRelation, neo4j_node);
-            System.out.println("Size: " + deleteNodeProps.size() + " " + relProps.size());
             delete(deleteNodeProps, relProps, id);
-            //new GraphDB().checkDB();
             tx.success();
-            // tx.close();
+            GraphMouseListener.lock = false;
         } finally {
             graphDb.shutdown();
+            GraphDBDelete.lock = true;
         }
-        //graphDb.shutdown();
-        //updateXMLFiles(id, nodeProps);
-        //returnVal.put("ID", id);
-        //returnVal.put("Value", confirm);
     }
 
+    /**
+     * Deletes the nodes
+     * @param nodeRelation
+     * @param neo4j_node
+     */
     public void deleteNode(Iterator<Relationship> nodeRelation, org.neo4j.graphdb.Node neo4j_node) {
-        //System.out.println("Entering ub node delete " + neo4j_node.toString());        
         if (!nodeRelation.hasNext()) {
             //delete the node if there are no relatioships liked to it.
             deleteNodeProps.add(neo4j_node);
-            //neo4j_node.delete();
         } else {
             while (nodeRelation.hasNext()) {
                 Relationship rel = nodeRelation.next();
@@ -89,18 +94,20 @@ public class GraphDBDelete {
                 } else if (rel.isType(GraphDB.RelTypes.SUB_ELEMENT) && rel.getEndNode().toString().equalsIgnoreCase(neo4j_node.toString())) {
                 } else {
                     relProps.add(rel);
-                    //rel.delete();
-                    //deleteNodeProps.add(neo4j_node);
                 }
-
             }
-            // deleteNodeProps.add(neo4j_node);
-            // neo4j_node.delete();
         }
     }
 
+    /**
+     * Delete method
+     *
+     * @param nodeProps
+     * @param relProps
+     * @param id
+     */
     public void delete(Set<org.neo4j.graphdb.Node> nodeProps, Set<Relationship> relProps, String id) {
-        String xml = updateXMLFiles(id);        
+        String xml = updateXMLFiles(id);
         ReadXML.deleteNodeFromSourceFile(deleteNodeProps, relProps, xml);
 
         try (Transaction tx = graphDb.beginTx()) {
@@ -154,6 +161,11 @@ public class GraphDBDelete {
 
     }
 
+    /**
+     * Deletes the node from db
+     *
+     * @param node
+     */
     public void deleteNodeDB(org.neo4j.graphdb.Node node) {
         try (Transaction tx = graphDb.beginTx()) {
             System.out.println("Before:" + node);
@@ -169,22 +181,25 @@ public class GraphDBDelete {
                     }
                 }
             }
-
             //node.delete();
             System.out.println("After:" + node);
             System.out.println("Detail:" + node.hasRelationship());
 
             tx.success();
             tx.close();
-        }
-        finally{
+        } finally {
             //graphDb.shutdown();
         }
     }
 
+    /**
+     * Deletes the relationship from DB if it is a sub node deletes the end node
+     * as well
+     *
+     * @param rel
+     */
     public void deleteRelDB(Relationship rel) {
         try (Transaction tx = graphDb.beginTx()) {
-            System.out.println("Before:" + rel);
             if (rel.isType(GraphDB.RelTypes.SUB_ELEMENT)) {
                 rel.getEndNode().delete();
                 rel.delete();
@@ -193,8 +208,7 @@ public class GraphDBDelete {
             }
             tx.success();
             tx.close();
-        }
-        finally{
+        } finally {
             //graphDb.shutdown();
         }
     }

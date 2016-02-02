@@ -26,10 +26,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Consists of operations based on Gexf File
  * @author Aarthika <>
  */
 public class AccessGexfFile {
+    
+    /**
+     * Removes the edges from the gexf file based on their id
+     * @param id 
+     */
     public static void removeEdgeFromGexf(int id) {
         String gexfXML = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".gexf";
 
@@ -37,13 +42,13 @@ public class AccessGexfFile {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(gexfXML);
-            System.out.println("" + gexfXML);
+            //System.out.println("" + gexfXML);
 
             NodeList nlParent = document.getElementsByTagName("edges");
-            System.out.println("" + nlParent.getLength());
-            System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
+            //System.out.println("" + nlParent.getLength());
+            //System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
             int count = Integer.parseInt(nlParent.item(0).getAttributes().item(0).getNodeValue());
-            System.out.println("Gexf dleting :" + id);
+            //System.out.println("Gexf dleting :" + id);
 
             NodeList nlChild = document.getElementsByTagName("edge");
             parent:
@@ -57,7 +62,7 @@ public class AccessGexfFile {
                                 nlChild.item(i).getParentNode().removeChild(nlChild.item(i));
                                 count--;
                                 nlParent.item(0).getAttributes().item(0).setNodeValue(String.valueOf(count));
-                                System.out.println("Gexf suc3 :" + id);
+                                //System.out.println("Gexf suc3 :" + id);
                                 break parent;
                             }
                         }
@@ -71,11 +76,11 @@ public class AccessGexfFile {
             String xmlpath = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY;
             File file = new File(xmlpath, HomeGUI.projectName + ".gexf");
 
-            System.out.println("file: " + file.getAbsolutePath());
+            //System.out.println("file: " + file.getAbsolutePath());
             StreamResult result = new StreamResult(file.getPath());
             transformer.transform(source, result);
 
-            System.out.println("Done nod");
+            //System.out.println("Done nod");
             //VisualizeGraph.refreshGraph();
 
         } catch (ParserConfigurationException | SAXException | IOException ex) {
@@ -87,6 +92,11 @@ public class AccessGexfFile {
         }
     }
 
+    /**
+     * Returns whether the id exists in gexf file
+     * @param id
+     * @return 
+     */
     public static boolean getIDFromGexf(int id) {
         String gexfXML = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName + ".gexf";
 
@@ -94,23 +104,28 @@ public class AccessGexfFile {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(gexfXML);
-            System.out.println("" + gexfXML);
+            //System.out.println("" + gexfXML);
 
             NodeList nlChild = document.getElementsByTagName("edge");
             for (int i = 0; i < nlChild.getLength(); i++) {
                 String childID = nlChild.item(i).getAttributes().item(0).getNodeValue();
                 if (childID.equalsIgnoreCase(String.valueOf(id))) {
-                    System.out.println(childID + " " + id);
+                    //System.out.println(childID + " " + id);
                     return true;
                 }
             }
-
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            Exceptions.printStackTrace(ex);
+        } catch (ParserConfigurationException | SAXException | IOException ex) {            
         }
         return false;
     }
 
+    /**
+     * Adds a new link to gexf file
+     * @param start
+     * @param end
+     * @param relType
+     * @return 
+     */
     public static int addToGEXF(String start, String end, String relType) {
         String relation = "";
         if (start.isEmpty() || end.isEmpty() || relType.isEmpty()) {
@@ -128,11 +143,11 @@ public class AccessGexfFile {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document document = documentBuilder.parse(gexfXML);
-                System.out.println("" + gexfXML);
+                //System.out.println("" + gexfXML);
 
                 NodeList nlParent = document.getElementsByTagName("edges");
-                System.out.println("" + nlParent.getLength());
-                System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
+                //System.out.println("" + nlParent.getLength());
+                //System.out.println("" + nlParent.item(0).getAttributes().item(0).getNodeValue());
                 count = Integer.parseInt(nlParent.item(0).getAttributes().item(0).getNodeValue());
 
                 NodeList nlChild = document.getElementsByTagName("edge");
@@ -183,11 +198,11 @@ public class AccessGexfFile {
                 String xmlpath = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY;
                 File file = new File(xmlpath, HomeGUI.projectName + ".gexf");
 
-                System.out.println("file: " + file.getAbsolutePath());
+                //System.out.println("file: " + file.getAbsolutePath());
                 StreamResult result = new StreamResult(file.getPath());
                 transformer.transform(source, result);
 
-                System.out.println("Done nod");
+                //System.out.println("Done nod");
                 //VisualizeGraph.refreshGraph();
 
             } catch (ParserConfigurationException | SAXException | IOException ex) {

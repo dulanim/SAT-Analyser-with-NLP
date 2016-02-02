@@ -214,4 +214,17 @@ public class WorkspaceSelectionWindow {
             combo.add(iterator.next().toString());
         }
     }
+    
+    public Shell getShell(){
+        return shell;
+    }
+    
+    public void eventLoop(Display display) {
+        //this.display = display;
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
 }

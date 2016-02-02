@@ -21,14 +21,16 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.openide.util.Exceptions;
 
 /**
- *
+ * Consists the methods related to the updates of node in graph
  * @author Aarthika <>
  */
 public class GraphDBEdit {
 
     GraphDatabaseService graphDb;
+    public static boolean lock = false;
 
     public GraphDBEdit() {
+        while(!GraphMouseListener.lock){}
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
                 HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                 + ".graphdb");
@@ -37,7 +39,6 @@ public class GraphDBEdit {
     public GraphDatabaseService getGraphDb() {
         return graphDb;
     }
-
     
     /**
      * Stores the data in a temporary map and edits the relevant backends
@@ -46,28 +47,14 @@ public class GraphDBEdit {
      * @param id
      */
     public void storeUpdatedNode(HashMap<String, Object> nodeProp) {
-        //HashMap<String, Object> newNodeProps = new HashMap<>();
-        //Updates the dataabase if there are any changes in the node properrties values.
-        /*Component[] panelComp = panel.getComponents();
-        for (Component comp : panelComp) {
-            if (comp.getClass() == JTextField.class) {
-                //if(!(comp.getName().equalsIgnoreCase(ID)||comp.getName().equalsIgnoreCase(TYPE))){
-                JTextField data = (JTextField) comp;
-                newNodeProps.put(comp.getName(), data.getText());
-                //}
-            }
-        }*/
- /*if (newNodeProps.equals(nodeProps)) {
-            System.out.println("No changes in the node");
-        } else {*/
-        System.out.println("Changes in Node:");
+        
+        //System.out.println("Changes in Node:");
         for (String key : nodeProp.keySet()) {
             System.out.println("Key: " + key + " Value: " + nodeProp.get(key).toString());
         }
         
         final String id = nodeProp.get("ID").toString();
         edit(nodeProp, id);
-        // }
     }
 
     /**
@@ -100,6 +87,7 @@ public class GraphDBEdit {
             tx.close();
         } finally {
             graphDb.shutdown();
+            GraphDBEdit.lock = true;
         }
 
     }

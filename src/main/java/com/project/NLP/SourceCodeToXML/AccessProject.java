@@ -17,6 +17,11 @@ public class AccessProject {
     
     private static List<File> javaFiles = new ArrayList();
 
+    /**
+     * Gets the relevant java files
+     * @param file
+     * @return 
+     */
     public static List<File> getJavaFiles(File file) {
         File files[] = null;
         
@@ -37,11 +42,20 @@ public class AccessProject {
         return javaFiles;
     }
     
-    public boolean javaFilesExists(File file){
+    /**
+     * Checks whether java files exist
+     * @param file
+     * @return boolean
+     */
+    public static boolean javaFilesExists(File file){
         getJavaFiles(file);
         return !javaFiles.isEmpty();
     }
     
+    /**
+     * Returns the files
+     * @return List
+     */
     public List getFiles(){
         return javaFiles;
     }

@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- *
+ * Walks the tree class
  * @author AARTHIKA
  */
 public class ExtractInterfaceListener extends Java8BaseListener {
@@ -40,6 +40,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         this.parser = parser;
     }
 
+    /**
+     * Enters the field declaration
+     * @param ctx 
+     */
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
         super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
@@ -89,6 +93,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         fieldNameList.clear();
     }
 
+    /**
+     * Writes the field to xml
+     */
     public void writeFieldToXML() {
 
         Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
@@ -117,6 +124,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         artefactSubElement.setAttributeNode(fieldTypeAttr);
     }
 
+    /**
+     * Enters method declaration
+     * @param ctx 
+     */
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
         super.enterMethodDeclaration(ctx);
@@ -130,14 +141,14 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         } else {
             methodMod = ctx.methodModifier().get(0).getText();
 
-            System.out.println("Override" + ctx.methodModifier().get(0).getText());
+            //System.out.println("Override" + ctx.methodModifier().get(0).getText());
             type = "Method";
             parameterList = new StringBuffer();
             Java8Parser.MethodDeclaratorContext mdc = ctx.methodHeader().methodDeclarator();
             methodName = mdc.Identifier().getText();
-            System.out.println("Method Name: " + methodName);
+            //System.out.println("Method Name: " + methodName);
             methodReturn = ctx.methodHeader().result().getText();
-            System.out.println("Method Return: " + methodReturn);
+            //System.out.println("Method Return: " + methodReturn);
 
             System.out.println("Method Modifier: " + methodMod);
 
@@ -150,7 +161,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
                         paramName = "";
                         paramMod = "";
                         getParameter(par);
-                        System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
+                        //System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
                         parameterList.append(paramName + ":" + paramType + ", ");
                     }
                 }
@@ -159,9 +170,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
                 paramName = "";
                 paramMod = "";
                 getParameter(mdc.formalParameterList().lastFormalParameter().formalParameter());
-                System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
+                //System.out.println("Parameter type:" + paramType + " name:" + paramName + " mod:" + paramMod);
                 parameterList.append(paramName + ":" + paramType);
-                System.out.println(parameterList.toString());
+                //System.out.println(parameterList.toString());
             }
             Element artefactSubElement = WriteToXML.getDocument().createElement("ArtefactSubElement");
             artefactElement.appendChild(artefactSubElement);
@@ -195,6 +206,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     }
 
+    /**
+     * Returns the paramter
+     * @param par 
+     */
     private void getParameter(Java8Parser.FormalParameterContext par) {
         int children = par.getChildCount();
         if (children == 2) {
@@ -212,6 +227,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     }
 
+    /**
+     * Enters the class declaration
+     * @param ctx 
+     */
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
         type = "Class";
@@ -226,7 +245,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             classMod = ctx.normalClassDeclaration().classModifier().get(0).getText();
         }
 
-        System.out.println("Class: " + className + " Modifier: " + classMod);
+        //System.out.println("Class: " + className + " Modifier: " + classMod);
 
         if (ctx.normalClassDeclaration().superclass() != null) {
             superClass = ctx.normalClassDeclaration().superclass().getChild(1).getText();
@@ -241,18 +260,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         }
         classId++;
 
-//implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
-        //
-        /*Element artefact  = WriteToXML.getDocument().createElement("Artefact");
-        AST.artefacts.appendChild(artefact);
-        Attr rootType = WriteToXML.getDocument().createAttribute("type");
-        rootType.setValue("SourceCode");
-        artefactElement.setAttributeNode(rootType);        
-         */
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
-        //AST.artefact.appendChild(artefactElement);
-        // artefact.appendChild(artefactElement);
-
         root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0).getParentNode();
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root.appendChild(artefactElement);
