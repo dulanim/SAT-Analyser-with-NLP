@@ -6,9 +6,10 @@
 package com.project.traceability.GUI;
 
 /**
- *
  * @author shiyam
+ * @author AARTHIKA
  */
+import com.project.NLP.SourceCodeToXML.AccessProject;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.property.config.xml.writer.Adapter;
 import com.project.property.config.xml.writer.XMLConversion;
@@ -17,7 +18,6 @@ import com.project.traceability.common.Dimension;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
 import com.project.traceability.staticdata.StaticData;
-import edu.stanford.nlp.util.logging.Color;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -302,8 +302,17 @@ public class ProjectCreateWindow {
                 srcJavaDir = new File(path);
                 if (localFilePath != null) {
                     txtProjectPath.setText(StaticData.sourceFilePath);
-                    if (!txtRequirementPath.getText().equals("") && !txtUmlPath.getText().equals("")) {
-                        btnFinish.setEnabled(true);
+                    boolean src = AccessProject.javaFilesExists(new File(StaticData.sourceFilePath.toString()));
+                    System.out.println("Java Files " + src);
+                    
+                    if (src) {
+                        if (!txtRequirementPath.getText().equals("") && !txtUmlPath.getText().equals("")) {
+
+                            btnFinish.setEnabled(true);
+                        }
+                    } else {
+                        txtProjectPath.setText("");
+                        //JOptionPane.showMessageDialog(null, "Error in java project file path...", "Java Project Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -407,12 +416,12 @@ public class ProjectCreateWindow {
                 shell.dispose();
             }
         });
-        
+
         final Label lblNewLabel = new Label(composite, SWT.NONE);
         lblNewLabel.setBounds(24, 10, 459, 17);
         lblNewLabel.setText("");
-        lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(),0,255,0));
-        
+        lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 0, 255, 0));
+
         button_2.setText("Cancel");
         //button_2.setImage(SWTResourceManager.getImage("null"));
         button_2.setBounds(0, 29, 75, 25);
@@ -506,7 +515,6 @@ public class ProjectCreateWindow {
                         Adapter.createwrkpace("false");
                     } else {
                         StaticData.workspace = temp;
-                        System.out.println(" aa"+temp + " "+ Adapter.projectPath);
                         Adapter.changeExistingWrkspaceStatus(StaticData.workspace, false);
                     }
                     System.out.println("Name: " + reqFilePath);
@@ -527,7 +535,7 @@ public class ProjectCreateWindow {
                         }
                     });
                     requirementThread.start();
-                    
+
                     Thread javaFilesThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -539,7 +547,7 @@ public class ProjectCreateWindow {
                         }
                     });
                     javaFilesThread.start();
-                    
+
                     Thread umlThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -547,27 +555,27 @@ public class ProjectCreateWindow {
                         }
                     });
                     umlThread.start();
-                    
-                    while(requirementThread.isAlive() || javaFilesThread.isAlive() || umlThread.isAlive()){  
-                        StringBuffer aliveThread = new StringBuffer();
-                        if(requirementThread.isAlive()){
+
+                    while (requirementThread.isAlive() || javaFilesThread.isAlive() || umlThread.isAlive()) {
+                        StringBuilder aliveThread = new StringBuilder();
+                        if (requirementThread.isAlive()) {
                             aliveThread.append("Requirement");
                             aliveThread.append(" ");
                         }
-                        if(javaFilesThread.isAlive()){
+                        if (javaFilesThread.isAlive()) {
                             aliveThread.append("Source Code");
                             aliveThread.append(" ");
                         }
-                        if(umlThread.isAlive()){
+                        if (umlThread.isAlive()) {
                             aliveThread.append("UML");
                             aliveThread.append(" ");
                         }
-                        
-                        lblNewLabel.setText( aliveThread.toString()+ " Extraction On Progress");
-                        
+
+                        lblNewLabel.setText(aliveThread.toString() + " Extraction On Progress");
+
                     }
                     System.out.println("Thread finished");
-                   /* XMLConversion.convertRequirementFile();
+                    /* XMLConversion.convertRequirementFile();
                     XMLConversion.convertUMLFile();
                     XMLConversion.convertJavaFiles();*/
                     shell.dispose();
@@ -588,8 +596,6 @@ public class ProjectCreateWindow {
         btnFinish.setText("Finish");
         btnFinish.setEnabled(false);
         btnFinish.setBounds(493, 29, 75, 25);
-
-        
 
         Label label_6 = new Label(shell, SWT.NONE);
         label_6.setText("New project will be created ");
