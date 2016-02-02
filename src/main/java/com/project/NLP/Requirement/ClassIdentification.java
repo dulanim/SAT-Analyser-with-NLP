@@ -8,20 +8,16 @@ package com.project.NLP.Requirement;
 
 import edu.stanford.nlp.trees.Tree;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-
 
 /**
+ * class to identify the classes from the sentence using tokenization
  *
  * @author S. Shobiga
  */
 public class ClassIdentification {
 
-    private Tree[] tree;
-    /*Single Tree */
     private Tree sTree;
     private ArrayList priorToRule1;
     private HashSet classList = new HashSet();
@@ -31,213 +27,172 @@ public class ClassIdentification {
     private ArrayList attributeFromClass = new ArrayList();
     private DesignElementClass designEleClass = new DesignElementClass();
     private DictionaryForClass dictionaryForClass = new DictionaryForClass();
-    
+
     ClassIdentification() {
 
     }
 
-    ClassIdentification(Tree[] tree){
-        this.tree =tree;
+    /**
+     * constructor to identify the classes for a single tree
+     *
+     * @param tree
+     */
+    ClassIdentification(Tree tree) {
+        this.sTree = tree;
         np = new PhrasesIdentification(tree);
         applyRules();
     }
-    
-    /*Single Tree */
-    ClassIdentification(Tree tree){
-        this.sTree=tree;
-        np = new PhrasesIdentification(tree);
-        applyRules();
-    }
- 
 
-    /*apply rules to find classes*/
+    /**
+     * apply rules to identify the classes
+     */
     private void applyRules() {
-        /*calling by this function it identifies NN phrases
-        and also it skips the class of people, places or things - proper noun*/
-        /* rule 1 and rule 2 and rule3*/
-        afterRules = nounPharseIdentification("NP");
-        //afterRules = innerPhrases("NN");
-        /*rule 2 */
+        //rule 1
+        afterRules = nounPharseIdentification();
+        //rule 2
         checksWhetherDesignElementExits(afterRules);
-        /* rule 3*/
+        //rule 3
+        eliminateRedundantClasses(afterRules);
+        //rule 4
+        attributesEliminationFromClass(afterRules);
+
+        //afterRules = innerPhrases("NN");
+        // rule 3
         //checksLocationAndPeopleName(afterRules);
-        
         /*rule 6*/
         //stemming(afterRules);
-    
-        
-        /*rule 4- eliminate redundant classes*/
-        eliminateRedundantClasses(afterRules);
-        /*rule 5- attribues elimination from classes */
-        attributesEliminationFromClass(afterRules);
-        
-        
-        
         /*rule 7*/
-       
     }
-    /*find the noun phrases in the sentence*/
 
-    private ArrayList nounPharseIdentification(String phrase) {
+    /**
+     * rule 1 identify the classes using the tokenization by call
+     * phraseIdentification class
+     *
+     * @return arrayList of classes
+     */
+    private ArrayList nounPharseIdentification() {
         ArrayList classL = np.getClassList();
-        //ArrayList verb = np.getClass("");
         return classL;
     }
 
-    /*rule 1
-     *if the phrase has 2 noun phrases first noun is identified as Class and 2nd is identified as attributes
+    /**
+     * this method checks whether class contains the design elements. if so it
+     * will skip those elements and store rest of the artefacts design elements
+     * are taken from the dictionary call - classElementDictionary
+     *
+     * @param className
      */
-
-
-    /*rule 2
-     this method checks whether the attribute or class contains the design elemets.
-     if so it will skip those elements and store rest of the artefacts
-     parameter: className, attribute
-     */
-    
     private void checksWhetherDesignElementExits(ArrayList className) {
         //ArrayList designElements = designEleClass.getDesignElementsList();
         ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
         className.removeAll(dictionaryElements);
         afterRules = className;
-        //System.out.println("cl: "+className);
-             
-    }
-    private void checksWhetherDesignElementExits1(Object className, Object attribute) {
-        //ArrayList designElements = designEleClass.getDesignElementsList();
-        ArrayList dictionaryElements = dictionaryForClass.getDictionaryForClass();
-        
-        if (!dictionaryElements.contains(className)) {
-            //System.out.println("design class... :" + String.valueOf(className));
-            afterRules.add(String.valueOf(className));
-
-        }
-        if (!dictionaryElements.contains(attribute)) {
-            //System.out.println("design attribute... :" + String.valueOf(attribute));
-            attributeFromClass.add(String.valueOf(attribute));
-
-        }
-
-        
     }
 
     /*rule 3
-    if the  concept is related to the location name or people name
-    then those concepts will be elemenated from className
-    */
-    
-    private void checksLocationAndPeopleName(ArrayList list){
+     if the  concept is related to the location name or people name
+     then those concepts will be elemenated from className
+     */
+    private void checksLocationAndPeopleName(ArrayList list) {
         ParserTreeGenerator parser = new ParserTreeGenerator();
         ArrayList nameEntity;
-        for(int j=0;j<list.size();j++){
+        for (int j = 0; j < list.size(); j++) {
             nameEntity = parser.generateNamedEntityTagAnnotation();
             /*remove the location name or people name if list of the class contains*/
-            for(int i=0;i<nameEntity.size();i++){
-                if(afterRules.contains(nameEntity.get(i))){
+            for (int i = 0; i < nameEntity.size(); i++) {
+                if (afterRules.contains(nameEntity.get(i))) {
                     afterRules.remove(nameEntity.get(i));
 
                 }
             }
         }
-        
+
     }
-    
-    /*rule 4
-    redundant classes are eleminated
-    */
-    private void eliminateRedundantClasses(ArrayList list){
-        //HashSet withoutDuplicateClass = new HashSet();
+
+    /**
+     * rule 3 the redundant classes which are stored in the array list by
+     * storing them in the hashSet
+     *
+     * @param list
+     */
+    private void eliminateRedundantClasses(ArrayList list) {
         /*add the list data to the hashset to eliminate the redundancy*/
-        for(int i=0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             classList.add(list.get(i).toString().trim());
         }
-        
     }
-    
-    /*rule 5
-    attribute elimination from class
-    */
-    private void attributesEliminationFromClass(ArrayList list){
-        ArrayList attributeFromClass  = np.getAttributeLists();
-        //System.out.println("attributes: "+attributeFromClass);
+
+    /**
+     * rule 4 if the class contains the attributes, then those are removed from
+     * the class list
+     *
+     * @param list
+     */
+    private void attributesEliminationFromClass(ArrayList list) {
+        ArrayList attributeFromClass = np.getAttributeLists();
     }
-    
-    /*rule 6
-    *stemming 
-    *input: classList
-    *output: removed class names using stemming
-    */
-    private void stemming(ArrayList afterRules){
-        
-        for(int i =0 ; i< afterRules.size() - 1; i++){
-            for(int j= i + 1; j < afterRules.size() ; j++ ){
-                if((afterRules.get(j).toString()).startsWith(afterRules.get(i).toString())){
+
+    /**
+     * rule 6 stemming input: classList output: removed class names using
+     * stemming
+     */
+    private void stemming(ArrayList afterRules) {
+
+        for (int i = 0; i < afterRules.size() - 1; i++) {
+            for (int j = i + 1; j < afterRules.size(); j++) {
+                if ((afterRules.get(j).toString()).startsWith(afterRules.get(i).toString())) {
                     afterRules.remove(j);
                 }
-                if((afterRules.get(i).toString()).startsWith(afterRules.get(j).toString())){
+                if ((afterRules.get(i).toString()).startsWith(afterRules.get(j).toString())) {
                     afterRules.remove(i);
                 }
             }
-            
         }
-        
-        
     }
-    
-    /*method to get the lists of classes*/
+
+    /**
+     * method to get the list of classes
+     *
+     * @return hashSet
+     */
     public HashSet getClasses() {
-        
-        
         return classList;
     }
-    public HashMap getClassWithAttr(){
+
+    /**
+     * method to return the classes which are stored with the attributes for
+     * example when noun + noun rule appears
+     *
+     * @return hashMap key: className value: attributeList
+     */
+    public HashMap getClassWithAttr() {
         return np.getClassWithAttr();
     }
-    public ArrayList getClassesTemp(){
+
+    /**
+     * method to return the temporary class list
+     *
+     * @return arrayList
+     */
+    public ArrayList getClassesTemp() {
         return afterRules;
     }
-    /*method to get the lists of attributes*/
-    public ArrayList getAttributeFromClass() {
-       ArrayList attribute= np.getAttributeLists();
-       String att;
-       for(int attrCount = 0; attrCount < attribute.size(); attrCount++){
-           att = attribute.get(attrCount).toString();
-           if(!att.isEmpty() || !att.equals("")){
-               attributeFromClass.add(att);
-           }
-       } 
-       
-       return attributeFromClass;
-    }
 
-    
-    
-    
-    
-    /*rule1 continuos...
-     if the phrase consists PRP + NN identify the PRP as a class and NN as attribute
-     but the PRP is stored already in class list. so store the NN as attributeFromClass
+    /**
+     * method to get the lists of attributes
+     *
+     * @return
      */
-    private void checkPRP(PhrasesIdentification PI) {
-        ArrayList innerPhraseList = PI.getIdentifiedPhrases1("NP");
-        //ArrayList 
-
-        ArrayList nn;
-        //Boolean status= false;
-
-        for (int i = 0; i < innerPhraseList.size(); i++) {
-            //System.out.println("prp.... :" + innerPhraseList);
-            if (innerPhraseList.get(i).equals("PRP")) {
-                //System.out.println("prp.... :" + innerPhraseList.get(i));
-                attributeFromClass.add(innerPhraseList.get(i + 1));
-                break;
+    public ArrayList getAttributeFromClass() {
+        ArrayList attribute = np.getAttributeLists();
+        String att;
+        for (int attrCount = 0; attrCount < attribute.size(); attrCount++) {
+            att = attribute.get(attrCount).toString();
+            if (!att.isEmpty() || !att.equals("")) {
+                attributeFromClass.add(att);
             }
         }
-
+        return attributeFromClass;
     }
-
-   
-
-   
 
 }

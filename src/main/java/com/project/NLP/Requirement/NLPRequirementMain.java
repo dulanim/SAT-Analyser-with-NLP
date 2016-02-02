@@ -7,7 +7,6 @@
 package com.project.NLP.Requirement;
 
 import com.project.NLP.GUI.ArtefactFrameTestGUI;
-import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,11 +25,12 @@ import java.util.Iterator;
  * Then this class identifies the artefacts such as classes, attributes, methods and relationships for a particular sentence
  * and write the output into the text file as well call the class to write the output in the XML format. 
  * 
- * @author S. Shobiga & T.Vinojan
+ * @author S. Shobiga
+ * @author T. Vinojan
  */
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "io/BankRequirement.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "io/Order_Requirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     public static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -47,8 +47,8 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 
@@ -87,9 +87,6 @@ public class NLPRequirementMain {
                                 MethodIdentifier mId = new MethodIdentifier(tree, classList);
                                 methodList = mId.identifyCandidateMethods(tree);
 
-                                /* if the rule detects multiple classes for a sentence add all the artefacts for each of the class 
-                                 *and if it has only one class, execute it normal way
-                                 */
                                 /*Storing Class details  */
                                 storingClassDetails(classList, className, requirementObjects, storingArtefacts, attrList, methodList, relationList);
                                 /*to handle class with attribute map (noun + noun)*/
@@ -156,8 +153,8 @@ public class NLPRequirementMain {
             String classN = classWithAttrIterator.next().toString();
             classListWithAttr.add(classN);
             attributeList = (HashSet) classWithAttr.get(classN);
-            System.out.println("class from classWith attributes :" + classN);
-            System.out.println("attributes from classwith attributes: " + attributeList);
+            System.out.println("Class from classWith attributes :" + classN);
+            System.out.println("Attributes from classwith attributes: " + attributeList);
             if (requirementObjects.containsKey(classN)) {
                 StoringArtefacts storeArt = (StoringArtefacts) requirementObjects.get(classN);
                 storeArt.addAttributes(attributeList);
@@ -221,45 +218,24 @@ public class NLPRequirementMain {
             String sCurrentLine;
             br = new BufferedReader(new FileReader(file));
             while ((sCurrentLine = br.readLine()) != null) {
-                /*start a new sentence if the sentence contains but */
-                if (sCurrentLine.contains("but")) {
-                    sCurrentLine = sCurrentLine.replace("but", ". But");
-                }
-                /*if the sentence is having hyphen, then it is replaced by a space*/
-                if (sCurrentLine.contains("-")) {
-                    sCurrentLine = sCurrentLine.replace("-", " ");
-                }
-                /*if the sentence if having underscore, then it is replace by a space*/
-                if (sCurrentLine.contains("_")) {
-                    //sCurrentLine = sCurrentLine.replace("_", " ");
-                }
-                /*if the sentence is having 's, then it is replaced by space EX: employee's -> employee*/
-                if (sCurrentLine.contains("'s")) {
-                    sCurrentLine = sCurrentLine.replace("'s", " ");
-                }
-                if (sCurrentLine.contains(",")) {
-                    //    sCurrentLine = sCurrentLine.replace(",", ". ");
-                }
-                if (sCurrentLine.contains("if")) {
-                    ///  sCurrentLine = sCurrentLine.replace("if", ". ");
-                }
-
-                if (sCurrentLine.contains("which")) {
-                    sCurrentLine = sCurrentLine.replace("which", ". It ");
-                }
-
+                //sentence modification is done
+                SentenceReplacement sentenceReplacement = new SentenceReplacement();
+                sCurrentLine = sentenceReplacement.doModify(sCurrentLine);
+                
                 req_Document += " " + sCurrentLine;
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Exception occurs: "+ e);
         } finally {
             try {
                 if (br != null) {
                     br.close();
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
+                //ex.printStackTrace();
+                System.out.println("Exception occurs: "+ ex);
             }
         }
         return req_Document;

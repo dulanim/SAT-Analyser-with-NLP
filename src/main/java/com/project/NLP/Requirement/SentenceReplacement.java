@@ -13,52 +13,81 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- *
+ * This is the class to modify the sentences. 
+ * For example if the sentence is having 'but', it will replace the sentence by starting a new sentence. 
+ * Like wise, it deals with complex sentences, hyphens, apostrophe and etc. 
+ * 
  * @author S. Shobiga
  */
 
-/*This is the class to modify the sentences. For example if the sentence is having but it will divide the 
- sentence into two and '-' are removed and replaced by space.
+/*
  */
 public class SentenceReplacement {
 
     private String sentence;
     private String fileName;
 
+    /**
+     * constructor without parameters
+     */
+    SentenceReplacement() {
+
+    }
+
+    /**
+     * constructor with parameters
+     * @param sentence
+     * @param file 
+     */
     SentenceReplacement(String sentence, String file) {
         this.sentence = sentence;
         this.fileName = file;
-        splitSentence();
+        this.sentence = doModify(sentence);
     }
 
-    private void splitSentence() {
-        String replacingWord = "";
-        String newSentence = "";
+    private String doModify(String currentLine) {
+        sentence = currentLine;
+
+        /*start a new sentence if the sentence contains but */
         if (sentence.contains("but")) {
-            newSentence = sentence.replace("but", ". But");
-            int position = sentence.indexOf("but");
-            
-            System.out.println("New Sentence: " + newSentence);
-            try{
-                FileWriter filewriter = new FileWriter(fileName);
-                filewriter.append(newSentence);
-                filewriter.close();
-
-            }
-            catch(Exception e){
-                
-            }
-            //WriteToTextFile(newSentence);
+            sentence = sentence.replace("but", ". But");
         }
+        /*if the sentence is having hyphen, then it is replaced by a space*/
+        if (sentence.contains("-")) {
+            sentence = sentence.replace("-", " ");
+        }
+        /*if the sentence is having 's, then it is replaced by space EX: employee's -> employee*/
+        if (sentence.contains("'s")) {
+            sentence = sentence.replace("'s", " ");
+        }
+        if (sentence.contains("which")) {
+            sentence = sentence.replace("which", ". It ");
+        }
+        /*if the sentence if having underscore, then it is replace by a space*/
+        if (sentence.contains("_")) {
+            //sCurrentLine = sCurrentLine.replace("_", " ");
+        }
+        if (sentence.contains(",")) {
+            //    sCurrentLine = sCurrentLine.replace(",", ". ");
+        }
+        if (sentence.contains("if")) {
+            ///  sCurrentLine = sCurrentLine.replace("if", ". ");
+        }
+        System.out.println("Modifications are done");
+        return sentence;
     }
 
+    /**
+     * method to write the modified sentence to the text file
+     * @param newSentence 
+     */
     public void WriteToTextFile(String newSentence) {
         //write to file : "Requirement Output"
         try {
 
             StringBuffer sbf = new StringBuffer();
             sbf.append(newSentence);
-           
+
             System.out.println(sbf.toString());
 
             BufferedWriter bwr = new BufferedWriter(new FileWriter(new File(fileName)));

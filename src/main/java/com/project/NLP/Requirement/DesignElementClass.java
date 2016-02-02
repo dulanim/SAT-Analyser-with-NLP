@@ -5,41 +5,53 @@
  */
 package com.project.NLP.Requirement;
 
-import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * class which reads the dictionary as a text file and stores the words in the
+ * array list
  *
  * @author S. Shobiga
- */
-
-/*This class checks whether artefact -class contains any of the design elements 
  */
 public class DesignElementClass {
 
     ArrayList designElements;
 
+    /**
+     * constructor
+     */
     DesignElementClass() {
         designElements = new ArrayList();
         setDesignElementsList();
     }
 
-    /*add design elements such as system, aplication and etc. to the arrayList
+    /**
+     * after reading the text file, words are stored in the array list
      */
     private void setDesignElementsList() {
-        designElements= readFromTextFile("res/DesignElementsDictionary.txt");
+        designElements = readFromTextFile("res/DesignElementsDictionary.txt");
     }
 
+    /**
+     * method to return the dictionary words
+     *
+     * @return array list
+     */
     public ArrayList getDesignElementsList() {
-        //System.out.println("from design :"+designElements);
         return designElements;
     }
-    
-    private ArrayList readFromTextFile(String file){
-    BufferedReader br = null;
+
+    /**
+     * method to read the dictionary file
+     *
+     * @param file
+     * @return
+     */
+    private ArrayList readFromTextFile(String file) {
+        BufferedReader br = null;
         ArrayList designEle = new ArrayList();
 
         try {

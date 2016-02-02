@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- *
+ * class for identifying the negative sentence
+ * 
  * @author S. Shobiga
  */
 public class NegativeSentenceDetection {
@@ -20,13 +21,21 @@ public class NegativeSentenceDetection {
     private Tree tree;
     private PhrasesIdentification phrasesIdentification;
     
-
+    /**
+     * constructor which takes a single tree
+     * @param tree 
+     */
     NegativeSentenceDetection(Tree tree) {
         this.tree = tree;
         phrasesIdentification = new PhrasesIdentification(tree);
 
     }
 
+    /**
+     * check whether a sentence is negative or not by comparing the negative words with the dictionary with 
+     * the negative words detected by tokenizing a sentence 
+     * @return 
+     */
     public boolean isNegativeSentence() {
         boolean negativeSentence = false;
         ArrayList wordsFromDictionary = readFromTextFile("res/NegativeWordsDictionary.txt");
@@ -41,12 +50,16 @@ public class NegativeSentenceDetection {
                 break;
             }
         }
-        
-        
+ 
         System.out.println("NEGATIVE: "+ negativeSentence);
         return negativeSentence;
     }
 
+    /**
+     * method to read the file 
+     * @param file
+     * @return 
+     */
     private static ArrayList readFromTextFile(String file) {
         BufferedReader br = null;
         ArrayList words = new ArrayList();
