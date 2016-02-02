@@ -125,7 +125,7 @@ public class WriteRequirementToXML {
             StaticData.classLst = classInfoList;
                 
             WriteToXML writer = new WriteToXML();
-            WriteToXML.type = "Requirement";
+            writer.type = "Requirement";
             writer.createXML();
            
             
