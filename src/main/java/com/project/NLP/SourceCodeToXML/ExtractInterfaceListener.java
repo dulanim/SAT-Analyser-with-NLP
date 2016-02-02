@@ -49,8 +49,6 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
         // ctx.unannType().unannReferenceType().unannClassOrInterfaceType().
         type = "Field";
-        super.enterFieldDeclaration(ctx);
-        type = "Variable";
         String associationType = "COMPOSITION";
         if (ctx.unannType().unannPrimitiveType() != null) {
             fieldType = ctx.unannType().unannPrimitiveType().getText();
