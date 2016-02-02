@@ -1,7 +1,5 @@
 package com.project.traceability.GUI;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.common.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -25,10 +25,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.Dimension;
 
 
 public class ImportProjectWindow {
@@ -411,15 +410,15 @@ public class ImportProjectWindow {
                                     */
                                     root.setText(projectName);
                                 }
-				root.setImage(new Image(display,
+                                root.setImage(new Image(display,
                                 FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
                                 
                                 if(importFiles != null)
                                     importFiles.add(file);
-                       }else{
-				root = new TreeItem(tree, SWT.NONE);
-				root.setText("DefaultProject");
-                        }
+                       			}else{
+									root = new TreeItem(tree, SWT.NONE);
+									root.setText("DefaultProject");
+                       			}
 			for(int i =0;i<listFile.length;i++){
 				String subFolderName = getSubFolder(listFile[i].getAbsolutePath());
 				TreeItem child = new TreeItem(root, SWT.NONE);
@@ -458,7 +457,7 @@ public class ImportProjectWindow {
                             String content = "Given Path does not have required file/ folder";
                             String title = "Information For Selection";
                             showErrorMessage(content, title);
-                         }
+             }
 		}
 	}
 	
@@ -470,7 +469,7 @@ public class ImportProjectWindow {
 		}else if(path.contains("\\")){ //For Windows
                     subFolderName = path.substring(path.lastIndexOf("\\") + 1, 
 					path.length());
-                }
+       }
 		
 		return subFolderName;
 	}

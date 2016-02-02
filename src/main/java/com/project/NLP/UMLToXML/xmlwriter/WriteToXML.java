@@ -46,7 +46,7 @@ public class WriteToXML {
     public static HashMap<String, String> keyIDMap = new HashMap<>();
     public int count = 0;
     public static String fileName = "";
-    public static String type = "UMLDiagram";//can change when requirement file writing as xml format
+    public String  type = "UMLDiagram";//can change when requirement file writing as xml format
     private static int attrId = 1;
     private static int methodId = 1;
 

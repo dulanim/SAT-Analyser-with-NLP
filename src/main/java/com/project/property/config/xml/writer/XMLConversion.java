@@ -25,7 +25,7 @@ public class XMLConversion {
        if(StaticData.umlFilePath.contains("mdj")){
             JSONReader reader = new JSONReader();
             reader.readJson();
-            WriteToXML.type="UMLDiagram";
+            xmlWriter.type="UMLDiagram";
             xmlWriter.createXML();
             isSuccess = true;
           

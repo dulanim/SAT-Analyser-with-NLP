@@ -38,6 +38,18 @@
                     <argLine>-Xms512m -Xmx1024m</argLine>
                 </configuration>
             </plugin>
+            
+             <plugin>
+	            <groupId>org.eclipse.tycho</groupId>
+	            <artifactId>tycho-surefire-plugin</artifactId>
+	            <version>3</version>
+	            <configuration>
+	              <useUIHarness>true</useUIHarness>
+	              <useUIThread>false</useUIThread>
+	              <product>org.eclipse.sdk.ide</product>
+	              <application>org.eclipse.ui.ide.workbench</application>
+	           </configuration>
+        </plugin>
         </plugins>
     </build>
     <repositories>
@@ -188,7 +200,12 @@
 		<groupId>info.debatty</groupId>
 		<artifactId>java-string-similarity</artifactId>
 		<version>0.10</version>
-	  </dependency>
-       
+	</dependency>
+        <dependency>
+            <groupId>uk.ac.shef.wit</groupId>
+            <artifactId>simmetrics</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
     </dependencies>
 </project>

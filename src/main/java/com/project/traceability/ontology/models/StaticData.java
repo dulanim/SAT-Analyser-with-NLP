@@ -29,4 +29,5 @@ public class StaticData {
                 +WordExpWindows.word1+ " & " + WordExpWindows.word2 +", "+
                 " you do not need to add for futher projects\n\n"+
                 "Do you want to add to Dictionary those words?";
+    public static boolean isAdded = false;
 }

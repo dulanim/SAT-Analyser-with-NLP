@@ -63,19 +63,19 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 
 public class NewFileWindow {
-    public static StyledText codeText;
+        public static StyledText codeText;
+        public static String selectedProjectPath;
+        public static Set<String> openedFiles = new HashSet<>();
 	static Shell shell;
 	private Text text;
 	static Path path;
 	public static String localFilePath;
 	static String[] selectedFiles;
 	static int filePostion = 0;
-    String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
+        String formats[] = { "*.uml*;*.xmi*;*.mdj*"};
 	static String textString;
 	FileDialog fileDialog;
 	private Text text_1;
-    public static String selectedProjectPath;
-    public static Set<String> openedFiles = new HashSet<>();
 
 	/**
 	 * Launch the application.
@@ -276,7 +276,6 @@ public class NewFileWindow {
 				// TODO Auto-generated method stub
 
 			}
-
 			@Override
 			public void controlMoved(ControlEvent arg0) {
 
@@ -300,7 +299,7 @@ public class NewFileWindow {
                 codeText.setEditable(false);
 		File file = new File(localFilePath + fileName);
                 
-        openedFiles.add(file.getAbsolutePath());
+                openedFiles.add(file.getAbsolutePath());
                 
                 
                 tabItem.setToolTipText(file.getPath());
@@ -378,8 +377,8 @@ public class NewFileWindow {
 		new UndoRedoImpl(codeText);
 		composite.setData(codeText);
 		tabItem.setControl(composite);
-        tabItem.setToolTipText(file.getPath());
-        final CTabItem tabItemFinal = tabItem;
+                tabItem.setToolTipText(file.getPath());
+                final CTabItem tabItemFinal = tabItem;
                 
                 // Add an event listener to write the selected tab to stdout
                 // Add a listener to get the close button on each tab

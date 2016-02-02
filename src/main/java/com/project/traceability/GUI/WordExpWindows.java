@@ -189,7 +189,7 @@ public class WordExpWindows {
 				creator.createNewNode(word1, word2, word);
 				
 				tree_desc.removeAll();
-				shell.dispose();
+				shell.close();
 			}
 		});
 		

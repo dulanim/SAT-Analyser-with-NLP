@@ -72,7 +72,7 @@ import com.project.traceability.visualization.GraphDB.RelTypes;
 /**
  * Main Home Window of the tool
  */
-public class HomeGUI extends JFrame implements KeyListener {
+public class HomeGUI implements KeyListener {
 
     public static Dimension screen = java.awt.Toolkit.getDefaultToolkit()
             .getScreenSize();
@@ -86,7 +86,7 @@ public class HomeGUI extends JFrame implements KeyListener {
     public static Composite composite;
     public static Composite graphComposite;
     public static Composite projComposite;
-    public static Display display;
+    public  static Display display;
     public static final Map<Boolean, String> activeTab = new HashMap<Boolean, String>();
     public static boolean isComaparing = false;
     public static boolean isSelectionForUMLFile = false;
@@ -146,6 +146,8 @@ public class HomeGUI extends JFrame implements KeyListener {
             window = new HomeGUI(); 		//start the project
             reader = new XMLReader();
             reader.readDefaultNode();
+            
+            
             window.open();
             window.eventLoop(Display.getDefault());
         } catch (Exception e) {
@@ -170,8 +172,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         return shell;
     }
 
-    public void eventLoop(Display display) {
-        this.display = display;
+    public  void eventLoop(Display display) {
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -187,6 +188,14 @@ public class HomeGUI extends JFrame implements KeyListener {
         label.setBounds(5, 5, p.x + 5, p.y + 5);
     }
 
+    public  Shell getShell(Display display){
+    	/*
+    	 * This method is for testing purpose
+    	 */
+    	createContents();
+    	return shell;
+    }
+    
     /**
      * Create contents of the window.
      */
@@ -196,7 +205,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         reader.readWorkspaces();
         //PropertyFile.filePath = StaticData.rootPathName;//update cuureent workspace 
 
-        shell = new Shell();
+        shell = new Shell(display);
         shell.setBounds(0, 0, screen.width, screen.height - 20);
         com.project.traceability.common.Dimension.toCenter(shell);
         shell.setLayout(new FillLayout());
@@ -462,7 +471,7 @@ public class HomeGUI extends JFrame implements KeyListener {
                         for (int i = 0; i < items.length; i++) {
 
                             String tips = items[i].getToolTipText();
-                            if (tips.equalsIgnoreCase(NewFileWindow.localFilePath + string)) {
+                            if (tips != null && tips.equalsIgnoreCase(NewFileWindow.localFilePath + string)) {
                                 tabFolder.setSelection(items[i]);
                                 break;
                             }
@@ -1256,16 +1265,27 @@ public class HomeGUI extends JFrame implements KeyListener {
 
         MenuItem closeItem = new MenuItem(projectMenu, SWT.NONE);
         closeItem.addSelectionListener(new SelectionAdapter() {
-
+                //close method go here 
         });
         closeItem.setText("Close");
 
-        MenuItem deleteProItem = new MenuItem(projectMenu, SWT.NONE);
-        deleteProItem.addSelectionListener(new SelectionAdapter() {
+        MenuItem resolveProItem = new MenuItem(projectMenu, SWT.NONE);
+        resolveProItem.addSelectionListener(new SelectionAdapter() {
 
-            //Resolve method going to here 
+            //Resolve method going to here
+            //if text file is not pop up file upload window
+            //if source file is not pop up file upload window
+            //if uml file is not pop up file upload window
+            //if xml files are not pop up file upload window
+            TreeItem item = tree.getSelection()[0];
+            String projectName = item.getText();
+            
+            //HomeGUI.main(null);
+                    
+            
+            
         });
-        deleteProItem.setText("Resolve");
+        resolveProItem.setText("Resolve");
 
         Menu visualMenu = new Menu(popupMenu);
         graphItem.setMenu(visualMenu);
@@ -1587,11 +1607,15 @@ public class HomeGUI extends JFrame implements KeyListener {
         CTabItem items[] = tabFolder.getItems();
         for (int i = 0; i < items.length; i++) {
             String tips = items[i].getToolTipText();
-            if (tips.equalsIgnoreCase(visiblePath)) {
+            if (tips != null && tips.equalsIgnoreCase(visiblePath)) {
 
                 tabFolder.setSelection(items[i]);
             }
         }
     }
     
+    private static void resolve(){
+            ErrorFinder.setProjectFolderResolve(projectPath, topParent);
+            
+    }
 }

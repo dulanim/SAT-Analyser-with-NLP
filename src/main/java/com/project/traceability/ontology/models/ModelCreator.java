@@ -246,6 +246,7 @@ public class ModelCreator {
 	              e.printStackTrace();
 	          }
          }
+          StaticData.isAdded = true;
          return isCreated;
     }
 

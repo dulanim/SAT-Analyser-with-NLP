@@ -34,8 +34,8 @@ public class UMLSourceClassManager {
 	static TableItem tableItem;
 	static TreeItem classItem;
 	
-	static Image exactImage = new Image(CompareWindow.display,FilePropertyName.IMAGE_PATH + "exact.jpg");
-	static Image violateImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH + "violation.jpg");
+	static Image exactImage = FilePropertyName.exactimg;
+	static Image violateImage = FilePropertyName.violoationimg;
 
 	/**
 	 * check whether the designed classes are implemented in sourcecode
@@ -330,12 +330,14 @@ public class UMLSourceClassManager {
 						TreeItem subItem = new TreeItem(subAttribute, SWT.NONE);
 						subItem.setText(1, model.getName());
 						subItem.setImage(1, violateImage);
+						subItem.setData("1",model);
 						subItem.setForeground(Display.getDefault()
 								.getSystemColor(SWT.COLOR_RED));
 					} else if (model.getType().equalsIgnoreCase("UMLOperation")) {
 						TreeItem subItem = new TreeItem(subMethod, SWT.NONE);
 						subItem.setText(1, model.getName());
 						subItem.setImage(1, violateImage);
+						subItem.setData("1",model);
 						subItem.setForeground(Display.getDefault()
 								.getSystemColor(SWT.COLOR_RED));
 					}
@@ -348,6 +350,7 @@ public class UMLSourceClassManager {
 					if (model.getType().equalsIgnoreCase("Field")) {
 						TreeItem subItem = new TreeItem(subAttribute, SWT.NONE);
 						subItem.setText(0, model.getName());
+						subItem.setData("0",model);
 						subItem.setImage(0, violateImage);
 						subItem.setForeground(Display.getDefault()
 								.getSystemColor(SWT.COLOR_RED));
@@ -355,6 +358,7 @@ public class UMLSourceClassManager {
 						TreeItem subItem = new TreeItem(subMethod, SWT.NONE);
 						subItem.setText(0, model.getName());
 						subItem.setImage(0, violateImage);
+						subItem.setData("0",model);
 						subItem.setForeground(Display.getDefault()
 								.getSystemColor(SWT.COLOR_RED));
 					}

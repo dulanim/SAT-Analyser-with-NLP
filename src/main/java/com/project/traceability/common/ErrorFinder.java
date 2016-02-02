@@ -7,7 +7,6 @@ package com.project.traceability.common;
 
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.GUI.NewFileWindow;
 import com.project.traceability.staticdata.StaticData;
 import java.io.File;
 import org.eclipse.swt.graphics.Image;
@@ -107,7 +106,17 @@ public class ErrorFinder {
         
     }
     
-    
+    public static void setProjectFolderResolve(String projectPath,TreeItem selection){
+        File f = new File(projectPath);
+        String folders[] = f.list();
+        
+        boolean foldersExists = lookUpForFolders(folders);
+        
+        if(!foldersExists){
+            //if folder does not exists mkdirirectories
+            resolve(projectPath, selection.getItems());
+        }
+    }
     public static void checkEachProject(){
         
         TreeItem projects[] = HomeGUI.tree.getItems();
@@ -200,8 +209,6 @@ public class ErrorFinder {
                     
                      if(file.isDirectory()){
                         file.mkdir();
-                     }else{
-                         NewFileWindow.main(null);
                      }
                  }
             }else if(txt.equals(FilePropertyName.REQUIREMENT) && !isTxt){

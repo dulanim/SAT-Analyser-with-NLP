@@ -12,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.FileDialog;
+
+import com.project.traceability.GUI.CompareWindow;
 
 
 /**
@@ -41,7 +44,12 @@ public class FilePropertyName {
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
     public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
     public static final String IMAGE_PATH = System.getProperty("user.dir") + File.separator + "img"+ File.separator;
-//    public static Path getPath(Path target,String type){
+
+    public static final Image exactimg = new Image(CompareWindow.display, IMAGE_PATH+ "exact.jpg");
+    public static final Image violoationimg = new Image(CompareWindow.display, IMAGE_PATH+ "violation.jpg");
+    public static final String exactImageData = exactimg.toString();
+    public static final String violationImageData = violoationimg.toString();
+    //    public static Path getPath(Path target,String type){
 //        if(type.contains(XML)){
 //            target = Paths.get(HomeGUI.projectPath + File.separator + XML);
 //        }else if(type.contains(REQUIREMENT) || type.contains("txt") || type.contains("pdf")||
