@@ -30,7 +30,7 @@ public class XMLReader {
         public XMLReader(){
             File config_XmlFile = new File(PropertyFile.configuration_file_path);
             
-		try{
+            	try{
                     dbFactory = DocumentBuilderFactory.newInstance();
                     dBuilder = dbFactory.newDocumentBuilder();
                     doc = dBuilder.parse(config_XmlFile);

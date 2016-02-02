@@ -150,7 +150,7 @@ public class JSONReader {
 		                                    
 		                                    JSONObject jsonObject_Operation = (JSONObject) operationIterator.next();
 		                                    Operation operation = new Operation();
-		                                    operation.setType("UMLOpertion");
+		                                    operation.setType("UMLOperation");
 		                                    operation.setId(jsonObject_Operation.get("_id").toString());
 		                                    operation.setName(jsonObject_Operation.get("name").toString());
 		                                    operation.setVisibility(jsonObject_Operation.get("visibility").

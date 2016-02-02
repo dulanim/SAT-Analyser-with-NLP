@@ -12,7 +12,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-7-openjdk-amd64">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -42,5 +42,6 @@
 	<classpathentry kind="lib" path="/home/shiyam/Projects/FinalYear/Anduril/lib/org.eclipse.swtbot.junit4_x-2.0.5.jar"/>
 	<classpathentry kind="lib" path="/home/shiyam/Projects/FinalYear/Anduril/lib/org.eclipse.swtbot.eclipse.gef.finder_2.2.2.201411280836.jar"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
+	<classpathentry kind="lib" path="/home/shiyam/Downloads/simmetrics_jar_v1_6_2_d07_02_07.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

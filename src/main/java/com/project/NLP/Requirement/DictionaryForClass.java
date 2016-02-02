@@ -22,17 +22,27 @@ public class DictionaryForClass {
         setDictionaryForClass();
     }
 
-    /*add design elements such as system, aplication and etc. to the arrayList
+    /**
+     * read dictionary file and store words in the array list
      */
     private void setDictionaryForClass() {
         dictionaryForClass= readFromTextFile("res/ClassElementsDictionary.txt");
     }
 
+    /**
+     * get dictionary words 
+     * @return arrayList
+     */
     public ArrayList getDictionaryForClass() {
         //System.out.println("from design :"+designElements);
         return dictionaryForClass;
     }
     
+    /**
+     * method to read the text file
+     * @param file
+     * @return 
+     */
     private ArrayList readFromTextFile(String file){
     BufferedReader br = null;
         ArrayList designEle = new ArrayList();

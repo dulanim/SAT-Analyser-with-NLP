@@ -9,10 +9,13 @@ import com.project.traceability.model.MethodModel;
 import com.project.traceability.model.ParameterModel;
 import com.project.traceability.model.RequirementModel;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -30,7 +33,12 @@ import org.neo4j.tooling.GlobalGraphOperations;
  * Model to add data to Neo4j graph DB.
  *
  * @author Thanu
+<<<<<<< HEAD
+ * @author AARTHIKA
+ *
+=======
  * @author Aarthika
+>>>>>>> 4f9b08cf18e5ae841f491ab2fb02e4224caacf96
  */
 public class GraphDB {
 
@@ -464,14 +472,63 @@ public class GraphDB {
             addSubMethod(temp, subNode);
             //Updates if there are any change in the return type of the artefact sub element  
 
+            if (null == subNode.getProperty("Return Type") || !subNode.getProperty("Return Type").equals(
+                    temp.getVisibility())) {
+                if (null != temp.getReturnType()) {
+                    subNode.setProperty("Return Type", temp.getReturnType());
+                    //System.out.println("Node Return Type updated " + temp.getReturnType());
+                } else {
+                    subNode.setProperty("Return Type", "");
+                }
+            }
+            if (null == subNode.getProperty("Parameters") || !subNode.getProperty("Parameters").equals(
+                    ((MethodModel) temp).getParameters())) {
+                if (null != ((MethodModel) temp).getParameters()) {
+                    List<ParameterModel> params = ((MethodModel) temp).getParameters();
+                    String parameters = "";
+                    for (int p = 0; p < params.size(); p++) {
+                        parameters += params.get(p).getName() + ":"
+                                + params.get(p).getVariableType();
+                        if (p < params.size() - 1) {
+                            parameters += ",";
+                        }
+                    }
+                    subNode.setProperty("Parameters", parameters);
+                    //System.out.println("Node parameters updated " + ((MethodModel) temp).getParameters());
+                } else {
+                    subNode.setProperty("Parameters", "");
+                }
+            }//Updates if there are any change in the content of the artefact sub element 
+            else if (null == subNode.getProperty("Content") || !subNode.getProperty("Content").equals(
+                    ((MethodModel) temp).getContent())) {
+                if (null != ((MethodModel) temp).getContent()) {
+                    subNode.setProperty("Content", ((MethodModel) temp).getContent());
+                    //System.out.println("Node content updated " + ((MethodModel) temp).getContent());
+                } else {
+                    subNode.setProperty("Content", "");
+                }
+
         }
         //Checks if it is a variable
         if (temp.getType().equalsIgnoreCase(
                 "UMLAttribute")
                 || temp.getType().equalsIgnoreCase("Field")) {
             //Updates if there are any change in the variable type of the artefact sub element 
+
+            if (null == subNode.getProperty("Variable Type") || !subNode.getProperty("Variable Type").equals(
+                    ((AttributeModel) temp).getVariableType())) {
+                if (null != ((AttributeModel) temp).getVariableType()) {
+                    subNode.setProperty("Variable Type", ((AttributeModel) temp).getVariableType());
+                    //System.out.println("Node Field updated " + ((AttributeModel) temp).getVariableType());
+                } else {
+                    subNode.setProperty("Variable Type", "");
+                }
+
+            }
+
             addSubVariable(temp, subNode);
         }
+    }
     }
 
     /**
@@ -567,15 +624,21 @@ public class GraphDB {
         Transaction tx = graphDb.beginTx();
         try {
             IndexManager index = graphDb.index();
+            Index<Node> artefactsRelation = index.forNodes("ArtefactElement");
+            Index<Relationship> edgesRelation = index.forRelationships("SOURCE_TO_TARGET");
+            System.out.println("Enetering relationships..." + relation.size());
+
             Index<Node> artefacts = index.forNodes("ArtefactElement");
             Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
 
+
+            String id;
             for (int i = 0; i < relation.size(); i++) {
+
                 IndexHits<Node> hits = artefacts.get("ID", relation.get(i));
                 Node source = hits.getSingle();
                 String message = relation.get(++i);
                 RelTypes relType = RelTypes.parseEnum(message);
-                hits = artefacts.get("ID", relation.get(++i));
                 Node target = hits.getSingle();
 
                 if (null != source && null != target) {
@@ -590,13 +653,29 @@ public class GraphDB {
                     if (!exist) {
                         relationship = source.createRelationshipTo(target, relType);
                         relationship.setProperty("message", message);
-                        edges.add(relationship, "ID", source.getProperty("ID") + "-" + target.getProperty("ID"));
+                        edgesRelation.add(relationship, "ID", source.getProperty("ID") + "-" + target.getProperty("ID"));
                     }
                 }
             }
             tx.success();
         } finally {
             tx.finish();
+        }
+    }
+
+    public void checkdb() {
+        Transaction tx = graphDb.beginTx();
+        try {
+            System.out.println("Entered db...");
+            for (Node n : GlobalGraphOperations.at(graphDb).getAllNodes()) {
+                for (String m : n.getPropertyKeys()) {
+                    System.out.println("" + m + " : " + n.getProperty(m));
+                }
+            }
+            tx.success();
+        }
+        finally{
+            
         }
     }
 

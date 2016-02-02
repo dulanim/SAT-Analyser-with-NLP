@@ -3,6 +3,7 @@ package com.project.traceability.GUI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -37,7 +38,7 @@ import com.project.traceability.ontology.models.Word;
 public class WordExpWindows {
 
 	protected Shell shell;
-	Label lblword2; // it keeps track of word 2 name in text format
+	Label lblword2; // it f word 2 name in text format
 	Label lblword1; // it keeps track of word 2 name in text format
 	public static Combo combo_parent; // it keeps track of parent names from model.owl file
 	public static Combo combo_proeprty;//it keeps track of all property name
@@ -49,6 +50,11 @@ public class WordExpWindows {
 	private static java.util.List<String> properties;
 	private static java.util.List<String> values;
 	private static java.util.List<String> parents;
+	private static java.util.Stack<String> propertiesStack;
+	private static java.util.Stack<String> parentsStack;
+	private static java.util.List<String> removedParent;
+	private static java.util.List<String> removedProperty;
+	private static java.util.Stack<String> descriptionsStack;
 	private java.util.List<String> list = null;
 	public String selectedParentItem;
 	public String selectedPropertyItem;
@@ -73,14 +79,21 @@ public class WordExpWindows {
 	 */
 	public static void main(String[] args) {
 		try {
-			word1 = "Teacher";
-			word2 = "Miss";
-			word = new Word();
-			word.setWordType(StaticData.OWL_CLASS);
+//			word1 = "Cocnut";
+//			word2 = "CocounantTree";
+//			word = new Word();
+//			word.setWordType(StaticData.OWL_CLASS);
 			
 			parents = new ArrayList<>();
 			properties = new ArrayList<>();
 			values = new ArrayList<>();
+			
+			propertiesStack = new Stack<>();
+			parentsStack = new Stack<>();
+			descriptionsStack = new Stack<>();
+			
+			removedParent = new ArrayList<>();
+			removedProperty = new ArrayList<>();
 			window = getWindowInstance();
 			window.open();
 			
@@ -171,9 +184,12 @@ public class WordExpWindows {
 				
 				word.setPropertyName(properties);
 				word.setValue(values);
-				word.setParentName(selectedParentItem);
+				word.setParentName(parents);
 				
 				creator.createNewNode(word1, word2, word);
+				
+				tree_desc.removeAll();
+				shell.close();
 			}
 		});
 		
@@ -201,15 +217,24 @@ public class WordExpWindows {
 				 */
 				String items[] = combo_parent.getItems();
 				int pos = combo_parent.getSelectionIndex();
-				selectedParentItem = items[pos];
+				if(pos>=0)
+					selectedParentItem = items[pos];
+				else
+					selectedParentItem = "";
 				
 				items = combo_proeprty.getItems();
-				int posParent = combo_proeprty.getSelectionIndex();
-				selectedPropertyItem = items[posParent];
+				int posProps = combo_proeprty.getSelectionIndex();
+				if(posProps>=0)
+					selectedPropertyItem = items[posProps];
+				else
+					selectedPropertyItem = "hasDefault";
 				
 				items =  combo_values.getItems();
 				pos = combo_values.getSelectionIndex();
-				selectedValueItem = items[pos];
+				if(pos>=0)
+					selectedValueItem = items[pos];
+				else 
+					selectedValueItem = "aValue";
 					if(selectedPropertyItem != ""){
 						if(selectedValueItem != ""){
 							
@@ -245,6 +270,8 @@ public class WordExpWindows {
 									properties.add(selectedPropertyItem);
 									values.add(selectedValueItem);
 									
+									propertiesStack.push(selectedPropertyItem);
+									parentsStack.push(selectedParentItem);
 									word.setParentName(parents);
 									word.setPropertyName(properties);
 									word.setValue(values);
@@ -284,7 +311,7 @@ public class WordExpWindows {
 		
 		final Button btnRemoveAddition = new Button(composite_1, SWT.NONE);
 		btnRemoveAddition.setBounds(0, 25, 136, 29);
-		btnRemoveAddition.setText("Remove Selection");
+		btnRemoveAddition.setText("Remove Last Added Content");
 		btnRemoveAddition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -296,15 +323,79 @@ public class WordExpWindows {
 				 */
 				
 			
-				TreeItem selectionitem[] = tree_desc.getSelection();
-				
-				for(int i=0;i<selectionitem.length;i++){
-					selectionitem[i].dispose();
+				TreeItem items[]= tree_desc.getItems();
+				TreeItem itemRoots[];
+				if(items.length>0)
+					 itemRoots = items[0].getItems();
+				else{
+					showPopUp("Nothing in Tree","Information Message");
+					return;
+				}
+				boolean isParentRemoved = false;
+				boolean isPropertyRemoved = false;
+				boolean isDescriptionRemoved = false;
+				for(TreeItem item:itemRoots){
+					TreeItem selectionitem[] = item.getItems();
+					List<TreeItem> itemList = Arrays.asList(selectionitem);
+					
+					for(TreeItem listItm:itemList){
+						
+							String parentText = item.getText();
+							String text = listItm.getText();
+							String lastAddedParent = "";
+							String lastAddedProperty = "";
+							String lastAddedDescripts = "";
+							if(parentsStack.size()>0)
+								 lastAddedParent = parentsStack.peek();
+							if(propertiesStack.size()>0)
+								lastAddedProperty = propertiesStack.peek();
+							if(descriptionsStack.size()>0)
+								lastAddedDescripts = descriptionsStack.peek();
+							if(text.equals(lastAddedParent) && !isParentRemoved){
+								//last parent removed from tree	
+								parents.remove(lastAddedParent);
+								if(!parentsStack.isEmpty())
+									parentsStack.pop();
+								isParentRemoved = true;
+								
+								listItm.dispose();
+								removedParent.add(lastAddedParent);
+						}else if(text.equals(lastAddedProperty) && !isPropertyRemoved){
+								//last property and value removed from tree
+								
+								int pos = properties.indexOf(lastAddedProperty);
+								properties.remove(lastAddedProperty);
+								values.remove(pos);
+								
+								if(!propertiesStack.isEmpty())
+									propertiesStack.pop();
+								listItm.dispose();
+								isPropertyRemoved = true;
+								removedProperty.add(lastAddedProperty);
+							}else if(parentText.equals("Descriptions") && !isDescriptionRemoved){
+								//last added description removed
+								if(text.equals(lastAddedDescripts)){
+									listItm.dispose();
+									descriptionsStack.pop();
+									isDescriptionRemoved = true;
+								}
+							}
+						
+					}
 					
 					
 				}
-		
-				
+				//remove if all property and value pair is not in tree
+				if(properties.size() == 0 || values.size() == 0){
+					
+					///all contents were removed from tree
+					properties.clear();
+					parents.clear();
+					values.clear();
+					items[0].dispose();
+				}
+				setNewComboItmes(combo_parent, removedParent);
+				setNewComboItmes(combo_proeprty, removedProperty);
 			}
 		});
 		Group grpWordsDescription = new Group(shell, SWT.NONE);
@@ -352,24 +443,45 @@ public class WordExpWindows {
 		//Font boldFont = new Font( list.getDisplay(), new FontData( "Arial", 12, SWT.BOLD ) );
 		//tree_desc.setFont( boldFont );
 		
-		btnEditAddition.setText("Edit Contents");
+		btnEditAddition.setText("Clear All");
 		btnEditAddition.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				TreeItem selection[] = tree_desc.getSelection();
-				
-				for(int i=0;i<selection.length;i++){
+//				TreeItem selection[] = tree_desc.getSelection();
+//				
+//				for(int i=0;i<selection.length;i++){
+//					
+//					String tempSelection = selection[i].toString();
+//					if(!(tempSelection.contains("Property") || tempSelection.contains("Parent")
+//							|| tempSelection.contains("Discriptions"))){
+//						//selection[i];
+//						
+//						System.out.println(tempSelection + " is editing now");
+//					}
+//					
+//				}
+				TreeItem item[] = tree_desc.getItems();
+				if(item.length>=1){
+
+					removedProperty = new ArrayList<>(parents);
+					removedProperty = new ArrayList<>(properties);
 					
-					String tempSelection = selection[i].toString();
-					if(!(tempSelection.contains("Property") || tempSelection.contains("Parent")
-							|| tempSelection.contains("Discriptions"))){
-						//selection[i];
-						
-						System.out.println(tempSelection + " is editing now");
-					}
+					parents.clear();
+					properties.clear();
+					setNewComboItmes(combo_parent, removedParent);
+					setNewComboItmes(combo_proeprty, removedProperty);
 					
+					item[0].dispose();
+				}else{
+					String message = "Nothing in Tree\n Before Clear add contents";
+					String title = "Information";
+					showPopUp(message,title);
+					return ;
 				}
+				
 			}
+
+			
 		});
 		
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -445,7 +557,14 @@ public class WordExpWindows {
 			}
 		}
 	}
-	
+	private void showPopUp(String message,String title) {
+		// TODO Auto-generated method stub
+		MessageBox messageBox = new MessageBox(shell, SWT.ERROR_CANNOT_GET_TEXT
+        		| SWT.OK);
+		messageBox.setMessage(message);
+		messageBox.setText(title);
+		messageBox.open();
+	}
 	private void setParentNames(){
 		
 		/*
@@ -623,7 +742,7 @@ public class WordExpWindows {
 		strMessage = word1  + " or " + word2 + " has parent " + selectedParentItem +" Those have " +
 		"" + selectedPropertyItem + " with the value " + selectedValueItem;
 		
-	
+		descriptionsStack.push(strMessage);
 		if(flag){
 			//combo_parent.setEnabled(false);
 			wordTree = new TreeItem(tree_desc, SWT.NONE);
@@ -634,6 +753,9 @@ public class WordExpWindows {
 			
 			parent_child = new TreeItem(parent,SWT.NONE);
 			parent_child.setText(selectedParentItem);
+			
+			if(selectedParentItem == null || selectedParentItem.equals(""))
+					parent_child.dispose();
 			
 			property = new TreeItem(wordTree,SWT.NONE);
 			property.setText("Property");
@@ -659,6 +781,9 @@ public class WordExpWindows {
 			parent_child = new TreeItem(parent,SWT.NONE);
 			parent_child.setText(selectedParentItem);
 			
+			if(selectedParentItem == null || selectedParentItem.equals(""))
+				parent_child.dispose();
+			
 			property_child = new TreeItem(property,SWT.NONE);
 			property_child.setText(selectedPropertyItem);
 			
@@ -671,16 +796,16 @@ public class WordExpWindows {
 			property_child.setExpanded(true);
 		}
 		
-		parent_child.addListener(SWT.MouseHover, new Listener() {
-			
-			@Override
-			public void handleEvent(Event arg0) {
-				// TODO Auto-generated method stub
-				
-				String pointText = arg0.text;
-				System.out.println(pointText);
-			}
-		});
+//		parent_child.addListener(SWT.MouseHover, new Listener() {
+//			
+//			@Override
+//			public void handleEvent(Event arg0) {
+//				// TODO Auto-generated method stub
+//				
+//				String pointText = arg0.text;
+//				System.out.println(pointText);
+//			}
+//		});
 		//NavigationModel navigator = NavigationModel.getNavigatorInstane();
 //		java.util.List<String> list = navigator.getAllProperties();
 		String itemsProperty[] = combo_proeprty.getItems();
@@ -689,20 +814,44 @@ public class WordExpWindows {
 		list = removeListItem(list, selectedPropertyItem);
 //		
 //		this.list = list;
-		combo_parent.removeAll();
-		combo_proeprty.removeAll();
 		combo_values.removeAll();
+		combo_proeprty.removeAll();
 		for(int i=0;i<list.size();i++){
 			combo_proeprty.add(list.get(i));
 		}
 		
 		list = new ArrayList<>(Arrays.asList(itemsParent));
 		list = removeListItem(list, selectedParentItem);
-		for(int i=0;i<list.size();i++){
-			combo_parent.add(list.get(i));
+		if(list != null)
+			combo_parent.removeAll();
+		for(int i=0; list != null && i<list.size();i++){
+				combo_parent.add(list.get(i));
 		}
 	}
 	
+	private void setNewComboItmes(Combo combo,List<String> itmList){
+		
+		String comboItems[] = combo.getItems();
+		combo.removeAll();
+		List<String> list = new ArrayList<>(Arrays.asList(comboItems));
+		
+		String item1 = list.get(list.size()-1);
+		String item2 = list.get(list.size()-2);
+		
+		list.remove(item1);
+		list.remove(item2);
+		
+		for(String item:itmList){
+			if(!list.contains(item))
+				list.add(item);
+		}
+		list.add(item2);
+		list.add(item1);
+		
+		for(int i=0;list != null && i<list.size();i++){
+			combo.add(list.get(i));
+		}
+	}
 	private java.util.List<String> removeListItem(java.util.List<String> list,String rmvItem){
 		java.util.List<String> result = null;
 		

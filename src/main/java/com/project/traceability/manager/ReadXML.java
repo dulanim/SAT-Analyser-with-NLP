@@ -47,6 +47,54 @@ public class ReadXML {
 
         try {
             HomeGUI.isComaparing = false;
+//<<<<<<< HEAD
+//            ReadFiles.readFiles(projectPath);
+//            Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
+//            Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
+//            List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
+//
+//            GraphDB graphDB = new GraphDB();
+//            graphDB.initiateGraphDB();
+//           
+//            System.out.println("Entering UML.....");
+//            graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
+//            System.out.println("Entering Req.....");
+//            graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
+//            System.out.println("Entering SourceCode.....");
+//            graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
+//
+//            graphDB.checkdb();
+//            // trace class links between UML & source code
+//            relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
+//            graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
+//
+//            // trace class links between requirement & source code
+//            List<String> reqSrcRelationNodes = RequirementSourceClassManager
+//                    .compareClassNames(projectPath);
+//            System.out.println("Size of " + reqSrcRelationNodes.size());
+//            graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
+//
+//           List<String> reqUMLRelationNodes = RequirementUMLClassManager
+//                    .compareClassNames(projectPath);
+//            graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
+//
+//            relationNodes.addAll(reqSrcRelationNodes);
+//            relationNodes.addAll(reqUMLRelationNodes);
+//
+//            List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
+//            System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
+//            graphDB.addIntraRelationTOGraphDB(sourceIntraRelations);//add intra relationships between SourceCode elements to db
+//            relationNodes.addAll(sourceIntraRelations);
+//
+//            List<String> UMLIntraRelations = IntraRelationManager.getUMLIntraRelation(projectPath);
+//            System.out.println("UML Intra Relation: " + UMLIntraRelations.size());
+//            graphDB.addIntraRelationTOGraphDB(UMLIntraRelations);//add intra relationships between UML elements to db
+//            relationNodes.addAll(UMLIntraRelations);
+//
+//            RelationManager.addLinks(relationNodes);
+//
+//            graphDB.generateGraphFile();//generate the graph file from db
+//=======
             transferDataToDBFromXML(projectPath, true);
 
             VisualizeGraph visual = VisualizeGraph.getInstance();

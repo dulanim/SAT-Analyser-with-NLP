@@ -17,3 +17,13 @@ multiple
 way
 digit
 detail
+proper
+record
+week
+work
+use
+count
+date
+year
+database
+

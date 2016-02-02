@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 
 Class : normal order
 	Attributes : item,
@@ -48,3 +49,29 @@ Relations :
  Type : Association, Parent : customer, Child : shopping_card
 
  Type : Generalization, Parent : customer, Child : regular customer
+=======
+Class : saving account
+	Attributes : balance,dumm account,withdrawal amount,user,transaction,	Methods : cover,inform,record,terminate,enter,
+Class : amount
+	Attributes : bank accounts,bank account,	Methods : replace,
+Class : item
+	Attributes : store,	Methods : dispose,
+Class : application
+	Attributes : employee account,access,personal identification number code,first prize,current balance,checking account,identification,balance,pin,dumm account,fund,related saving account,withdrawal amount,user,transaction,	Methods : cover,inform,verify,terminate,withdraw,gain,
+Class : officer
+	Attributes : candidate,employer,type,retrieving,	Methods : request,
+Class : save
+	Attributes : 	Methods : record,enter,
+Class : client
+	Attributes : employee account,access,identification,pin,ability,personal identification number code,account,	Methods : review,perform,verify,gain,
+Class : department
+	Attributes : student,	Methods : 
+Class : transaction
+	Attributes : date,amount,transaction type,account balance,time,ability,account,	Methods : include,review,perform,
+Class : verification
+	Attributes : candidate,officer,employer,type,retrieving,	Methods : request,
+Class : bank client
+	Attributes : amount,type,account,bank application,	Methods : deposit,withdraw,
+Class : customer
+	Attributes : candidate,employer,	Methods : 	Relations : Type - Parent-> Parent -client
+>>>>>>> 0397711520e2b20ff87c1608bcbcfa7c67380e38

@@ -3,7 +3,6 @@
  */
 package com.project.traceability.manager;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,24 +12,27 @@ import java.util.Map.Entry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.model.WordsMap;
+import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
 /**
  * 13 Nov 2014
  *
  * @author K.Kamalan
+ * @modified by shiyam
+ * 
+ * modified in 10 Nov 2015
  *
  */
 public class RequirementSourceClassManager {
@@ -46,8 +48,8 @@ public class RequirementSourceClassManager {
     static TreeItem classItem;
 
     //create static variable for show the image in compare file window.
-    static Image exactImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH + "exact.jpg");
-    static Image violateImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH  + "violation.jpg");
+    static Image exactImage = FilePropertyName.exactimg;
+	static Image violateImage = FilePropertyName.violoationimg;
 
     /**
      * check whether the requirement classes are implemented in sourcecode
@@ -130,6 +132,12 @@ public class RequirementSourceClassManager {
                        //require the ontology data 
                         ModelCreator modelCreator = ModelCreator.getModelInstance();
                         isWordMatchd = modelCreator.isMatchingWords(sourceName, name);
+                        if(!isWordMatchd){
+                        	//if it is not match by our dictionary 
+                        	//call the check similarity algorithm or edit distance
+                        	//based on edit distance we find out the similarity
+                        	isWordMatchd = MatchWords.compareStrings(sourceName, name);
+                        }	
                     }
                     if (sourceArtefactElement.getType().equalsIgnoreCase(
                             "Class")
@@ -267,7 +275,7 @@ public class RequirementSourceClassManager {
                 id = actualID.substring(actualID.indexOf("D"));
             }
             
-            relationNodes.add(id);
+        relationNodes.add(id);
 	    relationNodes.add("Req Class To Source Class");
 	    relationNodes.add(sourceArtefactElement.getArtefactElementId());
 
@@ -304,7 +312,13 @@ public class RequirementSourceClassManager {
                     //call ontology method to compare
                      ModelCreator modelCreator = ModelCreator.getModelInstance();
                      isMatched = modelCreator.isMatchingWords(name1, name2);
-                    
+                     if(!isMatched){
+                     	//if it is not match by our dictionary 
+                     	//call the check similarity algorithm or edit distance
+                     	//based on edit distance we find out the similarity
+                     	isMatched = MatchWords.compareStrings(name1, name2);
+                     }
+                     
                 }
                 if (isMatched) {
                 	if(requElement.getSubElementId().contains("RQ"))

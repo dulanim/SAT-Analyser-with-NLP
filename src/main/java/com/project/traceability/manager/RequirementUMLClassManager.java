@@ -1,6 +1,5 @@
 package com.project.traceability.manager;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,13 +13,15 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
-import com.project.traceability.common.PropertyFile;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
-import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.model.WordsMap;
+import com.project.traceability.ontology.models.MatchWords;
+import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
 public class RequirementUMLClassManager {
@@ -33,8 +34,8 @@ public class RequirementUMLClassManager {
 	static TableItem tableItem;
 	static TreeItem classItem;
 	
-	static Image exactImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "exact.jpg");
-	static Image violateImage = new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "violation.jpg");
+	static Image exactImage = FilePropertyName.exactimg;
+	static Image violateImage = FilePropertyName.violoationimg;//new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "violation.jpg");
 
 	/**
 	 * check whether the requirement classes are implemented in UML
@@ -77,13 +78,31 @@ public class RequirementUMLClassManager {
 					Map.Entry pairs1 = umlIterator.next();
 					ArtefactElement UMLArtefactElement = (ArtefactElement) pairs1
 							.getValue();
-                                        WordsMap w1 = new WordsMap();
-                                        w1 = SynonymWords.checkSymilarity(UMLArtefactElement.getName(), name,
+                    WordsMap w1 = new WordsMap();
+                    String umlName = UMLArtefactElement.getName();
+                    String requirementName = name;
+                    w1 = SynonymWords.checkSymilarity(UMLArtefactElement.getName(), name,
 									reqArtefactElement.getType());
+                    boolean isMatched = w1.isIsMatched();
+                    if(!isMatched){
+                    	//wordNet dictionary does not have any matching word
+                    	//call our dictionary model.owl 
+                    	ModelCreator model = ModelCreator.getModelInstance();
+                        model.setPath("");
+                    	isMatched = model.isMatchingWords(requirementName, umlName);
+                    	
+                    	if(!isMatched){
+                    		//if it is not match by our dictionary 
+                    		//call the check similarity algorithm or edit distance
+                    		//based on edit distance we find out the similarity
+                    		isMatched = MatchWords.compareStrings(requirementName, umlName);
+                    	}
+                    }
 					if (UMLArtefactElement.getType().equalsIgnoreCase("Class")
 							&& (UMLArtefactElement.getName().equalsIgnoreCase(
-									name) | w1.isIsMatched())) {
-
+									name) | isMatched)) {
+						System.out.println("Compared for Reuqirement and UML " + "RequirementClass:-" + 
+								requirementName + "UMLClass:->" + umlName);
 						compareSubElements(classItem, reqArtefactElement, UMLArtefactElement);
 						UMLMap.remove(UMLArtefactElement.getArtefactElementId());
 						reqMap.remove(reqArtefactElement.getArtefactElementId());
@@ -219,26 +238,41 @@ public class RequirementUMLClassManager {
 		List<ArtefactSubElement> reqAttributeElements = reqArtefactElement
 				.getArtefactSubElements();
 		for (int i = 0; i < UMLAttributeElements.size(); i++) {
-			ArtefactSubElement UMLAttribute = UMLAttributeElements
+			ArtefactSubElement UMLSubElement = UMLAttributeElements
 					.get(i);
 			for (int j = 0; j < reqAttributeElements.size(); j++) {
-				ArtefactSubElement reqElement = reqAttributeElements
+				ArtefactSubElement reqSubElement = reqAttributeElements
 						.get(j);
-                                WordsMap w2 = new WordsMap();
-                                w2 = SynonymWords.checkSymilarity(
-								UMLAttribute.getName(),
-								reqElement.getName(),
-								reqElement.getType(),UMLAttribute.getType(),requirementClasses);
-				if (UMLAttribute.getName().equalsIgnoreCase(
-						reqElement.getName())
-						| w2.isIsMatched()) {
-					relationNodes.add(reqElement
+				WordsMap w2 = new WordsMap();
+				String requirementArtName = reqSubElement.getName();
+				String umlArtName = UMLSubElement.getName();
+                w2 = SynonymWords.checkSymilarity(
+                		UMLSubElement.getName(),
+								reqSubElement.getName(),
+								reqSubElement.getType(),UMLSubElement.getType(),requirementClasses);
+                boolean isMatched = w2.isIsMatched();
+                if(!isMatched){
+                    //wordNet dictionary does not have any matching word
+                    //call our dictionary model.owl 
+                    ModelCreator model = ModelCreator.getModelInstance();
+                    isMatched = model.isMatchingWords(requirementArtName, umlArtName);
+                    if(!isMatched){
+                    	//if it is not match by our dictionary 
+                    	//call the check similarity algorithm or edit distance
+                    	//based on edit distance we find out the similarity
+                    	isMatched = MatchWords.compareStrings(requirementArtName, umlArtName);
+                    }	
+                }
+				if (UMLSubElement.getName().equalsIgnoreCase(
+						reqSubElement.getName())
+						| isMatched) {
+					relationNodes.add(reqSubElement
 							.getSubElementId().substring(
-									reqElement
+									reqSubElement
 											.getSubElementId()
 											.indexOf("RQ")));
-                                        relationNodes.add("Req "+reqElement.getType()+" To "+UMLAttribute.getType());
-					relationNodes.add(UMLAttribute
+                                        relationNodes.add("Req "+reqSubElement.getType()+" To "+UMLSubElement.getType());
+					relationNodes.add(UMLSubElement
 							.getSubElementId());
 					
 					// if(UMLAttribute.getName().equalsIgnoreCase(reqElement.getName())
@@ -247,23 +281,23 @@ public class RequirementUMLClassManager {
 					if (CompareWindow.tree != null
 							&& !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
 						
-						if ((reqElement.getType())
+						if ((reqSubElement.getType())
 								.equalsIgnoreCase("Field")) {
-							UMLAttributesList.add(UMLAttribute);
-							reqAttributesList.add(reqElement);
+							UMLAttributesList.add(UMLSubElement);
+							reqAttributesList.add(reqSubElement);
 							attributeWordsMapList.add(w2);
 						}
 
-						else if ((reqElement.getType())
+						else if ((reqSubElement.getType())
 								.equalsIgnoreCase("Method")) {
-							UMLMethodsList.add(UMLAttribute);
-							reqMethodsList.add(reqElement);
+							UMLMethodsList.add(UMLSubElement);
+							reqMethodsList.add(reqSubElement);
 							methodWordsMapList.add(w2);
 						}
 
 						UMLAttributeElements
-								.remove(UMLAttribute);
-						reqAttributeElements.remove(reqElement);
+								.remove(UMLSubElement);
+						reqAttributeElements.remove(reqSubElement);
 						i--;
 						j--;
 						break;
@@ -271,8 +305,8 @@ public class RequirementUMLClassManager {
 				}
 			}
 		}
-		if (CompareWindow.tree != null
-				&& !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
+		if ((CompareWindow.tree != null
+				||!CompareWindow.tree.isDisposed()) || HomeGUI.isComaparing) {
 			TreeItem subAttribute = new TreeItem(classItem, SWT.NONE);
 			subAttribute.setText("Attributes");
 			subAttribute.setForeground(Display.getDefault()
@@ -306,6 +340,7 @@ public class RequirementUMLClassManager {
 						TreeItem subItem = new TreeItem(subAttribute,
 								SWT.NONE);
 						subItem.setText(0, model.getName());
+						subItem.setData("0",model);
 						subItem.setImage(0, violateImage);
 						subItem.setForeground(Display
 								.getDefault().getSystemColor(
@@ -314,6 +349,7 @@ public class RequirementUMLClassManager {
 						TreeItem subItem = new TreeItem(subMethod,
 								SWT.NONE);
 						subItem.setText(0, model.getName());
+						subItem.setData("0",model);
 						subItem.setImage(0, violateImage);
 						subItem.setForeground(Display
 								.getDefault().getSystemColor(
@@ -328,6 +364,7 @@ public class RequirementUMLClassManager {
 								SWT.NONE);
 						subItem.setText(1, model.getName());
 						subItem.setImage(1, violateImage);
+						subItem.setData("1",model);
 						subItem.setForeground(Display
 								.getDefault().getSystemColor(
 										SWT.COLOR_RED));
@@ -336,6 +373,7 @@ public class RequirementUMLClassManager {
 								SWT.NONE);
 						subItem.setText(1, model.getName());
 						subItem.setImage(1, violateImage);
+						subItem.setData("1",model);
 						subItem.setForeground(Display
 								.getDefault().getSystemColor(
 										SWT.COLOR_RED));

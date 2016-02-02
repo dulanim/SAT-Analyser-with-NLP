@@ -20,7 +20,8 @@ public class HelpFileReader {
 
 	
 	private String fileName = "sat_help.xml";
-	private String filePath = System.getProperty("user.home") + File.separator;
+	private String filePath = System.getProperty("user.dir") + File.separator + "res"
+			+ File.separator;
 	
 	private String absoulutePath;
 	

@@ -1,5 +1,6 @@
 package com.project.traceability.utils;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,11 +85,10 @@ public class Constants {
 
 	public enum ImageType {
 
-		EXACT_MATCH(new Image(CompareWindow.display, PropertyFile.imagePath
-				+ "/" + "exact.jpg")), 
+		EXACT_MATCH(new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH+ "exact.jpg")), 
 		VIOLATION(new Image(CompareWindow.display,
-				PropertyFile.imagePath + "/" + "violation.jpg")),
-		WARNING(new Image(CompareWindow.display, PropertyFile.imagePath + "/" + "warning.png"));
+				FilePropertyName.IMAGE_PATH + "violation.jpg")),
+		WARNING(new Image(CompareWindow.display, FilePropertyName.IMAGE_PATH + "warning.png"));
 
 		private final Image value;
 
