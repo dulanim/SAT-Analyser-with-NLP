@@ -25,36 +25,45 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 /**
+ * This a class which outputs a frame for the user interaction. Output of
+ * artefacts will be displayed as tree and user can add, delete or edit any
+ * nodes if they expect a modification.
  *
  * @author S. Shobiga
  */
 public class ArtefactFrame extends JFrame {
 
-    private static final int DEFAULT_WIDTH = 350;
-    private static final int DEFAULT_HEIGHT = 400;
-    private HashMap requirementObjects = new HashMap();
-    private HashSet requirementRelationsObjects = new HashSet();
-    public static boolean lock = true;
-    protected JTree tree;
+    private static final int DEFAULT_WIDTH = 350; // width of the frame
+    private static final int DEFAULT_HEIGHT = 400; // height of the frame
+    private HashMap requirementObjects = new HashMap(); // requirementObject map to keep the artefacts
+    private HashSet requirementRelationsObjects = new HashSet(); // map to keep the relationships
+    public static boolean lock = true; // lock to execute the shared resource
+    protected JTree tree; // tree items
 
+    /**
+     * constructor with parameters
+     *
+     * @param output: hash map which consists the artefacts details key:
+     * className, value: classRelationIdentifier
+     * @param outputRelations: hashMap which consists the relationship details
+     * Key: className value: list of relationships
+     */
     public ArtefactFrame(HashMap output, HashSet outputRelations) {
         super();
-
         setTitle("Artefacts Confirmation");
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setLocationRelativeTo(null);
-        //tree = jt;
+        //call the method to add the items in the frame
         addTreeItems(output, outputRelations);
+        //call the method to add the buttons
         makeButtons();
         getContentPane().add(tree);
         tree.addMouseListener(new MouseAdapter() {
@@ -69,11 +78,18 @@ public class ArtefactFrame extends JFrame {
         add(new JScrollPane(tree));
     }
 
+    /**
+     * method to add the artefact results in the frame in a tree format
+     *
+     * @param output: hash map which consists the artefacts details key:
+     * className, value: classRelationIdentifier
+     * @param outputRelations: hashMap which consists the relationship details
+     * Key: className value: list of relationships
+     */
     protected void addTreeItems(HashMap output, HashSet outputRelations) {
 
-        System.out.println("ADD TREE ITEMS .................");
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Artefacts");
-        DefaultMutableTreeNode[] rootDummy = new DefaultMutableTreeNode[output.size()];
+        System.out.println("ADDING ARTEFACTS IN TREE FORMAT");
+        DefaultMutableTreeNode root = null;
         DefaultMutableTreeNode classNames;
         DefaultMutableTreeNode attributes;
         DefaultMutableTreeNode methods;
@@ -87,6 +103,8 @@ public class ArtefactFrame extends JFrame {
         HashSet relationGenSet = new HashSet();
         HashSet relationAssSet = new HashSet();
         if (!output.isEmpty()) {
+            //set the root node of the tree as 'artefacts'
+            root = new DefaultMutableTreeNode("Artefacts");
             Iterator outputIterator = output.keySet().iterator();
             while (outputIterator.hasNext()) {
                 String classNameString = outputIterator.next().toString();
@@ -95,94 +113,120 @@ public class ArtefactFrame extends JFrame {
                 methodSet = store.getMethods();
                 relationSet = store.getRelationships();
 
+                //initializing defaultMutableTreeNodes
                 attributes = new DefaultMutableTreeNode("Attributes");
                 methods = new DefaultMutableTreeNode("Methods");
                 relationships = new DefaultMutableTreeNode("Relationships");
                 relationshipsGeneralization = new DefaultMutableTreeNode("Generalization");
                 relationshipsAssociations = new DefaultMutableTreeNode("Association");
-
                 classNames = new DefaultMutableTreeNode(classNameString);
-                for (Object attributeItems : attributeSet) {
-                    attributes.add(new DefaultMutableTreeNode(attributeItems));
-                    System.out.println("attributes: ..." + attributeItems);
-                    classNames.add(attributes);
 
-                }
+                //add the items in the artefact set to the defaultMutableTreeNode to create the tree
+                setDefaultMutableTreeNodeToArtefacts(attributeSet, attributes, classNames);
+                setDefaultMutableTreeNodeToArtefacts(methodSet, methods, classNames);
 
-                for (Object methodItems : methodSet) {
-                    methods.add(new DefaultMutableTreeNode(methodItems));
-                    System.out.println("methods: ..." + methodItems);
-                    classNames.add(methods);
-
-                }
-
-                Iterator relationsIterator = outputRelations.iterator();
-                while (relationsIterator.hasNext()) {
-                    boolean status = false;
-                    Object relationshipItems = relationsIterator.next();
-                    ClassRelation rel = (ClassRelation) relationshipItems;
-                    Object childClass = rel.getChildElement();
-                    if (childClass.toString().equalsIgnoreCase(classNameString)) {
-
-                        //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
-                        System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-
-                        if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
-                            status = true;
-                            relationshipsGeneralization.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
-                            relationships.add(relationshipsGeneralization);
-
-                        }
-                        if (rel.getRelationType().equalsIgnoreCase("Association")) {
-                            relationshipsAssociations.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
-                            status = true;
-                            relationships.add(relationshipsAssociations);
-
-                        }
-
-                    }
-                    Object parentClass = rel.getParentElement();
-                    if (parentClass.toString().equalsIgnoreCase(classNameString)) {
-                        //relationships.add(new DefaultMutableTreeNode("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement()));
-                        System.out.println("Relationships: " + "Type - " + rel.getRelationType() + "-> Child -" + rel.getChildElement());
-
-                        if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
-                            status = true;
-                            relationshipsGeneralization.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
-                            relationships.add(relationshipsGeneralization);
-
-                        }
-                        if (rel.getRelationType().equalsIgnoreCase("Association")) {
-                            relationshipsAssociations.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
-                            relationships.add(relationshipsAssociations);
-                            status = true;
-                        }
-                    }
-                    if (status) {
-                        classNames.add(relationships);
-                    }
-                }
+                //add the relationship items in the outputRelations map to the defaultMutableTreeNode
+                setDefaultMutableTreeNodeToRelationships(outputRelations, classNameString, relationshipsGeneralization, relationships, relationshipsAssociations, classNames);
+                //add the classNodes to the root
                 root.add(classNames);
             }
         }
-        tree = new JTree(root);
+        if (root != null) {
+            //add root to the tree
+            tree = new JTree(root);
+        }
     }
 
+    /**
+     * add the relationship items in the outputRelations map to the
+     * defaultMutableTreeNode
+     *
+     * @param outputRelations
+     * @param classNameString
+     * @param relationshipsGeneralization
+     * @param relationships
+     * @param relationshipsAssociations
+     * @param classNames
+     */
+    private void setDefaultMutableTreeNodeToRelationships(HashSet outputRelations, String classNameString, DefaultMutableTreeNode relationshipsGeneralization, DefaultMutableTreeNode relationships, DefaultMutableTreeNode relationshipsAssociations, DefaultMutableTreeNode classNames) {
+        Iterator relationsIterator = outputRelations.iterator();
+        while (relationsIterator.hasNext()) {
+            boolean status = false;
+            Object relationshipItems = relationsIterator.next();
+            ClassRelation rel = (ClassRelation) relationshipItems;
+            Object childClass = rel.getChildElement();
+            if (childClass.toString().equalsIgnoreCase(classNameString)) {
+                if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                    status = true;
+                    relationshipsGeneralization.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                    relationships.add(relationshipsGeneralization);
+                }
+                if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                    relationshipsAssociations.add(new DefaultMutableTreeNode("Parent ->" + rel.getParentElement()));
+                    status = true;
+                    relationships.add(relationshipsAssociations);
+                }
+
+            }
+            Object parentClass = rel.getParentElement();
+            if (parentClass.toString().equalsIgnoreCase(classNameString)) {
+                if (rel.getRelationType().equalsIgnoreCase("Generalization")) {
+                    status = true;
+                    relationshipsGeneralization.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                    relationships.add(relationshipsGeneralization);
+
+                }
+                if (rel.getRelationType().equalsIgnoreCase("Association")) {
+                    relationshipsAssociations.add(new DefaultMutableTreeNode("Child ->" + rel.getChildElement()));
+                    relationships.add(relationshipsAssociations);
+                    status = true;
+                }
+            }
+            if (status) {
+                classNames.add(relationships);
+            }
+        }
+    }
+
+    /**
+     * add the items in the artefact set to the defaultMutableTreeNode to create
+     * the tree
+     *
+     * @param artefactSet
+     * @param artefacts
+     * @param classNames
+     */
+    private void setDefaultMutableTreeNodeToArtefacts(HashSet artefactSet, DefaultMutableTreeNode artefacts, DefaultMutableTreeNode classNames) {
+        for (Object attributeItems : artefactSet) {
+            artefacts.add(new DefaultMutableTreeNode(attributeItems));
+            classNames.add(artefacts);
+        }
+    }
+
+    /**
+     * method for the pop up menu when a user clicks on a particular node
+     *
+     * @param x
+     * @param y
+     */
     protected void showMenu(int x, int y) {
         JPopupMenu popup = new JPopupMenu();
+        //initializing the menu items
         JMenuItem delete = new JMenuItem("Delete");
         JMenuItem add = new JMenuItem("Add");
         JMenuItem edit = new JMenuItem("Edit");
 
         TreePath path = tree.getSelectionPath();
         Object node = path.getLastPathComponent();
-        /*if the node selection is root, then deny the permission to edit, add, and delete functionalities*/
+
+        //if the node selection is root, then deny the permission to edit, add, and delete functionalities
         if (node == tree.getModel().getRoot()) {
             delete.setEnabled(false);
             add.setEnabled(false);
             edit.setEnabled(false);
         }
-        /* if the node selection is leaf node, then only the delete permission is given*/
+
+        //if the node selection is leaf node, then add permission is denied
         if (tree.getModel().isLeaf(node)) {
             add.setEnabled(false);
 
@@ -201,26 +245,24 @@ public class ArtefactFrame extends JFrame {
             add.setEnabled(true);
         }
 
-        System.out.println(node.toString());
-        System.out.println(path.getPathCount());
-
         popup.add(delete);
         popup.add(add);
         popup.add(edit);
+        //action listener for the delete
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 deleteSelectedItems();
             }
         });
-
+        //action listener for the add
         add.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 addItems();
             }
         });
-
+        //action listener for the edit
         edit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -230,16 +272,45 @@ public class ArtefactFrame extends JFrame {
         popup.show(tree, x, y);
     }
 
+    /**
+     * method to delete the node when the node is selected and from the pop up
+     * selection delete operation differs according to the hierachy level in the
+     * treee node
+     *
+     */
     protected void deleteSelectedItems() {
-        DefaultMutableTreeNode node;
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+                .getLastSelectedPathComponent();
         DefaultTreeModel model = (DefaultTreeModel) (tree.getModel());
+        TreeNode parent = node.getParent();
         TreePath[] paths = tree.getSelectionPaths();
+        //if the node selection is leaf of the relationship 
+        if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
+            System.out.println("11");
+            changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
+
+        }
+        //if the selected node is association/generalization
+        if (node.getParent().toString().equalsIgnoreCase("Relationships")) {
+            System.out.println("in");
+            updateAss_Gen_Edit(node.toString(), node, "Delete");
+            //changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
+        }
+        //if the selected node is any other node of the the tree
         for (int i = 0; i < paths.length; i++) {
             node = (DefaultMutableTreeNode) (paths[i].getLastPathComponent());
             model.removeNodeFromParent(node);
         }
+        while (parent.getChildCount() == 0) {
+            DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (parent);
+            parent = parent.getParent();
+            ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+        }
     }
 
+    /**
+     * method to edit the selected items
+     */
     protected void editSelectedItems() {
         DefaultTreeModel model = (DefaultTreeModel) (tree.getModel());
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
@@ -252,47 +323,68 @@ public class ArtefactFrame extends JFrame {
         TreePath path = tree.getSelectionPath();
         Object nodes = path.getLastPathComponent();
         Object root = tree.getModel().getRoot();
-        /*if the selected node is the leaf node of relations*/
+        //if the selected node is the leaf node of relations
         if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
             validateRelations_Edit(node);
         }
 
-        /*if selected node is the associations or generalization relationship*/
+        //if selected node is the associations or generalization relationship
         if (node.toString().equalsIgnoreCase("Generalization") || (node.toString().equalsIgnoreCase("Association"))) {
             validateAss_Gen_Edit(node);
+        }
+        //if the selected node is leaf of the attributes or methods
+        if (node.getParent().toString().equalsIgnoreCase("Attributes") || node.getParent().toString().equalsIgnoreCase("Methods")) {
+            openEditFrame(node);
         }
         JFrame frame = new JFrame("Edit Window");
 
     }
 
-    /*method to handle when the association or generalization type is clicked for changes
+    /**
+     * method to edit frame for the leaf nodes of attributes and methods. This
+     * method gives the joptionPane to the users to get the input for the
+     * changes
+     *
+     * @param node: selected node
+     */
+    protected void openEditFrame(DefaultMutableTreeNode node) {
+        // prompt the user to enter their name
+        String newArtefactName = JOptionPane.showInputDialog(null, "New Artefact name...");
+        // get the user's input. note that if they press Cancel, 'name' will be null
+        try {
+            if (!newArtefactName.isEmpty()) {
+                node.setUserObject(newArtefactName);
+                TreePath pathSelected = tree.getSelectionPath();
+                Object n = pathSelected.getLastPathComponent();
+                ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurs in GUI: (ignore it)" + e);
+        }
+
+    }
+
+    /**
+     * method to handle when the association or generalization type is clicked
+     * for changes when the node is clicked it gives the input from the users
+     *
+     * @param node: selected node
      */
     protected void validateAss_Gen_Edit(DefaultMutableTreeNode node) {
-        TreePath path = tree.getSelectionPath();
-        Object nodes = path.getLastPathComponent();
-
-        Object root = tree.getModel().getRoot();
-        int childOfRoot = tree.getModel().getChildCount(root);
-        Object[] childOfRootObjectArray = new Object[childOfRoot];
-
         Object[] relOptions = {"Select the type", "Association", "Generalization"};
         JComboBox typeField = new JComboBox(relOptions);
         Object[] message = {
-            "Enter the type (Parent/Child):", typeField,};
+            "Enter the type (Association/Generalization):", typeField,};
         /* get the user's input. note that if they press Cancel, 'name' will be null*/
-
         int option = JOptionPane.showConfirmDialog(null, message, "Enter the type", JOptionPane.OK_CANCEL_OPTION);
         String selectedType = typeField.getSelectedItem().toString();
         if (option == JOptionPane.OK_OPTION) {
-            System.out.println(selectedType + " type: " + relOptions[0].toString());
             if (!(selectedType.equalsIgnoreCase(relOptions[0].toString()))) {
                 try {
                     node.setUserObject(selectedType);
-                    TreePath pathSelected = tree.getSelectionPath();
-                    Object n = pathSelected.getLastPathComponent();
-                    System.out.println("new node:" + node.toString());
                     ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-                    updateAss_Gen_Edit(selectedType, node);
+                    updateAss_Gen_Edit(selectedType, node, "Edit");
 
                 } catch (Exception e) {
                     System.out.println("Exception occurs in GUI: (ignore it)" + e);
@@ -302,9 +394,16 @@ public class ArtefactFrame extends JFrame {
         }
 
     }
-    /*method to update the changes in both classes when edit is pressed in any of the relationship type*/
 
-    protected void updateAss_Gen_Edit(String selectedType, DefaultMutableTreeNode node) {
+    /**
+     * method to update the changes in both classes when edit is pressed in any
+     * of the relationship type
+     *
+     * @param selectedType
+     * @param node
+     * @param action
+     */
+    protected void updateAss_Gen_Edit(String selectedType, DefaultMutableTreeNode node, String action) {
         Object newClass = null;
         Object selectedNodeParentClass = node.getParent().getParent();
         Object relationShipsNode = null;
@@ -331,7 +430,6 @@ public class ArtefactFrame extends JFrame {
                 if (tree.getModel().getChild(newClassNode, cCount).toString().equalsIgnoreCase("Relationships")) {
                     relationshipExist = true;
                     relationShipsNode = tree.getModel().getChild(newClassNode, cCount);
-                    System.out.println(relationShipsNode.toString());
                     break;
                 }
             }
@@ -339,19 +437,47 @@ public class ArtefactFrame extends JFrame {
                 assGenCount = tree.getModel().getChildCount(relationShipsNode);
                 for (int aCount = 0; aCount < assGenCount; aCount++) {
                     typeNode = tree.getModel().getChild(relationShipsNode, aCount);
-                    if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
-                        type = tree.getModel().getChild(typeNode, aCount);
-                        typeNodeChange = (DefaultMutableTreeNode) (typeNode);
-
-                        relationshipTypeExist = true;
-                        break;
+                    //if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
+                    if (action.equalsIgnoreCase("Edit")) {
+                        if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
+                            type = tree.getModel().getChild(typeNode, aCount);
+                            typeNodeChange = (DefaultMutableTreeNode) (typeNode);
+                            relationshipTypeExist = true;
+                            break;
+                        }
                     }
+                    if (action.equalsIgnoreCase("Delete")) {
+                        System.out.println("eddd");
+                        if ((typeNode.toString().equalsIgnoreCase(node.toString()))) {
+                            type = tree.getModel().getChild(typeNode, aCount);
+                            typeNodeChange = (DefaultMutableTreeNode) (typeNode);
+                            relationshipTypeExist = true;
+                            break;
+                        }
+                    }
+
                 }
             }
+            System.out.println(action.equalsIgnoreCase("Edit"));
             if (relationshipTypeExist) {
                 int leafCount = tree.getModel().getChildCount(typeNode);
                 if (leafCount == 1) {
-                    typeNodeChange.setUserObject(node.toString());
+                    System.out.println("delete 0");
+                    if (action.equalsIgnoreCase("Edit")) {
+                        typeNodeChange.setUserObject(node.toString());
+                    }
+                    if (action.equalsIgnoreCase("Delete")) {
+                        System.out.println("delete");
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(typeNodeChange);
+                        for (int lCount = 0; lCount < leafCount; lCount++) {
+                            leafNode = tree.getModel().getChild(typeNode, lCount);
+                            String[] leafString = leafNode.toString().split("->");
+                            if (leafString[1].equalsIgnoreCase(selectedNodeParentClass.toString())) {
+                                relLeafExist = true;
+                                break;
+                            }
+                        }
+                    }
                 } else {
                     for (int lCount = 0; lCount < leafCount; lCount++) {
                         leafNode = tree.getModel().getChild(typeNode, lCount);
@@ -364,22 +490,43 @@ public class ArtefactFrame extends JFrame {
                 }
             }
             if (relLeafExist) {
+                System.out.println("delete 3");
                 /*remove the node*/
                 DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
+                //System.out.println(nodess.toString());
                 ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
                 /*add the node with the type*/
-                addItems(relationShipsNode, node.toString(), 0);
-                Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
-                addItems(newLeafNode, leafNode.toString(), 0);
+                if (action.equalsIgnoreCase("Edit")) {
+                    addItems(relationShipsNode, node.toString(), 0);
+                    Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
+                    addItems(newLeafNode, leafNode.toString(), 0);
+                }
 
+                System.out.println(typeNodeChange.toString());
+                if (action.equalsIgnoreCase("delete")) {
+                    if (typeNodeChange.getChildCount() == 0) {
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode) relationShipsNode));
+                    }
+                    System.out.println(((DefaultMutableTreeNode) relationShipsNode).toString());
+                    if (((DefaultMutableTreeNode) relationShipsNode).getChildCount() == 0) {
+                        //((DefaultTreeModel) tree.getModel()).removeNodeFromParent();
+                    }
+
+                }
             }
-
-            ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
+            if (action.equalsIgnoreCase("Edit")) {
+                ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
+            }
 
         }
     }
 
-    /*method to change the relationships and to remove the relationships when edit is clicked
+    /**
+     *
+     * method to change the relationships and to remove the relationships when
+     * edit is clicked
+     *
+     * @param node : selected node
      */
     protected void validateRelations_Edit(DefaultMutableTreeNode node) {
         TreePath path = tree.getSelectionPath();
@@ -390,17 +537,11 @@ public class ArtefactFrame extends JFrame {
         Object[] childOfRootObjectArray = new Object[childOfRoot];
 
         /*get the current class stored in the leaf node */
-        String currentClass = nodes.toString().split("->")[1];
-
         /*if the selected node is leaf node - relations*/
         if (tree.getModel().isLeaf(nodes)) {
             String classNamess = node.getParent().getParent().getParent().toString();
-            System.out.println("cllllllllllllllllaaaaaaassssssss" + classNamess);
-            String classNameOfSelectedNode = path.getParentPath().getParentPath().getParentPath().toString().split("\\W")[3].trim();
-            System.out.println("classnnnnaaameess: " + classNameOfSelectedNode);
             childOfRootObjectArray[0] = "Select the class name";
             for (int childCount = 0, arrayCount = 1; childCount < childOfRoot; childCount++) {
-                System.out.println(childCount + "  " + arrayCount);
                 Object classNames = tree.getModel().getChild(root, childCount);
                 if (!classNamess.equalsIgnoreCase(classNames.toString())) {
                     childOfRootObjectArray[arrayCount++] = tree.getModel().getChild(root, childCount);
@@ -422,18 +563,13 @@ public class ArtefactFrame extends JFrame {
         String selectedType = typeField.getSelectedItem().toString();
         String newArtefactName = relationClass.getSelectedItem().toString();
         if (option == JOptionPane.OK_OPTION) {
-            System.out.println(selectedType + " type: " + typeFields[0].toString());
-            System.out.println(newArtefactName + " class :" + childOfRootObjectArray[0].toString());
             if (!(selectedType.equalsIgnoreCase(typeFields[0].toString()) || newArtefactName.equalsIgnoreCase(childOfRootObjectArray[0].toString()))) {
                 try {
                     if (!newArtefactName.isEmpty()) {
                         changeTheRelationInOtherClass_Edit(nodes, node);
 
                         node.setUserObject(selectedType + " ->" + newArtefactName);
-                        TreePath pathSelected = tree.getSelectionPath();
-                        Object n = pathSelected.getLastPathComponent();
                         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-
                         update_Edit(selectedType, newArtefactName, node);
                     }
                 } catch (Exception e) {
@@ -446,15 +582,16 @@ public class ArtefactFrame extends JFrame {
 
     }
 
-    /*
-     when the relationship is changed in one node, find the respective node in the parent class of the changed
-     relationship and remove that node
+    /**
+     * when the relationship is changed in one node, find the respective node in
+     * the parent class of the changed relationship and remove that node
+     *
+     * @param nodes
+     * @param node
      */
     protected void changeTheRelationInOtherClass_Edit(Object nodes, DefaultMutableTreeNode node) {
         /*get the current type and class */
         String nodeArray[] = nodes.toString().split("->");
-        String currentType = nodeArray[0];
-        String currentRelationClass = nodeArray[1];
         Object currentRelationClass_object = null;
         boolean nodeExists = false;
         Object leafRel = null;
@@ -464,94 +601,105 @@ public class ArtefactFrame extends JFrame {
         Object rel = null;
         boolean relationshipExist = false;
         boolean relationTypeExist = false;
-        Object currentParentClass = node.getParent().getParent().getParent();
-        /*traverse to the class where the the selected node's class exist*/
-
-        currentRelationClass_object = getObjectNode(currentRelationClass);
-
-        int childCountOfClass = tree.getModel().getChildCount(currentRelationClass_object);
-        System.out.println("childCountOfClass: " + childCountOfClass);
-
-        for (int childCount = 0; childCount < childCountOfClass; childCount++) {
-            rel = tree.getModel().getChild(currentRelationClass_object, childCount);
-            if (rel.toString().equalsIgnoreCase("Relationships")) {
-                relationshipExist = true;
-                break;
-            }
+        Object currentParentClass;
+        if (node.isLeaf()) {
+            currentParentClass = node.getParent().getParent().getParent();
+        } else {
+            currentParentClass = node.getParent().getParent();
         }
-        relCount = tree.getModel().getChildCount(rel);
-        if (relationshipExist) {
-            for (int rCount = 0; rCount < relCount; rCount++) {
-                /*checking whether current and previous types are same*/
-                System.out.println("count: " + rCount);
-                relType = tree.getModel().getChild(rel, rCount);
-                System.out.println("reltype: " + relType);
-                if (node.getParent().toString().equalsIgnoreCase(relType.toString())) {
-                    relationTypeExist = true;
+        //traverse to the class where the the selected node's class exist
+        if (nodeArray.length == 2) {
+            String currentRelationClass = nodeArray[1];
+
+            //if (currentRelationClass.isEmpty() || currentRelationClass == null) {
+            currentRelationClass_object = getObjectNode(currentRelationClass);
+
+            int childCountOfClass = tree.getModel().getChildCount(currentRelationClass_object);
+
+            for (int childCount = 0; childCount < childCountOfClass; childCount++) {
+                rel = tree.getModel().getChild(currentRelationClass_object, childCount);
+                if (rel.toString().equalsIgnoreCase("Relationships")) {
+                    relationshipExist = true;
                     break;
                 }
             }
-        }
+            relCount = tree.getModel().getChildCount(rel);
+            if (relationshipExist) {
+                for (int rCount = 0; rCount < relCount; rCount++) {
+                    /*checking whether current and previous types are same*/
+                    relType = tree.getModel().getChild(rel, rCount);
+                    if (node.getParent().toString().equalsIgnoreCase(relType.toString())) {
+                        relationTypeExist = true;
+                        break;
+                    }
+                }
+            }
 
-        leafRelCount = tree.getModel().getChildCount(relType);
-        if (relationTypeExist) {
-            for (int leafCount = 0; leafCount < leafRelCount; leafCount++) {
-                leafRel = tree.getModel().getChild(relType, leafCount);
-                String[] rmvLeaf = leafRel.toString().split("->");
+            leafRelCount = tree.getModel().getChildCount(relType);
+            if (relationTypeExist) {
+                for (int leafCount = 0; leafCount < leafRelCount; leafCount++) {
+                    leafRel = tree.getModel().getChild(relType, leafCount);
+                    String[] rmvLeaf = leafRel.toString().split("->");
 
-                if (rmvLeaf[1].equalsIgnoreCase(currentParentClass.toString())) {
-                    nodeExists = true;
-                    deleteNodes(nodeExists, leafRel, leafRelCount, relType, relCount, rel);
-                    break;
+                    if (rmvLeaf[1].equalsIgnoreCase(currentParentClass.toString())) {
+                        nodeExists = true;
+                        deleteNodes(nodeExists, leafRel, leafRelCount, relType, relCount, rel);
+                        break;
+                    }
                 }
             }
         }
-        System.out.println("bbbbbreeeeeeeeeeeaaaaaaaaakkkkk");
-
     }
 
-    /*delete a particular node in relation leaf*/
+    /**
+     * delete a particular node in relation leaf when the leaf node is deleted
+     * in the relationship, it deletes the respective node that can appear in
+     * the child or parent class.
+     *
+     * @param nodeExists
+     * @param leafRel
+     * @param leafRelCount
+     * @param relType
+     * @param relCount
+     * @param rel
+     */
     private void deleteNodes(boolean nodeExists, Object leafRel, int leafRelCount, Object relType, int relCount, Object rel) {
         if (nodeExists) {
             DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafRel);
-            System.out.println("leafRel : " + leafRel);
-            System.out.println("nodess: " + nodess);
             ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
 
             if (leafRelCount == 1) {
                 /*remove the relation type heading*/
                 nodess = (DefaultMutableTreeNode) (relType);
-                System.out.println("nodess 2: " + nodess);
                 ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
-
             }
             if (relCount == 1 && leafRelCount == 1) {
                 /*remove the relation heading*/
                 nodess = (DefaultMutableTreeNode) (rel);
-                System.out.println("nodess 3: " + nodess);
                 ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
-
             }
-
-            System.out.println("dsfsfsfsfsjhgkdjfhgjkdghkd");
 
         }
     }
 
+    /**
+     * method to update the nodes when edit is selected and the user gives the
+     * input to that node
+     *
+     * @param selectedType
+     * @param newArtefactName
+     * @param node
+     */
     protected void update_Edit(String selectedType, String newArtefactName, DefaultMutableTreeNode node) {
 
-        String currentType = selectedType;
         String currentRelationClass = newArtefactName;
         Object currentRelationClass_object = null;
 
         Object currentParentClass = node.getParent().getParent().getParent();
-        /*traverse to the class where the the selected node's class exist*/
+        //traverse to the class where the the selected node's class exist
         currentRelationClass_object = getObjectNode(currentRelationClass);
-
-        //currentparentClass
+        //current class
         int childCountOfClass = tree.getModel().getChildCount(currentRelationClass_object);
-
-        System.out.println("childCountOfClass: " + childCountOfClass);
 
         if (selectedType.equalsIgnoreCase("Parent")) {
             selectedType = "Child";
@@ -573,7 +721,6 @@ public class ArtefactFrame extends JFrame {
         }
         if (relationshipExists) {
             //checks whether next level of node exists
-            System.out.println("relationship node exists ddddddddddddddddddddddddddd");
             for (int rCount = 0; rCount < relCount; rCount++) {
                 /*checking whether current and previous types are same*/
                 relType = tree.getModel().getChild(rel, rCount);
@@ -583,7 +730,6 @@ public class ArtefactFrame extends JFrame {
                 }
             }
             if (relationTypeExists) {
-                System.out.println("generalzation or associatiat fsdjfksjdfjddddddddddddd");
                 int leafRelCount = tree.getModel().getChildCount(relType);
                 //new leaf node added
                 addItems(relType, selectedType + " ->" + currentParentClass, leafRelCount);
@@ -594,7 +740,6 @@ public class ArtefactFrame extends JFrame {
                 //add the leaf node
                 relType = tree.getModel().getChild(rel, 0);
                 addItems(relType, selectedType + " ->" + currentParentClass, 0);
-
             }
 
         } else {
@@ -602,11 +747,8 @@ public class ArtefactFrame extends JFrame {
             Object clNode = getObjectNode(newArtefactName);
             addItems(clNode, "Relations", childCountOfClass);
             //add the association or generalization
-            System.out.println("enddfsddddddddddddddddd");
             rel = tree.getModel().getChild(clNode, childCountOfClass);
-            System.out.println(rel);
             addItems(rel, node.getParent().toString(), 0);
-
             //add the leaf
             relType = tree.getModel().getChild(rel, 0);
             addItems(relType, selectedType + " ->" + currentParentClass, 0);
@@ -615,6 +757,13 @@ public class ArtefactFrame extends JFrame {
 
     }
 
+    /**
+     * add the relationship leaf nodes to the tree
+     *
+     * @param node: the parent node of the new node
+     * @param msg : the item that has to be stored as a node
+     * @param index : the position of the node
+     */
     protected void addItems(Object node, Object msg, int index) {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) (node);
         DefaultTreeModel model = (DefaultTreeModel) (tree.getModel());
@@ -623,6 +772,12 @@ public class ArtefactFrame extends JFrame {
 
     }
 
+    /**
+     * method to get the object(Tree node) of the node of an object
+     *
+     * @param obj: item
+     * @return
+     */
     protected Object getObjectNode(Object obj) {
         Object r = tree.getModel().getRoot();
         int rootChild = tree.getModel().getChildCount(r);
@@ -635,6 +790,10 @@ public class ArtefactFrame extends JFrame {
         return obj;
     }
 
+    /**
+     * method to add the items when user selects the add from the menu this
+     * functionality will add the 'New' node below the selected node
+     */
     protected void addItems() {
         DefaultTreeModel model = (DefaultTreeModel) (tree.getModel());
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
@@ -653,6 +812,10 @@ public class ArtefactFrame extends JFrame {
 
     }
 
+    /**
+     * method to store the artefacts after the confirmation of user
+     *
+     */
     public void storeItems() {
 
         Object rootArtefact = tree.getModel().getRoot();
@@ -665,91 +828,25 @@ public class ArtefactFrame extends JFrame {
 
             TreeModel classTreeModel = tree.getModel();
             Object className = classTreeModel.getChild(rootArtefact, child);
-            System.out.println("classNames: " + className.toString());
             classNameSet.add(className.toString());
 
             int artefactCount = classTreeModel.getChildCount(className);
 
             for (int artCount = 0; artCount < artefactCount; artCount++) {
                 Object artefactName = classTreeModel.getChild(className, artCount);
-                System.out.println("artefact element: " + artefactName.toString());
                 if (artefactName.toString().equalsIgnoreCase("Attributes")) {
-                    int attributeCount = classTreeModel.getChildCount(artefactName);
-                    System.out.println("attributeCount : " + attributeCount);
-
-                    for (int atrCount = 0; atrCount < attributeCount; atrCount++) {
-                        Object attrName = classTreeModel.getChild(artefactName, atrCount);
-                        System.out.println("attrName: " + attrName.toString());
-                        attributeSet.add(attrName.toString());
-                    }
+                    storeTheArtefactsInSet(classTreeModel, artefactName, attributeSet);
 
                 }
                 if (artefactName.toString().equalsIgnoreCase("Methods")) {
-                    int methodCount = classTreeModel.getChildCount(artefactName);
-                    System.out.println("methodCount : " + methodCount);
-                    for (int mCount = 0; mCount < methodCount; mCount++) {
-                        Object methodName = classTreeModel.getChild(artefactName, mCount);
-                        System.out.println("methods: " + methodName.toString());
-                        methodSet.add(methodName.toString());
-                    }
+                    storeTheArtefactsInSet(classTreeModel, artefactName, methodSet);
                 }
                 if (artefactName.toString().equalsIgnoreCase("Relationships")) {
-                    int relationCount = classTreeModel.getChildCount(artefactName);
-                    System.out.println("relationCount : " + relationCount);
+                    storeTheRelationShipInSet(classTreeModel, artefactName, className);
 
-                    for (int rCount = 0; rCount < relationCount; rCount++) {
-                        Object relName = classTreeModel.getChild(artefactName, rCount);
-                        if (relName.toString().equalsIgnoreCase("Generalization")) {
-                            int genCount = classTreeModel.getChildCount(relName);
-                            for (int gCount = 0; gCount < genCount; gCount++) {
-                                Object genName = classTreeModel.getChild(relName, gCount);
-                                String[] genNameArray = genName.toString().split("->");
-                                System.out.println("string[0]: " + genNameArray[0] + " String [1]: " + genNameArray[1]);
-                                String type = genNameArray[0].trim();
-                                String parent = genNameArray[1].trim();
-                                String childs = className.toString();
-                                if (type.equalsIgnoreCase("Parent")) {
-                                    ClassRelation clRelation = new ClassRelation(type, childs, parent);
-                                    System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
-                                    requirementRelationsObjects.add(clRelation);
-                                }
-
-                            }
-                        }
-                        if (relName.toString().equalsIgnoreCase("Association")) {
-                            int assCount = classTreeModel.getChildCount(relName);
-                            for (int aCount = 0; aCount < assCount; aCount++) {
-                                Object assName = classTreeModel.getChild(relName, aCount);
-                                String[] assNameArray = assName.toString().split("->");
-                                System.out.println("string[0]: " + assNameArray[0] + " String [1]: " + assNameArray[1]);
-
-                                if (assNameArray[0].equalsIgnoreCase("Parent")) {
-                                    ClassRelation clRelation = new ClassRelation(assNameArray[0], className.toString(), assNameArray[1]);
-                                    System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
-                                    requirementRelationsObjects.add(clRelation);
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-//                    for(int  rCount = 0; rCount < relationCount; rCount++) {
-//                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
-//                        ClassRelation rel = (ClassRelation) relationshipName;
-//                        
-//                    }
-//                    for (int rCount = 0; rCount < relationCount; rCount++) {
-//                        Object relationshipName = classTreeModel.getChild(artefactName, rCount);
-//                        ClassRelation rel = (ClassRelation) relationshipName;
-//                        System.out.println("relationships: " + relationshipName.toString());
-//                        System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-//                        relationSet.add("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-//                    }
                 }
-
             }
+
             StoringArtefacts storingArtefacts = new StoringArtefacts();
             storingArtefacts.addClassName(classNameSet);
             storingArtefacts.addAttributes(attributeSet);
@@ -762,12 +859,97 @@ public class ArtefactFrame extends JFrame {
 
     }
 
+    /**
+     * method to store the relationship in a set
+     * @param classTreeModel
+     * @param artefactName
+     * @param className 
+     */
+    private void storeTheRelationShipInSet(TreeModel classTreeModel, Object artefactName, Object className) {
+        int relationCount = classTreeModel.getChildCount(artefactName);
+        for (int rCount = 0; rCount < relationCount; rCount++) {
+            Object relName = classTreeModel.getChild(artefactName, rCount);
+            if (relName.toString().equalsIgnoreCase("Generalization")) {
+                int genCount = classTreeModel.getChildCount(relName);
+                String type = relName.toString();
+                for (int gCount = 0; gCount < genCount; gCount++) {
+                    Object genName = classTreeModel.getChild(relName, gCount);
+                    String[] genNameArray = genName.toString().split("->");
+                    
+                    String parentClass;
+                    String childClass;
+                    if ((genNameArray[0].trim()).equalsIgnoreCase("parent")) {
+                        parentClass = genNameArray[1].trim();
+                        childClass = className.toString();
+                    } else {
+                        parentClass = className.toString();
+                        childClass = genNameArray[1].trim();
+                        
+                    }
+                    
+                    ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
+                    System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
+                    requirementRelationsObjects.add(clRelation);
+                }
+                
+            }
+            if (relName.toString().equalsIgnoreCase("Association")) {
+                int assCount = classTreeModel.getChildCount(relName);
+                String type = relName.toString();
+                for (int aCount = 0; aCount < assCount; aCount++) {
+                    Object assName = classTreeModel.getChild(relName, aCount);
+                    String[] assNameArray = assName.toString().split("->");
+                    String class1 = assNameArray[0].toLowerCase().trim();
+                    String parentClass;
+                    String childClass;
+                    if (class1.equals("parent")) {
+                        parentClass = assNameArray[1].trim();
+                        childClass = className.toString();
+                    } else {
+                        parentClass = className.toString();
+                        childClass = assNameArray[1].trim();
+                        
+                    }
+                    
+                    ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
+                    System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
+                    requirementRelationsObjects.add(clRelation);
+                }
+                
+            }
+            
+        }
+    }
+
+    /**
+     * store the artefacts in a set
+     * @param classTreeModel
+     * @param artefactName
+     * @param attributeSet 
+     */
+    private void storeTheArtefactsInSet(TreeModel classTreeModel, Object artefactName, HashSet artefactSetSet) {
+        int attributeCount = classTreeModel.getChildCount(artefactName);
+        for (int atrCount = 0; atrCount < attributeCount; atrCount++) {
+            Object artName = classTreeModel.getChild(artefactName, atrCount);
+            artefactSetSet.add(artName.toString());
+        }
+    }
+
+    /**
+     * method to get the artefacts
+     *
+     * @return : HashMap of artefacts
+     */
     public HashMap getRequirementobjects() {
         return requirementObjects;
     }
 
+    /**
+     * method to get the relationship map
+     *
+     * @return : hashMap of relationships
+     */
     public HashSet getRequirementRelationsObject() {
-        System.out.println("Relations..................................ssss");
         if (requirementRelationsObjects.isEmpty()) {
             System.out.println("EMPTY");
 
@@ -777,6 +959,9 @@ public class ArtefactFrame extends JFrame {
         return requirementRelationsObjects;
     }
 
+    /**
+     * method to create the 'confirmation' button
+     */
     private void makeButtons() {
         JPanel panel = new JPanel();
         JButton confirmButton = new JButton("Confirm");
@@ -794,6 +979,11 @@ public class ArtefactFrame extends JFrame {
 
     }
 
+    /**
+     * method to print the output in the console
+     *
+     * @param output : hashMap of the artefacts
+     */
     protected void print(HashMap output) {
         System.out.println("PRINTING........");
         Iterator it = output.keySet().iterator();
@@ -818,7 +1008,6 @@ public class ArtefactFrame extends JFrame {
             for (Object relation : relations) {
                 ClassRelation rel = (ClassRelation) relation;
                 System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
-                //System.out.println("Type - " + rel.getRelationType() + "-> Parent -" + rel.getParentElement());
             }
 
         }

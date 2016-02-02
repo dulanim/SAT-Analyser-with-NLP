@@ -12,6 +12,8 @@ import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
 import com.project.traceability.staticdata.StaticData;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -158,6 +160,13 @@ public class WriteRequirementToXML {
                         sbf.append("\n Type : "+rel.getRelationType()+", Parent : "+rel.getParentElement()+", Child : "+rel.getChildElement()+"\n");
                         
                     }
+            BufferedWriter bwr = new BufferedWriter(new FileWriter("Requirement_Output.txt"));
+            /*write contents of StringBuffer to a file*/
+            bwr.write(sbf.toString());
+            /*flush the stream*/
+            bwr.flush();
+            /*close the stream*/
+            bwr.close();
             
                 System.out.println(sbf.toString());
             

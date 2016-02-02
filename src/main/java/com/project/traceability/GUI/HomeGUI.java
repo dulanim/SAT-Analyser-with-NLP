@@ -72,7 +72,8 @@ import com.project.traceability.visualization.GraphDB.RelTypes;
 /**
  * Main Home Window of the tool
  */
-public class HomeGUI implements KeyListener {
+
+public class HomeGUI extends JFrame implements KeyListener {
 
     public static Dimension screen = java.awt.Toolkit.getDefaultToolkit()
             .getScreenSize();
@@ -227,6 +228,7 @@ public class HomeGUI implements KeyListener {
         workSF = new SashForm(sidebarSF, SWT.VERTICAL | SWT.SMOOTH);		// sash form for vertical CTabFloders
         sidebarSF.setWeights(new int[]{1, 5});
        
+
         
         tabFolder = new CTabFolder(workSF, SWT.BORDER | SWT.CLOSE);			//new CTabFolder to show opened files and compared results
         tabFolder.setData("WorkSpace");
@@ -1366,6 +1368,7 @@ public class HomeGUI implements KeyListener {
         methodItem.setText("Methods");
         tree.setMenu(popupMenu);
     }
+
 
     public static void setupProject(String graphType) {
         projectName = trtmNewTreeitem.getText();

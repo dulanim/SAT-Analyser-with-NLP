@@ -34,10 +34,10 @@ public class PropertyFile {
     private static String relationshipXMLPath = null;
     public static String graphType = null;
     private static VisualizeGraph visual = null;
-    public static final String testFilePath =System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator;
-    public static final String testXmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"ATOM"+File.separator+"test"+File.separator;
-    public static final String testDb = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator+"Test"+File.separator+"Test.graphDb";
-    public static final String testGraphFile = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"SATWork"+File.separator+"Test"+File.separator+"Test.gexf";
+    public static final String testFilePath =System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator;
+    public static final String testXmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"test"+File.separator;
+    public static final String testDb = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"Test"+File.separator+"Test.graphdb";
+    public static final String testGraphFile = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"Test"+File.separator+"Test.gexf";
     public static final String xmlSourceCodeFilePath = PropertyFile.filePath + File.separator + FilePropertyName.XML;
   
     public static String getProjectName() {

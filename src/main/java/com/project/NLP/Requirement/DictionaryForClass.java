@@ -11,47 +11,40 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * class which reads the dictionary as a text file and stores the words in the
- * array list
  *
  * @author S. Shobiga
  */
-public class DesignElementClass {
+public class DictionaryForClass {
+  ArrayList dictionaryForClass;
 
-    ArrayList designElements;
-
-    /**
-     * constructor
-     */
-    DesignElementClass() {
-        designElements = new ArrayList();
-        setDesignElementsList();
+    DictionaryForClass() {
+        dictionaryForClass = new ArrayList();
+        setDictionaryForClass();
     }
 
     /**
-     * after reading the text file, words are stored in the array list
+     * read dictionary file and store words in the array list
      */
-    private void setDesignElementsList() {
-        designElements = readFromTextFile("res/DesignElementsDictionary.txt");
+    private void setDictionaryForClass() {
+        dictionaryForClass= readFromTextFile("res/ClassElementsDictionary.txt");
     }
 
     /**
-     * method to return the dictionary words
-     *
-     * @return array list
+     * get dictionary words 
+     * @return arrayList
      */
-    public ArrayList getDesignElementsList() {
-        return designElements;
+    public ArrayList getDictionaryForClass() {
+        //System.out.println("from design :"+designElements);
+        return dictionaryForClass;
     }
-
+    
     /**
-     * method to read the dictionary file
-     *
+     * method to read the text file
      * @param file
-     * @return
+     * @return 
      */
-    private ArrayList readFromTextFile(String file) {
-        BufferedReader br = null;
+    private ArrayList readFromTextFile(String file){
+    BufferedReader br = null;
         ArrayList designEle = new ArrayList();
 
         try {
@@ -76,3 +69,4 @@ public class DesignElementClass {
     }
 
 }
+

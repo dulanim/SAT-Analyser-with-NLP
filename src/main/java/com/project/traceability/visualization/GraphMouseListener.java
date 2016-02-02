@@ -7,15 +7,12 @@ package com.project.traceability.visualization;
 import com.project.NLP.file.operations.FilePropertyName;
 import static com.project.NLP.file.operations.FilePropertyName.XML;
 import com.project.traceability.GUI.HomeGUI;
-import static com.project.traceability.GUI.HomeGUI.projectPath;
 import java.awt.GridLayout;
 import java.util.HashMap;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.gephi.graph.api.GraphController;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.preview.api.PreviewMouseEvent;
 import org.gephi.preview.api.PreviewProperties;
@@ -33,19 +30,25 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ServiceProvider;
 
-import com.project.traceability.common.PropertyFile;
-import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
+import static com.project.traceability.visualization.VisualizeGraph.popupMenu;
 import java.io.File;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
+ * Listens to the mouse clicks on the graph
  *
  * @author Thanu
+ * @author Aarthika <>
  */
 @ServiceProvider(service = PreviewMouseListener.class)
 public class GraphMouseListener implements PreviewMouseListener {
@@ -64,104 +67,124 @@ public class GraphMouseListener implements PreviewMouseListener {
     public static HashMap<String, Object> nodeData = new HashMap<>();
     public static boolean update = false;
 
+    static Workspace wkspace;
+    static String id;
+    CCombo combo = null;
+    static boolean lock = false;
+
     public void shutDB() {
         graphDb.shutdown();
     }
 
     @SuppressWarnings("finally")
     @Override
-    public void mouseClicked(PreviewMouseEvent event, PreviewProperties properties, Workspace workspace) {
+    public void mouseClicked(PreviewMouseEvent event, PreviewProperties properties, final Workspace workspace) {
+        wkspace = workspace;
 
-        for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
-            if (clickingInNode(node, event)) {
+        if (event.button == PreviewMouseEvent.Button.LEFT) {
+            System.out.println("left Click");
+            for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
+                if (clickingInNode(node, event)) {
 
-                graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
-                        HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
-                        + ".graphdb");
-                System.out.println("DB path- " + graphDb.toString());
-
-                Transaction tx = graphDb.beginTx();
-                try {
-
-                    IndexManager index = graphDb.index();
-                    Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-                    IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
-                    org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
-
-                    System.out.println(neo4j_node.toString());
-
-                    HashMap<String, Object> nodeProps = new HashMap<>();
-                    for (String col : neo4j_node.getPropertyKeys()) {
-                        Object val = neo4j_node.getProperty(col);
-                        nodeProps.put(col, val);
-                    }
-                    System.out.println("Node: " + nodeProps);
-                    HashMap<String, Object> values = showPopup(nodeProps, node);
-                    /* int value = -1;
-                    final String id = values.get("ID").toString();
-                    if (values.containsKey("Value")) {
-                        value = Integer.parseInt(values.get("Value").toString());
-                    }
-
-                    if (value == JOptionPane.NO_OPTION) {
-                        System.out.println("Heliio");
-                        transferDataToDBFromXML(projectPath, false);
-
-                        VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                        HomeGUI.isComaparing = false;
-                        visual.setPreview();
-                        visual.setLayout();
-                        tx.success();
-                    } else if (value == JOptionPane.YES_OPTION) {
-                        //ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
-                        System.out.println("Heliio");
-                        transferDataToDBFromXML(projectPath, true);
-
-                        VisualizeGraph visual = VisualizeGraph.getInstance();
-                        visual.importFile();//import the generated graph file into Gephi toolkit API workspace
-                        GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
-                        visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
-                        HomeGUI.isComaparing = false;
-                        visual.setPreview();
-                        visual.setLayout();
-                        tx.success();
-                    }*/
-                } catch (Exception e) {
-                    Exceptions.printStackTrace(e);
-                    System.out.println(e.toString());
-                } finally {
-                    tx.finish();
-                    System.out.println("shutiing");
-                    graphDb.shutdown();
+                    graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
+                            HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                            + ".graphdb");
+                    System.out.println("DB path- " + graphDb.toString());
+                     
+                    Transaction tx = graphDb.beginTx();
                     try {
-                        Thread.sleep(5);
+
+                        IndexManager index = graphDb.index();
+                        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
+                        IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
+                        org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
+
+                        System.out.println(neo4j_node.toString());
+                        id = neo4j_node.getProperty("ID").toString();
+
+                        HashMap<String, Object> nodeProps = new HashMap<>();
+                        for (String col : neo4j_node.getPropertyKeys()) {
+                            Object val = neo4j_node.getProperty(col);
+                            nodeProps.put(col, val);
+                        }
+
+                        HashMap<String, Object> values = showPopup(nodeProps, node);
+                        tx.success();
+                        tx.close();
                     } catch (Exception e) {
-                        System.out.println("Error in thread sleeping");
+                        /*Exceptions.printStackTrace(e);
+                        System.out.println(e.toString());*/
+                    } finally {
+                        tx.finish();
+                        graphDb.shutdown();
+                        System.out.println("Releseing lock");
+                        lock = true;
+                        
+
+                        try {
+                            Thread.sleep(5);
+                        } catch (Exception e) {
+                            System.out.println("Error in thread sleeping");
+                        }
                     }
                 }
             }
         }
+        if (event.button == PreviewMouseEvent.Button.RIGHT) {
+            System.out.println("right Click");
+            Node myNode = null;
+            for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
+                if (clickingInNode(node, event)) {
+                    myNode = node;
+                }
+            }
+            String val = "";
+            if (null != myNode) {
+                val = myNode.getAttributes().getValue(ID).toString();
+            }
+            id = val;
+            if (null != myNode) {
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        popupMenu.setVisible(true);
+                        VisualizeGraph.getInstance().getComposite().setMenu(popupMenu);
+                    }
+                });
+            }
+
+        }
+
         properties.removeSimpleValue("display-label.node.id");
         event.setConsumed(true);
+
     }
 
     @Override
     public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
-
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (null != combo) {
+                    combo.setVisible(false);
+                    combo = null;
+                }
+            }
+        });
     }
 
     @Override
-    public void mouseDragged(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+    public void mouseDragged(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc
+    ) {
     }
 
     @Override
-    public void mouseReleased(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
+    public void mouseReleased(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc
+    ) {
     }
 
     /**
+     * Identifies the clicking node
      * @param node
      * @param event
      * @return
@@ -181,9 +204,6 @@ public class GraphMouseListener implements PreviewMouseListener {
      * @return
      */
     public HashMap<String, Object> showPopup(final HashMap<String, Object> nodeProps, final Node node) {
-        //JTextField field;
-        //graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(/*PropertyFile.getGraphDbPath()*/HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY);
-
         engine = new ExecutionEngine(graphDb);
         final HashMap<String, Object> node_props = nodeProps;
         final JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -195,25 +215,72 @@ public class GraphMouseListener implements PreviewMouseListener {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                combo = new CCombo(HomeGUI.table, SWT.NONE);
+                combo.setVisible(true);
+
                 HomeGUI.table.clearAll();
                 HomeGUI.table.deselectAll();
                 HomeGUI.table.removeAll();
+                combo.removeAll();
                 nodeData.clear();
                 nodeData = new HashMap<>();
                 int i = 0;
                 for (String key : nodeProps.keySet()) {
                     Object val = nodeProps.get(key);
+                    final TableEditor editor = new TableEditor(HomeGUI.table);
                     if (null != val) {
                         tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);
                         tableItem.setText(0, key);
                         tableItem.setText(1, val.toString());
-                        //field = new JTextField(nodeProps.get(key).toString());
-                        //field.setName(key);
-                        /*if (key.equalsIgnoreCase(ID) || key.equalsIgnoreCase(TYPE)) {
-                    field.setEditable(false);
-                }
-                panel.add(new JLabel(key + ": "));
-                panel.add(field);*/
+                        if (key.equalsIgnoreCase("Visibility")) {
+                            combo.add("");
+                            combo.add("Default");
+                            combo.add("Public");
+                            combo.add("Private");
+                            combo.add("Protected");
+                            combo.add("Default");
+                            int index = 0;
+                            System.out.println("Item count " + combo.getItemCount());
+                            for (int j = 0; j < combo.getItemCount(); j++) {
+                                if (combo.getItem(j).equalsIgnoreCase(val.toString())) {
+                                    combo.deselectAll();
+                                    System.out.println("Item " + val.toString() + " " + combo.getItem(j));
+                                    combo.setText(combo.getItem(j));
+                                    editor.grabHorizontal = true;
+                                    editor.setEditor(combo, tableItem, 1);
+                                    index = j;
+                                    break;
+                                }
+                            }
+
+                            combo.addSelectionListener(new SelectionListener() {
+                                @Override
+                                public void widgetSelected(SelectionEvent se) {
+                                    int t = ((CCombo) se.getSource()).getSelectionIndex();
+                                    //System.out.println("elected " + combo.getItem(t));
+                                    nodeData.replace("Visibility", combo.getItem(t));
+                                    combo.setText(combo.getItem(t));
+                                    for (TableItem it : HomeGUI.table.getItems()) {
+                                        if (it.getText(0).equalsIgnoreCase("Visibility")) {
+                                            editor.setEditor(combo, it, 1);
+                                            nodeData.replace("Visibility", combo.getItem(t));
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void widgetDefaultSelected(SelectionEvent se) {
+
+                                }
+                            });
+                            //combo.setText(combo.getItem(index));
+
+                        } else {
+                            //combo.setVisible(false);
+                        }
+
                         i++;
                     }
                     nodeData.put(key, val);
@@ -222,22 +289,6 @@ public class GraphMouseListener implements PreviewMouseListener {
             }
         });
 
-        /*int response = JOptionPane.showOptionDialog(VisualizeGraph.getInstance().getFrame(), panel, "Node properties", JOptionPane.YES_NO_OPTION,
-                JOptionPane.PLAIN_MESSAGE, null, options, null);//options[0]);
-
-        if (response == JOptionPane.YES_OPTION) {
-            storeUpdatedNode(panel, nodeProps, id);
-        } else if (response == JOptionPane.NO_OPTION) {
-            int confirm = JOptionPane.showConfirmDialog(VisualizeGraph.getInstance().getFrame(), "Are you sure you want to delete?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (confirm == JOptionPane.YES_OPTION) {
-                deleteNodeAndRelations(id, nodeProps, confirm);
-            }
-            if (confirm == JOptionPane.NO_OPTION) {
-
-            }
-        }*/
-        //if(update)
-        // returnVal.put("Value", 1);
         return returnVal;
     }
 
@@ -266,19 +317,5 @@ public class GraphMouseListener implements PreviewMouseListener {
         }
         return xml;
     }
-
-    /*public void checkRel(String id) {
-        IndexManager index = graphDb.index();
-        Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
-        IndexHits<Relationship> relHits = edges.get("ID", id);
-
-        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle().getType().name());
-    }
-
-    public void checkNode(String id) {
-        IndexManager index = graphDb.index();
-        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-        IndexHits<org.neo4j.graphdb.Node> relHits = artefacts.get("ID", id);
-        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle());
-    }*/
+    
 }
