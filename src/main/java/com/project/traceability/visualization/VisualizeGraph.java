@@ -9,6 +9,7 @@ import static com.project.traceability.GUI.HomeGUI.tbtmPropertyInfos;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
+import static com.project.traceability.visualization.GraphMouseListener.id;
 import static com.project.traceability.visualization.GraphMouseListener.nodeData;
 import static com.project.traceability.visualization.GraphMouseListener.tblclmnValue;
 import java.awt.BorderLayout;
@@ -31,7 +32,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -72,6 +72,7 @@ import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.filters.api.FilterController;
 import org.gephi.filters.api.Query;
+import org.gephi.filters.plugin.graph.EgoBuilder.EgoFilter;
 import org.gephi.filters.plugin.partition.PartitionBuilder.EdgePartitionFilter;
 import org.gephi.filters.plugin.partition.PartitionBuilder.NodePartitionFilter;
 import org.gephi.graph.api.DirectedGraph;
@@ -104,8 +105,6 @@ import org.gephi.preview.types.DependantOriginalColor;
 import org.gephi.preview.types.EdgeColor;
 import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
-import org.neo4j.graphdb.Relationship;
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
 
@@ -114,7 +113,7 @@ import processing.core.PApplet;
  * visualization).
  *
  * @author Thanu
- *
+ * @author Aarthika <>
  */
 public class VisualizeGraph {
 
@@ -339,7 +338,6 @@ public class VisualizeGraph {
                     break;
                 }
             }
-
         }
         //partion nodes using their type & color them according to the partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
@@ -354,7 +352,6 @@ public class VisualizeGraph {
 
     /**
      * Method to import graph file into Gephi Toolkit API workspace
-     *
      */
     public void importFile() {
         // Init a project - and therefore a workspace
@@ -382,7 +379,6 @@ public class VisualizeGraph {
 
     /**
      * Method to set Gephi preview properties
-     *
      */
     public void setPreview() {
         // Preview configuration
@@ -445,29 +441,6 @@ public class VisualizeGraph {
         previewModel.getProperties()
                 .putValue("GraphType", graphType);
         previewController.refreshPreview();
-    }
-
-    public void printEdgeColorDetails() {
-        AttributeModel attributeModel = Lookup.getDefault()
-                .lookup(AttributeController.class).getModel();
-        PartitionController partitionController = Lookup.getDefault().lookup(
-                PartitionController.class);
-
-        // See if graph is well imported
-        DirectedGraph graph = graphModel.getDirectedGraph();
-
-        EdgePartition edge_partition = (EdgePartition) partitionController
-                .buildPartition(
-                        attributeModel.getEdgeTable().getColumn(
-                                "Neo4j Relationship Type"), graph);
-
-        for (GraphDB.RelTypes type : GraphDB.RelTypes.values()) {
-            Part<Edge> part = edge_partition.getPartFromValue(type.name());
-            String edgeType = type.name();
-            if (part != null) {
-                Color color = part.getColor();
-            }
-        }
     }
 
     /**
@@ -545,26 +518,21 @@ public class VisualizeGraph {
             System.out.println(" " + col.getId() + " " + col.getTitle());
         }
 
+        List<Color> colors = addColors();
+        int i = 0;
+
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
         for (Part p : node_partition.getParts()) {
             System.out.println("Node : " + p.getValue());
-            int j = 0;
-            for (Object o : p.getObjects()) {
-                System.out.print(" " + j + " " + o.toString());
-                j++;
-            }
-            System.out.println("");
-
+            nodeColorTransformer.getMap().put(p.getValue(), colors.get(i));
+            i++;
         }
         nodeColorTransformer.randomizeColors(node_partition);
         partitionController.transform(node_partition, nodeColorTransformer);
 
         //color edges according to edge partition
         EdgeColorTransformer edgeColorTransformer = new EdgeColorTransformer();
-
-        List<Color> colors = addColors();
-        int i = 0;
 
         for (Part p : edge_partition.getParts()) {
             int green = colors.get(i).getGreen();
@@ -586,21 +554,24 @@ public class VisualizeGraph {
     public List<Color> addColors() {
         List<Color> colors = new ArrayList<>();
         colors.add(Color.RED);
+        colors.add(Color.PINK);
         colors.add(Color.BLUE);
         colors.add(Color.MAGENTA);
         colors.add(Color.GREEN);
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
-        colors.add(Color.PINK);
         colors.add(Color.orange);
-        colors.add(Color.PINK);
         colors.add(Color.getColor("10E7C1"));
         colors.add(Color.getColor("A21DFF"));
         colors.add(Color.getColor("A25773"));
+        colors.add(Color.PINK);
 
         return colors;
     }
 
+    /**
+     * Refreshes the graph when there are changes
+     */
     public static void refreshGraph() {
         VisualizeGraph visual = VisualizeGraph.getInstance();
         AccessLinksTextFile.addNewLinkstoGraph();
@@ -614,10 +585,15 @@ public class VisualizeGraph {
         HomeGUI.isComaparing = false;
         visual.setPreview();
         visual.setLayout();
-        
-        HomeGUI.table.clearAll();
-        HomeGUI.table.deselectAll();
-        HomeGUI.table.removeAll();
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                HomeGUI.table.clearAll();
+                HomeGUI.table.deselectAll();
+                HomeGUI.table.removeAll();
+            }
+        });
         nodeData.clear();
         nodeData = new HashMap<>();
     }
@@ -711,6 +687,9 @@ public class VisualizeGraph {
 
     }
 
+    /**
+     * Creates the details panel of edge coloring
+     */
     public void createColorDetails() {
         for (String type : edgeColoring.keySet()) {
             Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
@@ -727,6 +706,9 @@ public class VisualizeGraph {
         }
     }
 
+    /**
+     * Creates the table to show node properties
+     */
     public void createTableComponents() {
         table = new Table(composite2, SWT.BORDER);
         GridData data = new GridData();
@@ -765,12 +747,49 @@ public class VisualizeGraph {
         final org.eclipse.swt.widgets.Button deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.POP_UP | SWT.VERTICAL);
         deleteBtn.setText("Delete");
 
+        final org.eclipse.swt.widgets.Button impactBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        impactBtn.setText("Impact");
+        
+        final org.eclipse.swt.widgets.Button undoBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        undoBtn.setText("Undo");
+        
+        undoBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent se) {
+                refreshGraph();
+            }
+        });
+
+        impactBtn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent se) {
+                VisualizeGraph preview = VisualizeGraph.getInstance();//PropertyFile.getVisual();//new VisualizeGraph();
+                preview.importFile();
+                GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getModel();
+                FilterController filterController = Lookup.getDefault().lookup(FilterController.class);
+                EgoFilter egoFilter = new EgoFilter();
+                egoFilter.setPattern(id);
+                egoFilter.setDepth(1);
+                egoFilter.setSelf(true);
+
+                Query queryEgo = filterController.createQuery(egoFilter);
+                GraphView viewEgo = filterController.filter(queryEgo);
+                graphModel.setVisibleView(viewEgo);
+                preview.setGraph(graphModel);
+                preview.setPreview();
+                preview.setLayout();
+            }
+
+        });
+
         updateBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent se) {
                 GraphDBEdit gbEditor = new GraphDBEdit();
                 System.out.println("Selected Update :" + nodeData);
                 gbEditor.storeUpdatedNode(nodeData);
+                while (!GraphDBEdit.lock) {
+                }
                 transferDataToDBFromXML(projectPath, true);
                 refreshGraph();
             }
@@ -782,6 +801,8 @@ public class VisualizeGraph {
                 GraphDBDelete gbDeletor = new GraphDBDelete();
                 System.out.println("Selected Delete :" + nodeData);
                 gbDeletor.deleteNodeAndRelations(nodeData);
+                while (!GraphDBDelete.lock) {
+                }
                 transferDataToDBFromXML(projectPath, false);
                 refreshGraph();
             }
@@ -792,6 +813,9 @@ public class VisualizeGraph {
         editor.horizontalAlignment = SWT.LEFT;
         editor.grabHorizontal = true;
 
+        /**
+         * Listens for editing the table item
+         */
         table.addListener(SWT.MouseDown, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -810,10 +834,10 @@ public class VisualizeGraph {
                                 switch (e.type) {
                                     case SWT.CR:
                                         if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
-                                        } else if(item.getText(0).equalsIgnoreCase("Visibility")){
-                                            
+                                        } else if (item.getText(0).equalsIgnoreCase("Visibility")) {
+
                                             item.setText(1, text.getText());
-                                        }else {
+                                        } else {
                                             item.setText(1, text.getText());
                                         }
                                         //System.out.println("Replacing4: " + item.getText(0) + ":" + item.getText(1));
@@ -833,7 +857,7 @@ public class VisualizeGraph {
                                         break;
                                     case SWT.Traverse:
                                         switch (e.detail) {
-                                            case SWT.TRAVERSE_RETURN:                                                
+                                            case SWT.TRAVERSE_RETURN:
                                                 if (item.getText(0).equalsIgnoreCase("ID") || item.getText(0).equalsIgnoreCase("Type")) {
                                                 } else {
                                                     item.setText(1, text.getText());
@@ -872,6 +896,9 @@ public class VisualizeGraph {
         });
     }
 
+    /**
+     * Creates a new menu when right clicked on the node in visual
+     */
     public void createPopUpMenu() {
         popupMenu = new Menu(composite);
         newLink = new MenuItem(popupMenu, SWT.CASCADE);
@@ -945,6 +972,7 @@ public class VisualizeGraph {
                         if (artefactCombo.getSelectedItem() != null) {
                             artefactSelected = artefactCombo.getSelectedItem().toString();
                             String artefact = artefactCombo.getSelectedItem().toString();
+                            System.out.println("rtef " + artefact + " " + nodeRelations.size());
                             for (Node n : nodeRelations) {
                                 if (n.getAttributes().getValue("Artefact").toString().equalsIgnoreCase(artefact)) {
                                     nodes.add(n);
@@ -971,7 +999,15 @@ public class VisualizeGraph {
                                         typeCombo.setEnabled(true);
                                         break;
                                 }
+                            } else if (GraphMouseListener.id.charAt(0)
+                                    == artefact.charAt(0)) {
+                                model.removeElement("Field/Attribute");
+                                model.removeElement("Method/Operation");
+                                typeCombo.setModel(model);
+                                typeCombo.setEnabled(true);
                             } else {
+                                model.removeElement("Class");
+                                typeCombo.setModel(model);
                                 typeCombo.setEnabled(true);
                             }
                             modelNode.removeAllElements();
@@ -1347,6 +1383,11 @@ public class VisualizeGraph {
 
     }
 
+    /**
+     * Creates a new frame for removing frame when prompted
+     *
+     * @throws HeadlessException
+     */
     public void createRemovalLinkFrame() throws HeadlessException {
         frameRemoval = new JFrame();
         removePanel = new JPanel();
@@ -1369,6 +1410,9 @@ public class VisualizeGraph {
         frameRemoval.setPreferredSize(new Dimension(100, 100));
     }
 
+    /**
+     * Creates a new frame for link addition when prompted
+     */
     public void createNewLinkFrame() {
         newLinkFrame = new JFrame();
         newLinkPanel.add(lblArtefact);
@@ -1382,14 +1426,13 @@ public class VisualizeGraph {
         panelButton.add(btnCancel);
         newLinkPanel.add(panelButton);
 
-        newLinkFrame.pack();
-        newLinkFrame.revalidate();
         newLinkFrame.setBounds(new java.awt.Rectangle(50, 50));
         newLinkFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         newLinkFrame.setTitle("Links Addition");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         newLinkFrame.setLocation(dim.width / 2 - newLinkFrame.getSize().width / 2, dim.height / 2 - newLinkFrame.getSize().height / 2);
-
+        newLinkFrame.pack();
+        newLinkFrame.revalidate();
         newLinkFrame.add(newLinkPanel);
         newLinkFrame.pack();
         newLinkFrame.setPreferredSize(new Dimension(100, 100));

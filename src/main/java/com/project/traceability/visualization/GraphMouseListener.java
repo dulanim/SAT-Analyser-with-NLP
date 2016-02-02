@@ -45,11 +45,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- *
- * @author Thanu
- *
- */
-/**
  * Listens to the mouse clicks on the graph
  *
  * @author Thanu
@@ -75,6 +70,7 @@ public class GraphMouseListener implements PreviewMouseListener {
     static Workspace wkspace;
     static String id;
     CCombo combo = null;
+    static boolean lock = false;
 
     public void shutDB() {
         graphDb.shutdown();
@@ -94,7 +90,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                             HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                             + ".graphdb");
                     System.out.println("DB path- " + graphDb.toString());
-
+                     
                     Transaction tx = graphDb.beginTx();
                     try {
 
@@ -104,6 +100,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                         org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
 
                         System.out.println(neo4j_node.toString());
+                        id = neo4j_node.getProperty("ID").toString();
 
                         HashMap<String, Object> nodeProps = new HashMap<>();
                         for (String col : neo4j_node.getPropertyKeys()) {
@@ -112,19 +109,17 @@ public class GraphMouseListener implements PreviewMouseListener {
                         }
 
                         HashMap<String, Object> values = showPopup(nodeProps, node);
+                        tx.success();
+                        tx.close();
                     } catch (Exception e) {
-                        Exceptions.printStackTrace(e);
-                        System.out.println(e.toString());
+                        /*Exceptions.printStackTrace(e);
+                        System.out.println(e.toString());*/
                     } finally {
                         tx.finish();
                         graphDb.shutdown();
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                //combo.setVisible(false);
-                                //combo.dispose();
-                            }
-                        });
+                        System.out.println("Releseing lock");
+                        lock = true;
+                        
 
                         try {
                             Thread.sleep(5);
@@ -167,12 +162,12 @@ public class GraphMouseListener implements PreviewMouseListener {
 
     @Override
     public void mousePressed(PreviewMouseEvent pme, PreviewProperties pp, Workspace wrkspc) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if(null != combo){
-                combo.setVisible(false);
-                combo = null;
+                if (null != combo) {
+                    combo.setVisible(false);
+                    combo = null;
                 }
             }
         });
@@ -189,6 +184,7 @@ public class GraphMouseListener implements PreviewMouseListener {
     }
 
     /**
+     * Identifies the clicking node
      * @param node
      * @param event
      * @return
@@ -321,19 +317,5 @@ public class GraphMouseListener implements PreviewMouseListener {
         }
         return xml;
     }
-
-    /*public void checkRel(String id) {
-        IndexManager index = graphDb.index();
-        Index<Relationship> edges = index.forRelationships("SOURCE_TO_TARGET");
-        IndexHits<Relationship> relHits = edges.get("ID", id);
-
-        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle().getType().name());
-    }
-
-    public void checkNode(String id) {
-        IndexManager index = graphDb.index();
-        Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
-        IndexHits<org.neo4j.graphdb.Node> relHits = artefacts.get("ID", id);
-        System.out.println("Chk: " + relHits.size() + " " + relHits.getSingle());
-    }*/
+    
 }

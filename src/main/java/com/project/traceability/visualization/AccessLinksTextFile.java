@@ -13,10 +13,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *
+ * Access operations to the text file maintained by the tool.
  * @author Aarthika <>
  */
 public class AccessLinksTextFile {
+    
+    /**
+     * New links added to graph are stored in file
+     */
     public static void addNewLinkstoGraph() {
         String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "NewGraphLinks.txt";
         //String source = start + " " + end + " " + relType + "\n";
@@ -33,7 +37,7 @@ public class AccessLinksTextFile {
                     line = line.replaceAll(start, "").trim();
                     String end = line.substring(0, line.indexOf(" "));
                     String type = line.substring(line.indexOf(" ")).trim();
-                    System.out.println("Entering " + start + " " + end + " " + type);
+                    //System.out.println("Entering " + start + " " + end + " " + type);
                     if (Integer.parseInt(id) != -1) {
                         if (!AccessGexfFile.getIDFromGexf(Integer.parseInt(id))) {
                             AccessGexfFile.addToGEXF(start, end, type);
@@ -49,6 +53,9 @@ public class AccessLinksTextFile {
         }
     }
 
+    /**
+     * Deleted links in graphs are stored in file
+     */
     public static void deleteRemovalLinkstoGraph() {
         String newLinkFile = HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "DeletedGraphLinks.txt";
         //String source = start + " " + end + " " + relType + "\n";
@@ -60,7 +67,7 @@ public class AccessLinksTextFile {
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.length() > 1) {
                     String ids[] = line.split(" ");
-                    System.out.println("NumberL " + ids.length);
+                    //System.out.println("NumberL " + ids.length);
                     for (String id : ids) {
                         AccessGexfFile.removeEdgeFromGexf(Integer.parseInt(id));
                     }

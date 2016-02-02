@@ -18,7 +18,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- *
+ * Consists a list of check boxes 
  * @author Aarthika <>
  */
 public class CheckBoxList extends JList {
@@ -32,6 +32,10 @@ public class CheckBoxList extends JList {
         
     }
 
+    /**
+     * Renders a checkbox list for deletion
+     * @param count 
+     */
     public CheckBoxList(int count) {
         size = count;
         checklist = new int[size];
