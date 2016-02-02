@@ -9,6 +9,7 @@ import com.project.traceability.model.RequirementModel;
 import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.visualization.AccessLinksTextFile;
 import com.project.traceability.visualization.GraphDB;
+import com.project.traceability.visualization.GraphDBDelete;
 import com.project.traceability.visualization.VisualizeGraph;
 import java.io.File;
 import java.io.IOException;
@@ -80,11 +81,11 @@ public class ReadXML {
         graphDB.initiateGraphDB();
 
         System.out.println("Entering UML.....");
-        graphDB.addNodeToGraphDB("UML",UMLAretefactElements);//add UML artefact elements to db
+        graphDB.addNodeToGraphDB("UML", UMLAretefactElements);//add UML artefact elements to db
         System.out.println("Entering Req.....");
-        graphDB.addNodeToGraphDB("REQ",requirementsAretefactElements);//add requirement artefact elements to db
+        graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);//add requirement artefact elements to db
         System.out.println("Entering SourceCode.....");
-        graphDB.addNodeToGraphDB("SRC",sourceCodeAretefactElements);//add source code artefact elements to db
+        graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);//add source code artefact elements to db
 
         //trace class links between UML & source code
         relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
@@ -115,6 +116,7 @@ public class ReadXML {
         RelationManager.addLinks(relationNodes);
 
         graphDB.generateGraphFile();//generate the graph file from db
+        GraphDBDelete.lock = false;
     }
 
     public static void deleteNodeFromSourceFile(Set<org.neo4j.graphdb.Node> deleteNodeProps, Set<Relationship> relProps, String xml) {
@@ -130,39 +132,39 @@ public class ReadXML {
             deleteRelations(relProps);
             for (org.neo4j.graphdb.Node nodeProp : deleteNodeProps) {
                 System.out.println("" + nodeProp.getProperty("ID"));
-                NodeList nodeList = document.getElementsByTagName("ArtefactElement");
-                NodeList subList = document.getElementsByTagName("ArtefactSubElement");
-                boolean found = false;
+            NodeList nodeList = document.getElementsByTagName("ArtefactElement");
+            NodeList subList = document.getElementsByTagName("ArtefactSubElement");
+            boolean found = false;
 
-                for (int x = 0, size = nodeList.getLength(); x < size; x++) {
-                    NodeList subNodeList = nodeList.item(x).getChildNodes();
-                    //System.out.println("" + nodeList.item(x));
-                    if (null != nodeList.item(x)) {
+            for (int x = 0, size = nodeList.getLength(); x < size; x++) {
+                NodeList subNodeList = nodeList.item(x).getChildNodes();
+                //System.out.println("" + nodeList.item(x));
+                if (null != nodeList.item(x)) {
                         if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                            System.out.println("Donesc");
-                            //System.out.println(""+nodeList.item(x).getAttributes().toString());
-                            nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
-                            found = true;
-                            
+                        System.out.println("Donesc");
+                        //System.out.println(""+nodeList.item(x).getAttributes().toString());
+                        nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
+                        found = true;
+
+                        break;
+                    }
+                }
+            }
+
+            if (!found) {
+                for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
+                    if (subList.item(y) != null) {
+                        //System.out.println(""+subNodeList.item(y).getAttributes().toString());
+                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
+                            System.out.println("Done");
+                            subList.item(y).getParentNode().removeChild(subList.item(y));
+                            found = false;
                             break;
                         }
                     }
                 }
-
-                if (!found) {
-                    for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
-                        if (subList.item(y) != null) {
-                            //System.out.println(""+subNodeList.item(y).getAttributes().toString());
-                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                                System.out.println("Done");
-                                subList.item(y).getParentNode().removeChild(subList.item(y));
-                                found = false;
-                                break;
-                            }
-                        }
-                    }
-                }
             }
+        }
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
