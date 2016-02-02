@@ -16,7 +16,8 @@ many
 multiple
 way
 digit
-individual
 kilometer
 meter
 inches
+list
+use

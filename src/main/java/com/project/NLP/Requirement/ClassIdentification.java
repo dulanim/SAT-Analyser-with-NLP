@@ -149,7 +149,7 @@ public class ClassIdentification {
         //HashSet withoutDuplicateClass = new HashSet();
         /*add the list data to the hashset to eliminate the redundancy*/
         for(int i=0;i<list.size();i++){
-            classList.add(list.get(i));
+            classList.add(list.get(i).toString().trim());
         }
         
     }
@@ -198,8 +198,16 @@ public class ClassIdentification {
     }
     /*method to get the lists of attributes*/
     public ArrayList getAttributeFromClass() {
-       attributeFromClass= np.getAttributeLists();
-        return attributeFromClass;
+       ArrayList attribute= np.getAttributeLists();
+       String att;
+       for(int attrCount = 0; attrCount < attribute.size(); attrCount++){
+           att = attribute.get(attrCount).toString();
+           if(!att.isEmpty() || !att.equals("")){
+               attributeFromClass.add(att);
+           }
+       } 
+       
+       return attributeFromClass;
     }
 
     
