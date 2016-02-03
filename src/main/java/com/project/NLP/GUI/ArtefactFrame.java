@@ -285,26 +285,34 @@ public class ArtefactFrame extends JFrame {
         TreeNode parent = node.getParent();
         TreePath[] paths = tree.getSelectionPaths();
         //if the node selection is leaf of the relationship 
-        if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
-            System.out.println("11");
-            changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
+        try {
+            if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
+                System.out.println("11");
+                changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
 
-        }
-        //if the selected node is association/generalization
-        if (node.getParent().toString().equalsIgnoreCase("Relationships")) {
-            System.out.println("in");
-            updateAss_Gen_Edit(node.toString(), node, "Delete");
-            //changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
-        }
-        //if the selected node is any other node of the the tree
-        for (int i = 0; i < paths.length; i++) {
-            node = (DefaultMutableTreeNode) (paths[i].getLastPathComponent());
-            model.removeNodeFromParent(node);
-        }
-        while (parent.getChildCount() == 0) {
-            DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (parent);
-            parent = parent.getParent();
-            ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+            }
+            //if the selected node is association/generalization
+            if (node.getParent().toString().equalsIgnoreCase("Relationships")) {
+                System.out.println("in");
+                //updateAss_Gen_Edit(node.toString(), node, "Delete");
+                //changeTheRelationInOtherClass_Edit(tree.getSelectionPath().getLastPathComponent(), node);
+            }
+            //if the selected node is classes
+            if (node.getParent().toString().equalsIgnoreCase("Artefacts")) {
+
+            }
+            //if the selected node is any other node of the the tree
+            for (int i = 0; i < paths.length; i++) {
+                node = (DefaultMutableTreeNode) (paths[i].getLastPathComponent());
+                model.removeNodeFromParent(node);
+            }
+            while (parent.getChildCount() == 0) {
+                DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (parent);
+                parent = parent.getParent();
+                ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurs: " + e);
         }
     }
 
@@ -323,19 +331,27 @@ public class ArtefactFrame extends JFrame {
         TreePath path = tree.getSelectionPath();
         Object nodes = path.getLastPathComponent();
         Object root = tree.getModel().getRoot();
-        //if the selected node is the leaf node of relations
-        if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
-            validateRelations_Edit(node);
-        }
 
         //if selected node is the associations or generalization relationship
+        int index = path.getPathCount();
+
+        System.out.println("-----------------Index: " + index);
         if (node.toString().equalsIgnoreCase("Generalization") || (node.toString().equalsIgnoreCase("Association"))) {
             validateAss_Gen_Edit(node);
+        } //if the selected node is leaf of the attributes or methods
+        else if (node.getParent() != null) {
+            if (node.getParent().toString().equalsIgnoreCase("Attributes") || node.getParent().toString().equalsIgnoreCase("Methods") || node.getParent().toString().equalsIgnoreCase("Artefacts")) {
+                System.out.println("attr, method,  class");
+                openEditFrame(node);
+            } //if the selected node is the leaf node of relations
+            else if (node.getParent().getParent() != null) {
+                if (node.getParent().getParent().toString().equalsIgnoreCase("Relationships")) {
+                    System.out.println("exe");
+                    validateRelations_Edit(node);
+                }
+            }
         }
-        //if the selected node is leaf of the attributes or methods
-        if (node.getParent().toString().equalsIgnoreCase("Attributes") || node.getParent().toString().equalsIgnoreCase("Methods")) {
-            openEditFrame(node);
-        }
+
         JFrame frame = new JFrame("Edit Window");
 
     }
@@ -382,9 +398,22 @@ public class ArtefactFrame extends JFrame {
         if (option == JOptionPane.OK_OPTION) {
             if (!(selectedType.equalsIgnoreCase(relOptions[0].toString()))) {
                 try {
-                    node.setUserObject(selectedType);
-                    ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                    //node.setUserObject(selectedType);
+                    //((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                    //if the selected node is already exist within the parent of the selected node, then after transfering items from one node to an other, boolean result is return to denote the sibings are there
+                    boolean sibilingExist = modifyCurrentNodeAss_Gen_Edit(selectedType, node, "Edit");
                     updateAss_Gen_Edit(selectedType, node, "Edit");
+                    if (!sibilingExist) {
+                        System.out.println("sibiling does not exist");
+                        node.setUserObject(selectedType);
+                        ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                    }
+
+                    //after adding all the items to the other node, remove the current node
+                    if (sibilingExist) {
+                        System.out.println("removed");
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(node);
+                    }
 
                 } catch (Exception e) {
                     System.out.println("Exception occurs in GUI: (ignore it)" + e);
@@ -393,6 +422,63 @@ public class ArtefactFrame extends JFrame {
             }
         }
 
+    }
+
+    /**
+     * method to change the current node with the checking of whether the
+     * association or generalization are already exist.
+     *
+     * @param selectedType
+     * @param node
+     * @param action
+     */
+    private boolean modifyCurrentNodeAss_Gen_Edit(String selectedType, DefaultMutableTreeNode node, String action) {
+        boolean sibilingsExist = false;
+        DefaultMutableTreeNode nextSibiling = null;
+        DefaultMutableTreeNode previousSibiling = null;
+
+        if (node.getNextSibling() != null) {
+            nextSibiling = node.getNextSibling();
+            if (nextSibiling.toString().equalsIgnoreCase(selectedType)) {
+                sibilingsExist = true;
+                System.out.println("next sibiling: " + nextSibiling.toString());
+                int numberOfLeafs = node.getChildCount();
+                //add the items in a node to an other node
+                for (int leafCount = 0; leafCount < numberOfLeafs; leafCount++) {
+                    //TreeNode leaf = node.getChildAt(leafCount);
+                    Object leaf = tree.getModel().getChild(node, leafCount);
+                    System.out.println("--------------leaf: " + leaf);
+                    addItems(nextSibiling, leaf.toString(), 0);
+                    System.out.println("added");
+
+                }
+                //after adding all the items to the other node, remove the current node
+                //((DefaultTreeModel) tree.getModel()).removeNodeFromParent(node);
+            }
+
+        }
+        if (node.getPreviousSibling() != null) {
+            previousSibiling = node.getPreviousSibling();
+            if (previousSibiling.toString().equalsIgnoreCase(selectedType)) {
+                System.out.println("previous sibiling: " + previousSibiling.toString());
+                sibilingsExist = true;
+                System.out.println("previous sibiling: " + previousSibiling.toString());
+                int numberOfLeafs = node.getChildCount();
+                //add the items in a node to an other node
+                for (int leafCount = 0; leafCount < numberOfLeafs; leafCount++) {
+                    //TreeNode leaf = node.getChildAt(leafCount);
+                    Object leaf = tree.getModel().getChild(node, leafCount);
+                    addItems(previousSibiling, leaf.toString(), 0);
+
+                }
+
+            }
+        } else {
+            node.setUserObject(selectedType);
+            ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+
+        }
+        return sibilingsExist;
     }
 
     /**
@@ -417,9 +503,10 @@ public class ArtefactFrame extends JFrame {
         boolean relationshipTypeExist = false;
         boolean relLeafExist = false;
         DefaultMutableTreeNode typeNodeChange = null;
-
+        int assGenIndex = 0;
+        System.out.println("child count of current node: " + relCount);
         for (int rCount = 0; rCount < relCount; rCount++) {
-
+            System.out.println("1111111111111111111111");
             Object leaf = node.getChildAt(rCount);
             newClass = leaf.toString().split("->")[1];
             newClassNode = getObjectNode(newClass);
@@ -433,23 +520,33 @@ public class ArtefactFrame extends JFrame {
                     break;
                 }
             }
+            //if "Relaitonships" exist
             if (relationshipExist) {
+                System.out.println("Relationship exist");
                 assGenCount = tree.getModel().getChildCount(relationShipsNode);
-                for (int aCount = 0; aCount < assGenCount; aCount++) {
-                    typeNode = tree.getModel().getChild(relationShipsNode, aCount);
+
+                for (assGenIndex = 0; assGenIndex < assGenCount; assGenIndex++) {
+                    typeNode = tree.getModel().getChild(relationShipsNode, assGenIndex);
                     //if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
                     if (action.equalsIgnoreCase("Edit")) {
+                        System.out.println("action edit");
+                        typeNodeChange = (DefaultMutableTreeNode) (typeNode);
+                        System.out.println("typenodechange: " + typeNodeChange);
+                        System.out.println("typeNodeChange count :" + typeNodeChange.getSiblingCount());
+                        System.out.println("if is running");
                         if (!(typeNode.toString().equalsIgnoreCase(node.toString()))) {
-                            type = tree.getModel().getChild(typeNode, aCount);
+                            System.out.println("equal");
+                            type = tree.getModel().getChild(typeNode, assGenIndex);
                             typeNodeChange = (DefaultMutableTreeNode) (typeNode);
                             relationshipTypeExist = true;
                             break;
                         }
+
                     }
                     if (action.equalsIgnoreCase("Delete")) {
                         System.out.println("eddd");
                         if ((typeNode.toString().equalsIgnoreCase(node.toString()))) {
-                            type = tree.getModel().getChild(typeNode, aCount);
+                            type = tree.getModel().getChild(typeNode, assGenIndex);
                             typeNodeChange = (DefaultMutableTreeNode) (typeNode);
                             relationshipTypeExist = true;
                             break;
@@ -457,18 +554,28 @@ public class ArtefactFrame extends JFrame {
                     }
 
                 }
+                System.out.println("---------------ass gen node: " + assGenIndex);
             }
             System.out.println(action.equalsIgnoreCase("Edit"));
             if (relationshipTypeExist) {
+                System.out.println("relationship type exist");
                 int leafCount = tree.getModel().getChildCount(typeNode);
                 if (leafCount == 1) {
                     System.out.println("delete 0");
                     if (action.equalsIgnoreCase("Edit")) {
-                        typeNodeChange.setUserObject(node.toString());
+
+                        //typeNodeChange.setUserObject(selectedType);
+                        boolean sibilingExist = modifyCurrentNodeAss_Gen_Edit(selectedType, typeNodeChange, "edit");
+                        if (sibilingExist) {
+                            ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(typeNodeChange);
+                        } else {
+                            System.out.println("normal " + selectedType);
+                            typeNodeChange.setUserObject(selectedType);
+                        }
                     }
                     if (action.equalsIgnoreCase("Delete")) {
                         System.out.println("delete");
-                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(typeNodeChange);
+                        //((DefaultTreeModel) tree.getModel()).removeNodeFromParent(typeNodeChange);
                         for (int lCount = 0; lCount < leafCount; lCount++) {
                             leafNode = tree.getModel().getChild(typeNode, lCount);
                             String[] leafString = leafNode.toString().split("->");
@@ -482,6 +589,7 @@ public class ArtefactFrame extends JFrame {
                     for (int lCount = 0; lCount < leafCount; lCount++) {
                         leafNode = tree.getModel().getChild(typeNode, lCount);
                         String[] leafString = leafNode.toString().split("->");
+                        System.out.println("--------------Leaf node: " + leafNode);
                         if (leafString[1].equalsIgnoreCase(selectedNodeParentClass.toString())) {
                             relLeafExist = true;
                             break;
@@ -491,28 +599,67 @@ public class ArtefactFrame extends JFrame {
             }
             if (relLeafExist) {
                 System.out.println("delete 3");
+                DefaultMutableTreeNode rela = null;
                 /*remove the node*/
                 DefaultMutableTreeNode nodess = (DefaultMutableTreeNode) (leafNode);
                 //System.out.println(nodess.toString());
-                ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+                if (action.equalsIgnoreCase("Edit")) {
+                    ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
+                }
                 /*add the node with the type*/
                 if (action.equalsIgnoreCase("Edit")) {
-                    addItems(relationShipsNode, node.toString(), 0);
-                    Object newLeafNode = tree.getModel().getChild(relationShipsNode, 0);
+                    if (assGenIndex == 0) {
+                        assGenIndex = 1;
+                    } else {
+                        assGenIndex = 0;
+                    }
+                    System.out.println("----------------relationship node: " + relationShipsNode);
+                    if (relationshipTypeExist) {
+                        boolean existType = false;
+                        rela = (DefaultMutableTreeNode) (relationShipsNode);
+
+                        int typeC = rela.getChildCount();
+                        for (int typeCount = 0; typeCount < typeC; typeCount++) {
+                            if (rela.getChildAt(typeCount).toString().equalsIgnoreCase(selectedType)) {
+                                existType = true;
+                                break;
+                            }
+                        }
+                        if (!existType) {
+                            System.out.println("relationshp exist");
+                            addItems(relationShipsNode, node.toString(), 0);
+
+                        }
+
+                    }
+
+                    Object newLeafNode = tree.getModel().getChild(relationShipsNode, assGenIndex);
+                    System.out.println("-------------------new Leaf Node" + newLeafNode);
                     addItems(newLeafNode, leafNode.toString(), 0);
+
                 }
 
                 System.out.println(typeNodeChange.toString());
                 if (action.equalsIgnoreCase("delete")) {
-                    if (typeNodeChange.getChildCount() == 0) {
-                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode) relationShipsNode));
+                    if (nodess.getParent().getChildCount() != 0) {
+                        System.out.println("nodes are removing");
+                        System.out.println("nodess: "+ nodess.toString());
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(nodess);
                     }
-                    System.out.println(((DefaultMutableTreeNode) relationShipsNode).toString());
-                    if (((DefaultMutableTreeNode) relationShipsNode).getChildCount() == 0) {
-                        //((DefaultTreeModel) tree.getModel()).removeNodeFromParent();
+                    
+                    if (typeNodeChange.getParent().getChildCount() != 0) {
+                        System.out.println("typeNodeChange are removing");
+                        System.out.println("typeNode: "+ typeNodeChange);
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(typeNodeChange);
                     }
 
+                    if (rela.getChildCount() == 0) {
+                        System.out.println("rela are removing");
+                        ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(rela);
+
+                    }
                 }
+
             }
             if (action.equalsIgnoreCase("Edit")) {
                 ((DefaultTreeModel) tree.getModel()).nodeChanged(typeNodeChange);
@@ -745,7 +892,7 @@ public class ArtefactFrame extends JFrame {
         } else {
             //add the relationships
             Object clNode = getObjectNode(newArtefactName);
-            addItems(clNode, "Relations", childCountOfClass);
+            addItems(clNode, "Relationships", childCountOfClass);
             //add the association or generalization
             rel = tree.getModel().getChild(clNode, childCountOfClass);
             addItems(rel, node.getParent().toString(), 0);
@@ -861,9 +1008,10 @@ public class ArtefactFrame extends JFrame {
 
     /**
      * method to store the relationship in a set
+     *
      * @param classTreeModel
      * @param artefactName
-     * @param className 
+     * @param className
      */
     private void storeTheRelationShipInSet(TreeModel classTreeModel, Object artefactName, Object className) {
         int relationCount = classTreeModel.getChildCount(artefactName);
@@ -875,7 +1023,7 @@ public class ArtefactFrame extends JFrame {
                 for (int gCount = 0; gCount < genCount; gCount++) {
                     Object genName = classTreeModel.getChild(relName, gCount);
                     String[] genNameArray = genName.toString().split("->");
-                    
+
                     String parentClass;
                     String childClass;
                     if ((genNameArray[0].trim()).equalsIgnoreCase("parent")) {
@@ -884,14 +1032,14 @@ public class ArtefactFrame extends JFrame {
                     } else {
                         parentClass = className.toString();
                         childClass = genNameArray[1].trim();
-                        
+
                     }
-                    
+
                     ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
                     System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
                     requirementRelationsObjects.add(clRelation);
                 }
-                
+
             }
             if (relName.toString().equalsIgnoreCase("Association")) {
                 int assCount = classTreeModel.getChildCount(relName);
@@ -908,24 +1056,25 @@ public class ArtefactFrame extends JFrame {
                     } else {
                         parentClass = className.toString();
                         childClass = assNameArray[1].trim();
-                        
+
                     }
-                    
+
                     ClassRelation clRelation = new ClassRelation(type, childClass, parentClass);
                     System.out.println(clRelation.getRelationType() + " " + clRelation.getChildElement() + "->" + clRelation.getParentElement());
                     requirementRelationsObjects.add(clRelation);
                 }
-                
+
             }
-            
+
         }
     }
 
     /**
      * store the artefacts in a set
+     *
      * @param classTreeModel
      * @param artefactName
-     * @param attributeSet 
+     * @param attributeSet
      */
     private void storeTheArtefactsInSet(TreeModel classTreeModel, Object artefactName, HashSet artefactSetSet) {
         int attributeCount = classTreeModel.getChildCount(artefactName);
