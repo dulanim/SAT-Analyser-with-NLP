@@ -1,0 +1,30 @@
+Class : hostel
+	Attributes : hgfgh,hall,
+	Methods : 
+Class : student
+	Attributes : number,rooms,year,name,department,years,
+	Methods : record,assign,
+Class : live_on_students
+	Attributes : balance,record,
+	Methods : record,
+Class : hall
+	Attributes : female hall,name,room,capacity,male hall,
+	Methods : 
+Class : employee
+	Attributes : date,assignment,name,hall,id,position,salary,
+	Methods : move,assign,
+Class : people
+	Attributes : number,university,hall,
+	Methods : employ,work,
+Class : room
+	Attributes : double room,rooms,single room,years,
+	Methods : record,assign,
+
+Relations : 
+
+ Type : Generalization, Parent : student, Child : live_on_students
+ Type : Generalization, Parent : room, Child : hall
+ Type : Association, Parent : people, Child : hall
+ Type : Association, Parent : hall, Child : room
+ Type : Association, Parent : employee, Child : hall
+ Type : Generalization, Parent : hostel, Child : hall
