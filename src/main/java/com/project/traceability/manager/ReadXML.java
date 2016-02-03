@@ -46,67 +46,24 @@ public class ReadXML {
     public static void initApp(String projectPath, String graphType) {
 
         try {
+            System.out.println("Enter");
             HomeGUI.isComaparing = false;
-//<<<<<<< HEAD
-//            ReadFiles.readFiles(projectPath);
-//            Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
-//            Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
-//            List<RequirementModel> requirementsAretefactElements = RequirementsManger.requirementElements;
-//
-//            GraphDB graphDB = new GraphDB();
-//            graphDB.initiateGraphDB();
-//           
-//            System.out.println("Entering UML.....");
-//            graphDB.addNodeToGraphDB(UMLAretefactElements);//add UML artefact elements to db
-//            System.out.println("Entering Req.....");
-//            graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);//add requirement artefact elements to db
-//            System.out.println("Entering SourceCode.....");
-//            graphDB.addNodeToGraphDB(sourceCodeAretefactElements);//add source code artefact elements to db
-//
-//            graphDB.checkdb();
-//            // trace class links between UML & source code
-//            relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
-//            graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
-//
-//            // trace class links between requirement & source code
-//            List<String> reqSrcRelationNodes = RequirementSourceClassManager
-//                    .compareClassNames(projectPath);
-//            System.out.println("Size of " + reqSrcRelationNodes.size());
-//            graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
-//
-//           List<String> reqUMLRelationNodes = RequirementUMLClassManager
-//                    .compareClassNames(projectPath);
-//            graphDB.addRelationTOGraphDB(reqUMLRelationNodes);//add relationships between Requirements and UML to db
-//
-//            relationNodes.addAll(reqSrcRelationNodes);
-//            relationNodes.addAll(reqUMLRelationNodes);
-//
-//            List<String> sourceIntraRelations = IntraRelationManager.getSourceIntraRelation(projectPath);
-//            System.out.println("Source Intra Relation: " + sourceIntraRelations.size());
-//            graphDB.addIntraRelationTOGraphDB(sourceIntraRelations);//add intra relationships between SourceCode elements to db
-//            relationNodes.addAll(sourceIntraRelations);
-//
-//            List<String> UMLIntraRelations = IntraRelationManager.getUMLIntraRelation(projectPath);
-//            System.out.println("UML Intra Relation: " + UMLIntraRelations.size());
-//            graphDB.addIntraRelationTOGraphDB(UMLIntraRelations);//add intra relationships between UML elements to db
-//            relationNodes.addAll(UMLIntraRelations);
-//
-//            RelationManager.addLinks(relationNodes);
-//
-//            graphDB.generateGraphFile();//generate the graph file from db
-//=======
             transferDataToDBFromXML(projectPath, true);
+            System.out.println("Enter");
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
             AccessLinksTextFile.addNewLinkstoGraph();
             AccessLinksTextFile.deleteRemovalLinkstoGraph();
+            System.out.println("Enter");
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
             GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
             visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
             visual.setGraph(model);
+            System.out.println("Enter");
             visual.showGraph();//show the graph visualization in tool
-
+            System.out.println("Enter");
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -180,39 +137,39 @@ public class ReadXML {
             deleteRelations(relProps);
             for (org.neo4j.graphdb.Node nodeProp : deleteNodeProps) {
                 System.out.println("" + nodeProp.getProperty("ID"));
-            NodeList nodeList = document.getElementsByTagName("ArtefactElement");
-            NodeList subList = document.getElementsByTagName("ArtefactSubElement");
-            boolean found = false;
+                NodeList nodeList = document.getElementsByTagName("ArtefactElement");
+                NodeList subList = document.getElementsByTagName("ArtefactSubElement");
+                boolean found = false;
 
-            for (int x = 0, size = nodeList.getLength(); x < size; x++) {
-                NodeList subNodeList = nodeList.item(x).getChildNodes();
-                //System.out.println("" + nodeList.item(x));
-                if (null != nodeList.item(x)) {
+                for (int x = 0, size = nodeList.getLength(); x < size; x++) {
+                    NodeList subNodeList = nodeList.item(x).getChildNodes();
+                    //System.out.println("" + nodeList.item(x));
+                    if (null != nodeList.item(x)) {
                         if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                        System.out.println("Donesc");
-                        //System.out.println(""+nodeList.item(x).getAttributes().toString());
-                        nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
-                        found = true;
+                            System.out.println("Donesc");
+                            //System.out.println(""+nodeList.item(x).getAttributes().toString());
+                            nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
+                            found = true;
 
-                        break;
-                    }
-                }
-            }
-
-            if (!found) {
-                for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
-                    if (subList.item(y) != null) {
-                        //System.out.println(""+subNodeList.item(y).getAttributes().toString());
-                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                            System.out.println("Done");
-                            subList.item(y).getParentNode().removeChild(subList.item(y));
-                            found = false;
                             break;
                         }
                     }
                 }
+
+                if (!found) {
+                    for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
+                        if (subList.item(y) != null) {
+                            //System.out.println(""+subNodeList.item(y).getAttributes().toString());
+                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
+                                System.out.println("Done");
+                                subList.item(y).getParentNode().removeChild(subList.item(y));
+                                found = false;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-        }
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
