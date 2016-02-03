@@ -1,42 +1,30 @@
 
 
-Class : hostel
-	Attributes : hgfgh,hall,
+Class : normal order
+	Attributes : item,
+	Methods : receive,dispose,
+
+Class : shopping_card
+	Attributes : name,User_Id,point,
 	Methods : 
 
-Class : student
-	Attributes : number,rooms,year,name,department,years,
-	Methods : record,assign,
+Class : special order
+	Attributes : item,
+	Methods : dispose,
 
-Class : live_on_students
-	Attributes : balance,record,
-	Methods : record,
+Class : regular customer
+	Attributes : shopping_card,
+	Methods : 
 
-Class : hall
-	Attributes : female hall,name,room,capacity,male hall,
+Class : manager
+	Attributes : shop,employee,
 	Methods : 
 
 Class : employee
-	Attributes : date,assignment,name,hall,id,position,salary,
-	Methods : move,assign,
+	Attributes : attendance,
+	Methods : swipe_card,register,
 
-Class : people
-	Attributes : number,university,hall,
-	Methods : employ,work,
 
-Class : room
-	Attributes : double room,rooms,single room,years,
-	Methods : record,assign,
-Relations : 
-
- Type : Generalization, Parent : student, Child : live_on_students
-
- Type : Generalization, Parent : room, Child : hall
-
- Type : Association, Parent : people, Child : hall
-
- Type : Association, Parent : hall, Child : room
-
- Type : Association, Parent : employee, Child : hall
-
- Type : Generalization, Parent : hostel, Child : hall
+Class : customer
+	Attributes : shopping_card,name,discount,location,customer orders,order,
+	Methods : receive,record,send,order,
