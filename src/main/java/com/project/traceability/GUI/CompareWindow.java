@@ -108,13 +108,13 @@ public class CompareWindow {
                 String root = HomeGUI.tree.getToolTipText() + File.separator;
                 PropertyFile.filePath = root;
 		ReadFiles.readFiles(PropertyFile.filePath + item.getText());
-		java.awt.EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                ProgressBarCustom.myAttemptActionPerformed();
-            }
-        });
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                ProgressBarCustom.myAttemptActionPerformed();
+//            }
+//        });
 		compareFiles(project, selectedFiles);
 		return shell;
 	}

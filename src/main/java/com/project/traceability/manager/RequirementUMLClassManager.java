@@ -63,7 +63,7 @@ public class RequirementUMLClassManager {
             column2.setText("UML-XML file");
             column2.setWidth(300);
         }
-
+        StaticData.isStartedJustNow = true;
         while (requirementIterator.hasNext()) {
             Map.Entry pairs = requirementIterator.next();
             ArtefactElement reqArtefactElement = (ArtefactElement) pairs
@@ -91,7 +91,7 @@ public class RequirementUMLClassManager {
                         ModelCreator model = ModelCreator.getModelInstance();
                         model.setPath("");
                         isMatched = model.isMatchingWords(requirementName, umlName);
-
+                        StaticData.isStartedJustNow = false;
                         if (!isMatched) {
                             //if it is not match by our dictionary 
                             //call the check similarity algorithm or edit distance

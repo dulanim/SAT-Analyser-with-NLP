@@ -23,6 +23,7 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
 import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
@@ -91,6 +92,7 @@ public class RequirementSourceClassManager {
             column2.setText("RequirementsXML File");
             column2.setWidth(300);
         }
+        StaticData.isStartedJustNow = true;
         //iterate the req artefact element 
         while (requirementIterator.hasNext()) {
             
@@ -132,6 +134,7 @@ public class RequirementSourceClassManager {
                        //require the ontology data 
                         ModelCreator modelCreator = ModelCreator.getModelInstance();
                         isWordMatchd = modelCreator.isMatchingWords(sourceName, name);
+                        StaticData.isStartedJustNow = true;
                         if(!isWordMatchd){
                         	//if it is not match by our dictionary 
                         	//call the check similarity algorithm or edit distance

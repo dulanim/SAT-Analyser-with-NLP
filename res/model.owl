@@ -15,7 +15,7 @@
     </rdfs:subClassOf>
     <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
   </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Shop">
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shop">
     <rdfs:subClassOf>
       <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
     </rdfs:subClassOf>
@@ -26,7 +26,7 @@
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shop">
     <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Shop"/>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#shop"/>
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#aslkdnksald">
     <rdfs:subClassOf>
@@ -71,7 +71,7 @@
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shopping_card">
     <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Shop"/>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#shop"/>
   </rdfs:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Other_Noun">
     <rdfs:subClassOf>
