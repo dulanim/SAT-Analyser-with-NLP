@@ -167,10 +167,16 @@ public class JSONReader {
 		                                        while(ParameterIterator.hasNext()){
 		                                            JSONObject jsonObject_Parameter = (JSONObject) ParameterIterator.next();
 		                                            parameter = new Parameter();
-		                                            parameter.setParameterName(jsonObject_Parameter.
-		                                                    get("name").toString());
-		                                            parameter.setParameterType(jsonObject_Parameter.
-		                                                    get("type").toString());
+                                                            Object obj = jsonObject_Parameter.get("name");
+                                                            String name  = "";
+                                                            if(obj != null)
+                                                                name = obj.toString();
+		                                            parameter.setParameterName(name);
+                                                            obj = jsonObject_Parameter.get("type");
+                                                            String typeParam  = "";
+                                                            if(obj != null)
+                                                                typeParam = obj.toString();
+		                                            parameter.setParameterType(typeParam);
 		                                            paramList.add(parameter);
 		                                        }
 		                                        operation.setParameterList(paramList);
