@@ -104,7 +104,7 @@ public class HomeGUI extends JFrame implements KeyListener {
     private CTabFolder2Listener ctfCTF2L;
     private MouseListener ctfML;
     public static CTabFolder propertyTab ;
-
+    public static boolean isImport = false;
     static TreeViewer treeViewer;
 
     static String string = "";
@@ -703,6 +703,7 @@ public class HomeGUI extends JFrame implements KeyListener {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 //Import Functionality Here
+            	HomeGUI.isImport = true;
                 ImportProjectWindow.copyingLocation = StaticData.workspace;
                 ImportProjectWindow.main(null);
 

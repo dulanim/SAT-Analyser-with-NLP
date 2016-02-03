@@ -213,7 +213,7 @@ public class RequirementUMLClassManager {
 						reqArtefactElement
 								.getArtefactElementId()
 								.indexOf("RQ")));
-                relationNodes.add("Req Class To UML Class");
+        relationNodes.add("Req Class To UML Class");
 		relationNodes.add(UMLArtefactElement
 				.getArtefactElementId());
 		if (CompareWindow.tree != null
@@ -316,7 +316,7 @@ public class RequirementUMLClassManager {
 			}
 		}
 		if ((CompareWindow.tree != null
-				||!CompareWindow.tree.isDisposed()) || HomeGUI.isComaparing) {
+				&& !CompareWindow.tree.isDisposed()) && HomeGUI.isComaparing) {
 			TreeItem subAttribute = new TreeItem(classItem, SWT.NONE);
 			subAttribute.setText("Attributes");
 			subAttribute.setForeground(Display.getDefault()

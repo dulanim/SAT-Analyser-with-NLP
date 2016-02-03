@@ -32,7 +32,7 @@ import com.project.traceability.common.Dimension;
 
 public class ImportProjectWindow {
 
-	protected Shell shell;
+	protected static Shell shell;
 	private Text txtProjectPath;
 	private Text txtWrkspacePath;
 	
@@ -315,7 +315,7 @@ public class ImportProjectWindow {
 
 							e1.printStackTrace();
 						}
-                                                shell.dispose();
+                      shell.close();
 					}
 				}
 			
@@ -333,6 +333,23 @@ public class ImportProjectWindow {
 		Label lblCopyLocation = new Label(composite, SWT.NONE);
 		lblCopyLocation.setToolTipText("Selected Projects Will be Copied to " + copyingLocation);
 		lblCopyLocation.setBounds(187, 10, 283, 17);
+		
+		Button btnCancel = new Button(composite, SWT.NONE);
+		btnCancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION|
+						SWT.YES|SWT.NO);
+				box.setMessage("Do you want to close this window?");
+				int result = box.open();
+				if(result == SWT.YES){
+					ImportProjectWindow.shell.close();
+					HomeGUI.shell.setVisible(true);
+				}
+			}
+		});
+		btnCancel.setBounds(115, 244, 91, 29);
+		btnCancel.setText("Cancel");
 		
 		if(copyingLocation.equals("")){
 			lblCopyLocation.setText("Default");
@@ -453,7 +470,7 @@ public class ImportProjectWindow {
                             btnFinish.setEnabled(true);
 		}else{
 			//if not exists show message or pop up to user that project is not valid 
-			 if(btnFinish != null || importFiles != null){
+			 if(!HomeGUI.isImport || btnFinish != null || importFiles != null){
                             String content = "Given Path does not have required file/ folder";
                             String title = "Information For Selection";
                             showErrorMessage(content, title);
@@ -476,9 +493,10 @@ public class ImportProjectWindow {
 	
 	private void showErrorMessage(String content,String title){
 
-        MessageBox messageBox = new MessageBox(shell, SWT.ERROR
-	              | SWT.OK);
-                      if(!content.equals(""))
+		if(shell == null || shell.isDisposed())
+			return ;
+        MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR);
+                      if(content.equals(""))
                           content = "Error In Project";
                       if(title.equals(""))
                           title = "Error";
