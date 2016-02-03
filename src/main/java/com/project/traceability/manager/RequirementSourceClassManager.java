@@ -317,6 +317,10 @@ public class RequirementSourceClassManager {
                      	//call the check similarity algorithm or edit distance
                      	//based on edit distance we find out the similarity
                      	isMatched = MatchWords.compareStrings(name1, name2);
+                     	if(isMatched)
+                     		w1.setMapID(1000);
+                     }else{
+                    	 w1.setMapID(1000);
                      }
                      
                 }

@@ -9,27 +9,24 @@
       <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
     </rdfs:subClassOf>
   </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove">
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#close">
     <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Methods"/>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove"/>
+    </rdfs:subClassOf>
+    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Shop">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
     </rdfs:subClassOf>
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#SavingsAccount">
     <j.0:object>dummy</j.0:object>
     <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
   </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#">
-    <j.0:object>dummy</j.0:object>
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
-    <j.0:hasOrder>It is order type</j.0:hasOrder>
-  </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#detail">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
-    <j.0:hasOrder>It is order type</j.0:hasOrder>
-  </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#dispose">
-    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Remove"/>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shop">
+    <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Shop"/>
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#aslkdnksald">
     <rdfs:subClassOf>
@@ -50,7 +47,31 @@
   </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#dispatch">
     <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove"/>
+    </rdfs:subClassOf>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Methods"/>
+    </rdfs:subClassOf>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#">
+    <j.0:object>dummy</j.0:object>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
+    <j.0:hasOrder>It is order type</j.0:hasOrder>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#detail">
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
+    <j.0:hasOrder>It is order type</j.0:hasOrder>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#dispose">
+    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
     <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Remove"/>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shopping_card">
+    <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Shop"/>
   </rdfs:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Other_Noun">
     <rdfs:subClassOf>

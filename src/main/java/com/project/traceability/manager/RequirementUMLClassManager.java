@@ -21,6 +21,7 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
 import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
