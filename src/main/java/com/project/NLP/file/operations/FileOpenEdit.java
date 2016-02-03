@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.ToolItem;
 public class FileOpenEdit {
 
   Display d;
-
   Shell s;
 
   FileOpenEdit() {

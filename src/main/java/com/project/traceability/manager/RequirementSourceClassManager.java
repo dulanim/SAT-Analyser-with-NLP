@@ -31,7 +31,7 @@ import com.project.traceability.utils.Constants.ImageType;
  *
  * @author K.Kamalan
  * @modified by shiyam
- * 
+ *
  * modified in 10 Nov 2015
  *
  */
@@ -42,43 +42,41 @@ public class RequirementSourceClassManager {
     static List<String> requirementClasses = new ArrayList<String>();
     public static List<String> relationNodes = new ArrayList<String>();
     public static String TAG = "com.project.traceability.manager.RequirementSourceClassManager/";
-    
-    
+
     static String projectPath;
     static TreeItem classItem;
 
     //create static variable for show the image in compare file window.
     static Image exactImage = FilePropertyName.exactimg;
-	static Image violateImage = FilePropertyName.violoationimg;
+    static Image violateImage = FilePropertyName.violoationimg;
 
     /**
      * check whether the requirement classes are implemented in sourcecode
      *
      * @return
      */
-    
     //comapre class names
     @SuppressWarnings("rawtypes")
     public static List<String> compareClassNames(String projectPath) {
         //get the project path
         RequirementSourceClassManager.projectPath = projectPath;
-        
+
         //get the requirement classes
         requirementClasses = ClassManager.getReqClassName(projectPath);
-       // RequirementsManger.readXML(projectPath);
-        
+        // RequirementsManger.readXML(projectPath);
+
         //get the req class object with id as key 
         Map<String, ArtefactElement> reqMap = RequirementsManger.requirementArtefactElements;
-        
+
         //iterate the reqMap artefact to compare
         Iterator<Entry<String, ArtefactElement>> requirementIterator = reqMap
                 .entrySet().iterator();
         //SourceCodeArtefactManager.readXML(projectPath);
-        
+
         //get the sourceMap Class object with id as key
         SourceCodeArtefactManager.readXML(projectPath);
         Map<String, ArtefactElement> sourceMap = SourceCodeArtefactManager.sourceCodeAretefactElements;
-        
+
         Iterator<Entry<String, ArtefactElement>> sourceIterator = null;
 
         //put the heading for in 2 columns
@@ -93,23 +91,23 @@ public class RequirementSourceClassManager {
         }
         //iterate the req artefact element 
         while (requirementIterator.hasNext()) {
-            
+
             //keep track the matching information return from WordNet API
             boolean isWordMatchd = false;
             //get the key value pair
             Map.Entry pairs = requirementIterator.next();
-            
+
             //get the value that mean get the ID of the artefact element
             ArtefactElement reqArtefactElement = (ArtefactElement) pairs
                     .getValue();
-            
+
             //get the name of artefact element name
             String name = reqArtefactElement.getName();
-            
+
             //get the artefact sub elements (attribute and behaviour)
             List<ArtefactSubElement> reqAttributeElements = reqArtefactElement
                     .getArtefactSubElements();
-            
+
             //first we check whether the artefact elemtnt is class name or not
             if (reqArtefactElement.getType().equalsIgnoreCase("Class")) {
                 //then we iterate the sourceMap
@@ -117,33 +115,33 @@ public class RequirementSourceClassManager {
                 while (sourceIterator.hasNext()) {
                     //get the key value pair for source artefact
                     Map.Entry pairs1 = sourceIterator.next();
-                    
+
                     //get the value of artefact element
                     ArtefactElement sourceArtefactElement = (ArtefactElement) pairs1
                             .getValue();
                     WordsMap w1 = new WordsMap();
                     //check whether the both artefact element is matched or not.
                     String sourceName = sourceArtefactElement.getName();
-                  
+
                     w1 = SynonymWords.checkSymilarity(sourceName,
                             name, reqArtefactElement.getType());
                     isWordMatchd = w1.isIsMatched();
-                    if(!isWordMatchd){
-                       //require the ontology data 
+                    if (!isWordMatchd) {
+                        //require the ontology data 
                         ModelCreator modelCreator = ModelCreator.getModelInstance();
                         isWordMatchd = modelCreator.isMatchingWords(sourceName, name);
-                        if(!isWordMatchd){
-                        	//if it is not match by our dictionary 
-                        	//call the check similarity algorithm or edit distance
-                        	//based on edit distance we find out the similarity
-                        	isWordMatchd = MatchWords.compareStrings(sourceName, name);
-                        }	
+                        if (!isWordMatchd) {
+                            //if it is not match by our dictionary 
+                            //call the check similarity algorithm or edit distance
+                            //based on edit distance we find out the similarity
+                            isWordMatchd = MatchWords.compareStrings(sourceName, name);
+                        }
                     }
                     if (sourceArtefactElement.getType().equalsIgnoreCase(
                             "Class")
                             && (sourceArtefactElement.getName()
                             .equalsIgnoreCase(name) | isWordMatchd)) {
-                    	compareSubElements(classItem, reqArtefactElement,
+                        compareSubElements(classItem, reqArtefactElement,
                                 sourceArtefactElement);
                         sourceMap.remove(sourceArtefactElement
                                 .getArtefactElementId());
@@ -251,7 +249,6 @@ public class RequirementSourceClassManager {
     public static void compareSubElements(TreeItem classItem,
             ArtefactElement reqArtefactElement,
             ArtefactElement sourceArtefactElement) {
-        
 
         if (CompareWindow.tree != null && !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
             classItem = new TreeItem(CompareWindow.tree, SWT.NONE);
@@ -264,21 +261,20 @@ public class RequirementSourceClassManager {
             classItem.setData("1", reqArtefactElement);
             classItem.setImage(1, exactImage);
         }
-        
-            String actualID = reqArtefactElement.getArtefactElementId();
-            String id = ""; 
-            if(actualID.contains("RQ")){
-               id = actualID.substring(actualID.indexOf("RQ"));
-            }else if(actualID.contains("SC")){
-                id = actualID.substring(actualID.indexOf("SC"));
-            }else if(actualID.contains("D")){
-                id = actualID.substring(actualID.indexOf("D"));
-            }
-            
-        relationNodes.add(id);
-	    relationNodes.add("Req Class To Source Class");
-	    relationNodes.add(sourceArtefactElement.getArtefactElementId());
 
+        String actualID = reqArtefactElement.getArtefactElementId();
+        String id = "";
+        if (actualID.contains("RQ")) {
+            id = actualID.substring(actualID.indexOf("RQ"));
+        } else if (actualID.contains("SC")) {
+            id = actualID.substring(actualID.indexOf("SC"));
+        } else if (actualID.contains("D")) {
+            id = actualID.substring(actualID.indexOf("D"));
+        }
+
+        relationNodes.add(id);
+        relationNodes.add("Req Class To Source Class");
+        relationNodes.add(sourceArtefactElement.getArtefactElementId());
 
         ArrayList<ArtefactSubElement> reqAttributesList = new ArrayList<>();
         ArrayList<ArtefactSubElement> reqMethodsList = new ArrayList<>();
@@ -303,37 +299,39 @@ public class RequirementSourceClassManager {
                 String name2 = requElement.getName();
 
                 w1 = SynonymWords.checkSymilarity(name1,
-                       name2, sourceAttribute.getType(), requElement.getType(),
+                        name2, sourceAttribute.getType(), requElement.getType(),
                         requirementClasses);
-                
-                boolean  isMatched = w1.isIsMatched();
-                
-                if(!isMatched){
+
+                boolean isMatched = w1.isIsMatched();
+
+                if (!isMatched) {
                     //call ontology method to compare
-                     ModelCreator modelCreator = ModelCreator.getModelInstance();
-                     isMatched = modelCreator.isMatchingWords(name1, name2);
-                     if(!isMatched){
-                     	//if it is not match by our dictionary 
-                     	//call the check similarity algorithm or edit distance
-                     	//based on edit distance we find out the similarity
-                     	isMatched = MatchWords.compareStrings(name1, name2);
-                     	if(isMatched)
-                     		w1.setMapID(1000);
-                     }else{
-                    	 w1.setMapID(1000);
-                     }
-                     
+                    ModelCreator modelCreator = ModelCreator.getModelInstance();
+                    isMatched = modelCreator.isMatchingWords(name1, name2);
+                    if (!isMatched) {
+                        //if it is not match by our dictionary 
+                        //call the check similarity algorithm or edit distance
+                        //based on edit distance we find out the similarity
+                        isMatched = MatchWords.compareStrings(name1, name2);
+                        if (isMatched) {
+                            w1.setMapID(1000);
+                        }
+                    } else {
+                        w1.setMapID(1000);
+                    }
+
                 }
                 if (isMatched) {
-                	if(requElement.getSubElementId().contains("RQ"))
-                		requElement.setSubElementId(requElement.getSubElementId().substring(requElement.getSubElementId().indexOf("RQ")));
-                	System.out.println(requElement.getSubElementId() + "Uadcgbdhsuuuuuuuuuuug");
-                	relationNodes.add(requElement.getSubElementId());
-                        relationNodes.add("Req "+ requElement.getType()+ " To Source " + sourceAttribute.getType());
-                        relationNodes.add(sourceAttribute.getSubElementId());
-                        
-                        System.out.println(TAG+ "compareSubElements " +
-                                requElement.getName() + " is Matched with " +sourceAttribute.getName());
+                    if (requElement.getSubElementId().contains("RQ")) {
+                        requElement.setSubElementId(requElement.getSubElementId().substring(requElement.getSubElementId().indexOf("RQ")));
+                    }
+                    System.out.println(requElement.getSubElementId() + "Uadcgbdhsuuuuuuuuuuug");
+                    relationNodes.add(requElement.getSubElementId());
+                    relationNodes.add("Req " + requElement.getType() + " To Source " + sourceAttribute.getType());
+                    relationNodes.add(sourceAttribute.getSubElementId());
+
+                    System.out.println(TAG + "compareSubElements "
+                            + requElement.getName() + " is Matched with " + sourceAttribute.getName());
 
                     if (CompareWindow.tree != null
                             && !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
