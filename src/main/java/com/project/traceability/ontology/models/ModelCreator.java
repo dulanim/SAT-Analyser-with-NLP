@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,7 @@ public class ModelCreator {
     private OntModel model;
     private String filename = "model.owl";
     private String filePath;
-
+    
     public static OntClass parentClass;
 
     private ModelCreator() {
@@ -132,8 +134,8 @@ public class ModelCreator {
     public boolean createNewNode(String word1, String word2, Word word) {
     	  boolean isCreated = false;
 
-//    	  word1 = getNormalizedWordString(word1);
-//    	  word2 = getNormalizedWordString(word2);
+    	  word1 = getNormalizedWordString(word1);
+    	  word2 = getNormalizedWordString(word2);
           String wordURI1 = StaticData.OWL_ROOT_URI + "#" + word1;
           String wordURI2 = StaticData.OWL_ROOT_URI + "#" + word2;
 
@@ -255,18 +257,30 @@ public class ModelCreator {
         int weight = 0;
         double score = 0;
         double total = 1;
+        List<String> parent1 = StaticData.parent1;
+        List<String> parent2 = StaticData.parent2;
+        Map<String, List<String>> map = StaticData.map;
         if (!(word1.equals("") && word2.equals(""))) {
         	
-//        	word1 = getNormalizedWordString(word1);
-//        	word2 = getNormalizedWordString(word2);
+        	word1 = getNormalizedWordString(word1);
+        	word2 = getNormalizedWordString(word2);
             String uri1 = StaticData.OWL_ROOT_URI + "#" + word1;
             String uri2 = StaticData.OWL_ROOT_URI + "#" + word2;
-
-            OntModel model = this.getCreatedModel();
-            InputStream in = this.getInputStream();
-            model.read(in, null);///read the model.owl file from hard disk
             
+            OntModel model = this.getCreatedModel();
             NavigationModel navigationModel = NavigationModel.getNavigatorInstane();
+            if(StaticData.isStartedJustNow){	
+                InputStream in = this.getInputStream();
+            	model.read(in, null);///read the model.owl file from hard disk
+            	this.model = model;
+
+
+	            map = navigationModel.getAllClassesProperty();
+	            StaticData.map = map;
+	            
+            }
+            
+           
             OntClass wordlass1 = model.getOntClass(uri1);
             OntClass wordlass2 = model.getOntClass(uri2);
             
@@ -275,16 +289,17 @@ public class ModelCreator {
             	return false;
             }
             //gather parent classes for separate word1 and word classes
-            List<String> parent1 = navigationModel.getParentClassFor(wordlass1);
-            List<String> parent2 = navigationModel.getParentClassFor(wordlass2);
-
             
-            NavigationModel navigator = NavigationModel.getNavigatorInstane();
-            Map<String, List<String>> map = navigator.getAllClassesProperty();
-
+            if(!StaticData.isStartedJustNow){
+	            parent1 = navigationModel.getParentClassFor(wordlass1);
+	            parent2 = navigationModel.getParentClassFor(wordlass2);
+            	
+            	map = StaticData.map;
+            	
+            }
+            
             List<String> propertyList1 = map.get(word1);//hasName:shiyam hasSize:128cm
             List<String> propertyList2 = map.get(word2);
-
             int size1 = propertyList1.size();
             int size2 = propertyList2.size();
 
@@ -389,24 +404,24 @@ public class ModelCreator {
     
     public String getNormalizedWordString(String word){
     	//all name in model should be in lower case it is our convention for avoiding conflict
-    	String norm = "";
-    	if(word.length() ==1){
-	    	char chfirst = word.charAt(0);
-	    	String str = new String(new char[]{chfirst});
-	    	str.toUpperCase();
-	    	norm = str;
-    	}else if(word.length()>1){
-    		char chfirst = word.charAt(0);
-	    	String str = new String(new char[]{chfirst});
-	    	str.toUpperCase();
-	    	
-	    	String sub = word.substring(1);
-	    	str += sub;
-	    	norm =str;
-    	}else{
-    		norm = "";
-    	}
-    	return norm;
+//    	String norm = "";
+//    	if(word.length() ==1){
+//	    	char chfirst = word.charAt(0);
+//	    	String str = new String(new char[]{chfirst});
+//	    	str.toUpperCase();
+//	    	norm = str;
+//    	}else if(word.length()>1){
+//    		char chfirst = word.charAt(0);
+//	    	String str = new String(new char[]{chfirst});
+//	    	str.toLower
+//	    	
+//	    	String sub = word.substring(1).toLowerCase();
+//	    	str += sub;
+//	    	norm =str;
+//    	}else{
+//    		norm = "";
+//    	}
+    	return word.toLowerCase();
     }
 
 }

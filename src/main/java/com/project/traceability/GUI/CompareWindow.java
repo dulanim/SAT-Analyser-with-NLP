@@ -374,8 +374,8 @@ public class CompareWindow {
 													TreeItem newItem = new TreeItem(parent, SWT.NONE);
 													newItem.setText(column,selection[0].getText(column));
 													newItem.setText(alterColumn,subElements[i].getText(alterColumn));
-													newItem.setImage(0, ImageType.EXACT_MATCH.getValue());
-													newItem.setImage(1, ImageType.EXACT_MATCH.getValue());
+													newItem.setImage(0, ImageType.VIOLATION.getValue());
+													newItem.setImage(1, ImageType.VIOLATION.getValue());
 													selection[0].dispose();
 													subElements[i].dispose();
 													break;

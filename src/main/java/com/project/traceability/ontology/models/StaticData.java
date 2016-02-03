@@ -2,6 +2,11 @@
 
 package com.project.traceability.ontology.models;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.project.traceability.GUI.WordExpWindows;
 
 public class StaticData {
@@ -30,4 +35,9 @@ public class StaticData {
                 " you do not need to add for futher projects\n\n"+
                 "Do you want to add to Dictionary those words?";
     public static boolean isAdded = false;
+    public static boolean isStartedJustNow = false;
+    public static List<String> parent1 = new ArrayList<>();
+    public static List<String> parent2 =new ArrayList<>();
+    public static Map<String, List<String>> map = new HashMap<String, List<String>>();
+    
 }

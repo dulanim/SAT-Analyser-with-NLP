@@ -41,7 +41,7 @@ public class MatchWords {
 	    }
 	  }
 	
-//	public static void main(String args[]){
-//		System.out.println(MatchWords.compareStrings("1", "112"));
-//	}
+	public static void main(String args[]){
+		System.out.println(MatchWords.compareStrings("1", "112"));
+	}
 }

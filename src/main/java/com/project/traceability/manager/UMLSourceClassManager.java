@@ -21,6 +21,7 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
 import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
@@ -70,7 +71,7 @@ public class UMLSourceClassManager {
 			column2.setText("UML-XML file");
 			column2.setWidth(300);
 		}
-
+		StaticData.isStartedJustNow = true;
 		while (UMLIterator.hasNext()) {
 			Map.Entry pairs = UMLIterator.next();
 			ArtefactElement UMLArtefactElement = (ArtefactElement) pairs
@@ -100,6 +101,7 @@ public class UMLSourceClassManager {
                              //call our dictionary model.owl 
                              ModelCreator model = ModelCreator.getModelInstance();
                              isMatched = model.isMatchingWords(name1, name);
+                             StaticData.isStartedJustNow = false;
                              if(!isMatched){
                              	//if it is not match by our dictionary 
                              	//call the check similarity algorithm or edit distance
@@ -109,7 +111,7 @@ public class UMLSourceClassManager {
                          }
 					if (sourceArtefactElement.getType().equalsIgnoreCase(
 							"Class")
-							&& w1.isIsMatched()) {
+							&& isMatched) {
 						compareSubElements(classItem, UMLArtefactElement, sourceArtefactElement);
 						artefactMap.remove(sourceArtefactElement
 								.getArtefactElementId());
@@ -221,7 +223,8 @@ public class UMLSourceClassManager {
                 relationNodes.add("UML Class To Source Class");
 		relationNodes.add(sourceArtefactElement.getArtefactElementId());
 
-		if (CompareWindow.tree != null && !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
+		if (CompareWindow.tree != null && !CompareWindow.tree.isDisposed() && 
+				HomeGUI.isComaparing) {
 			classItem = new TreeItem(CompareWindow.tree, SWT.NONE);
 			classItem.setText(0, sourceArtefactElement.getName());
 			classItem.setData("0", sourceArtefactElement);
@@ -267,7 +270,11 @@ public class UMLSourceClassManager {
                      	//call the check similarity algorithm or edit distance
                      	//based on edit distance we find out the similarity
                      	isMatched = MatchWords.compareStrings(name1, name2);
-                     }	
+                     	if(isMatched)
+                     		w2.setMapID(1000);
+                     }else{
+                    	 w2.setMapID(1000);
+                     }
                  }
 				if (isMatched) {
 					relationNodes.add(UMLAttribute.getSubElementId());

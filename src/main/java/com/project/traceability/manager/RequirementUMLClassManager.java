@@ -21,6 +21,7 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
 import com.project.traceability.ontology.models.MatchWords;
 import com.project.traceability.ontology.models.ModelCreator;
+import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.semanticAnalysis.SynonymWords;
 import com.project.traceability.utils.Constants.ImageType;
 
@@ -63,6 +64,7 @@ public class RequirementUMLClassManager {
 			column2.setWidth(300);
 		}
 		
+		StaticData.isStartedJustNow = true;
 		while (requirementIterator.hasNext()) {
 			Map.Entry pairs = requirementIterator.next();
 			ArtefactElement reqArtefactElement = (ArtefactElement) pairs
@@ -84,6 +86,7 @@ public class RequirementUMLClassManager {
                     w1 = SynonymWords.checkSymilarity(UMLArtefactElement.getName(), name,
 									reqArtefactElement.getType());
                     boolean isMatched = w1.isIsMatched();
+                    
                     if(!isMatched){
                     	//wordNet dictionary does not have any matching word
                     	//call our dictionary model.owl 
@@ -91,6 +94,7 @@ public class RequirementUMLClassManager {
                         model.setPath("");
                     	isMatched = model.isMatchingWords(requirementName, umlName);
                     	
+                    	StaticData.isStartedJustNow = false;
                     	if(!isMatched){
                     		//if it is not match by our dictionary 
                     		//call the check similarity algorithm or edit distance
@@ -261,8 +265,14 @@ public class RequirementUMLClassManager {
                     	//call the check similarity algorithm or edit distance
                     	//based on edit distance we find out the similarity
                     	isMatched = MatchWords.compareStrings(requirementArtName, umlArtName);
-                    }	
+                    	if(isMatched)
+                    		w2.setMapID(1000);
+                    }else{
+                    	w2.setMapID(1000);
+                    }
+                    
                 }
+                w2.setIsMatched(isMatched);
 				if (UMLSubElement.getName().equalsIgnoreCase(
 						reqSubElement.getName())
 						| isMatched) {
