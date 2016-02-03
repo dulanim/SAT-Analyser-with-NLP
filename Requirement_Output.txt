@@ -1,25 +1,48 @@
 
-Class : saving account
-	Attributes : balance,dumm account,withdrawal amount,user,transaction,	Methods : cover,inform,record,terminate,enter,
-Class : amount
-	Attributes : bank accounts,bank account,	Methods : replace,
-Class : item
-	Attributes : store,	Methods : dispose,
-Class : application
-	Attributes : employee account,access,personal identification number code,first prize,current balance,checking account,identification,balance,pin,dumm account,fund,related saving account,withdrawal amount,user,transaction,	Methods : cover,inform,verify,terminate,withdraw,gain,
-Class : officer
-	Attributes : candidate,employer,type,retrieving,	Methods : request,
-Class : save
-	Attributes : 	Methods : record,enter,
-Class : client
-	Attributes : employee account,access,identification,pin,ability,personal identification number code,account,	Methods : review,perform,verify,gain,
-Class : department
-	Attributes : student,	Methods : 
-Class : transaction
-	Attributes : date,amount,transaction type,account balance,time,ability,account,	Methods : include,review,perform,
-Class : verification
-	Attributes : candidate,officer,employer,type,retrieving,	Methods : request,
-Class : bank client
-	Attributes : amount,type,account,bank application,	Methods : deposit,withdraw,
+
+Class : normal order
+	Attributes : item,
+	Methods : receive,dispose,
+
+Class : shopping_card
+	Attributes : name,User_Id,point,
+	Methods : 
+
+Class : special order
+	Attributes : item,
+	Methods : dispose,
+
+Class : regular customer
+	Attributes : shoping_card,
+	Methods : 
+
+Class : manager
+	Attributes : shop,employee,
+	Methods : 
+
+Class : employee
+	Attributes : attendance,
+	Methods : swipe_card,register,
+
 Class : customer
-	Attributes : candidate,employer,	Methods : 	Relations : Type - Parent-> Parent -client
+	Attributes : shopping_card,item,name,discount,location,customer orders,order,
+	Methods : receive,record,send,order,
+
+Class : order
+	Attributes : customer,
+	Methods : confirm,close,
+Relations : 
+
+ Type : Association, Parent : manager, Child : employee
+
+ Type : Generalization, Parent : order, Child : normal order
+
+ Type : Association, Parent : customer, Child : order
+
+ Type : Generalization, Parent : order, Child : special order
+
+ Type : Generalization, Parent : employee, Child : manager
+
+ Type : Association, Parent : customer, Child : shopping_card
+
+ Type : Generalization, Parent : customer, Child : regular customer

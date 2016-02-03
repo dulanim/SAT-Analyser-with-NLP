@@ -1,3 +1,4 @@
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,7 +6,7 @@
 package com.project.traceability.GUI;
 
 import org.eclipse.swt.widgets.Shell;
-// can not  find  : import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+//import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
 /**
  * 

@@ -4,6 +4,7 @@
  */
 package com.project.traceability.visualization;
 
+import com.project.NLP.SourceCodeToXML.SourceCodeDB2;
 import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.IntraRelationManager;
@@ -17,6 +18,7 @@ import com.project.traceability.manager.UMLSourceClassManager;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.RequirementModel;
+import com.project.traceability.visualization.GraphDB;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,8 +30,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
@@ -39,273 +43,317 @@ import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
- * 
+ *
  * @author Thanu
  */
-
 public class GraphDBTest {
 
-	static GraphDatabaseService graphDbService;
-	static ArtefactElement sourceElement;
-	static ArtefactElement UMLElement;
-	static ArtefactSubElement fieldSubElement;
-	static ArtefactSubElement methodSubElement;
-	static ArtefactSubElement attributeSubElement;
-	static ArtefactSubElement operationSubElement;
-	static RequirementModel requirement;
-	static Map<String, ArtefactElement> aretefactElements;
-	static List<RequirementModel> reqModel;
-	static GraphDB graphDB;
-	static List<String> relation = new ArrayList<>();
-	static Map<String, ArtefactElement> UMLAretefactElements;
-	static Map<String, ArtefactElement> sourceCodeAretefactElements;
-	static List<RequirementModel> requirementsAretefactElements;
-	static String filePath;
-	static String projectName;
-	static GraphDBTest test;
-	static String projectPath;
+    static GraphDatabaseService graphDbService;
+    static ArtefactElement sourceElement;
+    static ArtefactElement UMLElement;
+    static ArtefactSubElement fieldSubElement;
+    static ArtefactSubElement methodSubElement;
+    static ArtefactSubElement attributeSubElement;
+    static ArtefactSubElement operationSubElement;
+    static ArtefactElement requirement;
+    static ArtefactSubElement reqfieldSubElement;
+    static ArtefactSubElement reqmethodSubElement;
+    static Map<String, ArtefactElement> aretefactElements;
+    static List<RequirementModel> reqModel;
+    static GraphDB graphDB;
+    static List<String> relation = new ArrayList<>();
+    static Map<String, ArtefactElement> UMLAretefactElements;
+    static Map<String, ArtefactElement> sourceCodeAretefactElements;
+    static Map<String, ArtefactElement> requirementsAretefactElements;
+    static String filePath;
+    static String projectName;
+    static GraphDBTest test;
+    static String projectPath;
 
-	public GraphDBTest() {
-		System.out.println("graphDBTest");
-	}
+    public GraphDBTest() {
+        System.out.println("graphDBTest");
+    }
 
-	@BeforeClass
-	public static void setUpClass() {
-		System.out.println("setupclass");
-		ReadFiles.readFiles("E:/SATWork/Test/");
-		
-		sourceElement = new ArtefactElement("SC1", "Account", "Class",
-				"public", null);
-		fieldSubElement = new ArtefactSubElement("SC2", "accountNumber",
-				"private", null, "Field");
-		methodSubElement = new ArtefactSubElement("SC8", "getAccountNumber",
-				"private", null, "Method");
-		List<ArtefactSubElement> sourceSubElements = new ArrayList<>();
-		sourceSubElements.add(fieldSubElement);
-		sourceSubElements.add(methodSubElement);
-		sourceElement.setArtefactSubElements(sourceSubElements);
+    @BeforeClass
+    public static void setUpClass() {
+        System.out.println("setupclass");
+        ReadFiles.readFiles(System.getProperty("user.home") + File.separator + "SATAnalyzer" + File.separator + "Test");
+        //<ArtefactElement id="SC1" interface="[]" name="Customer" superClass="" type="Class" visibility="public">
+        sourceElement = new ArtefactElement("SC1", "Customer", "Class",
+                "public", null);
+        //<ArtefactSubElement id="SC1_F2" name="name" type="Variable" variableType="String" visibility="private"/>
+        fieldSubElement = new ArtefactSubElement("SC1_F2", "name",
+                "private", null, "Variable");
+        //<ArtefactSubElement id="SC1_M2" name="reciveOrder" parameters="" returnType="void" type="Method" visibility="Private"/>
+        methodSubElement = new ArtefactSubElement("SC1_M2", "reciveOrder",
+                "public", "void", "Method");
+        List<ArtefactSubElement> sourceSubElements = new ArrayList<>();
+        sourceSubElements.add(fieldSubElement);
+        sourceSubElements.add(methodSubElement);
+        sourceElement.setArtefactSubElements(sourceSubElements);
 
-		UMLElement = new ArtefactElement("D1", "Account", "Class", "public",
-				null);
-		attributeSubElement = new ArtefactSubElement("D2", "accountNumber",
-				"private", null, "UMLAttribute");
-		operationSubElement = new ArtefactSubElement("D7", "getAccountNumber",
-				"private", null, "UMLOperation");
-		List<ArtefactSubElement> UMLSubElements = new ArrayList<>();
-		UMLSubElements.add(attributeSubElement);
-		UMLSubElements.add(operationSubElement);
-		sourceElement.setArtefactSubElements(UMLSubElements);
+        //<ArtefactElement id="D1" name="Customer" type="Class">
+        UMLElement = new ArtefactElement("D1", "Customer", "Class", null,
+                null);
+        //<ArtefactSubElement id="D1_F1" name="name" type="UMLAttribute" variableType="" visibility="Protcted"/>
+        attributeSubElement = new ArtefactSubElement("D1_F1", "name",
+                "private", null, "UMLAttribute");
+        //<ArtefactSubElement id="D1_M2" name="recieveOrder" parameters="" returnType="" type="UMLOpertion" visibility="public"/>
+        operationSubElement = new ArtefactSubElement("D1_M2", "recieveOrder",
+                "private", null, "UMLOperation");
+        List<ArtefactSubElement> UMLSubElements = new ArrayList<>();
+        UMLSubElements.add(attributeSubElement);
+        UMLSubElements.add(operationSubElement);
+        sourceElement.setArtefactSubElements(UMLSubElements);
 
-		aretefactElements = new HashMap<>();
-		aretefactElements.put(sourceElement.getArtefactElementId(),
-				sourceElement);
-		aretefactElements.put(UMLElement.getArtefactElementId(), UMLElement);
+        aretefactElements = new HashMap<>();
+        aretefactElements.put(sourceElement.getArtefactElementId(),
+                sourceElement);
+        aretefactElements.put(UMLElement.getArtefactElementId(), UMLElement);
 
-		requirement = new RequirementModel(
-				"RQ3",
-				"R3",
-				"Account details",
-				"The system shall store account details, such as account number, balance, overdraft limit (current account), interest rate (savings account), withdrawal fee (savings account).",
-				"High", "Functional");
-		reqModel = new ArrayList<>();
-		reqModel.add(requirement);
+        //<ArtefactElement id="RQ3" name="customer" type="Class">
+        requirement = new ArtefactElement("RQ3", "customer", "Class", null, null);
+        //<ArtefactSubElement id="RQ3_F2" name="name" type="Field" variableType="" visibility=""/>
+        reqfieldSubElement = new ArtefactSubElement("RQ3_F2", "name",
+                "", null, "Field");
+        //<ArtefactSubElement id="RQ3_M2" name="receive" parameters="" returnType="" type="Method" visibility=""/>
+        reqmethodSubElement = new ArtefactSubElement("RQ3_M2", "receive",
+                "", "", "Method");
 
-		filePath = "E:/SATWork/";
-		projectPath = "E:/SATWork/Test/";
-		projectName = "Test";
-		PropertyFile.setFilePath(filePath);
-		PropertyFile.setProjectName(projectName);
+        filePath = System.getProperty("user.home") + File.separator + "SATAnalyzer" + File.separator;
+        projectPath = System.getProperty("user.home") + File.separator + "SATAnalyzer" + File.separator + "Test";
+        projectName = "Test";
+        PropertyFile.setFilePath(filePath);
+        PropertyFile.setProjectName(projectName);
 
-		UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
-		sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
-		requirementsAretefactElements = RequirementsManger.requirementElements;
+        UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
 
-		graphDB = new GraphDB();
-		graphDB.graphDb = graphDbService;
-		test = new GraphDBTest();
-	}
+        requirementsAretefactElements = RequirementsManger.requirementArtefactElements;
 
-	@AfterClass
-	public static void tearDownClass() {
-		System.out.println("teardownclass");		
-	}
+        sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
 
-	@Before
-	public void setUp() {
-		System.out.println("setup");
-		graphDbService = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(
-				PropertyFile.getTestDb()).newGraphDatabase();
-		graphDB.graphDb = graphDbService;
-	}
+        graphDB = new GraphDB();
+        graphDB.setGraphDb(graphDbService);
+        test = new GraphDBTest();
+    }
 
-	@After
-	public void tearDown() {
-		System.out.println("teardown");
-		graphDbService.shutdown();
-	}
+    @AfterClass
+    public static void tearDownClass() {
+        System.out.println("teardownclass");
+    }
 
-	/**
-	 * Test of addNodeToGraphDB method, of class GraphDB.
-	 */
-	@Test
-	public void testAddNodeToGraphDB() {
-		System.out.println("addNodeToGraphDB");
-                String fileType="Requirement";
-		Transaction tx = graphDbService.beginTx();
-		try {
-			graphDB.addNodeToGraphDB(fileType,UMLAretefactElements);
+    @Before
+    public void setUp() {
+        System.out.println("setup");
+        graphDbService = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(
+                PropertyFile.getTestDb()).newGraphDatabase();
+        graphDB.setGraphDb(graphDbService);
+    }
 
-			graphDB.addNodeToGraphDB(fileType,sourceCodeAretefactElements);
-			IndexManager index = graphDbService.index();
-			Index<Node> artefacts = index.forNodes("ArtefactElement");
+    @After
+    public void tearDown() {
+        System.out.println("teardown");
+        graphDbService.shutdown();
+    }
 
-			IndexHits<Node> first = artefacts.get("ID",
-					sourceElement.getArtefactElementId());
-			Node firstNode = first.getSingle();
-			assertEquals(firstNode.getProperty("ID").toString(),
-					sourceElement.getArtefactElementId());
-			assertEquals(firstNode.getProperty("Name").toString(),
-					sourceElement.getName());
-			assertEquals(firstNode.getProperty("Type").toString(),
-					sourceElement.getType());
-			// assertEquals(firstNode.getProperty("Visibility").toString(),sourceElement.getVisibility());
+    /**
+     * Test of addNodeToGraphDB method, of class GraphDB.
+     */
+    @Test
+    public void testAddNodeToGraphDB() {
+        System.out.println("addNodeToGraphDB");
+        Transaction tx = graphDbService.beginTx();
+        try {
+            graphDB.addNodeToGraphDB("UML", UMLAretefactElements);
+            graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);
+            IndexManager index = graphDbService.index();
+            Index<Node> artefacts = index.forNodes("ArtefactElement");
 
-			IndexHits<Node> second = artefacts.get("ID",
-					operationSubElement.getSubElementId());
-			Node secondNode = second.getSingle();
-			assertEquals(secondNode.getProperty("ID").toString(),
-					operationSubElement.getSubElementId());
-			assertEquals(secondNode.getProperty("Name").toString(),
-					operationSubElement.getName());
-			assertEquals(secondNode.getProperty("Type").toString(),
-					operationSubElement.getType());
-			// assertEquals(secondNode.getProperty("Visibility").toString(),operationSubElement.getVisibility());
-			assertEquals(147, IteratorUtil.count(GlobalGraphOperations.at(
-					graphDbService).getAllNodes()));
+            IndexHits<Node> first = artefacts.get("ID",
+                    sourceElement.getArtefactElementId());
+            Node firstNode = first.getSingle();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			tx.failure();
-		} finally {
-			tx.success();
-		}
-	}
+            assertEquals(firstNode.getProperty("ID").toString(),
+                    sourceElement.getArtefactElementId());
+            assertEquals(firstNode.getProperty("Name").toString(),
+                    sourceElement.getName());
+            assertEquals(firstNode.getProperty("Type").toString(),
+                    sourceElement.getType());
+            // assertEquals(firstNode.getProperty("Visibility").toString(),sourceElement.getVisibility());
 
-	/**
-	 * Test of addRelationTOGraphDB method, of class GraphDB.
-	 */
-	@Test
-	public void testAddRelationTOGraphDB() {
-		System.out.println("addRelationTOGraphDB");
-		HomeGUI.projectPath = projectPath;
-		relation = UMLSourceClassManager.compareClassNames(projectPath);
-		relation.addAll(RequirementSourceClassManager
-				.compareClassNames(projectPath));
-		relation.addAll(RequirementUMLClassManager
-				.compareClassNames(projectPath));
+            IndexHits<Node> second = artefacts.get("ID",
+                    operationSubElement.getSubElementId());
+            Node secondNode = second.getSingle();
+            assertEquals(secondNode.getProperty("ID").toString(),
+                    operationSubElement.getSubElementId());
+            assertEquals(secondNode.getProperty("Name").toString(),
+                    operationSubElement.getName());
+            assertEquals(secondNode.getProperty("Type").toString(),
+                    operationSubElement.getType());
+            // assertEquals(secondNode.getProperty("Visibility").toString(),operationSubElement.getVisibility());
+            assertEquals(34, IteratorUtil.count(GlobalGraphOperations.at(
+                    graphDbService).getAllNodes()));
 
-		Transaction tx = graphDbService.beginTx();
-		try {
-			test.testAddNodeToGraphDB();
-			test.testAddRequirementsNodeToGraphDB();
-			graphDB.addRelationTOGraphDB(relation);
-			assertEquals(251, IteratorUtil.count(GlobalGraphOperations.at(
-					graphDbService).getAllRelationships()));
-		} catch (Exception e) {
-			tx.failure();
-		} finally {
-			tx.success();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            tx.failure();
+        } finally {
+            tx.success();
+        }
+    }
 
-	}
+    /**
+     * Test of addRelationTOGraphDB method, of class GraphDB.
+     */
+    @Test
+    public void testAddRelationTOGraphDB() {
+        System.out.println("addRelationTOGraphDB");
+        HomeGUI.projectPath = projectPath;
+        relation = UMLSourceClassManager.compareClassNames(projectPath);
+        relation.addAll(RequirementSourceClassManager
+                .compareClassNames(projectPath));
+        relation.addAll(RequirementUMLClassManager
+                .compareClassNames(projectPath));
 
-	/**
-	 * Test of addIntraRelationTOGraphDB method, of class GraphDB.
-	 */
-	@Test
-	public void testAddIntraRelationTOGraphDB() {
-		System.out.println("addIntraRelationTOGraphDB");
-		relation = IntraRelationManager.getSourceIntraRelation(projectPath);
-		relation.addAll(IntraRelationManager.getUMLIntraRelation(projectPath));
+        Transaction tx = graphDbService.beginTx();
+        try {
+            graphDB.addNodeToGraphDB("UML", UMLAretefactElements);
+            graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);
+            graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);
+            graphDB.addRelationTOGraphDB(relation);
+            int count = 0;
+            for (Relationship n : GlobalGraphOperations.at(graphDbService).getAllRelationships()) {
+                System.out.println(count + " " + n);
+                count++;
+            }
+            assertEquals(22, IteratorUtil.count(GlobalGraphOperations.at(
+                    graphDbService).getAllRelationships()));
+        } catch (Exception e) {
+            tx.failure();
+        } finally {
+            tx.success();
+        }
 
-		Transaction tx = graphDbService.beginTx();
-		try {
-			test.testAddNodeToGraphDB();
-			test.testAddRequirementsNodeToGraphDB();
-			test.testAddRelationTOGraphDB();
-			graphDB.addIntraRelationTOGraphDB(relation);
-			assertEquals(251, IteratorUtil.count(GlobalGraphOperations.at(
-					graphDbService).getAllRelationships()));
-		} catch (Exception e) {
-			tx.failure();
-		} finally {
-			tx.success();
-		}
+    }
 
-	}
+    /**
+     * Test of addIntraRelationTOGraphDB method, of class GraphDB.
+     */
+    @Test
+    public void testAddIntraRelationTOGraphDB() {
+        System.out.println("addIntraRelationTOGraphDB");
+        relation = UMLSourceClassManager.compareClassNames(projectPath);
+        relation.addAll(RequirementSourceClassManager
+                .compareClassNames(projectPath));
+        relation.addAll(RequirementUMLClassManager
+                .compareClassNames(projectPath));
+        relation.addAll(IntraRelationManager.getSourceIntraRelation(projectPath));
+        relation.addAll(IntraRelationManager.getUMLIntraRelation(projectPath));
+        
 
-	/**
-	 * Test of addRequirementsNodeToGraphDB method, of class GraphDB.
-	 */
-	@Test
-	public void testAddRequirementsNodeToGraphDB() {
-		System.out.println("addRequirementsNodeToGraphDB");
-		Transaction tx = graphDbService.beginTx();
-		try {
+        Transaction tx = graphDbService.beginTx();
+        try {
+            graphDB.addNodeToGraphDB("UML", UMLAretefactElements);
+            graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);
+            graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);
+            graphDB.addRelationTOGraphDB(relation);            
+            graphDB.addIntraRelationTOGraphDB(relation);
+            System.out.println("DBRel count" + IteratorUtil.count(GlobalGraphOperations.at(
+                    graphDbService).getAllRelationships()));
+            assertEquals(36, IteratorUtil.count(GlobalGraphOperations.at(
+                    graphDbService).getAllRelationships()));
+        } catch (Exception e) {
+            tx.failure();
+        } finally {
+            tx.success();
+        }
 
-			graphDB.addRequirementsNodeToGraphDB(requirementsAretefactElements);
-			IndexManager index = graphDbService.index();
-			Index<Node> artefacts = index.forNodes("ArtefactElement");
+    }
 
-			IndexHits<Node> hits = artefacts.get("ID",
-					requirement.getRequirementId());
-			Node firstNode = hits.getSingle();
+    /**
+     * Test of addRequirementsNodeToGraphDB method, of class GraphDB.
+     */
+    @Test
+    public void testAddRequirementsNodeToGraphDB() {
+        System.out.println("addRequirementsNodeToGraphDB");
+        Transaction tx = graphDbService.beginTx();
+        try {
 
-			assertEquals(firstNode.getProperty("ID").toString(),
-					requirement.getRequirementId());
-			assertEquals(firstNode.getProperty("Name").toString(),
-					requirement.getName());
-			assertEquals(firstNode.getProperty("Type").toString(),
-					requirement.getType());
-			assertEquals(firstNode.getProperty("Title").toString(),
-					requirement.getTitle());
-			assertEquals(firstNode.getProperty("Content").toString(),
-					requirement.getContent());
-			assertEquals(firstNode.getProperty("Priority").toString(),
-					requirement.getPriority());
-			assertEquals(147, IteratorUtil.count(GlobalGraphOperations.at(
-					graphDbService).getAllNodes()));
+            graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);
+            IndexManager index = graphDbService.index();
+            Index<Node> artefacts = index.forNodes("ArtefactElement");
+            
+            IndexHits<Node> hits = artefacts.get("ID",
+                    requirement.getArtefactElementId());
+            Node firstNode = hits.getSingle();
 
-		} catch (Exception e) {
-			tx.failure();
-		} finally {
-			tx.success();
-		}
-	}
+            assertEquals(firstNode.getProperty("ID").toString(),
+                    requirement.getArtefactElementId());
+            assertEquals(firstNode.getProperty("Name").toString(),
+                    requirement.getName());
+            assertEquals(firstNode.getProperty("Type").toString(),
+                    requirement.getType());
+            // assertEquals(firstNode.getProperty("Visibility").toString(),sourceElement.getVisibility());
 
-	/**
-	 * Test of generateGraphFile method, of class GraphDB.
-	 */
-	@Test
-	public void testGenerateGraphFile() {
-		System.out.println("generateGraphFile");
-		Transaction tx = graphDbService.beginTx();
-		try {
-			PropertyFile.setProjectName("Test");
-			PropertyFile.setGeneratedGexfFilePath(PropertyFile
-					.getTestGraphFile());
-			test.testAddNodeToGraphDB();
-			test.testAddRequirementsNodeToGraphDB();
-			test.testAddRelationTOGraphDB();
-			test.testAddIntraRelationTOGraphDB();
-			graphDB.generateGraphFile();
-			File f = new File(PropertyFile.getTestGraphFile());
-			assertTrue(f.exists());
-			PropertyFile.setGeneratedGexfFilePath(null);
-		} catch (Exception e) {
-			tx.failure();
-		} finally {
-			tx.success();
-		}
-	}
+            IndexHits<Node> second = artefacts.get("ID",
+                    reqmethodSubElement.getSubElementId());
+            Node secondNode = second.getSingle();
+            assertEquals(secondNode.getProperty("ID").toString(),
+                    reqmethodSubElement.getSubElementId());
+            assertEquals(secondNode.getProperty("Name").toString(),
+                    reqmethodSubElement.getName());
+            assertEquals(secondNode.getProperty("Type").toString(),
+                    reqmethodSubElement.getType());
+            int count = 0;
+            System.out.println("Relatinship nodes");
+            for (Node n : GlobalGraphOperations.at(graphDbService).getAllNodes()) {
+                System.out.println(count + " " + n);
+                count++;
+            }
+            // assertEquals(secondNode.getProperty("Visibility").toString(),operationSubElement.getVisibility());
+            assertEquals(15, IteratorUtil.count(GlobalGraphOperations.at(
+                    graphDbService).getAllNodes()));
+
+        } catch (Exception e) {
+            tx.failure();
+        } finally {
+            tx.success();
+        }
+    }
+
+    /**
+     * Test of generateGraphFile method, of class GraphDB.
+     */
+    @Test
+    public void testGenerateGraphFile() {
+        System.out.println("generateGraphFile");
+        relation = UMLSourceClassManager.compareClassNames(projectPath);
+        relation.addAll(RequirementSourceClassManager
+                .compareClassNames(projectPath));
+        relation.addAll(RequirementUMLClassManager
+                .compareClassNames(projectPath));
+        relation.addAll(IntraRelationManager.getSourceIntraRelation(projectPath));
+        relation.addAll(IntraRelationManager.getUMLIntraRelation(projectPath));
+        
+        Transaction tx = graphDbService.beginTx();
+        try {
+            PropertyFile.setProjectName("Test");
+            PropertyFile.setGeneratedGexfFilePath(PropertyFile
+                    .getTestGraphFile());
+            graphDB.addNodeToGraphDB("UML", UMLAretefactElements);
+            graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);
+            graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);
+            graphDB.addRelationTOGraphDB(relation);            
+            graphDB.addIntraRelationTOGraphDB(relation);
+            graphDB.generateGraphFile();
+            File f = new File(PropertyFile.getTestGraphFile());
+            assertTrue(f.exists());
+            PropertyFile.setGeneratedGexfFilePath(null);
+        } catch (Exception e) {
+            tx.failure();
+        } finally {
+            tx.success();
+        }
+    }
 }
+
