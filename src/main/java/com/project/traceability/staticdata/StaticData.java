@@ -57,6 +57,7 @@ public class StaticData {
             + "you can open using double press on that folder";
     
     
-    public static String statusString;
+    public static String statusString = "Comparation Started for Requirement and UML"
+    		+ " \n Please wait";
 
 }

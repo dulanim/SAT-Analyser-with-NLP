@@ -1,5 +1,6 @@
 package com.project.traceability.GUI.New;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,16 +54,28 @@ public class WorkspaceselectionTest extends StartUpGUITest{
 	    	checkBox.click();
 	    	assertEquals(false, isPressed);
 	    }
-//	    @Test
-//	    public void testButtonPressed(){
-//	    	SWTBotButton cancelBtn = bot.button("Cancel");
-//	    	cancelBtn.click();
-//	    	
-//	    	assertEquals(true, shell.isDisposed());
-//	    }
+	    @Test
+	    public void testButtonPressed(){
+	    	SWTBotButton cancelBtn = bot.button("Cancel");
+	    	cancelBtn.click();
+	    	
+	    	assertEquals(true, shell.isDisposed());
+	    }
 	    @Test
 	    public void testBrowsePressed(){
 	    	assertBrowseCancelPressed();
 	    }
+	
+	
+//	 @Test
+//	  public void testNameInput() {
+////		 SWTBotPreferences.PLAYBACK_DELAY = 100; // slow down tests...Otherwise we won't see anything
+////
+//		 	//bot.menu("File").menu("New").menu("Project").click();
+//		 
+//		 	//assertResultGivenInput("");
+//
+//	       
+//	    }
 	  
 }

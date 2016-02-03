@@ -23,7 +23,6 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.TreeEditor;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
@@ -43,6 +42,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.progress.progressbar.ProgressBarCustom;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.EditManager;
 import com.project.traceability.manager.ReadFiles;
@@ -108,6 +108,13 @@ public class CompareWindow {
                 String root = HomeGUI.tree.getToolTipText() + File.separator;
                 PropertyFile.filePath = root;
 		ReadFiles.readFiles(PropertyFile.filePath + item.getText());
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                ProgressBarCustom.myAttemptActionPerformed();
+//            }
+//        });
 		compareFiles(project, selectedFiles);
 		return shell;
 	}

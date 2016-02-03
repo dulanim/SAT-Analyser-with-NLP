@@ -63,7 +63,7 @@ public class RequirementUMLClassManager {
             column2.setText("UML-XML file");
             column2.setWidth(300);
         }
-
+        StaticData.isStartedJustNow = true;
         while (requirementIterator.hasNext()) {
             Map.Entry pairs = requirementIterator.next();
             ArtefactElement reqArtefactElement = (ArtefactElement) pairs
@@ -91,7 +91,7 @@ public class RequirementUMLClassManager {
                         ModelCreator model = ModelCreator.getModelInstance();
                         model.setPath("");
                         isMatched = model.isMatchingWords(requirementName, umlName);
-
+                        StaticData.isStartedJustNow = false;
                         if (!isMatched) {
                             //if it is not match by our dictionary 
                             //call the check similarity algorithm or edit distance
@@ -209,6 +209,46 @@ public class RequirementUMLClassManager {
 				.getArtefactElementId().substring(
 						reqArtefactElement
 								.getArtefactElementId()
+<<<<<<< HEAD
+								.indexOf("RQ")));
+        relationNodes.add("Req Class To UML Class");
+		relationNodes.add(UMLArtefactElement
+				.getArtefactElementId());
+		if (CompareWindow.tree != null
+				&& !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
+			classItem = new TreeItem(CompareWindow.tree, SWT.NONE);
+			classItem.setText(0, reqArtefactElement.getName());
+			classItem.setData("0", reqArtefactElement);
+			classItem.setImage(exactImage);
+			classItem.setForeground(Display.getDefault()
+					.getSystemColor(SWT.COLOR_DARK_BLUE));
+			classItem.setText(1, UMLArtefactElement.getName());
+			classItem.setData("1", UMLArtefactElement);
+
+		}
+		ArrayList<ArtefactSubElement> UMLAttributesList = new ArrayList<ArtefactSubElement>();
+		ArrayList<ArtefactSubElement> UMLMethodsList = new ArrayList<ArtefactSubElement>();
+
+		ArrayList<ArtefactSubElement> reqAttributesList = new ArrayList<ArtefactSubElement>();
+		ArrayList<ArtefactSubElement> reqMethodsList = new ArrayList<ArtefactSubElement>();
+		
+		ArrayList<WordsMap> methodWordsMapList = new ArrayList<WordsMap>();
+		ArrayList<WordsMap> attributeWordsMapList = new ArrayList<WordsMap>();
+
+		List<ArtefactSubElement> UMLAttributeElements = UMLArtefactElement
+				.getArtefactSubElements();
+		List<ArtefactSubElement> reqAttributeElements = reqArtefactElement
+				.getArtefactSubElements();
+		for (int i = 0; i < UMLAttributeElements.size(); i++) {
+			ArtefactSubElement UMLSubElement = UMLAttributeElements
+					.get(i);
+			for (int j = 0; j < reqAttributeElements.size(); j++) {
+				ArtefactSubElement reqSubElement = reqAttributeElements
+						.get(j);
+				WordsMap w2 = new WordsMap();
+				String requirementArtName = reqSubElement.getName();
+				String umlArtName = UMLSubElement.getName();
+=======
 								.indexOf("RQ")));*/
         relationNodes.add(reqArtefactElement
                 .getArtefactElementId());
@@ -249,6 +289,7 @@ public class RequirementUMLClassManager {
                 WordsMap w2 = new WordsMap();
                 String requirementArtName = reqSubElement.getName();
                 String umlArtName = UMLSubElement.getName();
+
                 w2 = SynonymWords.checkSymilarity(
                         UMLSubElement.getName(),
                         reqSubElement.getName(),
@@ -264,7 +305,11 @@ public class RequirementUMLClassManager {
                         //call the check similarity algorithm or edit distance
                         //based on edit distance we find out the similarity
                         isMatched = MatchWords.compareStrings(requirementArtName, umlArtName);
+                        if(isMatched)
+                        	w2.setMapID(1000);
                     }
+                    if(isMatched)
+                    	w2.setMapID(1000);
                 }
                 if (UMLSubElement.getName().equalsIgnoreCase(
                         reqSubElement.getName())
@@ -306,6 +351,7 @@ public class RequirementUMLClassManager {
                         break;
                     }
                 }
+
             }
         }
         if ((CompareWindow.tree != null
@@ -386,5 +432,6 @@ public class RequirementUMLClassManager {
             }
         }
     }
+
 
 }
