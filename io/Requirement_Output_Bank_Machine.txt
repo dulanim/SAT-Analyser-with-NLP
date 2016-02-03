@@ -1,0 +1,35 @@
+Class : normal order
+	Attributes : item,
+	Methods : receive,dispose,
+Class : shopping_card
+	Attributes : name,User_Id,point,
+	Methods : 
+Class : special order
+	Attributes : item,
+	Methods : dispose,
+Class : regular customer
+	Attributes : shopping_card,
+	Methods : 
+Class : manager
+	Attributes : shop,employee,
+	Methods : 
+Class : employee
+	Attributes : attendance,
+	Methods : swipe_card,register,
+Class : customer
+	Attributes : shopping_card,discount,customer orders,order,
+	Methods : receive,send,order,
+Class : order
+	Attributes : customer,
+	Methods : confirm,close,
+
+Relations : 
+
+ Type : Association, Parent : regular customer, Child : shopping_card
+ Type : Association, Parent : manager, Child : employee
+ Type : Generalization, Parent : order, Child : normal order
+ Type : Association, Parent : customer, Child : order
+ Type : Generalization, Parent : order, Child : special order
+ Type : Generalization, Parent : employee, Child : manager
+ Type : Association, Parent : customer, Child : shopping_card
+ Type : Generalization, Parent : customer, Child : regular customer
