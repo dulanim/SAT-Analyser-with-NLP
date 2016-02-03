@@ -45,7 +45,7 @@ public class SentenceReplacement {
         this.sentence = doModify(sentence);
     }
 
-    private String doModify(String currentLine) {
+    String doModify(String currentLine) {
         sentence = currentLine;
 
         /*start a new sentence if the sentence contains but */

@@ -25,7 +25,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.project.traceability.GUI.HomeGUI</mainClass>
+                            <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -53,26 +53,46 @@
         </plugins>
     </build>
     <repositories>
+        <!--
         <repository>
             <id>gephi-snapshots</id>
             <name>Gephi Snapshots</name>
             <url>http://nexus.gephi.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        -->
+         <repository>
+         <id>oss-sonatype</id>
+         <name>oss-sonatype</name>
+         <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+        </repository>
+        <!--
         <repository>
             <id>gephi-releases</id>
             <name>Gephi Releases</name>
             <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
         </repository>
+        -->
         <repository>
             <id>swt-repo</id>
             <url>https://swt-repo.googlecode.com/svn/repo/</url>
         </repository>
     </repositories>
     <dependencies>
+        <!--
         <dependency>
             <groupId>org.gephi</groupId>
             <artifactId>gephi-toolkit</artifactId>
             <version>0.8.7</version>
+        </dependency>
+        -->
+        <dependency>
+         <groupId>org.gephi</groupId>
+         <artifactId>gephi-toolkit</artifactId>
+         <version>0.8.7</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>core</groupId>
@@ -186,15 +206,18 @@
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.eclipse.swt</groupId>
             <artifactId>swt-package</artifactId>
             <version>1.0</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
+            <type>jar</type>
         </dependency>
        <dependency>
 		<groupId>info.debatty</groupId>
@@ -205,6 +228,33 @@
             <groupId>matcher</groupId>
             <artifactId>matcher</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+            <version>4.4</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+            <version>4.4</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>swt</groupId>
+            <artifactId>swtbot-jnuit</artifactId>
+            <version>2.0.5</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>swt</groupId>
+            <artifactId>swtfinder</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

@@ -150,11 +150,12 @@ public class GraphDBTest {
 	@Test
 	public void testAddNodeToGraphDB() {
 		System.out.println("addNodeToGraphDB");
+                String fileType="Requirement";
 		Transaction tx = graphDbService.beginTx();
 		try {
-			graphDB.addNodeToGraphDB(UMLAretefactElements);
+			graphDB.addNodeToGraphDB(fileType,UMLAretefactElements);
 
-			graphDB.addNodeToGraphDB(sourceCodeAretefactElements);
+			graphDB.addNodeToGraphDB(fileType,sourceCodeAretefactElements);
 			IndexManager index = graphDbService.index();
 			Index<Node> artefacts = index.forNodes("ArtefactElement");
 
