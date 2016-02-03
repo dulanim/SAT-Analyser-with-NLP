@@ -5,7 +5,7 @@
 package com.project.traceability.GUI;
 
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+//import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
 /**
  * 
@@ -14,7 +14,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 public class NewFileWindowTest extends IsolatedShellTest {
 
 	
-	private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+	//private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 	public NewFileWindowTest() {
 	}
 
