@@ -10,8 +10,6 @@ import org.eclipse.swtbot.swt.finder.SWTBotTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-import com.project.traceability.GUI.HomeGUI;
 public abstract class HomeGUITest extends SWTBotTestCase {
 
 	 	protected SWTBot bot;
@@ -34,14 +32,14 @@ public abstract class HomeGUITest extends SWTBotTestCase {
 	                            // open and layout the shell
 	                        	//final Display display = Display.getDefault();
 
-	                            HomeGUI window = new HomeGUI();
-	                            shell = window.open();
+//	                            HomeGUI window = new HomeGUI();
+	//                            shell = window.open();
 	 
 	                            // wait for the test setup
 	                            swtBarrier.await();
 	 
 	                            // run the event loop
-	                            window.eventLoop(Display.getDefault());
+	                            //window.eventLoop(Display.getDefault());
 	                        }
 	                    } catch (Exception e) {
 	                        e.printStackTrace();

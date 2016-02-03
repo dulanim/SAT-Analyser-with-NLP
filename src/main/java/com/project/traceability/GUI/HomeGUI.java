@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.NLP.file.operations.FileSave;
@@ -115,7 +116,7 @@ public class HomeGUI extends JFrame implements KeyListener {
     public static HomeGUI window;//globally added to refresh the project window
 
     public Map<String, String> recentFilePath = new HashMap<>();
-    public Stack<String> recentNames = new Stack();
+    public Stack<String> recentNames = new Stack<>();
 
     Menu menu_1; // file Menu Drop Bar
     public static Menu menu_recent;//hold recent file infors
@@ -148,9 +149,9 @@ public class HomeGUI extends JFrame implements KeyListener {
             reader = new XMLReader();
             reader.readDefaultNode();
             
-            
+            display = Display.getDefault();
             window.open();
-            window.eventLoop(Display.getDefault());
+            window.eventLoop(display);
         } catch (Exception e) {
             displayError(e.toString());
             e.printStackTrace();
@@ -629,6 +630,19 @@ public class HomeGUI extends JFrame implements KeyListener {
                 public void widgetSelected(SelectionEvent e) {
                     //load current location project files
                     String path = temp.getText().trim();
+                    
+                    if(!path.equals("")
+                    		&& path.substring(path.length()-1,path.length()).equals(File.separator))
+                    	path = path.substring(0, path.length()-1);
+                    File f = new File(path);
+                    if(!(f.isDirectory() && f.exists())){
+                    	MessageBox box  = new MessageBox(shell,SWT.ERROR);
+                    	box.setMessage("This is not a directory");
+                    	box.setText("Path Invalid!");
+                    	box.open();
+                    	return ;
+                    }
+                    	
                     StaticData.workspace = path;
                     XMLWriter xMLWriter = XMLWriter.getXMLWriterInstance("nothing");
                     xMLWriter.changeCurrnntWorkspaceVale(path);
@@ -1280,9 +1294,11 @@ public class HomeGUI extends JFrame implements KeyListener {
             //if source file is not pop up file upload window
             //if uml file is not pop up file upload window
             //if xml files are not pop up file upload window
-            TreeItem item = tree.getSelection()[0];
-            String projectName = item.getText();
-            
+//            TreeItem[] items = HomeGUI.tree.getSelection();
+//            if(items.length>0){
+//            	String projectName = items[0].getText();
+//            }
+//            
             //HomeGUI.main(null);
                     
             

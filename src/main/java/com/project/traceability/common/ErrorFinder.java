@@ -68,8 +68,9 @@ public class ErrorFinder {
     public static boolean lookUpForFolders(String folders[]){
         
         int count = 0;
-       
-        
+        if(folders == null)
+        	return false;
+         
         for(String folder:folders){
             
            if(folder.equals(FilePropertyName.SOURCE_CODE)){
@@ -145,7 +146,7 @@ public class ErrorFinder {
                 
                 project.setImage(
                         new Image(HomeGUI.shell.getDisplay(),
-                                FilePropertyName.IMAGE_PATH + "folderError.png"));
+                                FilePropertyName.IMAGE_PATH + "folder_root.gif"));
                 checkSubFiles(projectPath,project);
             }
         } 
@@ -173,22 +174,37 @@ public class ErrorFinder {
                         folder.setImage(new Image(HomeGUI.shell.getDisplay(),
                                 FilePropertyName.IMAGE_PATH + "folderError.png"));
                         
+                        project.setImage(
+                                new Image(HomeGUI.shell.getDisplay(),
+                                        FilePropertyName.IMAGE_PATH + "folderError.png"));
                     }else if(text.equals(FilePropertyName.XML)
                             && !isXMLFiles){
                         folder.setImage(new Image(HomeGUI.shell.getDisplay(),
                                 FilePropertyName.IMAGE_PATH + "folderError.png"));
+                        project.setImage(
+                                new Image(HomeGUI.shell.getDisplay(),
+                                        FilePropertyName.IMAGE_PATH + "folderError.png"));
                     }else if(text.equals(FilePropertyName.UML)
                             && !isUmlFiles){
                         folder.setImage(new Image(HomeGUI.shell.getDisplay(),
                                 FilePropertyName.IMAGE_PATH + "folderError.png"));
+                        project.setImage(
+                                new Image(HomeGUI.shell.getDisplay(),
+                                        FilePropertyName.IMAGE_PATH + "folderError.png"));
                     }else if(text.equals(FilePropertyName.REQUIREMENT)
                             && !isTxtFiles){
                         folder.setImage(new Image(HomeGUI.shell.getDisplay(),
                                 FilePropertyName.IMAGE_PATH + "folderError.png"));
+                        project.setImage(
+                                new Image(HomeGUI.shell.getDisplay(),
+                                        FilePropertyName.IMAGE_PATH + "folderError.png"));
                     }else if(text.equals(FilePropertyName.PROPERTY)
                             && !isPropertyFiles){
                         folder.setImage(new Image(HomeGUI.shell.getDisplay(),
                                 FilePropertyName.IMAGE_PATH + "folderError.png"));
+                        project.setImage(
+                                new Image(HomeGUI.shell.getDisplay(),
+                                        FilePropertyName.IMAGE_PATH + "folderError.png"));
                     }
                 }
     }

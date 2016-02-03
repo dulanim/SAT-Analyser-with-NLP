@@ -373,7 +373,8 @@ public class ImportProjectWindow {
 			File file = new File(projectPath);
 			File fileList[] = file.listFiles();
 			
-			for(int i=0;i<fileList.length;i++){
+			for(int i=0;fileList != null 
+					&& i<fileList.length;i++){
 				
 				String subFolderName = getSubFolder(fileList[i].getAbsolutePath());
 				File f = fileList[i].getAbsoluteFile();

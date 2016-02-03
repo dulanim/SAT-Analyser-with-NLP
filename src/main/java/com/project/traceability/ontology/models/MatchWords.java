@@ -3,6 +3,10 @@
  * compareString method compare string using JaroWinkler algorithm
  * if not use Levenshtein distance to match words
  */
+/****
+ * @author shiyam
+ * @created at 15 Dec 2015
+ */
 package com.project.traceability.ontology.models;
 
 import uk.ac.shef.wit.simmetrics.similaritymetrics.JaroWinkler;

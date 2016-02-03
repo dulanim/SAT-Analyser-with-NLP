@@ -1,6 +1,9 @@
 
 package com.project.traceability.ontology.models;
-
+/****
+ * @author shiyam
+ * @created at 15 Dec 2015
+ */
 public class ModelGenerator {
 
 	
