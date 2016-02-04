@@ -184,19 +184,22 @@ public class MethodIdentifier {
         //HashSet newVPList = new HashSet();
 
         ArrayList designElements = designEleClass.getDesignElementsList();
-        System.out.println("designElements: " + designElements);
-        if (!vpList.isEmpty()) {
-            Iterator vpIterator = vpList.iterator();
-            while (vpIterator.hasNext()) {
-                Object vpItem = vpIterator.next();
-                if (designElements.contains(vpItem.toString())) {
-                    System.out.println("Design elements are found in method list");
-                    vpList.remove(vpItem);
-                }
-
-            }
-
-        }
+        vpList.removeAll(designElements);
+        
+//        ArrayList designElements = designEleClass.getDesignElementsList();
+//        System.out.println("designElements: " + designElements);
+//        if (!vpList.isEmpty()) {
+//            Iterator vpIterator = vpList.iterator();
+//            while (vpIterator.hasNext()) {
+//                Object vpItem = vpIterator.next();
+//                if (designElements.contains(vpItem.toString())) {
+//                    System.out.println("Design elements are found in method list");
+//                    vpList.remove(vpItem);
+//                }
+//
+//            }
+//
+//        }
         return vpList;
     }
     /*

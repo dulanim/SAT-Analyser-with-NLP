@@ -7,6 +7,7 @@
 package com.project.NLP.Requirement;
 
 import com.project.NLP.GUI.ArtefactFrameTestGUI;
+import com.project.NLP.file.operations.FilePropertyName;
 import static com.project.NLP.file.operations.FilePropertyName.user_home;
 import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
@@ -32,12 +33,7 @@ import java.util.Iterator;
  */
 public class NLPRequirementMain {
 
-	// input file
-
-    //private static final String REQUIREMENT_INPUT_FILE = "io/PaymentSystemRequirement.txt"; // input file
-
-    private static final String REQUIREMENT_INPUT_FILE = "io/Order_Requirement.txt"; // input file
-
+    private static final String REQUIREMENT_INPUT_FILE = user_home + File.separator + "Resources" + File.separator+ "io" + File.separator + "OrderRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     public static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -217,7 +213,7 @@ public class NLPRequirementMain {
      * @param file
      * @return modified text file in String
      */
-    private static String readFromTextFile(String file) {
+    public static String readFromTextFile(String file) {
         BufferedReader br = null;
         String req_Document = "";
 
@@ -307,7 +303,7 @@ public class NLPRequirementMain {
             }
 
             //System.out.println(sbf.toString());
-            BufferedWriter bwr = new BufferedWriter(new FileWriter(user_home + File.separator + "Resources"+File.separator+ "io/Requirement_Output_Bank_Machine.txt"));
+            BufferedWriter bwr = new BufferedWriter(new FileWriter(user_home + File.separator + "Resources" + File.separator+ "io" + File.separator+ "Requirement_Output_Order_Machine.txt"));
             /*write contents of StringBuffer to a file*/
             bwr.write(sbf.toString());
             /*flush the stream*/

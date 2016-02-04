@@ -5,7 +5,9 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +34,8 @@ public class DesignElementClass {
      * after reading the text file, words are stored in the array list
      */
     private void setDesignElementsList() {
-        designElements = readFromTextFile("res/DesignElementsDictionary.txt");
+        String filePath = FilePropertyName.RESOURCE_PATH + File.separator + "DesignElementsDictionary.txt";
+        designElements = readFromTextFile(filePath);
     }
 
     /**

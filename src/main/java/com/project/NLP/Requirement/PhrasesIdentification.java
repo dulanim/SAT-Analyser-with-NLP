@@ -156,7 +156,60 @@ public class PhrasesIdentification {
                     if (adjectiveExist == 1) {
                         storeClassesAndAttributesWhenAdjectiveExistToIdentifyClasses(inChild, adjectiveNoun, adj);
                     } else {
-                        storeClassesAndAttributesWhenAdjectiveNotExistToIdentifyClasses(inChild, loopCount, innerChild, separator, tempClass, count);
+                        //storeClassesAndAttributesWhenAdjectiveNotExistToIdentifyClasses(inChild, loopCount, innerChild, separator, tempClass, count);
+                        if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
+                            leaves = inChild.getLeaves(); //leaves correspond to the tokens
+                            System.out.println("loopCount: " + loopCount);
+                            System.out.println("innerChild lenght:" + innerChild.length);
+                            if (separator == 0) {
+                                if (loopCount == innerChild.length) {
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    String word = "";
+                                    word = stemmingForAWord(identifiedWord);
+                                    if (!dictionaryForClassList.contains(word)) {
+                                        nounList.remove(tempClass);
+                                        nounList.add(word);
+                                        attributeLists.add(tempClass);
+                                        System.out.println("att temp: " + tempClass);
+                                        System.out.println("2 " + nounList);
+                                    }
+
+                                } else if (count == 1) {
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                    String word = stemmingForAWord(identifiedWord);
+                                    nounList.add(word);
+                                    System.out.println("word: " + word);
+                                    tempClass = word;
+                                    storingClass = word;
+
+                                } else {
+                                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                    if (tempClass.contains("_")) {
+                                        nounList.remove(tempClass);
+                                    } else {
+                                        nounList.remove(morphology.stem(tempClass));
+                                        nounList.remove(tempClass);
+                                    }
+                                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+
+                                    tempClass += " " + identifiedWord;
+                                    nounList.add(tempClass);
+                                    System.out.println("tempClass: " + tempClass);
+                                    storingClass = tempClass;
+                                }
+
+                                count++;
+                            } else {
+                                String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
+                                /*if the identified word is having underscore skips the stemming part . ex: user_id*/
+                                String word = stemmingForAWord(identifiedWord);
+                                nounList.add(word);
+                                tempClass = word;
+                                storingClass = word;
+                            }
+                        }
+
                     }
                     loopCount++;
                 }
@@ -184,13 +237,15 @@ public class PhrasesIdentification {
     }
 
     /**
-     * method to identify the classes and attributes when adjective does not exist
+     * method to identify the classes and attributes when adjective does not
+     * exist
+     *
      * @param inChild
      * @param loopCount
      * @param innerChild
      * @param separator
      * @param tempClass
-     * @param count 
+     * @param count
      */
     private void storeClassesAndAttributesWhenAdjectiveNotExistToIdentifyClasses(Tree inChild, int loopCount, Tree[] innerChild, int separator, String tempClass, int count) {
         List<Tree> leaves;
@@ -207,15 +262,17 @@ public class PhrasesIdentification {
                     nounList.remove(tempClass);
                     nounList.add(word);
                     attributeLists.add(tempClass);
+                    System.out.println("att temp: " + tempClass);
                     System.out.println("2 " + nounList);
                 } else if (count == 1) {
                     String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
                     /*if the identified word is having underscore skips the stemming part . ex: user_id*/
                     String word = stemmingForAWord(identifiedWord);
                     nounList.add(word);
+                    System.out.println("word: " + word);
                     tempClass = word;
                     storingClass = word;
-                    
+
                 } else {
                     /*if the identified word is having underscore skips the stemming part . ex: user_id*/
                     if (tempClass.contains("_")) {
@@ -225,12 +282,13 @@ public class PhrasesIdentification {
                         nounList.remove(tempClass);
                     }
                     String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
-                    
+
                     tempClass += " " + identifiedWord;
                     nounList.add(tempClass);
+                    System.out.println("tempClass: " + tempClass);
                     storingClass = tempClass;
                 }
-                
+
                 count++;
             } else {
                 String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
@@ -245,9 +303,10 @@ public class PhrasesIdentification {
 
     /**
      * method to identify the classes and attributes when adjective exist
+     *
      * @param inChild
      * @param adjectiveNoun
-     * @param adj 
+     * @param adj
      */
     private void storeClassesAndAttributesWhenAdjectiveExistToIdentifyClasses(Tree inChild, int adjectiveNoun, String adj) {
         List<Tree> leaves;
@@ -261,13 +320,13 @@ public class PhrasesIdentification {
             } else {
                 attributeLists.add(leaves.get(0).yieldWords().get(0).word());
             }
-            
+
         }
     }
 
     /**
-     * method to stem the word (convert to base form) only if the word is not having under score
-     * For example: saving_account
+     * method to stem the word (convert to base form) only if the word is not
+     * having under score For example: saving_account
      *
      * @param identifiedWord
      * @return String - modified word
@@ -393,7 +452,9 @@ public class PhrasesIdentification {
     }
 
     /**
-     * method to identify the attributes when the words which are identifies as nouns are in adjective phrases
+     * method to identify the attributes when the words which are identifies as
+     * nouns are in adjective phrases
+     *
      * @return ArrayList of adjective attributes
      */
     public ArrayList getAdjectiveAttribute() {
@@ -450,7 +511,8 @@ public class PhrasesIdentification {
                     }
                 }
                 if (adjectiveExist == 1 && adjectiveNoun == 0 && !adj.isEmpty()) {
-                    adjAttributeList.add(adj);
+                    adjAttributeList.add(stemmingForAWord(adj));
+
                 }
             }
         }
@@ -459,9 +521,10 @@ public class PhrasesIdentification {
         return adjAttributeList;
 
     }
-    
+
     /**
      * method to store the adjective attribute
+     *
      * @param inChild
      * @param adjectiveNoun
      * @param nnCount
@@ -476,13 +539,14 @@ public class PhrasesIdentification {
             adjectiveNoun++;
             nnCount++;
             if (adjectiveNoun == 1) {
-                attribute = leaves.get(0).yieldWords().get(0).word();
-                attribute = adj + " " + leaves.get(0).yieldWords().get(0).word();
+                attribute = stemmingForAWord(leaves.get(0).yieldWords().get(0).word());
+                attribute = adj + " " + stemmingForAWord(leaves.get(0).yieldWords().get(0).word());
                 System.out.println("at: " + attribute);
                 adjAttributeList.add(attribute);
+
             }
             if (adjectiveNoun > 1) {
-                
+
                 adjAttributeList.remove(morphology.stem(attribute));
                 adjAttributeList.remove(attribute);
                 attribute += " " + leaves.get(0).yieldWords().get(0).word();
@@ -493,9 +557,9 @@ public class PhrasesIdentification {
     }
 
     /**
-     * method to return the classes with the attribute
-     * for example: bank client
-     * @return hashMap 
+     * method to return the classes with the attribute for example: bank client
+     *
+     * @return hashMap
      */
     public HashMap getClassWithAttr() {
         return storingClassWithAttr;
@@ -503,7 +567,8 @@ public class PhrasesIdentification {
 
     /**
      * method to return the attributeList
-     * @return 
+     *
+     * @return
      */
     public ArrayList getAttributeLists() {
         return attributeLists;

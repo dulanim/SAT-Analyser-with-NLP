@@ -5,7 +5,9 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +28,8 @@ public class DictionaryForClass {
      * read dictionary file and store words in the array list
      */
     private void setDictionaryForClass() {
-        dictionaryForClass= readFromTextFile("res/ClassElementsDictionary.txt");
+        String filePath = FilePropertyName.RESOURCE_PATH + File.separator + "ClassElementsDictionary.txt";
+        dictionaryForClass= readFromTextFile(filePath);
     }
 
     /**
