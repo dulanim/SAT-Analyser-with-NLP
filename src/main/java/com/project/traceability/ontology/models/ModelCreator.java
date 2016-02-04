@@ -3,6 +3,7 @@ package com.project.traceability.ontology.models;
  * @author shiyam
  * @created at 15 Dec 2015
  */
+import com.project.NLP.file.operations.FilePropertyName;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -369,7 +370,7 @@ public class ModelCreator {
 
         
         filePath = getFilePath();
-        FileOutputStream fos = new FileOutputStream(this.filePath + File.separator
+        FileOutputStream fos = new FileOutputStream(FilePropertyName.RESOURCE_PATH + File.separator
                 + filename, false);
         PrintWriter writer = new PrintWriter(fos);
         return writer;
@@ -395,7 +396,7 @@ public class ModelCreator {
 
     public InputStream getInputStream() {
         // Use the FileManager to find the input file 
-        InputStream in = FileManager.get().open(filePath + File.separator + filename);
+        InputStream in = FileManager.get().open(FilePropertyName.RESOURCE_PATH + File.separator + filename);
         if (in == null) {
             throw new IllegalArgumentException("File: " + filename + " not found");
         }
