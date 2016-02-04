@@ -17,6 +17,7 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <addClasspath>true</addClasspath>
                             <mainClass>com.project.traceability.GUI.StartUpProject</mainClass>
                         </manifest>
                     </archive>
@@ -24,6 +25,15 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -35,10 +45,10 @@
                     <maxmem>1024m</maxmem>
                     <source>1.7</source>
                     <target>1.7</target>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
-                        </manifest>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
+                    </manifest>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,30 +61,30 @@
                 </configuration>
             </plugin>
             
-             <plugin>
-	            <groupId>org.eclipse.tycho</groupId>
-	            <artifactId>tycho-surefire-plugin</artifactId>
-	            <version>3</version>
-	            <configuration>
-	              <useUIHarness>true</useUIHarness>
-	              <useUIThread>false</useUIThread>
-	              <product>org.eclipse.sdk.ide</product>
-	              <application>org.eclipse.ui.ide.workbench</application>
-	           </configuration>
-        </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-surefire-plugin</artifactId>
+                <version>3</version>
+                <configuration>
+                    <useUIHarness>true</useUIHarness>
+                    <useUIThread>false</useUIThread>
+                    <product>org.eclipse.sdk.ide</product>
+                    <application>org.eclipse.ui.ide.workbench</application>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <repositories>
 
-         <!--<repository>
+        <!--<repository>
          <id>oss-sonatype</id>
          <name>oss-sonatype</name>
          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
          <snapshots>
             <enabled>true</enabled>
          </snapshots>
-        </repository>
-        -->
+        </repository>  -->
+        
         <repository>
             <id>swt-repo</id>
             <url>https://swt-repo.googlecode.com/svn/repo/</url>
@@ -200,17 +210,12 @@
             <version>1.1.1</version>
         </dependency>
         
-       <dependency>
-		<groupId>info.debatty</groupId>
-		<artifactId>java-string-similarity</artifactId>
-		<version>0.10</version>
-	</dependency>
-        <!--<dependency>
-            <groupId>matcher</groupId>
-            <artifactId>matcher</artifactId>
-            <version>1.0.2</version>
-        </dependency>-->
-        
+        <dependency>
+            <groupId>info.debatty</groupId>
+            <artifactId>java-string-similarity</artifactId>
+            <version>0.10</version>
+        </dependency>
+                
         <dependency>
             <groupId>uk.ac.shef.wit</groupId>
             <artifactId>simmetrics</artifactId>
@@ -230,38 +235,27 @@
             <version>4.4</version>
             <type>jar</type>
         </dependency>
-        <!--<dependency>
-            <groupId>swt</groupId>
-            <artifactId>swtbot-jnuit</artifactId>
-            <version>2.0.5</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>swt</groupId>
-            <artifactId>swtfinder</artifactId>
-            <version>2.0.4</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>-->
+        
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
             <version>3.0.1</version>
             <type>jar</type>
         </dependency>
-        <!--<dependency>
-            <groupId>swtbot</groupId>
-            <artifactId>swt.finder</artifactId>
-            <version>2.0.4</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>-->
+        
         <!--Added by rt-->
         <dependency>
             <groupId>swtbot</groupId>
             <artifactId>swt.finder</artifactId>
             <version>2.0.4</version>
         </dependency>
+        
+        <!--<dependency>
+            <groupId>swt</groupId>
+            <artifactId>swtfinder</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency> -->
     </dependencies>
 </project>
