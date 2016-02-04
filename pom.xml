@@ -263,5 +263,12 @@
             <version>4.4</version>
             <type>jar</type>
         </dependency>
+        <!--<dependency>
+            <groupId>swtbot</groupId>
+            <artifactId>swt.finder</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>-->
     </dependencies>
 </project>
