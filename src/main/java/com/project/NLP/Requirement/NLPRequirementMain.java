@@ -7,6 +7,7 @@
 package com.project.NLP.Requirement;
 
 import com.project.NLP.GUI.ArtefactFrameTestGUI;
+import static com.project.NLP.file.operations.FilePropertyName.user_home;
 import com.project.traceability.staticdata.StaticData;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
@@ -301,7 +302,7 @@ public class NLPRequirementMain {
             }
 
             //System.out.println(sbf.toString());
-            BufferedWriter bwr = new BufferedWriter(new FileWriter("io/Requirement_Output_Order_Machine.txt"));
+            BufferedWriter bwr = new BufferedWriter(new FileWriter(user_home + File.separator + "Resources"+File.separator+ "io/Requirement_Output_Bank_Machine.txt"));
             /*write contents of StringBuffer to a file*/
             bwr.write(sbf.toString());
             /*flush the stream*/
