@@ -78,6 +78,18 @@ public class ProjectCreateWindow {
             e.printStackTrace();
         }
     }
+    
+    public Shell getShell(){
+        return shell;
+    }
+    
+    public  void eventLoop(Display display) {
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
 
     /**
      * Open the window.
