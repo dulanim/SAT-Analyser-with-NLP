@@ -89,8 +89,8 @@ public class GraphMouseListener implements PreviewMouseListener {
                     graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
                             HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                             + ".graphdb");
-                    System.out.println("DB path- " + graphDb.toString());
-                     
+                    //System.out.println("DB path- " + graphDb.toString());
+
                     Transaction tx = graphDb.beginTx();
                     try {
 
@@ -99,7 +99,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                         IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
                         org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
 
-                        System.out.println(neo4j_node.toString());
+                        //System.out.println(neo4j_node.toString());
                         id = neo4j_node.getProperty("ID").toString();
 
                         HashMap<String, Object> nodeProps = new HashMap<>();
@@ -116,16 +116,23 @@ public class GraphMouseListener implements PreviewMouseListener {
                         System.out.println(e.toString());*/
                     } finally {
                         tx.finish();
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                VisualizeGraph.updateBtn.setEnabled(false);
+                                VisualizeGraph.deleteBtn.setEnabled(false);
+                            }
+                        });
                         graphDb.shutdown();
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                VisualizeGraph.updateBtn.setEnabled(true);
+                                VisualizeGraph.deleteBtn.setEnabled(true);
+                            }
+                        });
+                        GraphMouseListener.lock = true;
                         System.out.println("Releseing lock");
-                        lock = true;
-                        
-
-                        try {
-                            Thread.sleep(5);
-                        } catch (Exception e) {
-                            System.out.println("Error in thread sleeping");
-                        }
                     }
                 }
             }
@@ -185,6 +192,7 @@ public class GraphMouseListener implements PreviewMouseListener {
 
     /**
      * Identifies the clicking node
+     *
      * @param node
      * @param event
      * @return
@@ -240,11 +248,11 @@ public class GraphMouseListener implements PreviewMouseListener {
                             combo.add("Protected");
                             combo.add("Default");
                             int index = 0;
-                            System.out.println("Item count " + combo.getItemCount());
+                            //System.out.println("Item count " + combo.getItemCount());
                             for (int j = 0; j < combo.getItemCount(); j++) {
                                 if (combo.getItem(j).equalsIgnoreCase(val.toString())) {
                                     combo.deselectAll();
-                                    System.out.println("Item " + val.toString() + " " + combo.getItem(j));
+                                    //System.out.println("Item " + val.toString() + " " + combo.getItem(j));
                                     combo.setText(combo.getItem(j));
                                     editor.grabHorizontal = true;
                                     editor.setEditor(combo, tableItem, 1);
@@ -317,5 +325,5 @@ public class GraphMouseListener implements PreviewMouseListener {
         }
         return xml;
     }
-    
+
 }

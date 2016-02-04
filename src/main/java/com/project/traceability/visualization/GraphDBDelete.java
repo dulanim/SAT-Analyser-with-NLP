@@ -38,7 +38,6 @@ public class GraphDBDelete {
 
     public static boolean lock = false;
     public GraphDBDelete() {
-        
     }
 
     /**

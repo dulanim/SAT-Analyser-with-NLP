@@ -161,6 +161,11 @@ public class VisualizeGraph {
     static CheckBoxList cbList = new CheckBoxList();
     static boolean enter = true;
 
+    static org.eclipse.swt.widgets.Button updateBtn = null;
+    static org.eclipse.swt.widgets.Button deleteBtn = null;
+    static org.eclipse.swt.widgets.Button impactBtn = null;
+    static org.eclipse.swt.widgets.Button undoBtn = null;
+
     private VisualizeGraph() {
     }
 
@@ -515,7 +520,7 @@ public class VisualizeGraph {
                                 "Neo4j Relationship Type"), graph);
 
         for (AttributeColumn col : attributeModel.getNodeTable().getColumns()) {
-            System.out.println(" " + col.getId() + " " + col.getTitle());
+            //System.out.println(" " + col.getId() + " " + col.getTitle());
         }
 
         List<Color> colors = addColors();
@@ -524,7 +529,7 @@ public class VisualizeGraph {
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
         for (Part p : node_partition.getParts()) {
-            System.out.println("Node : " + p.getValue());
+            //System.out.println("Node : " + p.getValue());
             nodeColorTransformer.getMap().put(p.getValue(), colors.get(i));
             i++;
         }
@@ -542,8 +547,9 @@ public class VisualizeGraph {
             edgeColoring.put(p.getValue().toString(), cl);
             edgeColorTransformer.getMap().put(p.getValue(), colors.get(i));
             i++;
-            if(i == colors.size())
-                i =0;
+            if (i == colors.size()) {
+                i = 0;
+            }
         }
         partitionController.transform(edge_partition, edgeColorTransformer);
     }
@@ -563,6 +569,11 @@ public class VisualizeGraph {
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
         colors.add(Color.orange);
+        colors.add(new Color(40, 240, 100));
+        colors.add(new Color(100, 240, 100));
+        colors.add(new Color(40, 240, 40));
+        colors.add(new Color(100, 100, 100));
+        colors.add(new Color(40, 240, 200));
 
         return colors;
     }
@@ -606,82 +617,88 @@ public class VisualizeGraph {
         setLayout();
         target = getTarget(100);
 
-        HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
-        composite = new Composite(HomeGUI.graphTab,
-                SWT.EMBEDDED);
-        composite.setLayout(new GridLayout(1, false));
-        GridData spec = new GridData();
-        spec.horizontalAlignment = GridData.FILL;
-        spec.grabExcessHorizontalSpace = true;
-        spec.verticalAlignment = GridData.FILL;
-        spec.grabExcessVerticalSpace = true;
-        composite.setLayoutData(spec);
-
-        createPopUpMenu();
-        frame = SWT_AWT.new_Frame(composite);
-
-        composite2 = new Composite(HomeGUI.propertyTab, SWT.H_SCROLL | SWT.V_SCROLL);
-        composite2.setLayout(new GridLayout(1, false));
-
-        composite3 = new Composite(composite2, SWT.RIGHT);
-        composite3.setLayout(new FillLayout());
-
-        createTableComponents();
-
-        Label space = new Label(composite2, SWT.NONE);
-        GridData spaceData = new GridData();
-        spaceData.heightHint = 10;
-        space.setLayoutData(spaceData);
-
-        Label edgetitle = new Label(composite2, SWT.NONE);
-        edgetitle.setText("Edge-Color Notations:");
-        edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
-        System.out.println("Doneeeeee");
-        tbtmPropertyInfos.setControl(composite2);
-
-        composite4 = new Composite(composite2, SWT.RIGHT);
-        composite4.setLayout(new GridLayout(2, false));
-        composite4.setRedraw(true);
-
-        for (String type : edgeColoring.keySet()) {
-            Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
-            GridData gridData = new GridData();
-            gridData.widthHint = 20;
-            gridData.heightHint = 20;
-            edgeColor.setLayoutData(gridData);
-            edgeColor.setText("");
-            Label edgeDetailLabel = new Label(composite4, SWT.NONE);
-            edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
-            edgeDetailLabel.setText(type);
-            edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
-            edgeColor.setBackground(edgeColoring.get(type));
-        }
-
-        //add refresh button to graph panel
-        Button refresh = new Button("Refresh");
-        refresh.addActionListener(new ActionListener() {
-            final String type = PropertyFile.getGraphType();
-
+        Display.getCurrent().asyncExec(new Runnable() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
+            public void run() {
+                HomeGUI.graphtabItem.setText(PropertyFile.getProjectName() + "-" + PropertyFile.getGraphType() + " View");
+                composite = new Composite(HomeGUI.graphTab,
+                        SWT.EMBEDDED);
+                composite.setLayout(new GridLayout(1, false));
+                GridData spec = new GridData();
+                spec.horizontalAlignment = GridData.FILL;
+                spec.grabExcessHorizontalSpace = true;
+                spec.verticalAlignment = GridData.FILL;
+                spec.grabExcessVerticalSpace = true;
+                composite.setLayoutData(spec);
+
+                createPopUpMenu();
+                frame = SWT_AWT.new_Frame(composite);
+
+                composite2 = new Composite(HomeGUI.propertyTab, SWT.H_SCROLL | SWT.V_SCROLL);
+                composite2.setLayout(new GridLayout(1, false));
+
+                composite3 = new Composite(composite2, SWT.RIGHT);
+                composite3.setLayout(new FillLayout());
+
+                createTableComponents();
+
+                Label space = new Label(composite2, SWT.NONE);
+                GridData spaceData = new GridData();
+                spaceData.heightHint = 10;
+                space.setLayoutData(spaceData);
+
+                Label edgetitle = new Label(composite2, SWT.NONE);
+                edgetitle.setText("Edge-Color Notations:");
+                edgetitle.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 10, SWT.BOLD));
+                //System.out.println("Doneeeeee");
+                tbtmPropertyInfos.setControl(composite2);
+
+                composite4 = new Composite(composite2, SWT.RIGHT);
+                composite4.setLayout(new GridLayout(2, false));
+                composite4.setRedraw(true);
+
+                for (String type : edgeColoring.keySet()) {
+                    Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
+                    GridData gridData = new GridData();
+                    gridData.widthHint = 20;
+                    gridData.heightHint = 20;
+                    edgeColor.setLayoutData(gridData);
+                    edgeColor.setText("");
+                    Label edgeDetailLabel = new Label(composite4, SWT.NONE);
+                    edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
+                    edgeDetailLabel.setText(type);
+                    edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
+                    edgeColor.setBackground(edgeColoring.get(type));
+                }
+
+                //add refresh button to graph panel
+                Button refresh = new Button("Refresh");
+                refresh.addActionListener(new ActionListener() {
+                    final String type = PropertyFile.getGraphType();
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ReadXML.initApp(HomeGUI.projectPath, PropertyFile.graphType);
+                    }
+                });
+
+                Panel btnPanel = new Panel();
+                btnPanel.setLayout(new FlowLayout());
+                btnPanel.setBackground(Color.LIGHT_GRAY);
+                btnPanel.add(refresh);
+
+                Panel panel = new Panel();
+                panel.setLayout(new BorderLayout());
+                panel.add(applet, BorderLayout.CENTER);
+                panel.add(refresh, BorderLayout.PAGE_START);
+                frame.add(panel);
+                composite.setData(panel);
+                HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
+
+                frame.revalidate();
+
             }
         });
-
-        Panel btnPanel = new Panel();
-        btnPanel.setLayout(new FlowLayout());
-        btnPanel.setBackground(Color.LIGHT_GRAY);
-        btnPanel.add(refresh);
-
-        Panel panel = new Panel();
-        panel.setLayout(new BorderLayout());
-        panel.add(applet, BorderLayout.CENTER);
-        panel.add(refresh, BorderLayout.PAGE_START);
-        frame.add(panel);
-        composite.setData(panel);
-        HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
-
-        frame.revalidate();
 
     }
 
@@ -739,17 +756,19 @@ public class VisualizeGraph {
         table holder for scrolling purpose
          */
         //tableCursor = new TableCursor(table, SWT.NONE);
-        final org.eclipse.swt.widgets.Button updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        updateBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         updateBtn.setText("Update");
 
-        final org.eclipse.swt.widgets.Button deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.POP_UP | SWT.VERTICAL);
+        deleteBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.POP_UP | SWT.VERTICAL);
         deleteBtn.setText("Delete");
 
-        final org.eclipse.swt.widgets.Button impactBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        impactBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         impactBtn.setText("Impact");
 
-        final org.eclipse.swt.widgets.Button undoBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
+        undoBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         undoBtn.setText("Undo");
+
+        final GraphMouseListener gml = new GraphMouseListener();
 
         undoBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -785,11 +804,13 @@ public class VisualizeGraph {
             public void widgetSelected(SelectionEvent se) {
                 GraphDBEdit gbEditor = new GraphDBEdit();
                 System.out.println("Selected Update :" + nodeData);
-                gbEditor.storeUpdatedNode(nodeData);
-                while (!GraphDBEdit.lock) {
+                if (!nodeData.isEmpty()) {
+                    gbEditor.storeUpdatedNode(nodeData);
+                    while (!GraphDBEdit.lock) {
+                    }
+                    transferDataToDBFromXML(projectPath, true);
+                    refreshGraph();
                 }
-                transferDataToDBFromXML(projectPath, true);
-                refreshGraph();
             }
         });
 
@@ -797,12 +818,15 @@ public class VisualizeGraph {
             @Override
             public void widgetSelected(SelectionEvent se) {
                 GraphDBDelete gbDeletor = new GraphDBDelete();
-                System.out.println("Selected Delete :" + nodeData);
-                gbDeletor.deleteNodeAndRelations(nodeData);
-                while (!GraphDBDelete.lock) {
+                //System.out.println("Selected Delete :" + nodeData);
+                if (!nodeData.isEmpty()) {
+                    gbDeletor.deleteNodeAndRelations(nodeData);
+                    while (!GraphDBDelete.lock) {
+                    }
+                    transferDataToDBFromXML(projectPath, false);
+                    refreshGraph();
                 }
-                transferDataToDBFromXML(projectPath, false);
-                refreshGraph();
+
             }
 
         });
@@ -970,7 +994,7 @@ public class VisualizeGraph {
                         if (artefactCombo.getSelectedItem() != null) {
                             artefactSelected = artefactCombo.getSelectedItem().toString();
                             String artefact = artefactCombo.getSelectedItem().toString();
-                            System.out.println("rtef " + artefact + " " + nodeRelations.size());
+                            //System.out.println("rtef " + artefact + " " + nodeRelations.size());
                             for (Node n : nodeRelations) {
                                 if (n.getAttributes().getValue("Artefact").toString().equalsIgnoreCase(artefact)) {
                                     nodes.add(n);
@@ -1289,7 +1313,7 @@ public class VisualizeGraph {
                         frameRemoval.dispose();
                         List<JCheckBox> selectedList = cbList.getSelectedValuesList();
                         ids = new ArrayList<>();
-                        System.out.println("IDS " + ids.size());
+                        //System.out.println("IDS " + ids.size());
                         if (edgesList.size() > 0) {
                             for (int i = 0; i < cbList.getCheckList().length; i++) {
                                 if (cbList.getCheckList()[i] == 1) {
@@ -1398,15 +1422,14 @@ public class VisualizeGraph {
         panelRemoveButton.add(btnRemoveDelete);
         panelRemoveButton.add(btnRemoveCancel);
 
-        System.out.println("Done new lik");
-
+        //System.out.println("Done new lik");
         frameRemoval.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frameRemoval.setLocation(dim.width / 2 - frameRemoval.getSize().width / 2, dim.height / 2 - frameRemoval.getSize().height / 2);
         frameRemoval.add(removePanel);
         //frameRemoval.setSize(300, 400);
         frameRemoval.setTitle("Links Removal");
-        
+
         frameRemoval.pack();
         frameRemoval.revalidate();
     }
