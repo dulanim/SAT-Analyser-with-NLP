@@ -29,6 +29,7 @@ public class AccessProjectTest {
          imgFile = new File(System.getProperty("user.dir") + File.separator
             + "img" + File.separator);
     }
+    
     @Test
     public void getJavFilesTest() {
         //System.out.println("File: " + javaFile.toString());
