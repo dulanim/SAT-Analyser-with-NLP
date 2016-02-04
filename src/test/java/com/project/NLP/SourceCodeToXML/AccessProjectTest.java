@@ -38,6 +38,7 @@ public class AccessProjectTest {
         javaFiles = getJavaFiles(imgFile);
         //System.out.println("File: " + imgFile.toString());
         assertEquals(0, javaFiles.size());
+       
     }
     
     @Test
