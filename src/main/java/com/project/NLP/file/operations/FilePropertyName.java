@@ -26,7 +26,7 @@ import com.project.traceability.GUI.StartUpProject;
 public class FilePropertyName {
 
     public static String user_home = System.getProperty("user.home") + File.separator + "SATAnalyzer";
-    public static String RESOURCE_PATH = System.getProperty("user.dir") + File.separator + "res";
+    public static String RESOURCE_PATH = user_home + File.separator + "Resources" + File.separator + "res";
     public static final String default_project_path = RESOURCE_PATH + File.separator + "Anduril";
     public static final String default_requirement_doc_path = RESOURCE_PATH + File.separator + "requirement.txt";
     public static final String default_uml_file_path = RESOURCE_PATH + File.separator + "umlFile.json";
@@ -41,9 +41,9 @@ public class FilePropertyName {
     public static final String UML_ARTIFACT_NAME = "UMLArtefactFile.xml";
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
     public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
-    public static final String IMAGE_PATH = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "images" + File.separator;
+    public static final String IMAGE_PATH = user_home + File.separator + "Resources" + File.separator + "images" + File.separator;
 
-    public static final Image exactimg = new Image(CompareWindow.display, System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "images" + File.separator + "exact.jpg");
+    public static final Image exactimg = new Image(CompareWindow.display, IMAGE_PATH + "exact.jpg");
     public static final Image violoationimg = new Image(CompareWindow.display, IMAGE_PATH + "violation.jpg");
     public static final String exactImageData = exactimg.toString();
     public static final String violationImageData = violoationimg.toString();
