@@ -46,19 +46,24 @@ public class ReadXML {
     public static void initApp(String projectPath, String graphType) {
 
         try {
+            System.out.println("Enter");
             HomeGUI.isComaparing = false;
             transferDataToDBFromXML(projectPath, true);
+            System.out.println("Enter");
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
             AccessLinksTextFile.addNewLinkstoGraph();
             AccessLinksTextFile.deleteRemovalLinkstoGraph();
+            System.out.println("Enter");
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
             GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
             visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
             visual.setGraph(model);
+            System.out.println("Enter");
             visual.showGraph();//show the graph visualization in tool
-
+            System.out.println("Enter");
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -132,39 +137,39 @@ public class ReadXML {
             deleteRelations(relProps);
             for (org.neo4j.graphdb.Node nodeProp : deleteNodeProps) {
                 System.out.println("" + nodeProp.getProperty("ID"));
-            NodeList nodeList = document.getElementsByTagName("ArtefactElement");
-            NodeList subList = document.getElementsByTagName("ArtefactSubElement");
-            boolean found = false;
+                NodeList nodeList = document.getElementsByTagName("ArtefactElement");
+                NodeList subList = document.getElementsByTagName("ArtefactSubElement");
+                boolean found = false;
 
-            for (int x = 0, size = nodeList.getLength(); x < size; x++) {
-                NodeList subNodeList = nodeList.item(x).getChildNodes();
-                //System.out.println("" + nodeList.item(x));
-                if (null != nodeList.item(x)) {
+                for (int x = 0, size = nodeList.getLength(); x < size; x++) {
+                    NodeList subNodeList = nodeList.item(x).getChildNodes();
+                    //System.out.println("" + nodeList.item(x));
+                    if (null != nodeList.item(x)) {
                         if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                        System.out.println("Donesc");
-                        //System.out.println(""+nodeList.item(x).getAttributes().toString());
-                        nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
-                        found = true;
+                            System.out.println("Donesc");
+                            //System.out.println(""+nodeList.item(x).getAttributes().toString());
+                            nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
+                            found = true;
 
-                        break;
-                    }
-                }
-            }
-
-            if (!found) {
-                for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
-                    if (subList.item(y) != null) {
-                        //System.out.println(""+subNodeList.item(y).getAttributes().toString());
-                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                            System.out.println("Done");
-                            subList.item(y).getParentNode().removeChild(subList.item(y));
-                            found = false;
                             break;
                         }
                     }
                 }
+
+                if (!found) {
+                    for (int y = 0, sizeSb = subList.getLength(); y < sizeSb; y++) {
+                        if (subList.item(y) != null) {
+                            //System.out.println(""+subNodeList.item(y).getAttributes().toString());
+                            if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
+                                System.out.println("Done");
+                                subList.item(y).getParentNode().removeChild(subList.item(y));
+                                found = false;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-        }
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);

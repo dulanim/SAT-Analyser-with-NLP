@@ -50,7 +50,7 @@ public class SourceCodeDB2 {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName + File.separator + FilePropertyName.PROPERTY + File.separator + ProjectCreateWindow.projectName + "-source" + ".graphdb");
         createNodes();
     }
-
+    
     /**
      * Creates the node labels and class nodes 
      */
@@ -94,6 +94,10 @@ public class SourceCodeDB2 {
 
         } 
         return node;
+    }
+    
+    public static void setGraphDB(GraphDatabaseService db){
+        graphDb = db;
     }
 
     /**

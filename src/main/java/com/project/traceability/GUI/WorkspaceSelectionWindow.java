@@ -4,15 +4,12 @@ import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.staticdata.StaticData;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.swing.JOptionPane;
-
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Group;
@@ -41,19 +38,31 @@ public class WorkspaceSelectionWindow {
         try {
             WorkspaceSelectionWindow window = new WorkspaceSelectionWindow();
             window.open();
+            window.eventLoop(Display.getDefault());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public Shell getShell(){
+    	
+    	/*
+    	 * for testing purpose only
+    	 * 
+    	 */
+    	return shell;
+    }
     /**
      * Open the window.
      */
     public void open() {
-        Display display = Display.getDefault();
         createContents();
         shell.open();
         shell.layout();
+        
+    }
+    
+    public void eventLoop(Display display) {
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -215,16 +224,5 @@ public class WorkspaceSelectionWindow {
         }
     }
     
-    public Shell getShell(){
-        return shell;
-    }
-    
-    public void eventLoop(Display display) {
-        //this.display = display;
-        while (!shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
-        }
-    }
+   
 }

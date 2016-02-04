@@ -3,11 +3,11 @@
  */
 package com.project.traceability.common;
 
+import java.io.File;
+
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.staticdata.StaticData;
-import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.visualization.VisualizeGraph;
-import java.io.File;
 
 /**
  * 13 Nov 2014
@@ -20,10 +20,11 @@ public class PropertyFile {
     public static String umlXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"UMLArtefactFile.xml";
     public static String sourceXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"SourceCodeArtefactFile.xml";
     public static final String wordNetDbDirectory = System.getProperty("user.home")+File.separator+"WordNet"+File.separator+"dict";
+
     public static String filePath = StaticData.workspace;
     public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
     public static String docsFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator;
-    public static final String imagePath = System.getProperty("user.dir")+File.separator+"img"; // img folder in
+    public static final String imagePath = System.getProperty("user.dir") + File.separator +"src"+ File.separator+"main"+ File.separator+"resources"+ File.separator+"images"+File.separator; // img folder in
     public static String configuration_file_path = System.getProperty("user.home")
                 +File.separator + "sat_configuration.xml";
     // project

@@ -38,6 +38,8 @@ public class GraphDB {
     Index<Relationship> edges;
     private String fileType;
 
+    
+
     /**
      * Define relationship type.
      *

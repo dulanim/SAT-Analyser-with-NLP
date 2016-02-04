@@ -8,9 +8,6 @@ package com.project.NLP.Requirement;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * This is the class to modify the sentences. 

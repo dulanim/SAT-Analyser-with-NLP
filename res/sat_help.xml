@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MainHelps>
+   <WordAdditionHelp>
+	<Helps>
+		<!-- this is the Help1 for WordAddition Help-->
+	   <Help title = "What is the Parent?" tag = "Question1">
+	      <descriptions> 
+		<description content = "1. Parent is root class for defining words. For example 
+				Animal is root class for Cat and Dog. If you give any parent for those words, model ensures that 
+				both word is same or similar meaning.
+				
+				
+				"/>
+		<description content = "2. Those word may not have the parent or root. All defined parent classes 
+					are listed in Parent Combo box. you can select one of the parent classes to
+					related both words.
+					
+					
+				"/>
+		<description content = "3. If the parent class is not listed, you can define your custom parent class from 
+					Other Parent. Press Other Parent Name in Combo box.
+					
+					
+				"/>
+	      </descriptions>
+	   </Help>
+		<!-- this is the Help2 for WordAddition Help-->
+	   <Help title = "What is the Property?" tag = "Question2">
+	      <descriptions> 
+		<description content = "1. Property is a Information Content "/>
+		<description content = "2. If the Property class is not listed, you can define your custom Property class from 
+					Custome Property. Press Other Parent Name in Combo box.
+					
+					
+				"/>
+		<description content = "For Example Property for class Car may be hasColor or hasName or hasSize
+					
+					
+				"/>
+	      </descriptions>
+	   </Help>
+	       	<!-- this is the Help2 for WordAddition Help-->
+	   <Help title = "What is the Property Value / Value?" tag = "Question3">
+	      <descriptions> 
+		<description content = "1. Parent is root class "/>
+		<description content = "2. If the parent class is not listed, you can define your custom parent class from 
+					Other Parent. Press Other Parent Name in Combo box.	
+					
+					
+				"/>
+		<description content = "3. If the parent class is not listed, you can define your custom parent class from 
+					Other Parent. Press Other Parent Name in Combo box.
+					
+					
+				"/>
+	      </descriptions>
+	   </Help>
+	</Helps>
+   </WordAdditionHelp>
+</MainHelps>

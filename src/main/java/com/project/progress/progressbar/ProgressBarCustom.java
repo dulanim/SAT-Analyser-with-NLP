@@ -8,103 +8,112 @@ package com.project.progress.progressbar;
  *
  * @author shiyam
  */
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.JLabel;
+
+import com.project.traceability.staticdata.StaticData;
 
 public class ProgressBarCustom{
-  private static Shell        shell;
-private static ProgressBar  progressBar;
 
-public  void create()
-{
-    Display display = new Display();
-    shell = new Shell(SWT.SHELL_TRIM);
-    shell.setText("Changing UML File to XML");
-    shell.setLayout(new GridLayout(1, false));
+     private static JPanel mainPanel = new JPanel();
+	 private static void createAndShowUI() {
+//	        JFrame frame = new JFrame("TestProgressBar");
+//	        frame.getContentPane().add(new TestPBGui().getMainPanel());
+//	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//	        frame.pack();
+//	        frame.setLocationRelativeTo(null);
+//	        frame.setVisible(true);
+		 myAttemptActionPerformed();
+	    }
 
-    setUpContent();
-    setUpStatusBar();
+	    public static void main(String[] args) {
+	        java.awt.EventQueue.invokeLater(new Runnable() {
 
-    updateProgressBar();
+	            @Override
+	            public void run() {
+	                createAndShowUI();
+	            }
+	        });
+	    }
+	    
+	    public static void myAttemptActionPerformed() {
+	        Window thisWin = SwingUtilities.getWindowAncestor(mainPanel);
+	        final JDialog progressDialog = new JDialog(thisWin, StaticData.statusString);
+	        JPanel contentPane = new JPanel();
+	        contentPane.setPreferredSize(new Dimension(300, 100));
+	        
+	        JPanel panel = new JPanel();
+	        contentPane.add(panel);
+	        final JProgressBar bar = new JProgressBar(0, 100);
+	        bar.setIndeterminate(true);
+	        contentPane.add(bar);
+	        
+	        JLabel lblAdd = new JLabel("Add");
+	        contentPane.add(lblAdd);
+	        progressDialog.setContentPane(contentPane);
+	        progressDialog.pack();
+	        progressDialog.setLocationRelativeTo(null);
+	        final Task task = new Task("My attempt");
+	        task.addPropertyChangeListener(new PropertyChangeListener() {
+				
+				@Override
+				public void propertyChange(java.beans.PropertyChangeEvent evt) {
+					// TODO Auto-generated method stub
+					if (evt.getPropertyName().equalsIgnoreCase("progress")) {
+	                    int progress = task.getProgress();
+	                    if (progress == 0) {
+	                        bar.setIndeterminate(true);
+	                    } else {
+	                        bar.setIndeterminate(false);
+	                        bar.setValue(progress);
+	                        progressDialog.dispose();
+	                    }
+	                }
+				}
+			});
+	        task.execute();
+	        progressDialog.setVisible(true);
+	    }
 
-    shell.pack();
-    shell.setSize(400, 200);
-    shell.open();
+	    public JPanel getMainPanel() {
+	        return mainPanel;
+	    }
+	}
 
-    while (!shell.isDisposed())
-    {
-        if (!display.readAndDispatch())
-        {
-            display.sleep();
-        }
-    }
-    display.dispose();
-}
+	class Task extends SwingWorker<Void, Void> {
 
-public static void updateProgressBar()
-{
-    new Thread(new Runnable()
-    {
-        private int                 progress    = 0;
-        private static final int    INCREMENT   = 10;
+	    private static final long SLEEP_TIME = 4000;
+	    private String text;
 
-        @Override
-        public void run()
-        {
-            while (!progressBar.isDisposed())
-            {
-                Display.getDefault().asyncExec(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (!progressBar.isDisposed())
-                            progressBar.setSelection((progress += INCREMENT) % (progressBar.getMaximum() + INCREMENT));
-                    }
-                });
+	    public Task(String text) {
+	        this.text = text;
+	    }
 
-                try
-                {
-                    Thread.sleep(1000);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }).start();
-}
+	    @Override
+	    public Void doInBackground() {
+	        setProgress(0);
+	        try {
+	            Thread.sleep(SLEEP_TIME);// imitate a long-running task
+	        } catch (InterruptedException e) {
+	        }
+	        setProgress(100);
+	        return null;
+	    }
 
-public static void setUpStatusBar()
-{
-    Composite statusBar = new Composite(shell, SWT.BORDER);
-    statusBar.setLayout(new GridLayout(2, false));
-    statusBar.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+	    @Override
+	    public void done() {
+	        System.out.println(text + " is done");
+	        Toolkit.getDefaultToolkit().beep();
+	    }
+	}
 
-    progressBar = new ProgressBar(statusBar, SWT.SMOOTH);
-    progressBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, true, false));
-    progressBar.setMaximum(100);
 
-    Label status = new Label(statusBar, SWT.NONE);
-    status.setText("Some status message");
-    status.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
-}
-
-private static void setUpContent()
-{
-    Composite content = new Composite(shell, SWT.NONE);
-    content.setLayout(new GridLayout(2, false));
-    content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    Text text = new Text(content, SWT.BORDER | SWT.MULTI);
-    text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-}
-}

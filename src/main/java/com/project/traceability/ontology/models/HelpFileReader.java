@@ -1,5 +1,8 @@
 package com.project.traceability.ontology.models;
-
+/****
+ * @author shiyam
+ * @created at 15 Dec 2015
+ */
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +23,8 @@ public class HelpFileReader {
 
 	
 	private String fileName = "sat_help.xml";
-	private String filePath = System.getProperty("user.home") + File.separator;
+	private String filePath = System.getProperty("user.dir") + File.separator + "res"
+			+ File.separator;
 	
 	private String absoulutePath;
 	

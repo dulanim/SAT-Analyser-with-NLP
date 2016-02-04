@@ -26,7 +26,7 @@ public class AccessProject {
         File files[] = null;
         
         if (file.isFile()) {
-            //System.out.println(file.getAbsolutePath());
+            System.out.println(file.getAbsolutePath());
         } else {
             files = file.listFiles();
 
@@ -48,6 +48,7 @@ public class AccessProject {
      * @return boolean
      */
     public static boolean javaFilesExists(File file){
+        javaFiles.clear();
         getJavaFiles(file);
         return !javaFiles.isEmpty();
     }

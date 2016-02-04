@@ -4,143 +4,117 @@
     xmlns:j.0="http://www.sat.analyser.com/words/#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#OrderInfo">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
+    </rdfs:subClassOf>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#close">
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove"/>
+    </rdfs:subClassOf>
+    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
+  </rdfs:Class>
   <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#SavingsAccount">
-    <j.0:hasDescription>Indication of Account</j.0:hasDescription>
+    <j.0:object>dummy</j.0:object>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shop">
     <rdfs:subClassOf>
-      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Class"/>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
+    </rdfs:subClassOf>
+    <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#shop"/>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#buyers">
+    <j.0:isDefinedBy>they are person</j.0:isDefinedBy>
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
+    </rdfs:subClassOf>
+    <j.0:type>It is kid of person whp buy item from a shop</j.0:type>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#customer">
+    <j.0:isDefinedBy>they are person</j.0:isDefinedBy>
+    <rdfs:subClassOf>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
+    </rdfs:subClassOf>
+    <j.0:type>It is kid of person whp buy item from a shop</j.0:type>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Person">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes"/>
     </rdfs:subClassOf>
   </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Teacher">
-    <j.0:hasHeight>125cm</j.0:hasHeight>
-    <j.0:hasName>Malathy</j.0:hasName>
-    <j.0:hasColor>Fair</j.0:hasColor>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#dispatch">
+    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
     <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Class"/>
-    </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
-    </rdfs:subClassOf>
-    <j.0:hasName>Farhan</j.0:hasName>
-    <j.0:hasSize>125cm</j.0:hasSize>
-  </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Order">
-    <j.0:hasDescription>Order is used to identify particular order</j.0:hasDescription>
-    <rdfs:subClassOf>
-      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Class"/>
+      <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove"/>
     </rdfs:subClassOf>
   </rdfs:Class>
-  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Miss">
-    <j.0:hasSize>165cm</j.0:hasSize>
-    <j.0:hasName>Malathy</j.0:hasName>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#Remove">
     <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Class"/>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Methods"/>
     </rdfs:subClassOf>
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
-    </rdfs:subClassOf>
-    <j.0:hasName>Kanapathy</j.0:hasName>
   </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#">
+    <j.0:object>dummy</j.0:object>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
+    <j.0:hasOrder>It is order type</j.0:hasOrder>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#detail">
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#OrderInfo"/>
+    <j.0:hasOrder>It is order type</j.0:hasOrder>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#dispose">
+    <j.0:isDefinedBy>Item can remove from place</j.0:isDefinedBy>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Remove"/>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://www.sat.analyser.com/words/#shopping_card">
+    <j.0:hasAttribute>shopping_card</j.0:hasAttribute>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#shop"/>
+  </rdfs:Class>
+  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Other_Noun">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Noun"/>
+    </rdfs:subClassOf>
+  </owl:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Classes">
     <rdfs:subClassOf>
       <owl:Class rdf:about="http://www.sat.analyser.com/words/#Noun"/>
     </rdfs:subClassOf>
   </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Maruthi">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#SuperCar"/>
-    </rdfs:subClassOf>
-    <j.0:hasLength>1.5meter</j.0:hasLength>
+  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Word">
+    <j.0:hasNoun>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Noun"/>
+    </j.0:hasNoun>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Verb">
+    <j.0:hasMethod>
+      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Methods"/>
+    </j.0:hasMethod>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Word"/>
   </owl:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Methods">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Verb"/>
-    </rdfs:subClassOf>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Mother">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
-    </rdfs:subClassOf>
-    <j.0:hasName>Kanapathy</j.0:hasName>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#SuperCar">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Car"/>
-    </rdfs:subClassOf>
-    <j.0:hasSize>90cm</j.0:hasSize>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Car">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Vehicle"/>
-    </rdfs:subClassOf>
-    <j.0:hasSize>25cm</j.0:hasSize>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Father">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Person"/>
-    </rdfs:subClassOf>
-    <j.0:hasName>SteveJob</j.0:hasName>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Person">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Classes"/>
+    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Verb"/>
   </owl:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Noun">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Word"/>
-    </rdfs:subClassOf>
-    <j.0:hasClass rdf:resource="http://www.sat.analyser.com/words/#Classes"/>
-    <j.0:hasOtherNoun>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Other_Noun"/>
-    </j.0:hasOtherNoun>
     <j.0:hasAttribute>
       <owl:Class rdf:about="http://www.sat.analyser.com/words/#Attributes"/>
     </j.0:hasAttribute>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Appa">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Person"/>
-    <j.0:hasName>SteveJob</j.0:hasName>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Other_Noun">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Noun"/>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Word">
-    <j.0:hasNoun rdf:resource="http://www.sat.analyser.com/words/#Noun"/>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#SafariCar">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#SuperCar"/>
-    <j.0:hasLength>1.5meter</j.0:hasLength>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Verb">
+    <j.0:hasOtherNoun rdf:resource="http://www.sat.analyser.com/words/#Other_Noun"/>
+    <j.0:hasClass rdf:resource="http://www.sat.analyser.com/words/#Classes"/>
     <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Word"/>
-    <j.0:hasMethod rdf:resource="http://www.sat.analyser.com/words/#Methods"/>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Mini-Bus">
-    <rdfs:subClassOf>
-      <owl:Class rdf:about="http://www.sat.analyser.com/words/#Vehicle"/>
-    </rdfs:subClassOf>
-    <j.0:hasSize>25cm</j.0:hasSize>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Vehicle">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Classes"/>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#Mom">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Person"/>
-    <j.0:hasName>Kanapathy</j.0:hasName>
-  </owl:Class>
-  <owl:Class rdf:about="http://www.sat.analyser.com/words/#DevilCar">
-    <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Car"/>
-    <j.0:hasSize>90cm</j.0:hasSize>
   </owl:Class>
   <owl:Class rdf:about="http://www.sat.analyser.com/words/#Attributes">
     <rdfs:subClassOf rdf:resource="http://www.sat.analyser.com/words/#Noun"/>
   </owl:Class>
-  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasLength"/>
+  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasOrder"/>
+  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#type"/>
+  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#object"/>
   <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasOtherNoun"/>
   <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasNoun"/>
+  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#isDefinedBy"/>
   <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasAttribute"/>
-  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasSize"/>
   <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasMethod"/>
   <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasClass"/>
-  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasName"/>
-  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasHeight"/>
-  <rdf:Property rdf:about="http://www.sat.analyser.com/words/#hasDescription"/>
 </rdf:RDF>

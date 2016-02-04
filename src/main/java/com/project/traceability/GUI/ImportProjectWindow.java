@@ -1,7 +1,5 @@
 package com.project.traceability.GUI;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.common.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -25,15 +25,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.Dimension;
 
 
 public class ImportProjectWindow {
 
-	protected Shell shell;
+	protected static Shell shell;
 	private Text txtProjectPath;
 	private Text txtWrkspacePath;
 	
@@ -316,7 +315,7 @@ public class ImportProjectWindow {
 
 							e1.printStackTrace();
 						}
-                                                shell.dispose();
+                      shell.close();
 					}
 				}
 			
@@ -334,6 +333,23 @@ public class ImportProjectWindow {
 		Label lblCopyLocation = new Label(composite, SWT.NONE);
 		lblCopyLocation.setToolTipText("Selected Projects Will be Copied to " + copyingLocation);
 		lblCopyLocation.setBounds(187, 10, 283, 17);
+		
+		Button btnCancel = new Button(composite, SWT.NONE);
+		btnCancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION|
+						SWT.YES|SWT.NO);
+				box.setMessage("Do you want to close this window?");
+				int result = box.open();
+				if(result == SWT.YES){
+					ImportProjectWindow.shell.close();
+					HomeGUI.shell.setVisible(true);
+				}
+			}
+		});
+		btnCancel.setBounds(115, 244, 91, 29);
+		btnCancel.setText("Cancel");
 		
 		if(copyingLocation.equals("")){
 			lblCopyLocation.setText("Default");
@@ -357,7 +373,8 @@ public class ImportProjectWindow {
 			File file = new File(projectPath);
 			File fileList[] = file.listFiles();
 			
-			for(int i=0;i<fileList.length;i++){
+			for(int i=0;fileList != null 
+					&& i<fileList.length;i++){
 				
 				String subFolderName = getSubFolder(fileList[i].getAbsolutePath());
 				File f = fileList[i].getAbsoluteFile();
@@ -411,15 +428,15 @@ public class ImportProjectWindow {
                                     */
                                     root.setText(projectName);
                                 }
-				root.setImage(new Image(display,
+                                root.setImage(new Image(display,
                                 FilePropertyName.IMAGE_PATH.concat("folder_root.gif")));
                                 
                                 if(importFiles != null)
                                     importFiles.add(file);
-                       }else{
-				root = new TreeItem(tree, SWT.NONE);
-				root.setText("DefaultProject");
-                        }
+                       			}else{
+									root = new TreeItem(tree, SWT.NONE);
+									root.setText("DefaultProject");
+                       			}
 			for(int i =0;i<listFile.length;i++){
 				String subFolderName = getSubFolder(listFile[i].getAbsolutePath());
 				TreeItem child = new TreeItem(root, SWT.NONE);
@@ -454,11 +471,11 @@ public class ImportProjectWindow {
                             btnFinish.setEnabled(true);
 		}else{
 			//if not exists show message or pop up to user that project is not valid 
-			 if(btnFinish != null || importFiles != null){
+			 if(!HomeGUI.isImport || btnFinish != null || importFiles != null){
                             String content = "Given Path does not have required file/ folder";
                             String title = "Information For Selection";
                             showErrorMessage(content, title);
-                         }
+             }
 		}
 	}
 	
@@ -470,16 +487,17 @@ public class ImportProjectWindow {
 		}else if(path.contains("\\")){ //For Windows
                     subFolderName = path.substring(path.lastIndexOf("\\") + 1, 
 					path.length());
-                }
+       }
 		
 		return subFolderName;
 	}
 	
 	private void showErrorMessage(String content,String title){
 
-        MessageBox messageBox = new MessageBox(shell, SWT.ERROR
-	              | SWT.OK);
-                      if(!content.equals(""))
+		if(shell == null || shell.isDisposed())
+			return ;
+        MessageBox messageBox = new MessageBox(shell, SWT.ICON_ERROR);
+                      if(content.equals(""))
                           content = "Error In Project";
                       if(title.equals(""))
                           title = "Error";

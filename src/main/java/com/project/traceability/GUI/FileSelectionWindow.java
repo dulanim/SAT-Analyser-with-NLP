@@ -3,9 +3,6 @@
  */
 package com.project.traceability.GUI;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.traceability.staticdata.StaticData;
-import com.project.progress.progressbar.Exection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,9 +22,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-
-import com.project.traceability.common.PropertyFile;
 import org.eclipse.wb.swt.layout.grouplayout.GroupLayout;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.PropertyFile;
+import com.project.traceability.staticdata.StaticData;
 
 /**
  * @author Gitanjali Nov 17, 2014

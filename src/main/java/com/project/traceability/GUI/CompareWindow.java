@@ -4,12 +4,12 @@
 package com.project.traceability.GUI;
 
 /**
- * @author Gitanjali
- * Dec 4, 2014
+ * @author shiyam
+ * Jan 14, 2015
  */
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -41,6 +41,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.progress.progressbar.ProgressBarCustom;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.EditManager;
 import com.project.traceability.manager.ReadFiles;
@@ -53,7 +55,6 @@ import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.ontology.models.StaticData;
 import com.project.traceability.ontology.models.Word;
 import com.project.traceability.utils.Constants.ImageType;
-import java.io.File;
 
 public class CompareWindow {
 
@@ -107,6 +108,13 @@ public class CompareWindow {
                 String root = HomeGUI.tree.getToolTipText() + File.separator;
                 PropertyFile.filePath = root;
 		ReadFiles.readFiles(PropertyFile.filePath + item.getText());
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                ProgressBarCustom.myAttemptActionPerformed();
+//            }
+//        });
 		compareFiles(project, selectedFiles);
 		return shell;
 	}
@@ -197,7 +205,7 @@ public class CompareWindow {
 				else if(tree.getSelection()[0] == null)
 					canAdd = false;
 				else if(tree.getSelection()[0].getText(0) != "" && tree.getSelection()[0].getText(1) != "" )
-					canAdd = false;
+					canAdd = true;
 				if(!canAdd)
 					newLinkItem.setEnabled(false);
 
@@ -205,6 +213,9 @@ public class CompareWindow {
 				newLinkItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
 						final TreeItem[] selection = tree.getSelection();
+						if(selection.length == 0 ){
+							return ;
+						}
 						TreeItem[] items = selection[0].getItems();
 						boolean showBorder = true;
 						final Composite composite = new Composite(tree,
@@ -220,14 +231,18 @@ public class CompareWindow {
 							classList = null;
 						}
 
-						if (classList != null && classList.length > 0) {		//to store non matched artefact elements
+						if(classList != null && classList.length > 0) {		//to store non matched artefact elements
 							for (int i = 0; i < classList.length; i++) {
 								TreeItem item = classList[i];
 								System.out.println(classList[i].getText());
 								if (column == 0)
 									alterColumn = 1;
-								if (item.getData(Integer.toString(alterColumn)) != null
-										&& item.getText(alterColumn) != "" && item.getText(column) == "") {
+								ArtefactElement element = (ArtefactElement) item.getData(Integer.toString(alterColumn));
+								String text11 = item.getText(alterColumn);
+								String text12 = item.getText(column);
+								if (element != null
+										&& text11 != "" && text12 == "") {
+									//if selected row contains null go and add to combo box
 									text.add(((ArtefactElement) item.getData(Integer.toString(alterColumn))).getName());
 									text.setData(((ArtefactElement) item.getData(Integer.toString(alterColumn))).getName(), 
 											item.getData(Integer.toString(alterColumn)));
@@ -239,8 +254,31 @@ public class CompareWindow {
 								System.out.println(subElements[i].getText());
 								if (column == 0)
 									alterColumn = 1;
-								if (item.getData(Integer.toString(alterColumn)) != null
-										&& item.getText(alterColumn) != ""&& item.getText(column) == "") {
+								ArtefactSubElement subElmnt =
+										(ArtefactSubElement) item.getData(Integer.toString(alterColumn));
+								String item1 = item.getText(alterColumn);
+								String item2 = item.getText(column);
+								
+								if(column ==0){
+									if(item2 == "")
+										item2 = "some";
+									if(item1 == ""){
+										item1 = "some";
+									}
+								}else if(column == 1){
+									if(item1 == ""){
+										item1 = "some";
+									}
+									if(item2.equals("")){
+										item2 = "some";
+									}
+								}
+//								Image image = item.getImage();
+//								String imageData = "";
+//								if(image != null)
+//								 imageData = image.toString();
+								if (subElmnt != null
+										&& item1 != ""&& item2 != "") {
 									text.add(((ArtefactSubElement) item.getData(Integer.toString(alterColumn))).getName());
 									text.setData(((ArtefactSubElement) item.getData(Integer.toString(alterColumn))).getName(), 
 											item.getData(Integer.toString(alterColumn)));
@@ -268,26 +306,41 @@ public class CompareWindow {
 									System.out.println(text.getData(text
 											.getText()));
 									if (classList != null) {		// to map new class
-										if (confirmMapping(((ArtefactElement) selection[0].getData("" + column+ "")),
-												(ArtefactElement) text.getData(text.getText()))) {
+										
+										if(selection[0] == null|| selection[0].getData("" + column+ "") == null || (ArtefactElement)text.getData(text.getText()) == null){
+											composite.dispose();
+
+											return ;
+										}
+										String name1 = ((ArtefactElement) selection[0].getData("" + column+ "")).getName();
+										String name2 = ((ArtefactElement) text.getData(text.getText())).getName();
+										MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION);
+										if(name1 == "" || name2 == "" ){
+											messageBox.setMessage("You can not link this Artifacts..");
+										}
+										boolean confirmed = confirmMapping(((ArtefactElement) selection[0].getData("" + column+ "")),
+												(ArtefactElement) text.getData(text.getText()));
+										
+										
+										if (confirmed) {
 													String className = updateSubElements(tree.getColumn(0).getText(),
 													tree.getColumn(1).getText());
-                                                                                                        ArtefactElement element1  = (ArtefactElement) selection[0].getData(""+ column+ "");
-                                                                                                        ArtefactElement element2 = (ArtefactElement) text.getData(text.getText());
+                                                    ArtefactElement element1  = (ArtefactElement) selection[0].getData(""+ column+ "");
+                                                    ArtefactElement element2 = (ArtefactElement) text.getData(text.getText());
 													if (className.equals("RS")){		//to compare sub elements
 															RequirementSourceClassManager.relationNodes = null;
 															RequirementSourceClassManager.relationNodes = new ArrayList<String>();
 															RequirementSourceClassManager.compareSubElements(selection[0],element1,element2);
 															RelationManager.addLinks(RequirementSourceClassManager.relationNodes);
 													}
-											else if (className.equals("RU")){
-												RequirementUMLClassManager.compareSubElements(selection[0],element1,element2);
-												RelationManager.addLinks(RequirementUMLClassManager.relationNodes);
-											}
-											else if (className.equals("US")){
-												UMLSourceClassManager.compareSubElements(selection[0],element1,element2);
-												RelationManager.addLinks(UMLSourceClassManager.relationNodes);
-											}
+													else if (className.equals("RU")){
+														RequirementUMLClassManager.compareSubElements(selection[0],element1,element2);
+														RelationManager.addLinks(RequirementUMLClassManager.relationNodes);
+													}
+													else if (className.equals("US")){
+														UMLSourceClassManager.compareSubElements(selection[0],element1,element2);
+														RelationManager.addLinks(UMLSourceClassManager.relationNodes);
+													}
 											for (int i = 0; i < classList.length; i++) {
 												if (classList[i].getText(alterColumn).equalsIgnoreCase(text.getText())) {
 													selection[0].dispose();
@@ -298,19 +351,38 @@ public class CompareWindow {
                                                                                         
                                                                                         //WordExp Window pops up
                                                                                         
-                                                                                        showWordExpWindow(element1.getName(), element2.getName(), "Class");
+                                       showWordExpWindow(element1.getName(), element2.getName(), "Class");
 										}
 									} else if (subElements != null) {			// map new sub element
-										if (confirmMapping(
+										if(selection[0] == null ||
+												selection[0].getData("" + column+ "") == null || (ArtefactSubElement)text.getData(text.getText()) == null){
+											composite.dispose();
+
+											return ;
+										}
+										String name1 = ((ArtefactSubElement) selection[0].getData("" + column+ "")).getName();
+										String name2 = ((ArtefactSubElement) text.getData(text.getText())).getName();
+										MessageBox messageBox = new MessageBox(shell, SWT.ICON_INFORMATION);
+										if(name1 == "" || name2 == "" ){
+											messageBox.setMessage("You can not link this Artifacts Sub Element..\n "
+													+ "No Sub Element not exists or you did not select");
+										}
+										boolean confirmed = confirmMapping(
 												((ArtefactSubElement) selection[0].getData("" + column+ "")),
-												(ArtefactSubElement) text.getData(text.getText()))) {
+												(ArtefactSubElement) text.getData(text.getText()));
+										if (confirmed) {
+											ArtefactSubElement element1  = (ArtefactSubElement) selection[0].getData(""+ column+ "");
+                                            ArtefactSubElement element2 = (ArtefactSubElement) text.getData(text.getText());
+											showWordExpWindow(element1.getName(), element2.getName(), element1.getType());
+											
 											for (int i = 0; i < subElements.length; i++) {
-												if (subElements[i].getText(alterColumn).equalsIgnoreCase(text.getText())) {
+												if (subElements[i].getText(alterColumn).equalsIgnoreCase(text.getText()) &&
+														StaticData.isAdded) {
 													TreeItem newItem = new TreeItem(parent, SWT.NONE);
 													newItem.setText(column,selection[0].getText(column));
 													newItem.setText(alterColumn,subElements[i].getText(alterColumn));
-													newItem.setImage(0, ImageType.EXACT_MATCH.getValue());
-													newItem.setImage(1, ImageType.EXACT_MATCH.getValue());
+													newItem.setImage(0, ImageType.VIOLATION.getValue());
+													newItem.setImage(1, ImageType.VIOLATION.getValue());
 													selection[0].dispose();
 													subElements[i].dispose();
 													break;
@@ -436,7 +508,7 @@ public class CompareWindow {
 		style.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 		stText.setStyleRange(style);		
 	}
-        private void showWordExpWindow(String word1,String word2,String type){
+    private void showWordExpWindow(String word1,String word2,String type){
             /*
             Pop up our ontology for required 
             two words
@@ -524,13 +596,25 @@ public class CompareWindow {
 		boolean confirmed = false;
 		MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION
 				| SWT.YES | SWT.NO);
-		if(className instanceof ArtefactElement && mapClass instanceof ArtefactElement)
-			messageBox.setMessage("Do you really want to map " + ((ArtefactElement)className).getName() + " to "
-					+ ((ArtefactElement)mapClass).getName() + " ?");
-		if(className instanceof ArtefactSubElement && mapClass instanceof ArtefactSubElement)
+		if(className instanceof ArtefactElement && mapClass instanceof ArtefactElement){
+			
+			String name1 = ((ArtefactElement)className).getName();
+			String name2 = ((ArtefactElement)mapClass).getName();
+			if(name1 == "" || name2 == "" ){
+				messageBox = new MessageBox(shell, SWT.ICON_QUESTION
+						| SWT.YES | SWT.NO);
+				confirmed = false;
+				return confirmed;
+			}else if(name1 != "" && name2 != ""){
+				messageBox.setMessage("Do you really want to map " + name1 + " to "
+					+ name2 + " ?");
+			}
+		}
+		if(className instanceof ArtefactSubElement && mapClass instanceof ArtefactSubElement){
 			messageBox.setMessage("Do you really want to map " + ((ArtefactSubElement)className).getName() + " to "
 					+ ((ArtefactSubElement)mapClass).getName() + " ?");
-		messageBox.setText("Confirmation");
+		}
+			messageBox.setText("Confirmation");
 		int response = messageBox.open();
 		if (response == SWT.YES){
 			if(classList == null)
