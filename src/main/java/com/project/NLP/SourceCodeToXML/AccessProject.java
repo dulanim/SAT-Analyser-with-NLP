@@ -26,7 +26,7 @@ public class AccessProject {
         File files[] = null;
         
         if (file.isFile()) {
-            System.out.println(file.getAbsolutePath());
+            //System.out.println(file.getAbsolutePath());
         } else {
             files = file.listFiles();
 
@@ -66,7 +66,7 @@ public class AccessProject {
         List<File> files = getJavaFiles(mainFolder);
 
         for (File file : files) {
-            System.out.println(file.getAbsolutePath());
+            //System.out.println(file.getAbsolutePath());
         }
     }
 }

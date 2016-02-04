@@ -148,7 +148,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             methodReturn = ctx.methodHeader().result().getText();
             //System.out.println("Method Return: " + methodReturn);
 
-            System.out.println("Method Modifier: " + methodMod);
+            //System.out.println("Method Modifier: " + methodMod);
 
             if (mdc.formalParameterList() != null) {
                 if (mdc.formalParameterList().formalParameters() != null) {

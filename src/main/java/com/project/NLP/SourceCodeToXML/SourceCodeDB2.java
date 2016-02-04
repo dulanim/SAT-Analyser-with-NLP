@@ -214,7 +214,7 @@ public class SourceCodeDB2 {
                     Node o = r.getOtherNode(n);
 
                     if (!o.getProperty("class_id").toString().isEmpty()) {
-                        System.out.println("g " + n.getProperty("class_id") + " " + o.getProperty("class_id"));
+                        //System.out.println("g " + n.getProperty("class_id") + " " + o.getProperty("class_id"));
                         map.put("1", n.getProperty("class_id").toString());
                         map.put("2", o.getProperty("class_id").toString());
                         relationshipList.add(map);
@@ -222,7 +222,7 @@ public class SourceCodeDB2 {
 
                 }
             }
-            System.out.println(count);
+            //System.out.println(count);
         } 
 
         return relationshipList;
