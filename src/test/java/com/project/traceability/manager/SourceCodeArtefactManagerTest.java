@@ -22,6 +22,7 @@ import com.project.traceability.model.MethodModel;
 /**
  *
  * @author Gitanjali
+ * @author Aarthika <>
  */
 public class SourceCodeArtefactManagerTest {
     
@@ -31,13 +32,13 @@ public class SourceCodeArtefactManagerTest {
     @Test
     public void readXMLTest(){
     	SourceCodeArtefactManager.readXML(PropertyFile.testFilePath + "test/");
-    	assertEquals(5, SourceCodeArtefactManager.sourceCodeAretefactElements.size());
-    	assertEquals("Account", SourceCodeArtefactManager.sourceCodeAretefactElements.get("SC1").getName());
+    	assertEquals(4, SourceCodeArtefactManager.sourceCodeAretefactElements.size());
+    	assertEquals("Customer", SourceCodeArtefactManager.sourceCodeAretefactElements.get("SC1").getName());
     	List<ArtefactSubElement> subElements = SourceCodeArtefactManager.sourceCodeAretefactElements.get("SC1").getArtefactSubElements();
-    	assertEquals(13, subElements.size());
-    	assertEquals("Double", (((AttributeModel)(subElements.get(1))).getVariableType()));
-    	assertEquals("String", (((MethodModel)(subElements.get(6))).getParameters().get(0).getVariableType()));
-    	assertEquals("String", (((MethodModel)(subElements.get(9))).getReturnType()));
+    	assertEquals(2, subElements.size());
+    	//assertEquals("String", (((AttributeModel)(subElements.get(0))).getVariableType()));
+    	assertEquals("void", (((MethodModel)(subElements.get(1))).getReturnType()));
+    	assertEquals("void", (((MethodModel)(subElements.get(0))).getReturnType()));
     }
 
     @BeforeClass

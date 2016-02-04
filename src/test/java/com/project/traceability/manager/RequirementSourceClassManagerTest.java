@@ -19,6 +19,7 @@ import com.project.traceability.common.PropertyFile;
 /**
  *
  * @author Gitanjali
+ * @author Aarthika <>
  */
 public class RequirementSourceClassManagerTest {
     
@@ -55,7 +56,7 @@ public class RequirementSourceClassManagerTest {
 
 
         List result = RequirementSourceClassManager.compareClassNames(PropertyFile.testFilePath + "test/");
-        assertEquals(123 , RequirementSourceClassManager.relationNodes.size());
+        assertEquals(30 , RequirementSourceClassManager.relationNodes.size());
 
 
     }
