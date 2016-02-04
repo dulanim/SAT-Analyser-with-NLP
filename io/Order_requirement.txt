@@ -1,0 +1,15 @@
+In a shop system, a customer can not order more than one items.
+Customer details must record the name and location.
+A customer can send and receive the order using the system.
+The customer can order in two types.
+Orders are special order and normal order.
+An order can be confirmed and closed by the customer.
+The special order only can dispose the items.
+Normal order can dispose and receive the items.
+A regular customer is given a shopping_card.
+The shopping_card holds his name, User_Id and points.
+A customer has the shopping_card is given a discount for his orders.
+Employee's name, address, ic_number and employee_no are maintained by the system.
+Manager is an employee responsible for the shop.
+Employees have swipe_card to register their attendance.
+

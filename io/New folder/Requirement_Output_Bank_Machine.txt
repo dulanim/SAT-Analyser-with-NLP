@@ -1,0 +1,23 @@
+Class : saving account
+	Attributes : withdrawal amount,user,transaction,
+	Methods : cover,inform,terminate,
+Class : client
+	Attributes : number,bank,amount,access,identification,code,pin,personal identification,account,bank client,
+	Methods : review,record,deposit,verify,withdraw,gain,
+Class : saving balance
+	Attributes : withdrawal amount,user,transaction,
+	Methods : cover,inform,terminate,
+Class : transaction
+	Attributes : date,amount,account balance,time,account,
+	Methods : review,record,
+Class : account
+	Attributes : checking account,
+	Methods : 
+
+Relations : 
+
+ Type : Association, Parent : client, Child : account
+ Type : Generalization, Parent : account, Child : saving account
+ Type : Association, Parent : saving balance, Child : transaction
+ Type : Association, Parent : transaction, Child : account
+ Type : Association, Parent : saving account, Child : transaction

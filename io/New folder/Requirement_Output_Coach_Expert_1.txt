@@ -1,0 +1,41 @@
+Class : Coach tour Operator
+	Attributes : reocords,
+	Methods : maintain, 
+Class : Scheduling Manager 
+	Attributes : driver, coaches,
+	Methods : allocate, keep,
+Class : Driver
+	Attributes : route, available, number of hours , company code, name , address, telephone,
+	Methods : drive, allocation,
+Class : Coach
+	Attributes : reg num, capacity ,last service, milleage,
+	Methods : ientify,
+Class : Tour
+	Attributes : service, unique code, start date, route, driver, coch,
+	Methods : 
+Class : Route
+	Attributes : town, duration, length,
+Class : Town
+	Attributes : overnight,
+	Methods : occur,
+Class : Booking MAnager
+	Attributes : individuals, 
+	Methods : books
+Class : individuals
+	Attributes : name
+	Methods :
+Class : Hotel
+	Attributes : clerk, bills, town,
+	Methods : submit,use
+Class : Clerk
+	Attributes :
+	Methods : pay
+Class : Bills
+	Attributes : date of use, no of individuals,town, tour code
+	Methods : 
+	
+
+	
+
+
+

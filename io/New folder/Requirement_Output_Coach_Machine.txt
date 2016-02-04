@@ -1,0 +1,50 @@
+Class : clerk
+	Attributes : overnight stop,hotel bills,hotel Liaison,
+	Methods : 
+Class : route
+	Attributes : duration,town,length,day,
+	Methods : 
+Class : manager
+	Attributes : schedule,driver,coach,tour,
+	Methods : keep,
+Class : driver
+	Attributes : route,week,work,coaches names,average hour,current year,company code,tour,
+	Methods : allocate,drive,
+Class : town
+	Attributes : route,overnight stop,
+	Methods : occur,
+Class : individual
+	Attributes : name,
+	Methods : identify,
+Class : records
+	Attributes : schedule,driver,coach,tour,
+	Methods : keep,
+Class : hotel
+	Attributes : date,number,tour code,town,individual,
+	Methods : 
+Class : bill
+	Attributes : date,number,tour code,town,individual,
+	Methods : 
+Class : interval
+	Attributes : service,
+	Methods : fix,
+Class : coach
+	Attributes : number,person,coaches names,Coaches registration number,company code,capacity,
+	Methods : identify,
+Class : operator
+	Attributes : coach tour,database,record,company,
+	Methods : maintain,
+
+Relations : 
+
+ Type : Association, Parent : hotel, Child : town
+ Type : Association, Parent : hotel, Child : individual
+ Type : Association, Parent : manager, Child : coach
+ Type : Association, Parent : driver, Child : route
+ Type : Association, Parent : records, Child : driver
+ Type : Association, Parent : bill, Child : town
+ Type : Association, Parent : records, Child : coach
+ Type : Association, Parent : manager, Child : driver
+ Type : Generalization, Parent : operator, Child : driver
+ Type : Association, Parent : route, Child : town
+ Type : Association, Parent : bill, Child : individual

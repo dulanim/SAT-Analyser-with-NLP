@@ -1,0 +1,5 @@
+
+Coach tour operator wishes to maintain some of the company’s records in a database.
+credit card account wishes to maintain some of the company’s records in a database
+
+The booking Manager books individuals onto tours, which has a uniquecode, a start date, a route, a driver and a coach.

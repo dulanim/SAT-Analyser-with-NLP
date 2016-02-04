@@ -1,0 +1,16 @@
+University of Sumanadasa has a hostel for their students. 
+Hostel has halls.  Each hall has a name, capacity and type. 
+The halls are female hall and male hall.
+These halls have rooms.
+Each room has room number, type and cost of staying in the room.
+The rooms are single room and double room.
+Details of Students who live on the campus are recorded.
+Student has a number, name, department and year.
+Those students who live on campus are assigned to rooms. 
+The year the student is assigned the room must be recorded, as students may be assigned different rooms in different years. 
+A record of the balance that the live_on_students owe must be recorded for each of these students.
+
+There are a number of employees employed by the University to work on the halls. 
+These employees can be moved from hall to hall. 
+Therefore, at any time a record must be kept of which hall a employee is assigned to and the date of the assignment.
+Database keep track of the employees. Each employee has an id, name, salary and position. Also, employees can be a cook, manager and cleaner. 
