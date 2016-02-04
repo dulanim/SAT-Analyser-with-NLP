@@ -1,6 +1,7 @@
 
 package com.project.traceability.ontology.models;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import scala.sys.process.FileProcessLogger;
 
 
 public class NavigationModel {
@@ -36,7 +38,7 @@ public class NavigationModel {
 	List<OntProperty> ontProps;
 	private NavigationModel(){
 		generator = ModelCreator.getModelInstance();
-		generator.setPath("/home/shiyam");
+		generator.setPath(FilePropertyName.RESOURCE_PATH);
 		model = generator.getCreatedModel();
 		
 		if(model == null){

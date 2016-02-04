@@ -59,6 +59,9 @@ public class ErrorFinder {
                     exists = true;
                     break;
                 }
+                else{
+                    return true;
+                }
             }
         }      
         return exists;    
