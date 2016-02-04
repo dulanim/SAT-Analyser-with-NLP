@@ -17,6 +17,7 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <addClasspath>true</addClasspath>
                             <mainClass>com.project.traceability.GUI.StartUpProject</mainClass>
                         </manifest>
                     </archive>
@@ -24,6 +25,15 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -35,10 +45,10 @@
                     <maxmem>1024m</maxmem>
                     <source>1.7</source>
                     <target>1.7</target>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
-                        </manifest>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
+                    </manifest>
                 </configuration>
             </plugin>
             <plugin>
@@ -46,27 +56,27 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <!--<skipTests>true</skipTests>-->
+                    <skipTests>true</skipTests>
                     <argLine>-Xms512m -Xmx1024m</argLine>
                 </configuration>
             </plugin>
             
-             <plugin>
-	            <groupId>org.eclipse.tycho</groupId>
-	            <artifactId>tycho-surefire-plugin</artifactId>
-	            <version>3</version>
-	            <configuration>
-	              <useUIHarness>true</useUIHarness>
-	              <useUIThread>false</useUIThread>
-	              <product>org.eclipse.sdk.ide</product>
-	              <application>org.eclipse.ui.ide.workbench</application>
-	           </configuration>
-        </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-surefire-plugin</artifactId>
+                <version>3</version>
+                <configuration>
+                    <useUIHarness>true</useUIHarness>
+                    <useUIThread>false</useUIThread>
+                    <product>org.eclipse.sdk.ide</product>
+                    <application>org.eclipse.ui.ide.workbench</application>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <repositories>
 
-         <!--<repository>
+        <!--<repository>
          <id>oss-sonatype</id>
          <name>oss-sonatype</name>
          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -200,11 +210,11 @@
             <version>1.1.1</version>
         </dependency>
         
-       <dependency>
-		<groupId>info.debatty</groupId>
-		<artifactId>java-string-similarity</artifactId>
-		<version>0.10</version>
-	</dependency>
+        <dependency>
+            <groupId>info.debatty</groupId>
+            <artifactId>java-string-similarity</artifactId>
+            <version>0.10</version>
+        </dependency>
         <!--<dependency>
             <groupId>matcher</groupId>
             <artifactId>matcher</artifactId>
@@ -218,12 +228,12 @@
             <type>jar</type>
         </dependency>
         
-        <dependency>
+        <!--<dependency>
             <groupId>org.eclipse.swt</groupId>
             <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
             <version>4.4</version>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.eclipse.swt</groupId>
             <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
