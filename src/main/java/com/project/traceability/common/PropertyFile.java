@@ -6,6 +6,7 @@ package com.project.traceability.common;
 import java.io.File;
 
 import com.project.NLP.file.operations.FilePropertyName;
+import static com.project.NLP.file.operations.FilePropertyName.IMAGE_PATH;
 import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.visualization.VisualizeGraph;
 
@@ -24,7 +25,7 @@ public class PropertyFile {
     public static String filePath = StaticData.workspace;
     public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
     public static String docsFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator;
-    public static final String imagePath = System.getProperty("user.dir") + File.separator +"src"+ File.separator+"main"+ File.separator+"resources"+ File.separator+"images"+File.separator; // img folder in
+    public static final String imagePath = IMAGE_PATH ; // img folder in
     public static String configuration_file_path = System.getProperty("user.home")
                 +File.separator + "sat_configuration.xml";
     // project
