@@ -31,7 +31,7 @@ import java.util.Iterator;
  */
 public class NLPRequirementMain {
 
-    private static final String REQUIREMENT_INPUT_FILE = "io/Hostel_Management_Requirement.txt"; // input file
+    private static final String REQUIREMENT_INPUT_FILE = "io/OrderRequirement.txt"; // input file
     private static String requirementDocument = ""; //variable to hold the input document 
     public static HashMap requirementObjects = new HashMap(); // to store the final artefacts in the map
     private static HashSet<ClassRelation> requirementObjectRelations = new HashSet<>();// to store the final relationships in the map
@@ -48,8 +48,8 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 
@@ -301,7 +301,7 @@ public class NLPRequirementMain {
             }
 
             //System.out.println(sbf.toString());
-            BufferedWriter bwr = new BufferedWriter(new FileWriter("io/Requirement_Output_Bank_Machine.txt"));
+            BufferedWriter bwr = new BufferedWriter(new FileWriter("io/Requirement_Output_Order_Machine.txt"));
             /*write contents of StringBuffer to a file*/
             bwr.write(sbf.toString());
             /*flush the stream*/
