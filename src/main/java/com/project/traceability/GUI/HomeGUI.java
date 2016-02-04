@@ -289,43 +289,6 @@ public class HomeGUI extends JFrame implements KeyListener {
         graphtabItem.setText("Graph");      
         
         addEditMenuPopUpMenu();
-        //create ToolBar and ToolItems
-//                final ToolItem openToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem saveToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem sep1 = new ToolItem(bar, SWT.SEPARATOR);
-//                final ToolItem cutToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem copyToolItem = new ToolItem(bar, SWT.PUSH);
-//                final ToolItem pasteToolItem = new ToolItem(bar, SWT.PUSH);
-//                
-//                            //set the size and location of the user interface widgets
-//                bar.setSize(50, 55);
-//                bar.setLocation(10, 0);
-//                Device dev = shell.getDisplay();
-//                final Image saveIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image openIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image childIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image cutIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image copyIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                final Image pasteIcon = new Image(dev, "/home/shiyam/Desktop/Resources/Images/file_txt.png");
-//                //t.setBounds(0, 56, 490, 395);
-//
-//                //Configure the ToolBar
-//                openToolItem.setImage(openIcon);
-//                openToolItem.setText("Open");
-//                openToolItem.setToolTipText("Open File");
-//                saveToolItem.setImage(saveIcon);
-//                saveToolItem.setText("Save");
-//                saveToolItem.setToolTipText("Save File");
-//                cutToolItem.setImage(cutIcon);
-//                cutToolItem.setText("Cut");
-//                cutToolItem.setToolTipText("Cut");
-//                copyToolItem.setImage(copyIcon);
-//                copyToolItem.setText("Copy");
-//                copyToolItem.setToolTipText("Copy");
-//                pasteToolItem.setImage(pasteIcon);
-//                pasteToolItem.setText("Paste");
-//                pasteToolItem.setToolTipText("Paste");
-
         defineListeners();
 
         newTab.addCTabFolder2Listener(ctfCTF2L);			//for managing maximize, minimize and restore
@@ -337,8 +300,6 @@ public class HomeGUI extends JFrame implements KeyListener {
         graphTab.addCTabFolder2Listener(ctfCTF2L);
         graphTab.addMouseListener(ctfML);
 
-        graphtabItem = new CTabItem(graphTab, SWT.NONE);		//create CTabItem for visualization
-        graphtabItem.setText("Graph");
 
         File projectFile = new File(PropertyFile.filePath);		//to access the workspace
         projectFile.mkdir();

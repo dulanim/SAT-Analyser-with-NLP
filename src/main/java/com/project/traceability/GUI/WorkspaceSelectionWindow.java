@@ -75,7 +75,7 @@ public class WorkspaceSelectionWindow {
      */
     protected void createContents() {
         shell = new Shell();
-        shell.setSize(584, 346);
+        shell.setSize(600, 346);
         shell.setText("SAT Workspace Selection Window");
 
         Dimension.toCenter(shell);
@@ -154,11 +154,11 @@ public class WorkspaceSelectionWindow {
 
         Label lblSelectAWorkspace = new Label(shell, SWT.NONE);
         lblSelectAWorkspace.setBounds(10, 10, 302, 17);
-        lblSelectAWorkspace.setText("Select a Workspace ath");
+        lblSelectAWorkspace.setText("Select a Workspace Path");
 
         Label lblItKkepsPyour = new Label(shell, SWT.NONE);
         lblItKkepsPyour.setBounds(10, 46, 565, 24);
-        lblItKkepsPyour.setText("It keeps your created internally. When you select folder, folder should empty");
+        lblItKkepsPyour.setText("It keeps your created project internally. When you select the folder, folder should be empty");
 
         Button btnCancel = new Button(shell, SWT.PUSH);
         btnCancel.addSelectionListener(new SelectionAdapter() {
