@@ -5,6 +5,7 @@
  */
 package com.project.NLP.GUI;
 
+import com.project.NLP.Requirement.ClassRelation;
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -110,9 +111,14 @@ public class DummyGUIInput {
         
         requirementObj.put(classn, storing);
         
+        HashSet requirementObjRelation = new HashSet();
+        requirementObjRelation.add(new ClassRelation("Association", "client", "dffdddddddddddddddddddddddssssssssssssssssssssssssssclient"));
+        requirementObjRelation.add(new ClassRelation("Association", "c", "bank"));
+        requirementObjRelation.add(new ClassRelation("Association", "dffdddddddddddddddddddddddssssssssssssssssssssssssssclient", "client"));
         
         
-        //ArtefactFrameTestGUI t = new ArtefactFrameTestGUI(requirementObj);
+        
+        ArtefactFrameTestGUI t = new ArtefactFrameTestGUI(requirementObj,requirementObjRelation);
         //DeleteNodes t = new DeleteNodes(requirementObj);
         
     }
