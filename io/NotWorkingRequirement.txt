@@ -1,2 +1,0 @@
-A customer with the shopping_card is given a discount for customer's orders.
-Employee's name, address, ic number and employee_no are maintained by the shop system.

@@ -1,11 +1,17 @@
-The Scheduling Manager allocates drivers and coaches to tours, and ensures that proper records are kept.  A driver can be allocated to a tour only if he is familiar with the route and if he is available for work.  He is available if the average number of hours that he has driven per week in the current year is less than 40.  Drivers are uniquely identified by a company code and their names. In addition their addresses and telephone numbers are recorded.  Coaches are identified by their registration number and have a capacity of a number of persons.  They may be allocated to a tour if by the end of the tour it does not require a service.  Dates of last service and the mileage at that time are recorded.  The service interval is fixed at 10,000 kilometers.
-
-A route is a list of towns, duration in days and a length in kilometers.  Some towns are
-overnight stops.  A town may occur on more than one route, but an overnight stop
-may not. The booking Manager books individuals onto tours, which has a unique
-code, a start date, a route, a driver and a coach.  Individuals are identified by name.
-
-The Hotel Liaison clerk pays the hotel bills for the overnight stops.  Only one hotel is
-used in each town and it submits bills giving the date of use, the number of
-individuals, the town and the tour code.
-
+A coach tour operator wishes to maintain some of the company’s records in a database.
+The Scheduling Manager allocates drivers and coaches to tours, and ensures that proper records are kept. 
+A driver can be allocated to a tour only if he is familiar with the route and if he is available for work. 
+He is available if the average hours that he has driven per week in the current year is less than 40. 
+Drivers are uniquely identified by a company code and their names. 
+In addition their addresses and telephone numbers are recorded. 
+Coaches are identified by their registration number and have a capacity of a number of persons. 
+They may be allocated to a tour if by the end of the tour it does not require a service. 
+Dates of last service and the mileage at that time are recorded. 
+The service interval is fixed at 10,000 kilometers.
+A route is a list of towns, duration in days and a length in kilometers.  
+Some towns are overnight stops. 
+A town may occur on more than one route, but an overnight stop may not. 
+The booking Manager books individuals onto tours, which has a uniquecode, a start date, a route, a driver and a coach. 
+Individuals are identified by name.
+The Hotel Liaison clerk pays the hotel bills for the overnight stops.  
+Only one hotel is used in each town and it submits bills giving the date of use, the number of individuals, the town and the tour code. 

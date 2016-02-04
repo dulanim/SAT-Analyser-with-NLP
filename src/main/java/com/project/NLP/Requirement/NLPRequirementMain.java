@@ -50,8 +50,8 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
             System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 

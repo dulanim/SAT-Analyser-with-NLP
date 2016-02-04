@@ -25,5 +25,6 @@ use
 count
 date
 year
+balance
 database
 

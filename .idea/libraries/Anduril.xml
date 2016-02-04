@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Anduril">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/miglayout-src.zip!/" />
+      <root url="jar://$PROJECT_DIR$/miglayout15-swing.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

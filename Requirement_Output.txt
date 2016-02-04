@@ -1,50 +1,26 @@
 
 
-Class : normal order
-	Attributes : item,
-	Methods : receive,dispose,
+Class : client
+	Attributes : number,bank,amount,identification,code,pin,personal identification,account,bank client,
+	Methods : review,record,deposit,verify,withdraw,gain,
 
-Class : shopping_card
-	Attributes : name,User_Id,point,
+Class : transaction
+	Attributes : date,amount,account balance,time,account,
+	Methods : review,record,
+
+Class : account
+	Attributes : checking account,
 	Methods : 
 
-Class : special order
-	Attributes : item,
-	Methods : dispose,
-
-Class : regular customer
-	Attributes : shopping_card,
-	Methods : 
-
-Class : manager
-	Attributes : shop,employee,
-	Methods : 
-
-Class : employee
-	Attributes : attendance,
-	Methods : swipe_card,register,
-
-Class : customer
-	Attributes : shopping_card,name,discount,location,customer orders,order,
-	Methods : receive,record,send,order,
-
-Class : order
-	Attributes : customer,
-	Methods : confirm,close,
+Class : saving_account balance
+	Attributes : withdrawal amount,user,transaction,
+	Methods : cover,inform,terminate,
 Relations : 
 
- Type : Association, Parent : regular customer, Child : shopping_card
+ Type : Association, Parent : client, Child : account
 
- Type : Association, Parent : manager, Child : employee
+ Type : Generalization, Parent : account, Child : saving_account balance
 
- Type : Generalization, Parent : order, Child : normal order
+ Type : Association, Parent : transaction, Child : account
 
- Type : Association, Parent : customer, Child : order
-
- Type : Generalization, Parent : order, Child : special order
-
- Type : Generalization, Parent : employee, Child : manager
-
- Type : Association, Parent : customer, Child : shopping_card
-
- Type : Generalization, Parent : customer, Child : regular customer
+ Type : Association, Parent : saving_account balance, Child : transaction

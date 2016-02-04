@@ -17,8 +17,8 @@ Class : employee
 	Attributes : attendance,
 	Methods : swipe_card,register,
 Class : customer
-	Attributes : shopping_card,discount,customer orders,order,
-	Methods : receive,send,order,
+	Attributes : shopping_card,name,discount,location,customer orders,order,
+	Methods : receive,record,send,order,
 Class : order
 	Attributes : customer,
 	Methods : confirm,close,
