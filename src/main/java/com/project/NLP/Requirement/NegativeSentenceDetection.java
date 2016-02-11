@@ -5,10 +5,8 @@
  */
 package com.project.NLP.Requirement;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import edu.stanford.nlp.trees.Tree;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,13 +38,8 @@ public class NegativeSentenceDetection {
      */
     public boolean isNegativeSentence() {
         boolean negativeSentence = false;
-        String filePath = FilePropertyName.RESOURCE_PATH + File.separator + "NegativeWordsDictionary.txt";
-        ArrayList wordsFromDictionary = readFromTextFile(filePath);
+        ArrayList wordsFromDictionary = readFromTextFile("res/NegativeWordsDictionary.txt");
         ArrayList negativeWordList = phrasesIdentification.NegativeSentenceDetection();
-        boolean b= phrasesIdentification.checkActiveOrPassive();
-        System.out.println("NegativeWordList:" + negativeWordList);
-        System.out.println("wordsFromDictionary:" + wordsFromDictionary);
-
         for(int i=0; i<negativeWordList.size(); i++){
             if(wordsFromDictionary.contains(negativeWordList.get(i))){
                 negativeSentence= true;
