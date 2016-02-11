@@ -33,6 +33,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 /**
+ * HAVE TO IMPROVE THE CODE.. INTERMS OF FUNCTIONALITY AND CODE
+ * 
  * This a class which outputs a frame for the user interaction. Output of
  * artefacts will be displayed as tree and user can add, delete or edit any
  * nodes if they expect a modification.
