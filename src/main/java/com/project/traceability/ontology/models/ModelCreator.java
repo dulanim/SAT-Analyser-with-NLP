@@ -114,7 +114,7 @@ public class ModelCreator {
 
     public void setPath(String projectPath) {
         
-        projectPath = System.getProperty("user.dir")+File.separator+"res";
+        projectPath = FilePropertyName.RESOURCE_PATH ;
         this.filePath = projectPath;
     }
 

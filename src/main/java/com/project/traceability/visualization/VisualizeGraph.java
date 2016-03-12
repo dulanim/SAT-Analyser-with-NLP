@@ -298,45 +298,42 @@ public class VisualizeGraph {
 
         if (graphType.equalsIgnoreCase("Full Graph")) { // visualize the entire project artefact element overview
         } else if (graphType.equalsIgnoreCase(
-                "Class")) {// visualize "Class" type artefact element view
+                "Requirement")) {// visualize "Class" type artefact element view
             NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            classFilter.unselectAll();
-            classFilter.addPart(node_partition.getPartFromValue("Class"));//set filter to "Class" type artefact elements
-            classFilter.addPart(node_partition.getPartFromValue("Functional"));//set filter to "Functional" type artefact elements
+            classFilter.unselectAll();          
+            
+            classFilter.addPart(node_partition.getPartFromValue("Requirement"));//set filter to "Class" type artefact elements
             Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
             GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
             graphModel.setVisibleView(class_view);//set graph model to class view
         } else if (graphType.equalsIgnoreCase(
-                "Attributes")) {// visualize attributes artefact element from source and UML
+                "Source")) {// visualize attributes artefact element from source and UML
 
-            NodePartitionFilter attributeFilter = new NodePartitionFilter(
+            NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            attributeFilter.unselectAll();
-            attributeFilter.addPart(node_partition
-                    .getPartFromValue("UMLAttribute"));//set filter to "UMLAttribute" type artefact elements
-            attributeFilter.addPart(node_partition.getPartFromValue("Field"));//set filter to "Field" type artefact elements
-            Query attribute_query = filterController
-                    .createQuery(attributeFilter);//filter "Field" and "UMLAttribute" type artefact elements
-            GraphView attribute_view = filterController.filter(attribute_query);//set graph view to attributes cluster view
-            graphModel.setVisibleView(attribute_view);//set graph model to attribute view
+            classFilter.unselectAll();          
+            
+            classFilter.addPart(node_partition.getPartFromValue("Source"));//set filter to "Class" type artefact elements
+            Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
+            GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
+            graphModel.setVisibleView(class_view);//set graph model to class view
         } else if (graphType.equalsIgnoreCase(
-                "Methods")) {// visualize methods artefact element from source and UML
-            NodePartitionFilter methodFilter = new NodePartitionFilter(
+                "Diagram")) {// visualize methods artefact element from source and UML
+            NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            methodFilter.unselectAll();
-            methodFilter.addPart(node_partition.getPartFromValue("Method"));//set filter to "Method" type artefact elements
-            methodFilter.addPart(node_partition
-                    .getPartFromValue("UMLOperation"));//set filter to "UMLOperation" type artefact elements
-            Query method_query = filterController.createQuery(methodFilter);//filter "Method" and "UMLOperation" type artefact elements
-            GraphView method_view = filterController.filter(method_query);//set graph view to methods cluster view
-            graphModel.setVisibleView(method_view);//set graph model to method view
+            classFilter.unselectAll();          
+            
+            classFilter.addPart(node_partition.getPartFromValue("Diagram"));//set filter to "Class" type artefact elements
+            Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
+            GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
+            graphModel.setVisibleView(class_view);//set graph model to class view
         } else {//then user asked to get rel cluter view
 
             for (GraphDB.RelTypes type : GraphDB.RelTypes.values()) {
                 if (type.getValue().equalsIgnoreCase(graphType)) {
-                    edgeFilter.addPart(edge_partition
-                            .getPartFromValue(type.name()));//set filter to specified rel type
+                    edgeFilter.unselectAll();                    
+                    edgeFilter.addPart(edge_partition.getPartFromValue(type.name()));//set filter to specified rel type
                     Query edge_query = filterController.createQuery(edgeFilter);//filter to specified rel type
                     GraphView edge_view = filterController.filter(edge_query);//set graph view to specified rel type cluster view
                     graphModel.setVisibleView(edge_view);//set graph model to specified rel type cluster view
@@ -569,11 +566,14 @@ public class VisualizeGraph {
         colors.add(Color.YELLOW);
         colors.add(Color.CYAN);
         colors.add(Color.orange);
+        colors.add(Color.RED);
+        colors.add(Color.PINK);
+        colors.add(Color.BLUE);
         colors.add(new Color(40, 240, 100));
-        colors.add(new Color(100, 240, 100));
+        colors.add(new Color(240, 240, 20));
         colors.add(new Color(40, 240, 40));
         colors.add(new Color(100, 100, 100));
-        colors.add(new Color(40, 240, 200));
+        colors.add(new Color(200, 40, 200));
 
         return colors;
     }
@@ -767,8 +767,6 @@ public class VisualizeGraph {
 
         undoBtn = new org.eclipse.swt.widgets.Button(composite3, SWT.BORDER | SWT.PUSH | SWT.VERTICAL);
         undoBtn.setText("Undo");
-
-        final GraphMouseListener gml = new GraphMouseListener();
 
         undoBtn.addSelectionListener(new SelectionAdapter() {
             @Override

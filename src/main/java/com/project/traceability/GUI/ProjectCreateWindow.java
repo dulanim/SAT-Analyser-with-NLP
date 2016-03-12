@@ -432,7 +432,7 @@ public class ProjectCreateWindow {
         final Label lblNewLabel = new Label(composite, SWT.NONE);
         lblNewLabel.setBounds(24, 10, 459, 17);
         lblNewLabel.setText("");
-        lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 0, 255, 0));
+        lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255, 0, 0));
 
         button_2.setText("Cancel");
         //button_2.setImage(SWTResourceManager.getImage("null"));

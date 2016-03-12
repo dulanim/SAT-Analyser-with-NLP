@@ -80,9 +80,7 @@ public class GraphMouseListener implements PreviewMouseListener {
     @Override
     public void mouseClicked(PreviewMouseEvent event, PreviewProperties properties, final Workspace workspace) {
         wkspace = workspace;
-
         if (event.button == PreviewMouseEvent.Button.LEFT) {
-            System.out.println("left Click");
             for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
                 if (clickingInNode(node, event)) {
 
