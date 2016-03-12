@@ -37,9 +37,7 @@ public class GraphDB {
     Index<Node> artefacts;
     Index<Relationship> edges;
     private String fileType;
-
     
-
     /**
      * Define relationship type.
      *
@@ -589,7 +587,8 @@ public class GraphDB {
                             exist = true;
                         }
                     }
-                    if (!exist) {
+                    System.out.println(" "+target+" "+relType);
+                    if (!exist && null != target  && relType != null) {
                         relationship = source.createRelationshipTo(target, relType);
                         relationship.setProperty("message", message);
                         edges.add(relationship, "ID", source.getProperty("ID") + "-" + target.getProperty("ID"));

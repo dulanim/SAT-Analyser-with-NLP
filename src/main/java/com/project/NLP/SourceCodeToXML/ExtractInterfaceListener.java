@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 
 /**
  * Walks the tree class
+ *
  * @author AARTHIKA
  */
 public class ExtractInterfaceListener extends Java8BaseListener {
@@ -38,11 +39,15 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
         this.parser = parser;
+        classId = 1;
+        attrId = 1;
+        methodId = 1;
     }
 
     /**
      * Enters the field declaration
-     * @param ctx 
+     *
+     * @param ctx
      */
     @Override
     public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
@@ -124,7 +129,8 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     /**
      * Enters method declaration
-     * @param ctx 
+     *
+     * @param ctx
      */
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
@@ -149,7 +155,6 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             //System.out.println("Method Return: " + methodReturn);
 
             //System.out.println("Method Modifier: " + methodMod);
-
             if (mdc.formalParameterList() != null) {
                 if (mdc.formalParameterList().formalParameters() != null) {
                     List<Java8Parser.FormalParameterContext> param = mdc.formalParameterList().formalParameters().formalParameter();
@@ -206,7 +211,8 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     /**
      * Returns the paramter
-     * @param par 
+     *
+     * @param par
      */
     private void getParameter(Java8Parser.FormalParameterContext par) {
         int children = par.getChildCount();
@@ -227,7 +233,8 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     /**
      * Enters the class declaration
-     * @param ctx 
+     *
+     * @param ctx
      */
     @Override
     public void enterClassDeclaration(Java8Parser.ClassDeclarationContext ctx) {
@@ -244,7 +251,6 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         }
 
         //System.out.println("Class: " + className + " Modifier: " + classMod);
-
         if (ctx.normalClassDeclaration().superclass() != null) {
             superClass = ctx.normalClassDeclaration().superclass().getChild(1).getText();
         }

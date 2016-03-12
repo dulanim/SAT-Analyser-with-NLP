@@ -1313,7 +1313,7 @@ public class HomeGUI extends JFrame implements KeyListener {
                 HomeGUI.setupProject(nodeItem.getText());
             }
         });
-        nodeItem.setText("Node Filtered");
+        nodeItem.setText("Artefacts Filtered");
 
         Menu nodeMenu = new Menu(popupMenu);
         nodeItem.setMenu(nodeMenu);
@@ -1325,7 +1325,7 @@ public class HomeGUI extends JFrame implements KeyListener {
                 HomeGUI.setupProject(classItem.getText());
             }
         });
-        classItem.setText("Class");
+        classItem.setText("Requirement");
 
         final MenuItem attributeItem = new MenuItem(nodeMenu, SWT.NONE);
         attributeItem.addSelectionListener(new SelectionAdapter() {
@@ -1334,7 +1334,7 @@ public class HomeGUI extends JFrame implements KeyListener {
                 HomeGUI.setupProject(attributeItem.getText());
             }
         });
-        attributeItem.setText("Attributes");
+        attributeItem.setText("Source");
 
         final MenuItem methodItem = new MenuItem(nodeMenu, SWT.NONE);
         methodItem.addSelectionListener(new SelectionAdapter() {
@@ -1343,7 +1343,7 @@ public class HomeGUI extends JFrame implements KeyListener {
                 HomeGUI.setupProject(methodItem.getText());
             }
         });
-        methodItem.setText("Methods");
+        methodItem.setText("Diagram");
         tree.setMenu(popupMenu);
     }
 

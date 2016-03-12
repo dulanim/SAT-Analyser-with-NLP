@@ -190,8 +190,7 @@ public class WordExpWindows {
 				 * add to model method 
 				 * parent single 
 				 * property-value map
-                 */
-                addingWord();
+                 */                
                 ModelCreator creator = ModelCreator.getModelInstance();
 
                 word.setPropertyName(properties);
