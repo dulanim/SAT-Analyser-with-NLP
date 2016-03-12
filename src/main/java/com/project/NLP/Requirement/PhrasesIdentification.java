@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- *
+ *  NEED STRONG RULES FOR CLASSES AND ATTRIBUTES FOR COMPLEX SENTENCES
  * Class to identify the artefacts such as classes and attributes
  *
  * @author S. Shobiga
@@ -89,25 +89,6 @@ public class PhrasesIdentification {
     }
 
     /**
-     * method to check whether a sentence is active voice or passive voice
-     *
-     * @return boolean result where if the sentence is passive
-     */
-    public boolean checkActiveOrPassive() {
-        String phraseNotation = "RB|CC";//@" + phrase + "! << @" + phrase;
-        TregexPattern VBpattern = TregexPattern.compile(phraseNotation);
-        TregexMatcher matcher = VBpattern.matcher(sTree);
-        SemanticHeadFinder semanticHeadFinder = new SemanticHeadFinder();
-
-        ArrayList negativeLists = new ArrayList();
-        while (matcher.findNextMatchingNode()) {
-            Tree match = matcher.getMatch();
-
-        }
-        return true;
-    }
-
-    /**
      * method to extract the classes from a sentence
      *
      * @return ArrayList: arrayList of classes from a sentence
@@ -159,8 +140,6 @@ public class PhrasesIdentification {
                         //storeClassesAndAttributesWhenAdjectiveNotExistToIdentifyClasses(inChild, loopCount, innerChild, separator, tempClass, count);
                         if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
                             leaves = inChild.getLeaves(); //leaves correspond to the tokens
-                            System.out.println("loopCount: " + loopCount);
-                            System.out.println("innerChild lenght:" + innerChild.length);
                             if (separator == 0) {
                                 if (loopCount == innerChild.length) {
                                     String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
@@ -170,8 +149,7 @@ public class PhrasesIdentification {
                                         nounList.remove(tempClass);
                                         nounList.add(word);
                                         attributeLists.add(tempClass);
-                                        System.out.println("att temp: " + tempClass);
-                                        System.out.println("2 " + nounList);
+                                        
                                     }
 
                                 } else if (count == 1) {
@@ -179,7 +157,6 @@ public class PhrasesIdentification {
                                     /*if the identified word is having underscore skips the stemming part . ex: user_id*/
                                     String word = stemmingForAWord(identifiedWord);
                                     nounList.add(word);
-                                    System.out.println("word: " + word);
                                     tempClass = word;
                                     storingClass = word;
 
@@ -195,7 +172,6 @@ public class PhrasesIdentification {
 
                                     tempClass += " " + identifiedWord;
                                     nounList.add(tempClass);
-                                    System.out.println("tempClass: " + tempClass);
                                     storingClass = tempClass;
                                 }
 
@@ -234,71 +210,6 @@ public class PhrasesIdentification {
         }
         System.out.println("NOUN LIST :" + nounList);
         return nounList;
-    }
-
-    /**
-     * method to identify the classes and attributes when adjective does not
-     * exist
-     *
-     * @param inChild
-     * @param loopCount
-     * @param innerChild
-     * @param separator
-     * @param tempClass
-     * @param count
-     */
-    private void storeClassesAndAttributesWhenAdjectiveNotExistToIdentifyClasses(Tree inChild, int loopCount, Tree[] innerChild, int separator, String tempClass, int count) {
-        List<Tree> leaves;
-        String storingClass;
-        if ((inChild.value().equals("NN")) || (inChild.value().equals("NNS") || (inChild.value().equals("NNP")))) {
-            leaves = inChild.getLeaves(); //leaves correspond to the tokens
-            System.out.println("loopCount: " + loopCount);
-            System.out.println("innerChild lenght:" + innerChild.length);
-            if (separator == 0) {
-                if (loopCount == innerChild.length) {
-                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
-                    String word = "";
-                    word = stemmingForAWord(identifiedWord);
-                    nounList.remove(tempClass);
-                    nounList.add(word);
-                    attributeLists.add(tempClass);
-                    System.out.println("att temp: " + tempClass);
-                    System.out.println("2 " + nounList);
-                } else if (count == 1) {
-                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
-                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
-                    String word = stemmingForAWord(identifiedWord);
-                    nounList.add(word);
-                    System.out.println("word: " + word);
-                    tempClass = word;
-                    storingClass = word;
-
-                } else {
-                    /*if the identified word is having underscore skips the stemming part . ex: user_id*/
-                    if (tempClass.contains("_")) {
-                        nounList.remove(tempClass);
-                    } else {
-                        nounList.remove(morphology.stem(tempClass));
-                        nounList.remove(tempClass);
-                    }
-                    String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
-
-                    tempClass += " " + identifiedWord;
-                    nounList.add(tempClass);
-                    System.out.println("tempClass: " + tempClass);
-                    storingClass = tempClass;
-                }
-
-                count++;
-            } else {
-                String identifiedWord = ((leaves.get(0).yieldWords()).get(0).word());
-                /*if the identified word is having underscore skips the stemming part . ex: user_id*/
-                String word = stemmingForAWord(identifiedWord);
-                nounList.add(word);
-                tempClass = word;
-                storingClass = word;
-            }
-        }
     }
 
     /**
@@ -440,7 +351,6 @@ public class PhrasesIdentification {
             for (int i = 0; i < adjAtt.size(); i++) {
                 att = adjAtt.get(i).toString();
                 if (!att.isEmpty() || !att.equals("") || !(att.equals(" "))) {
-                    System.out.println("attribute in adj " + att);
                     attributeLists.add(att.trim());
                 }
             }
@@ -541,7 +451,6 @@ public class PhrasesIdentification {
             if (adjectiveNoun == 1) {
                 attribute = stemmingForAWord(leaves.get(0).yieldWords().get(0).word());
                 attribute = adj + " " + stemmingForAWord(leaves.get(0).yieldWords().get(0).word());
-                System.out.println("at: " + attribute);
                 adjAttributeList.add(attribute);
 
             }
