@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class AnaphoraAnalyzer {
     
-    private String document;
+    private final String document;
     private ArrayList<String> sentencesFromDoc;
     private ArrayList<String[]> wordsFromDoc; //=new ArrayList<>();
     private ParserTreeGenerator generator;
