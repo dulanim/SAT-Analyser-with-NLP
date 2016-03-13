@@ -174,7 +174,7 @@ public class MethodIdentifier {
         }
 
         vpList.removeAll(commonVerbs);
-        System.out.print("\n---VPList----" + vpList + "----\n");
+        System.out.print("\n------VPList----" + vpList + "----\n");
 
         vpList = removeDesignElements(vpList);
         return vpList;
@@ -186,20 +186,7 @@ public class MethodIdentifier {
         ArrayList designElements = designEleClass.getDesignElementsList();
         vpList.removeAll(designElements);
         
-//        ArrayList designElements = designEleClass.getDesignElementsList();
-//        System.out.println("designElements: " + designElements);
-//        if (!vpList.isEmpty()) {
-//            Iterator vpIterator = vpList.iterator();
-//            while (vpIterator.hasNext()) {
-//                Object vpItem = vpIterator.next();
-//                if (designElements.contains(vpItem.toString())) {
-//                    System.out.println("Design elements are found in method list");
-//                    vpList.remove(vpItem);
-//                }
-//
-//            }
-//
-//        }
+
         return vpList;
     }
     /*
