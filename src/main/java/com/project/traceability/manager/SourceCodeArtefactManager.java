@@ -73,12 +73,13 @@ public class SourceCodeArtefactManager {
                         String name = artefact.getAttribute("name");
                         String type = artefact.getAttribute("type");
                         String visibility = artefact.getAttribute("visibility");
+                        String status = artefact.getAttribute("status");
 
                         NodeList artefactSubElementList = artefact
                                 .getElementsByTagName("ArtefactSubElement");
                         artefactsSubElements = readArtefactSubElement(artefactSubElementList);
                         artefactElement = new ArtefactElement(id, name, type,
-                                visibility, artefactsSubElements);
+                                visibility, status, artefactsSubElements);
                         sourceCodeAretefactElements.put(id, artefactElement);
                        // GraphDB db = new GraphDB();
                        // db.initiateGraphDB();
