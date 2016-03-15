@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class AnaphoraAnalyzer {
     
-    private String document;
+    private final String document;
     private ArrayList<String> sentencesFromDoc;
     private ArrayList<String[]> wordsFromDoc; //=new ArrayList<>();
     private ParserTreeGenerator generator;
@@ -34,7 +34,7 @@ public class AnaphoraAnalyzer {
     */
     public AnaphoraAnalyzer(String documnet){
         this.document=documnet;
-        System.out.println("document --- :\n"+documnet );
+        //System.out.println("document --- :\n"+documnet );
         getCoreferenChains();
         this.wordsFromDoc=splitSentence(sentencesFromDoc);
     }
@@ -55,14 +55,12 @@ public class AnaphoraAnalyzer {
     
     public String doPronounResolving(){
         for(int i=1;i<=graph.size();i++){
-            System.out.println("----- "+i+"  --- :"+graph.get(i));
-
             CorefChain cc=graph.get(i);
             if(cc!=null){
                 //System.out.println("-----"+cc.toString());
                 //System.out.println("---TextualOrder--"+cc.getMentionsInTextualOrder());
                 Map<IntPair,Set<CorefChain.CorefMention>> mentionMap=cc.getMentionMap();
-                System.out.println("--MentionMap-----"+mentionMap);
+                //System.out.println("--MentionMap-----"+mentionMap);
                 int mentionSize=mentionMap.size();
 
                 Set intPairSet=mentionMap.keySet();
@@ -70,9 +68,9 @@ public class AnaphoraAnalyzer {
                   // System.out.println("-----"+cc.getMentionsWithSameHead(1,i));
                 //System.out.println("---RepresentativeMention-----"+cc.getRepresentativeMention());
                 String mentionSpan=cc.getRepresentativeMention().mentionSpan; 
-                System.out.println("----get the mentionspan---"+mentionSpan);
+                //System.out.println("----get the mentionspan---"+mentionSpan);
                 String animacy=cc.getRepresentativeMention().animacy.toString();
-                System.out.println("----get the animacy---"+animacy);
+                //System.out.println("----get the animacy---"+animacy);
                 if(animacy.equalsIgnoreCase("ANIMATE") && mentionSize>1){
                     Iterator it=intPairSet.iterator();
                     while(it.hasNext()){
@@ -94,12 +92,12 @@ public class AnaphoraAnalyzer {
                             int wordIndex=ip.getTarget()-1;
                                 try{
                                 String docWord=wordsFromDoc.get(sentenceIndex)[wordIndex];
-                                System.out.println("From arraylist : "+docWord);
+                                //System.out.println("From arraylist : "+docWord);
                                 if(mentionPronoun.equalsIgnoreCase(docWord)){
                                     wordsFromDoc.get(sentenceIndex)[wordIndex]=mentionSpan;
                                 }
                                         }catch(ArrayIndexOutOfBoundsException e){
-                                        System.err.println("----- AnaphoraAnalyzer ------- : "+e.getMessage());
+                                        //System.err.println("----- AnaphoraAnalyzer ------- : "+e.getMessage());
                             }
                         }
                     }
@@ -108,7 +106,6 @@ public class AnaphoraAnalyzer {
         
         }
 
-        System.out.println("---- Pronoun Resolved : \n"+getPronounResolvedDocument());
         return getPronounResolvedDocument();
     }
 

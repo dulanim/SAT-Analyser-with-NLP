@@ -5,6 +5,7 @@
  */
 package com.project.NLP.Requirement;
 
+import com.project.NLP.Requirement.*;
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;

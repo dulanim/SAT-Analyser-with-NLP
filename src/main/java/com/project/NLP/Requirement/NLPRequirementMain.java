@@ -50,13 +50,13 @@ public class NLPRequirementMain {
         HashMap classWithAttr;
         try {
             /*Reading requirement file */
-            requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
-            //requirementDocument = readFromTextFile(StaticData.requirementFilePath);
+            //requirementDocument = readFromTextFile(REQUIREMENT_INPUT_FILE);
+            requirementDocument = readFromTextFile(StaticData.requirementFilePath);
             //System.setProperty("wordnet.database.dir", "/usr/local/WordNet-2.1/dict");
-            System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
+            //System.setProperty("wordnet.database.dir", System.getProperty("user.home") + File.separator + "WordNet" + File.separator + "dict");
 
             if ("".equals(requirementDocument)) {
-                System.out.println("Error : There is no input document !!!");
+                //System.out.println("Error : There is no input document !!!");
             } else {
                 AnaphoraAnalyzer analyzer = new AnaphoraAnalyzer(requirementDocument);
                 requirementDocument = analyzer.doPronounResolving();
@@ -65,7 +65,7 @@ public class NLPRequirementMain {
                 /*For individual sentence in the requirement Document */
                 for (int countTree = 0; countTree < trees.size(); countTree++) {
                     Tree tree = (Tree) trees.get(countTree);
-                    System.out.println("Tree: " + tree);
+                    //System.out.println("Tree: " + tree);
                     /*if sentence is not negative, then allowing the artefact extraction*/
                     NegativeSentenceDetection negativeSentence = new NegativeSentenceDetection(tree);
                     if (!negativeSentence.isNegativeSentence()) {
@@ -76,14 +76,14 @@ public class NLPRequirementMain {
                         classWithAttr = np.getClassWithAttr();
 
                         ArrayList attributesFromClass = np.getAttributeFromClass();
-                        System.out.println("CLASS LIST:" + classList);
+                        //System.out.println("CLASS LIST:" + classList);
 
                         /*if classList is empty skip the rest of the extraction of artefacts*/
                         if (!classList.isEmpty()) {
                             /*attributes identification */
                             AttributeIdentification attr = new AttributeIdentification(tree, attributesFromClass, classList);
                             attrList = attr.getAttributes();
-                            System.out.println("ATTRIBUTE LIST: " + attrList);
+                            //System.out.println("ATTRIBUTE LIST: " + attrList);
 
                             if (!classList.isEmpty()) {
                                 /* methods identification */
@@ -118,7 +118,7 @@ public class NLPRequirementMain {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e);
+            //System.out.println(e);
             e.printStackTrace();
         }
     }
