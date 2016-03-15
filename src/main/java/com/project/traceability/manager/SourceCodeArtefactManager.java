@@ -1,6 +1,5 @@
 package com.project.traceability.manager;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.AttributeModel;
@@ -27,7 +27,6 @@ import com.project.traceability.model.MethodModel;
 import com.project.traceability.utils.Constants;
 import com.project.traceability.utils.Constants.ArtefactSubElementType;
 import com.project.traceability.utils.Constants.ArtefactType;
-import com.project.traceability.visualization.GraphDB;
 
 public class SourceCodeArtefactManager {
 
@@ -35,13 +34,32 @@ public class SourceCodeArtefactManager {
     public static Document sourceDoc;
     static String projectPath;
     public static Map<String, ArtefactElement> sourceCodeAretefactElements = new HashMap<String, ArtefactElement>();
-
+    public static String isComparing = "NONE";
     public static void readXML(String projectPath) {
         SourceCodeArtefactManager.projectPath = projectPath;
-        File sourceXmlFile = new File(projectPath + File.separator + FilePropertyName.XML + File.separator
+        File sourceXmlFile;
+        if(!isComparing.equals("NONE")){
+        	if(isComparing.equals("OLD"))
+        	FilePropertyName.SOURCE_ARTIFACT_NAME = 
+        						FilePropertyName.SOURCE_ARETEFACT_NAME_OLD;
+        	else if(isComparing.equals("NEW"))
+            	FilePropertyName.SOURCE_ARTIFACT_NAME = 
+            					FilePropertyName.SOURCE_ARETEFACT_NAME_NEW;
+        	else
+            	FilePropertyName.SOURCE_ARTIFACT_NAME = 
+            					FilePropertyName.SOURCE_ARETEFACT_NAME_MODIFIED;
+        		
+        }else{
+        	FilePropertyName.SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
+        }
+        sourceXmlFile = new File(projectPath + File.separator + FilePropertyName.XML + File.separator
                 + FilePropertyName.SOURCE_ARTIFACT_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
+        if(sourceCodeAretefactElements!=null && sourceCodeAretefactElements.size()>0)
+        	sourceCodeAretefactElements.clear();
+        else
+        	sourceCodeAretefactElements = new HashMap<>();
         try {
             dBuilder = dbFactory.newDocumentBuilder();
             sourceDoc = (Document) dBuilder.parse(sourceXmlFile);
@@ -75,11 +93,15 @@ public class SourceCodeArtefactManager {
                         String visibility = artefact.getAttribute("visibility");
                         String status = artefact.getAttribute("status");
 
+                        String interfaceNames = artefact.getAttribute("interface");
+                        String superClassNames = artefact.getAttribute("superClass");
                         NodeList artefactSubElementList = artefact
                                 .getElementsByTagName("ArtefactSubElement");
                         artefactsSubElements = readArtefactSubElement(artefactSubElementList);
                         artefactElement = new ArtefactElement(id, name, type,
-                                visibility, status, artefactsSubElements);
+                                visibility, artefactsSubElements,status);
+                        artefactElement.setInterfaceName(interfaceNames);
+                        artefactElement.setSuperClassNames(superClassNames);
                         sourceCodeAretefactElements.put(id, artefactElement);
                        // GraphDB db = new GraphDB();
                        // db.initiateGraphDB();
@@ -178,7 +200,7 @@ public class SourceCodeArtefactManager {
             String name = artefact.getAttribute("name");
             String type = artefact.getAttribute("type");
             String visibility = artefact.getAttribute("visibility");
-
+            String status = artefact.getAttribute("status");
             if (type.equalsIgnoreCase("Method")) {
                 String parameters = artefact.getAttribute("parameters");
                 String returnType = artefact.getAttribute("returnType");
@@ -190,6 +212,8 @@ public class SourceCodeArtefactManager {
                 methodAttribute.setVisibility(visibility);
                 methodAttribute.setReturnType(returnType);
                 methodAttribute.setContent(content);
+
+                methodAttribute.setStatus(status);
                 if (!parameters.equals("")) {
                     methodAttribute.setParameters(ParameterManager
                             .listParameters(parameters));
@@ -203,6 +227,7 @@ public class SourceCodeArtefactManager {
                 attributeElement.setType(type);
                 attributeElement.setVariableType(variableType);
                 attributeElement.setVisibility(visibility);
+                attributeElement.setStatus(status);
                 artefactSubElements.add(attributeElement);
             }
         }
@@ -267,6 +292,7 @@ public class SourceCodeArtefactManager {
     public static Map<String, ArtefactElement> getSourceCodeAretefactElements() {
         return sourceCodeAretefactElements;
     }
+    
     
     
     

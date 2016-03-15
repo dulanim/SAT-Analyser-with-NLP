@@ -12,11 +12,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.FileDialog;
+import org.w3c.dom.Document;
 
 import com.project.traceability.GUI.CompareWindow;
-import com.project.traceability.GUI.StartUpProject;
 
 /**
  *
@@ -40,9 +47,13 @@ public class FilePropertyName {
     public static final String RELATION_ARTIFACT_NAME = "Relations.xml";
     public static final String UML_ARTIFACT_NAME = "UMLArtefactFile.xml";
     public static final String REQUIREMENT_ARTIFACT_NAME = "RequirementArtefactFile.xml";
-    public static final String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
+    public static String SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
     public static final String IMAGE_PATH = user_home + File.separator + "Resources" + File.separator + "images" + File.separator;
-
+    //new artifact name added for extension
+    public static final String SOURCE_ARETEFACT_NAME_OLD = "old_version.xml";
+    public static final String SOURCE_ARETEFACT_NAME_NEW = "new_version.xml";
+    public static final String SOURCE_ARETEFACT_NAME_MODIFIED = "modified_version.xml";
+    //finish name initialization part
     public static final Image exactimg = new Image(CompareWindow.display, IMAGE_PATH + "exact.jpg");
     public static final Image violoationimg = new Image(CompareWindow.display, IMAGE_PATH + "violation.jpg");
     public static final String exactImageData = exactimg.toString();
@@ -63,6 +74,28 @@ public class FilePropertyName {
 //        }
 //        return target;
 //    }
+    
+    private static String getXMLFileRootPath(String projectPath){
+		String fileRoot = projectPath + File.separator + FilePropertyName.XML + File.separator;
+		
+		return fileRoot;
+	}
+	
+	public static String getXMLFilePath(String projectPath,String TAG){
+		String path = "";
+		path += getXMLFileRootPath(projectPath);
+		String fileName = "";
+		if(TAG.equals("OLD")){
+			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_OLD;
+		}else if(TAG.equals("NEW")){
+			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_NEW;
+		}else{
+			fileName = FilePropertyName.SOURCE_ARTIFACT_NAME;
+		}
+		
+		path += fileName;
+		return path;
+	}
     public static void addSubFolderIntoProject(File folder) {
 
         if (!folder.exists()) {
@@ -174,7 +207,6 @@ public class FilePropertyName {
 
             in.close();
             out.close();
-            System.out.println("File copied from " + src + " to " + dest);
         }
     }
 
@@ -194,5 +226,34 @@ public class FilePropertyName {
 
         destFile = new File(destFile.getAbsolutePath(), fileName);
         copyFolder(sourceFile, destFile);
+    }
+    public static void copyTwoFile(File sourceFile, File destFile) throws IOException {
+        copyFolder(sourceFile, destFile);
+    }
+    
+//    public static void renameAFile(File file,String newName){
+//    	
+////    	
+////
+////        File destFile = new File(destFile.getAbsolutePath(), fileName);
+////    	file.renameTo(dest)
+//    }
+    public static void writeToXML(String filePath,Document doc){
+	    	try{// write the content into xml file
+	    		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+	    		Transformer transformer = transformerFactory.newTransformer();
+	    	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
+	    	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
+	            DOMSource source = new DOMSource(doc);
+	    	    //String driveLetter = getSuitableDrive();
+	    	                
+	    	    File f = new File(filePath);
+	    	    StreamResult result = new StreamResult(f.getPath());
+	    	    transformer.transform(source, result);
+    		}catch (TransformerException tfe) {
+    			tfe.printStackTrace();
+    		}catch(Exception e){
+    			 
+    		}
     }
 }

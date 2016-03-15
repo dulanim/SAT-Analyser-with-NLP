@@ -7,10 +7,15 @@ package com.project.NLP.SourceCodeToXML;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.w3c.dom.Attr;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.project.traceability.staticdata.StaticData;
 
 /**
  * Walks the tree class
@@ -24,7 +29,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     private StringBuffer parameterList = new StringBuffer();
     private String methodReturn, methodName, methodMod, type;
     private String className, classMod, superClass = "";
-    private String fieldName, fieldMod, fieldType;
+    private String fieldName, fieldMod, fieldType,fieldStatus = StaticData.DEFAULT_STATUS;
     private Element artefactElement;
     public static Node root;
     private List<String> fieldNameList = new ArrayList();
@@ -36,6 +41,8 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     private static final String INHERITANCE = "INHERITANCE";
     private static final String COMPOSITION = "COMPOSITION";
     private String currentClassID = "";
+	private String methodStatus;
+	private String classStatus;
 
     public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
         this.parser = parser;
@@ -54,6 +61,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         super.enterFieldDeclaration(ctx); //To change body of generated methods, choose Tools | Templates.
         // ctx.unannType().unannReferenceType().unannClassOrInterfaceType().
         type = "Field";
+        fieldStatus = StaticData.DEFAULT_STATUS;
         String associationType = "COMPOSITION";
         if (ctx.unannType().unannPrimitiveType() != null) {
             fieldType = ctx.unannType().unannPrimitiveType().getText();
@@ -125,6 +133,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         Attr fieldTypeAttr = WriteToXML.getDocument().createAttribute("variableType");
         fieldTypeAttr.setValue(fieldType);
         artefactSubElement.setAttributeNode(fieldTypeAttr);
+        
+        Attr fieldStatusAttr = WriteToXML.getDocument().createAttribute(StaticData.STATUS);
+        fieldStatusAttr.setValue(fieldStatus);
+        artefactSubElement.setAttributeNode(fieldStatusAttr);
     }
 
     /**
@@ -135,7 +147,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     @Override
     public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
         super.enterMethodDeclaration(ctx);
-
+        methodStatus = StaticData.DEFAULT_STATUS;
         if (ctx.methodModifier().isEmpty()) {
             methodMod = "package-private";
         } else if (ctx.methodModifier().size() == 2) {
@@ -205,6 +217,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             Attr parameterAttr = WriteToXML.getDocument().createAttribute("parameters");
             parameterAttr.setValue(parameterList.toString());
             artefactSubElement.setAttributeNode(parameterAttr);
+            
+            Attr statusAttr = WriteToXML.getDocument().createAttribute(StaticData.STATUS);
+            statusAttr.setValue(methodStatus);
+            artefactSubElement.setAttributeNode(statusAttr);
         }
 
     }
@@ -243,7 +259,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         methodId = 1;
         String inheritanceType = "INHERITANCE";
         className = ctx.normalClassDeclaration().Identifier().getText();
-
+        classStatus = StaticData.DEFAULT_STATUS;
         if (ctx.normalClassDeclaration().classModifier().isEmpty()) {
             classMod = "package-private";
         } else {
@@ -257,7 +273,12 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         if (ctx.normalClassDeclaration().superinterfaces() != null) {
             implementClass = ctx.normalClassDeclaration().superinterfaces().interfaceTypeList().interfaceType();
         }
-        currentClassID = "SC" + classId;
+        
+        if(WriteToXML.isTragging.equals("Tragging"))
+        	currentClassID = WriteToXML.TAG + "_" + "SC" + classId;
+        else{
+        	currentClassID = "SC" + classId;
+        }
         try {
             AST.scdb.createNodeRelationship(className, currentClassID, superClass, inheritanceType);
         } catch (Exception e) {
@@ -292,6 +313,10 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         Attr interfaceAttr = WriteToXML.getDocument().createAttribute("interface");
         interfaceAttr.setValue(implementClass.toString());
         artefactElement.setAttributeNode(interfaceAttr);
+        
+        Attr statusAttr = WriteToXML.getDocument().createAttribute(StaticData.STATUS);
+        statusAttr.setValue(classStatus);
+        artefactElement.setAttributeNode(statusAttr);
     }
 
 }

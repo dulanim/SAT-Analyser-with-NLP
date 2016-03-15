@@ -40,6 +40,14 @@ public class AST {
      * @param filePath
      * @throws java.lang.Exception
      */
+    public static void main(String args[]){
+    	String filePath =  System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/Jar";
+    	try{
+    		new AST().startSourceCodeConversion(filePath);
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    }
     public void startSourceCodeConversion(String filePath) throws Exception {
         ast = new AST();
         scdb = new SourceCodeDB2();
@@ -55,7 +63,8 @@ public class AST {
             }
             scdb.shutdownDB();
         } else {
-            JOptionPane.showMessageDialog(null, "Incorrect Path. The specified path does not contain any java files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Incorrect Path. The specified path does not contain any java files.", 
+            		"Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -74,9 +83,11 @@ public class AST {
             ExtractInterfaceListener extractor = new ExtractInterfaceListener(parser);
             walker.walk(extractor, tree);
         } catch (ParserConfigurationException ex) {
-            JOptionPane.showMessageDialog(null, "Parser problem while parsing the source code files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, 
+            		"Parser problem while parsing the source code files.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Problem occured in the given file.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, 
+            		"Problem occured in the given file.", "Source-code Conversion", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -94,7 +105,6 @@ public class AST {
         addRelationsToXML(relationshipList, "Composition");
         WriteToXML.createXML();
         //shutdownDB();
-
     }
 
     /**

@@ -15,7 +15,7 @@ public class Property {
     private String visibility;
     private String type;
     private boolean isStatic;
-
+    private String status;
     
     
     
@@ -54,7 +54,9 @@ public class Property {
     public String getVisibility() {
         return visibility;
     }
-
+    public String getStatus(){
+    	return status;
+    }
     /**
      * @param visibility the visibility to set
      */
@@ -88,5 +90,12 @@ public class Property {
      */
     public void setType(String type) {
         this.type = type;
+    }
+    
+    /**
+     * @param status the type to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

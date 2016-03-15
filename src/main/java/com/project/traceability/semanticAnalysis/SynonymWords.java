@@ -5,10 +5,12 @@ package com.project.traceability.semanticAnalysis;
  * and open the template in the editor.
  */
 import com.project.traceability.model.WordsMap;
+
 import java.util.List;
 
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.ir.LevenshteinDistance;
+import com.project.traceability.staticdata.StaticData;
 import com.project.traceability.utils.DefaultWords;
 
 import edu.smu.tspell.wordnet.Synset;
@@ -24,7 +26,7 @@ public class SynonymWords {
     public static String simpleWord1, simpleWord2;
     public static WordNetDatabase database = WordNetDatabase.getFileInstance();
     public static int classMapId, mapId;
-
+    public static String isMatchingXML = "NONE";
     //get the similar words for spesific words
     public static String[] getSynSetWords(String term) {
         System.setProperty("wordnet.database.dir", PropertyFile.wordNetDbDirectory);
@@ -47,15 +49,47 @@ public class SynonymWords {
 
     
     //Check similarity for identitying classes relationship
-    public static WordsMap checkSymilarity(String term1, String term2, String type) {
+    public static WordsMap checkSymilarity(String term1, String term2,String type) {
+    	
+    	if(isMatchingXML.equals("XML Matching")){
+    		WordsMap w1 = new WordsMap();
+
+    		if(term1.length() != term2.length()){
+            
+            if(term1.length() > term2.length()){
+            	w1.setIsMatched(true);
+                w1.setMapID(1);
+            	if (term1.contains(term2)){
+        			w1.setStatus("String " + StaticData.MODIFIED_STATUS);
+            		return w1;
+        		}
+			}else{
+				if (term2.contains(term1)){
+					w1.setIsMatched(true);
+		            w1.setMapID(1);
+        			w1.setStatus("String " + StaticData.MODIFIED_STATUS);
+            		return w1;
+        		}
+    		}
+    	  }
+    	}
         String similarWords1[] = getSynSetWords(term1);
         String similarWords2[] = getSynSetWords(term2);
         boolean status = false;
+        
         if (term1.equalsIgnoreCase(term2)
                 || LevenshteinDistance.similarity(term1, term2) > .85) {
-            WordsMap w1 = new WordsMap();
+        	WordsMap w1 = new WordsMap();
+
             w1.setIsMatched(true);
             w1.setMapID(1);
+        	if(!term1.equalsIgnoreCase(term2) && 
+        			LevenshteinDistance.similarity(term1, term2) > .85){
+        		w1.setStatus("String " + StaticData.MODIFIED_STATUS);
+        		return w1;
+        	}
+            
+            w1.setStatus("String Matched");
             return w1;
         } else {
             if(similarWords1!=null & similarWords2!=null){
@@ -77,11 +111,13 @@ public class SynonymWords {
             if (status) {
                 WordsMap w1 = new WordsMap();
                 w1.setIsMatched(true);
+                w1.setStatus("String Matched");
                 w1.setMapID(1);
                 return w1;
             } else {
                 WordsMap w2 = new WordsMap();
                 w2.setIsMatched(false);
+                w2.setStatus("");
                 w2.setMapID(100);
                 return w2;
             }
@@ -90,27 +126,64 @@ public class SynonymWords {
     }
 
     //overload the method & check similarity for attributes & behaviour
-    public static WordsMap checkSymilarity(String term1, String term2, String sourceType, String tagetType, List<String> classNames) {
+    public static WordsMap checkSymilarity(String term1, String term2, String sourceType,
+    		String tagetType, List<String> classNames) {
         WordsMap w2 = new WordsMap();
+        
+        if(isMatchingXML.equals("XML Matching")){
+	    		WordsMap w1 = new WordsMap();
+	
+	           
+	    		if(term1.length() != term2.length()){
+	            if(term1.length() > term2.length()){
+	            	
+	            	if (term1.contains(term2)){
+	            		w1.setIsMatched(true);
+	                    w1.setMapID(1);
+	        			w1.setStatus("String " + StaticData.MODIFIED_STATUS);
+	            		return w1;
+	        		}
+				}else{
+					if (term2.contains(term1)){
+						w1.setIsMatched(true);
+				        w1.setMapID(1);
+	        			w1.setStatus("String " + StaticData.MODIFIED_STATUS);
+	            		return w1;
+	        		}
+	    		}
+	    	}
+        }
         //check only 1st letter changed remaining unchanged 
         if (isFirstletterChanged(term1, term2)) {
             w2.setIsMatched(false);
             w2.setMapID(100);
+            w2.setStatus("String " + StaticData.MODIFIED_STATUS);
             return w2;
         } //check similarity get the edit distance & if >.85 then it will be ok
         else if (term1.equalsIgnoreCase(term2) ||term1.trim().equalsIgnoreCase(term2.trim())
                 || LevenshteinDistance.similarity(term1, term2) > .85) {
-            System.out.println(term1.equalsIgnoreCase(term2) + " : " + LevenshteinDistance.similarity(term1, term2) + " : " + term1 + "**************" + term2 + "TRUE");
+            System.out.println(term1.equalsIgnoreCase(term2) + " : " + 
+                LevenshteinDistance.similarity(term1, term2) + " : " + term1 +
+                "**************" + term2 + "TRUE");
             w2.setIsMatched(true);
             w2.setMapID(1);
+            if( !(term1.equalsIgnoreCase(term2) ||term1.trim().equalsIgnoreCase(term2.trim()))
+            		&& LevenshteinDistance.similarity(term1, term2) > .85){
+            	w2.setStatus("String " + StaticData.MODIFIED_STATUS);
+            	return w2;
+            }
+            
+            w2.setStatus("String " + "Matched");
             return w2;
         } else if (HasSimilarWords(term1, term2, sourceType, tagetType, classNames)) {
             w2.setIsMatched(true);
+            w2.setStatus("String " + StaticData.MODIFIED_STATUS);
             w2.setMapID(2);
             return w2;
         } else {
             w2.setIsMatched(false);
             w2.setMapID(100);
+            w2.setStatus("");
             return w2;
         }
 
@@ -136,7 +209,8 @@ public class SynonymWords {
     //divide into substring according to the letter which is in capital letter
     //remove class names & check whether they have partial word matching
     //send the words to wordnet to get the similar words 
-    public static boolean HasSimilarWords(String term1, String term2, String sourceType, String targetType, List<String> classNames) {
+    public static boolean HasSimilarWords(String term1, String term2, String sourceType, 
+    		String targetType, List<String> classNames) {
 
         boolean status = false;
         String[] partialWords1;

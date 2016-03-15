@@ -13,7 +13,8 @@ import java.util.List;
 public class ModelData extends Property{
     private List<Attribute> attributeList;
     private List<Operation> operationList;
-
+    private String interfaces;
+    private String superClasses;
     public ModelData() {
     }
 
@@ -38,7 +39,12 @@ public class ModelData extends Property{
     public List<Operation> getOperationList() {
         return operationList;
     }
-
+    public String getInterfaceNames(){
+    	return this.interfaces;
+    }
+    public String getSuperclassNames(){
+    	return this.superClasses;
+    }
     /**
      * @param operationList the operationList to set
      */
@@ -46,5 +52,12 @@ public class ModelData extends Property{
         this.operationList = operationList;
     }
     
+    public void setInterfaceNames(String nameString){
+    	this.interfaces = nameString;
+    }
+    
+    public void setSuperClassNames(String nameString){
+    	this.superClasses = nameString;
+    }
     
 }

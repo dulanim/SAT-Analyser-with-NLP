@@ -12,12 +12,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -522,32 +516,10 @@ public class XMLWriter {
 		}
 		
 	}
-	
-        public void call_done(){
-		try{
-			
-		// write the content into xml file
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transformerFactory.newTransformer();
-	        transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
-	        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
-                DOMSource source = new DOMSource(doc);
-	         //String driveLetter = getSuitableDrive();
-	                
-	        File f = new File(filepath);
-	        StreamResult result = new StreamResult(f.getPath());
-	        transformer.transform(source, result);
-	        System.out.println("File saved into " + f.getPath());
-		
-                System.out.println("Done");
-		}catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		}catch(Exception e){
-			 
-		}
-		
-		
-	}
+
+    public void call_done(){
+			FilePropertyName.writeToXML(filepath, doc);
+    }
 	
 	public Map<String,Boolean> retriveExpenededProject(String projectPath){
 		Map<String,Boolean> projectsInfos

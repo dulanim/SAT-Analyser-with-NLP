@@ -14,7 +14,7 @@ import com.project.traceability.staticdata.StaticData;
 public class Adapter {
     
     static XMLWriter writer;
-    public static String projectPath = "";
+    public static String projectPath = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal";
     public static String wrkspace = "";
     
     static{
