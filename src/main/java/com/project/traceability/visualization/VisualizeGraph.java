@@ -328,7 +328,10 @@ public class VisualizeGraph {
             Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
             GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
             graphModel.setVisibleView(class_view);//set graph model to class view
-        } else {//then user asked to get rel cluter view
+        } else if (graphType.equalsIgnoreCase("Modifications")){
+            
+        }
+        else {//then user asked to get rel cluter view
 
             for (GraphDB.RelTypes type : GraphDB.RelTypes.values()) {
                 if (type.getValue().equalsIgnoreCase(graphType)) {
