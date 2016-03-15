@@ -46,7 +46,7 @@ public class ProjectCreateWindow {
     public File srcJavaDir;
     public Label lalProjectWrkspace;
 
-    public static String projectName;
+    public static String projectName = "DEFAULT";
     public static Shell shell;
     private Text textWrkspace;
     private Text txtProjectName;

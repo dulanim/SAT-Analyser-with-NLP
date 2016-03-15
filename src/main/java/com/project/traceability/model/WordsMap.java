@@ -13,11 +13,14 @@ package com.project.traceability.model;
 public class WordsMap {
     int mapID;
     boolean isMatched;
+    private  String status;
 
     public int getMapID() {
         return mapID;
     }
-
+    public String getStatus(){
+    	return this.status;
+    }
     public void setMapID(int mapID) {
         this.mapID = mapID;
     }
@@ -30,5 +33,11 @@ public class WordsMap {
         this.isMatched = isMatched;
     }
     
+    public void setStatus(String status){
+    	if(status.equals("")){
+    		status = "Not Matched";
+    	}
+    	this.status = status;
+    }
     
 }

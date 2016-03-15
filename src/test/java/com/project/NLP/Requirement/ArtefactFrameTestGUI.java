@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.project.NLP.GUI;
+package com.project.NLP.Requirement;
 
 import com.project.NLP.Requirement.StoringArtefacts;
 import java.awt.BorderLayout;

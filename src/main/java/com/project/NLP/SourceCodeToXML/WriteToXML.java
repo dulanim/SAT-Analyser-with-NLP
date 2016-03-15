@@ -5,14 +5,12 @@
  */
 package com.project.NLP.SourceCodeToXML;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.property.config.xml.writer.Adapter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,11 +21,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.openide.util.Exceptions;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.writer.Adapter;
 
 /**
  * Creates the xml
@@ -35,11 +37,12 @@ import org.xml.sax.SAXException;
  */
 public class WriteToXML {
 
-    public static Document document;
+    public  static Document document;
     private static String destinationPath;
     private static File file;
-    public static Element artefacts, artefactType, fileLocation;
-
+    public  static Element artefacts, artefactType, fileLocation;
+    public  static String isTragging = "NONE";
+    public  static String TAG = "NONE";
     public static Document getDocument() {
         return document;
     }
@@ -53,10 +56,15 @@ public class WriteToXML {
         File f = new File(root + File.separator +FilePropertyName.XML);
         if(!f.exists())
             f.mkdir();
-        destinationPath = f.getPath() + File.separator + FilePropertyName.SOURCE_ARTIFACT_NAME;
+        
+        if(isTragging.equals("Tragging")){
+        	destinationPath = FilePropertyName.getXMLFilePath(root, TAG);
+        }else{
+        	destinationPath = FilePropertyName.getXMLFilePath(root, TAG);
+        }
         file = new File(destinationPath);
-        /*destinationPath = "D:\\myVirtusa\\xml\\Source1.xml";
-        file = new File(destinationPath);*/
+//        destinationPath = "/home/shiyam/Desktop/SatWrks/Jar/" + FilePropertyName.SOURCE_ARTIFACT_NAME;
+//        file = new File(destinationPath);
     }
     
     private static boolean checkFileExist() {
@@ -72,6 +80,8 @@ public class WriteToXML {
             getFilePath();
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            
+            file.delete();
             if (checkFileExist()) {
                 document = docBuilder.parse(file);
             } else {
@@ -102,15 +112,15 @@ public class WriteToXML {
      * Creates the final xml
      */
     public static void createXML() {
-        FileOutputStream fos;        
+        File target;        
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
             DOMSource source = new DOMSource(document);
-            fos = createXmlFile();
-            StreamResult result = new StreamResult(fos);
+            target = createXmlFile();
+            StreamResult result = new StreamResult(target.getPath());
             transformer.transform(source, result);
             //System.out.println("File saved!");
         } catch (TransformerConfigurationException ex) {
@@ -119,23 +129,44 @@ public class WriteToXML {
             Logger.getLogger(WriteToXML.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             Exceptions.printStackTrace(ex);
+        }catch(IOException ex){
+        	 Exceptions.printStackTrace(ex);
         }
     }
 
     /**
      * Creates the instance of fileoutputstream based on the existence of xml
      * @return
-     * @throws FileNotFoundException 
+     * @throws IOException 
      */
-    private static FileOutputStream createXmlFile() throws FileNotFoundException{
-        FileOutputStream fos = null;
+    private static File createXmlFile() throws IOException{
+        File target = null;
         
         if (!file.exists()) {
-            fos = new FileOutputStream(destinationPath,false);
+        	if(isTragging.equalsIgnoreCase("Tragging")){
+        		String temp = destinationPath;
+        		String fileName = "";
+        		if(TAG.equals("OLD"))
+        			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_OLD;
+        		else if(TAG.equals("NEW"))
+        			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_NEW;
+        		destinationPath = temp.substring(0,file.getAbsolutePath().
+        				lastIndexOf(File.separator)) + File.separator + fileName;
+        		target = new File(new String(destinationPath));
+        		destinationPath = temp;
+        	}else{
+        		target = new File(destinationPath);
+        		return target;
+        	}
         } else {
-            fos = new FileOutputStream(destinationPath,false);            
+                  
+            File f = new File(destinationPath);
+            f.delete();
+//            f.createNewFile();    
+//            fos = new FileOutputStream(f.getAbsolutePath()); 
+            target = createXmlFile();
         }
-        return fos;
+        return target;
     }
 
     /*public static void main(String args[]) {

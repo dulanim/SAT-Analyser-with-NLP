@@ -8,8 +8,6 @@ package com.project.NLP.UMLToXML.xmlwriter;
  *
  * @author shiyam
  */
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.property.config.xml.writer.Adapter;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -17,29 +15,22 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.project.traceability.staticdata.StaticData;
-import com.project.traceability.GUI.HomeGUI;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.writer.Adapter;
 import com.project.traceability.GUI.ProjectCreateWindow;
 import com.project.traceability.model.Attribute;
 import com.project.traceability.model.Dependencies;
 import com.project.traceability.model.ModelData;
 import com.project.traceability.model.Operation;
 import com.project.traceability.model.Parameter;
-import java.io.IOException;
-import javax.swing.JOptionPane;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
+import com.project.traceability.staticdata.StaticData;
 
 public class WriteToXML {
 
@@ -91,6 +82,24 @@ public class WriteToXML {
                 classIDAttr.setValue(id);
                 artifactElement.setAttributeNode(classIDAttr);
 
+                if(type.equals("Sourcecode")){
+                	Attr typeVisibility = doc.createAttribute(StaticData.VISIBILITY_ROOT);
+                	typeVisibility.setValue(tempData.getVisibility());
+                    artifactElement.setAttributeNode(typeVisibility);
+                    
+                    Attr statusAttr = doc.createAttribute(StaticData.STATUS);
+                    statusAttr.setValue(tempData.getStatus());
+                    artifactElement.setAttributeNode(statusAttr);
+                    
+                    Attr interfaceAttr = doc.createAttribute(StaticData.INTERFACES);
+                    interfaceAttr.setValue(tempData.getInterfaceNames());
+                    artifactElement.setAttributeNode(interfaceAttr);
+                    
+                    Attr superClassAttr = doc.createAttribute(StaticData.SUPER_CLASSES);
+                    superClassAttr.setValue(tempData.getSuperclassNames());
+                    artifactElement.setAttributeNode(superClassAttr);
+                    
+                }
                 keyIDMap.put(tempData.getId(), id);
 
                 //class/Interface Behavior finished
@@ -109,29 +118,17 @@ public class WriteToXML {
             artifact.appendChild(intraConnectionElement);//append an artifact main Artifact
 
             //Connection Element is adding to InterConnectionsElement
-            createConnectionElement(doc, intraConnectionElement);
+            //createConnectionElement(doc, intraConnectionElement);
 
-            // write the content into xml file
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");//No I18N
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");//No I18N
-            DOMSource source = new DOMSource(doc);
-            //String driveLetter = getSuitableDrive();
-
+            // write the content into xml file///chenaged to general method in FilePropertyName
             String fDir = getFileDir();
-            System.out.println("------Writing Requirement XML to Workspace/projectname/xml directory : " + fDir);
-            File xmlFile = new File(fDir);
-            StreamResult result = new StreamResult(xmlFile.getPath());
+            System.out.println("------Writing  XML to Workspace/projectname/xml directory : " + fDir);
+         	File xmlFile = new File(fDir);
+            FilePropertyName.writeToXML(xmlFile.getPath(), doc);
 
-            System.out.println("------Writing Requirement XML to Workspace/projectname/xml directory : " + xmlFile.getPath());
+        } catch (ParserConfigurationException pce) {
 
-            transformer.transform(source, result);
-
-            System.out.println("XML File saved @ " + xmlFile.getPath());
-
-        } catch (ParserConfigurationException | TransformerException pce) {
-
+        	pce.printStackTrace();
             MessageBox box = new MessageBox(ProjectCreateWindow.shell,
                     SWT.ERROR);
             box.setText("File Not Found Error");
@@ -157,8 +154,12 @@ public class WriteToXML {
                 System.out.println("------Writing Requirement XML -- type :" + type);
                 dir = f.getPath() + File.separator
                         + FilePropertyName.REQUIREMENT_ARTIFACT_NAME;
-            } else {
-                System.out.println("------Writing Requirement XML -- type :" + type);
+            } else if(type.equals("Sourcecode")){
+            	 System.out.println("------Writing SourceCode XML -- type :" + type);
+                 dir = f.getPath() + File.separator
+                         + FilePropertyName.SOURCE_ARETEFACT_NAME_MODIFIED;
+            }else {
+                System.out.println("------Writing UMLDiagram XML -- type :" + type);
                 dir = f.getPath() + File.separator
                         + FilePropertyName.UML_ARTIFACT_NAME;
             }
@@ -176,7 +177,10 @@ public class WriteToXML {
             count++;
             ID = "RQ".concat(Integer.toString(count));
 
-        } else {
+        } else if (type.equals("Sourcecode")){
+        	count++;
+            ID = "SC".concat(Integer.toString(count));
+        }else {
             count++;
             ID = "D".concat(Integer.toString(count));
 
@@ -187,10 +191,16 @@ public class WriteToXML {
     private String getAttributeID() {
         String ID;
         if (type.equals("Requirement")) {            
-            ID = "RQ".concat(Integer.toString(count)).concat("_F").concat(Integer.toString(attrId));
+            ID = "RQ".concat(Integer.toString(count)).concat("_F").
+            		concat(Integer.toString(attrId));
 
-        } else {           
-            ID = "D".concat(Integer.toString(count)).concat("_F").concat(Integer.toString(attrId));
+        }else if(type.equals("Sourcecode")) {
+        	ID = "SC".concat(Integer.toString(count)).concat("_F").
+            		concat(Integer.toString(attrId));
+        }else {           
+        
+            ID = "D".concat(Integer.toString(count)).concat("_F").
+            		concat(Integer.toString(attrId));
 
         }
         attrId++;
@@ -202,6 +212,9 @@ public class WriteToXML {
         if (type.equals("Requirement")) {            
             ID = "RQ".concat(Integer.toString(count)).concat("_M").concat(Integer.toString(methodId));
 
+        }else if(type.equals("Sourcecode")) {
+        	ID = "SC".concat(Integer.toString(count)).concat("_M").
+            		concat(Integer.toString(methodId));
         } else {
             ID = "D".concat(Integer.toString(count)).concat("_M").concat(Integer.toString(methodId));
 
@@ -238,7 +251,14 @@ public class WriteToXML {
 
                 Attr attrVariableType = doc.createAttribute(StaticData.VARIABLE_TYPE_ROOT);
                 attrVariableType.setValue(attribute.getDataType());
-                artifactSubElement.setAttributeNode(attrVariableType);                
+                artifactSubElement.setAttributeNode(attrVariableType); 
+                
+                if(type.equals("Sourcecode")){
+	                Attr attrStatus = doc.createAttribute(StaticData.STATUS);
+	                attrStatus.setValue(attribute.getStatus());
+	                artifactSubElement.setAttributeNode(attrStatus);
+                }
+                
             }
 
         } catch (Exception ex) {
@@ -276,16 +296,30 @@ public class WriteToXML {
                 attrReturnType.setValue(operation.getReturnType());
                 artifactSubElement.setAttributeNode(attrReturnType);
 
+                //newly added variable status for extension module
+                Attr attrStatus = doc.createAttribute(StaticData.STATUS);
+                String tempStatus = operation.getStatus();
+                if(tempStatus == null || tempStatus.equals(""))
+                	tempStatus = "";
+                attrStatus.setValue(tempStatus);
+                artifactSubElement.setAttributeNode(attrStatus);
+                
+                
                 List<Parameter> paramList = operation.getParameterList();
                 Attr attrParameters = doc.createAttribute(StaticData.PARAMETER_ROOT);
                 String parameterString = "";
-                for (int j = 0; paramList != null && j < paramList.size(); j++) {
-                    Parameter param = paramList.get(j);
-                    parameterString += param.getParameterName().concat(":").concat(param.getParameterType());
-
-                    if (j != paramList.size() - 1) {
-                        parameterString += ", ";
-                    }
+                String tempString = operation.getParamString();
+                if(tempString.equals("")){
+	                for (int j = 0; paramList != null && j < paramList.size(); j++) {
+	                    Parameter param = paramList.get(j);
+	                    parameterString += param.getParameterName().concat(":").concat(param.getParameterType());
+	
+	                    if (j != paramList.size() - 1) {
+	                        parameterString += ", ";
+	                    }
+	                }
+                }else{
+                	parameterString = tempString;
                 }
                 attrParameters.setValue(parameterString);
                 artifactSubElement.setAttributeNode(attrParameters);

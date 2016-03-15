@@ -15,6 +15,7 @@ public class Operation extends Property{
     private boolean isAbstract;
     private String returnType;
     private List<Parameter> parameterList;
+    private String paramString;
     /**
      * @return the isAbstract
      */
@@ -55,6 +56,14 @@ public class Operation extends Property{
      */
     public void setReturnType(String returnType) {
         this.returnType = returnType;
+    }
+    
+    public void setParamString(String paramString){
+    	this.paramString = paramString;
+    }
+    
+    public String getParamString(){
+    	return paramString;
     }
     
 }

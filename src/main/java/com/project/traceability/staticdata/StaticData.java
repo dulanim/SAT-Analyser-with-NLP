@@ -37,6 +37,17 @@ public class StaticData {
     public static final String VARIABLE_TYPE_ROOT = "variableType";
     public static final String PARAMETER_ROOT = "parameters";
     public static final String RETURN_TYPE_ROOT = "returnType";
+    public static final String STATUS = "status";
+    public static final String INTERFACES = "interface";
+    public static final String SUPER_CLASSES = "superClass";
+    /*
+     * status value
+     */
+    public static final String DEFAULT_STATUS = "NONE";
+    public static final String ADDED_STATUS = "ADDED";
+    public static final String MODIFIED_STATUS = "MODIFIED";
+    public static final String DELETED_STATUS = "DELETED";
+    //finish declaration of status values
     public static List<ModelData> classLst;
     public static List<Dependencies> depencyList;
     public static String umlFilePath = "";
