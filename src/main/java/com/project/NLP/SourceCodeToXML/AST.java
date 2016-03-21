@@ -41,12 +41,12 @@ public class AST {
      * @throws java.lang.Exception
      */
     public static void main(String args[]){
-    	String filePath = "/home/shiyam/Desktop/SatWrks/Jar";
-    	try{
-    		new AST().startSourceCodeConversion(filePath);
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}
+//    	String filePath = "";//"/home/shiyam/Desktop/SatWrks/Jar";
+//    	try{
+//    		new AST().startSourceCodeConversion(filePath);
+//    	}catch(Exception e){
+//    		e.printStackTrace();
+//    	}
     }
     public void startSourceCodeConversion(String filePath) throws Exception {
         ast = new AST();
