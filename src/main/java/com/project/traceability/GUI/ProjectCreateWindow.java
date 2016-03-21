@@ -9,19 +9,16 @@ package com.project.traceability.GUI;
  * @author shiyam
  * @author AARTHIKA
  */
-import com.project.NLP.SourceCodeToXML.AccessProject;
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.property.config.xml.writer.Adapter;
-import com.project.property.config.xml.writer.XMLConversion;
 import static com.project.traceability.GUI.NewProjectWindow.projectPath;
-import com.project.traceability.common.Dimension;
-import com.project.traceability.common.PropertyFile;
-import com.project.traceability.manager.RelationManager;
-import com.project.traceability.staticdata.StaticData;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -39,6 +36,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 import org.openide.util.Exceptions;
+
+import com.project.NLP.SourceCodeToXML.AccessProject;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.reader.XMLReader;
+import com.project.property.config.xml.writer.Adapter;
+import com.project.property.config.xml.writer.XMLConversion;
+import com.project.traceability.common.Dimension;
+import com.project.traceability.common.PropertyFile;
+import com.project.traceability.manager.RelationManager;
+import com.project.traceability.staticdata.StaticData;
 
 public class ProjectCreateWindow {
 
@@ -62,6 +69,7 @@ public class ProjectCreateWindow {
     static String localFilePath;
     static String[] selectedFiles;
     static Path path;
+    static Map<String,String> allProjectsNamePathMap = new HashMap<>(); 
     String uml_formats[] = {"*.uml*;*.xmi*;*.mdj*"};
     String req_formats[] = {"*.docs*;*.txt*"};
 
@@ -72,6 +80,9 @@ public class ProjectCreateWindow {
      */
     public static void main(String[] args) {
         try {
+        	allProjectsNamePathMap.clear();
+        	XMLReader reader =new  XMLReader();
+        	allProjectsNamePathMap = reader.readAllProjectName();
             ProjectCreateWindow window = new ProjectCreateWindow();
             window.open();
         } catch (Exception e) {
@@ -358,7 +369,14 @@ public class ProjectCreateWindow {
         });
         btnOk.setBounds(477, 67, 77, 29);
         btnOk.setText("Ok");
-
+        Composite composite = new Composite(shell, SWT.NONE);
+        composite.setBounds(10, 394, 568, 97);
+        
+        final Label lblNewLabel = new Label(composite, SWT.NONE);
+        lblNewLabel.setBounds(24, 10, 459, 17);
+        lblNewLabel.setText("");
+        lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255, 0, 0));
+        
         txtProjectName = new Text(group, SWT.BORDER);
         txtProjectName.addKeyListener(new KeyAdapter() {
             @Override
@@ -376,7 +394,10 @@ public class ProjectCreateWindow {
             public void keyReleased(KeyEvent e) {
 
                 File file = new File(StaticData.workspace, txtProjectName.getText());
-                if (file.exists()) {
+                String typedName = txtProjectName.getText();
+                boolean isProjectNameExists = isProjectExists(typedName);
+                lblNewLabel.setText("");
+                if (file.exists() || isProjectNameExists) {
                     btnOk.setEnabled(false);
 
                     txtRequirementPath.setEnabled(false);
@@ -388,10 +409,39 @@ public class ProjectCreateWindow {
                     btnUmlBrwse.setEnabled(false);
 
                     btnFinish.setEnabled(false);
+                    
+                    if(!typedName.equals(""))
+                    	lblNewLabel.setText("You typed project name exists in " + 
+                    			allProjectsNamePathMap.get(typedName));
+                    else
+                    	lblNewLabel.setText("Project Name should not empty");
                 } else {
                     btnOk.setEnabled(true);
+                    lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255,0,0));
+                    lblNewLabel.setText("Project Name is valid");
                 }
             }
+
+			private boolean isProjectExists(String text) {
+				// TODO Auto-generated method stub
+				boolean isExits = false;
+				if(allProjectsNamePathMap != null &&
+								allProjectsNamePathMap.containsKey(text)){
+					isExits = false;
+				}else{
+					//no need 
+					List<String> names = new ArrayList<>(allProjectsNamePathMap.keySet());
+					for(String name:names){
+						if(name.equals(text)){
+							isExits = true;
+							return isExits;
+						}
+					}
+					isExits = false;
+				}
+				
+				return isExits;
+			}
         });
         txtProjectName.setText("");
         txtProjectName.setEnabled(true);
@@ -418,8 +468,7 @@ public class ProjectCreateWindow {
         btnNewWrkspace.setText("Create New Workspace");
         btnNewWrkspace.setBounds(270, 34, 199, 24);
 
-        Composite composite = new Composite(shell, SWT.NONE);
-        composite.setBounds(10, 394, 568, 97);
+       
 
         Button button_2 = new Button(composite, SWT.NONE);
         button_2.addSelectionListener(new SelectionAdapter() {
@@ -429,8 +478,7 @@ public class ProjectCreateWindow {
             }
         });
 
-        final Label lblNewLabel = new Label(composite, SWT.NONE);
-        lblNewLabel.setBounds(24, 10, 459, 17);
+        
         lblNewLabel.setText("");
         lblNewLabel.setForeground(new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255, 0, 0));
 
@@ -620,6 +668,7 @@ public class ProjectCreateWindow {
 		 * have to write name validation here
          */
         boolean isValid = true;
+        
         return isValid;
     }
 
