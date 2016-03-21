@@ -37,6 +37,8 @@ public class GraphDB {
     Index<Node> artefacts;
     Index<Relationship> edges;
     private String fileType;
+
+    
     
     /**
      * Define relationship type.
@@ -158,6 +160,7 @@ public class GraphDB {
         addName(artefactElement, n);
         addType(artefactElement, n);
         addVisibility(artefactElement, n);
+        addStatus(artefactElement, n);
         artefacts.add(n, "ID", n.getProperty("ID"));
         List<ArtefactSubElement> artefactsSubElements = artefactElement
                 .getArtefactSubElements();
@@ -172,6 +175,14 @@ public class GraphDB {
                 updateSubNodeToDB(subNode, temp);
 
             }
+        }
+    }
+    
+    private void addStatus(ArtefactElement artefactElement, Node n) {
+        if (null == artefactElement.getStatus()) {
+            n.setProperty("Status", "");
+        } else {
+            n.setProperty("Status", artefactElement.getStatus());
         }
     }
 
@@ -268,6 +279,7 @@ public class GraphDB {
         addSubName(temp, m);
         addSubType(temp, m);
         addSubVisibility(temp, m);
+        addSubStatus(temp, m);
         if (temp.getType().equalsIgnoreCase("UMLOperation")
                 || temp.getType().equalsIgnoreCase("Method")) {
             addSubMethod(temp, m);
@@ -290,6 +302,14 @@ public class GraphDB {
         relationship.setProperty("message",
                 RelTypes.SUB_ELEMENT.getValue());
         edges.add(relationship, "ID", n.getProperty("ID") + "-" + m.getProperty("ID"));
+    }
+    
+    public void addSubStatus(ArtefactSubElement temp, Node m) {
+        if (null != temp.getVisibility()) {
+            m.setProperty("Status", temp.getVisibility());
+        } else {
+            m.setProperty("Status", "");
+        }
     }
 
     /**

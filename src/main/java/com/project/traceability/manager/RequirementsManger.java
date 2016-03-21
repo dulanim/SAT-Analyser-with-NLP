@@ -126,7 +126,7 @@ public class RequirementsManger {
                             artefactSubElements.add(artefactSubElement);*/
                         }
 
-                        ArtefactElement extractedArtefactElement = new ArtefactElement(id, name, type, null, artefactSubElements);
+                        ArtefactElement extractedArtefactElement = new ArtefactElement(id, name, type, null, artefactSubElements, null);
                         expectedRequirementElements.add(extractedArtefactElement);
                         requirementArtefactElements.put(id, extractedArtefactElement);
                     }

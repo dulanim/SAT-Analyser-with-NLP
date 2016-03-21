@@ -91,7 +91,7 @@ public class UMLArtefactManager {
 																				// artefactelements
 						artefactsSubElements = readArtefactSubElement(artefactSubElementList);
 						artefactElement = new ArtefactElement(id, name, type,
-								visibility, artefactsSubElements);
+								visibility,  artefactsSubElements, null);
 						UMLAretefactElements.put(id, artefactElement);
 						//GraphDB db = new GraphDB();
 						//db.initiateGraphDB();

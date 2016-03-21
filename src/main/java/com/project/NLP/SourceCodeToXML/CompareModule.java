@@ -38,7 +38,7 @@ public class CompareModule {
 //	private static String fileName2 = "new_version.xml";
 	private static Map<String,ArtefactElement> modified;
 	private static String targetFileName = "modified_version.xml";
-	public  static String filePath = "/home/shiyam/Desktop/SatWrks/Jar/";
+	public  static String filePath =  System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/Jar/";
 	private static Map<String,ArtefactElement> oldArtefactMap;
 	private static Map<String,ArtefactElement> newArtefactMap;
 	//private static Map<String,ArtefactElement> clonedOldArtefactMap;
@@ -47,7 +47,7 @@ public class CompareModule {
 	public static void main(String[] args) {
 		
 		//set the project path like as following to run this 
-		String projectPath = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal";
+		String projectPath = System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/NewSatWrkspaceskal";
 		compareFiles(projectPath);
 		printData();
 		writeToXML();
