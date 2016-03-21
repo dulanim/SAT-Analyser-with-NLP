@@ -58,6 +58,11 @@ public class FilePropertyName {
     public static final Image violoationimg = new Image(CompareWindow.display, IMAGE_PATH + "violation.jpg");
     public static final String exactImageData = exactimg.toString();
     public static final String violationImageData = violoationimg.toString();
+    
+    //For an extension project 
+    //localDirectory of JENKINS 
+    
+    public static final String LOCAL_DIR_JENKINS = "/home/shiyam/Desktop/SatWrks/";
 
     //    public static Path getPath(Path target,String type){
 //        if(type.contains(XML)){
@@ -76,7 +81,8 @@ public class FilePropertyName {
 //    }
     
     private static String getXMLFileRootPath(String projectPath){
-		String fileRoot = projectPath + File.separator + FilePropertyName.XML + File.separator;
+		String fileRoot = projectPath + File.separator + 
+				FilePropertyName.XML + File.separator;
 		
 		return fileRoot;
 	}
@@ -89,6 +95,8 @@ public class FilePropertyName {
 			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_OLD;
 		}else if(TAG.equals("NEW")){
 			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_NEW;
+		}else if(TAG.equals("MODIFIED")){
+			fileName = FilePropertyName.SOURCE_ARETEFACT_NAME_MODIFIED;
 		}else{
 			fileName = FilePropertyName.SOURCE_ARTIFACT_NAME;
 		}
@@ -256,4 +264,6 @@ public class FilePropertyName {
     			 
     		}
     }
+
+	
 }
