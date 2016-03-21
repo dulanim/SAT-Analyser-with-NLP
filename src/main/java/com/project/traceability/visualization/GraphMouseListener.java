@@ -264,12 +264,12 @@ public class GraphMouseListener implements PreviewMouseListener {
                                 public void widgetSelected(SelectionEvent se) {
                                     int t = ((CCombo) se.getSource()).getSelectionIndex();
                                     //System.out.println("elected " + combo.getItem(t));
-                                    nodeData.replace("Visibility", combo.getItem(t));
+                                    //nodeData.replace("Visibility", combo.getItem(t));
                                     combo.setText(combo.getItem(t));
                                     for (TableItem it : HomeGUI.table.getItems()) {
                                         if (it.getText(0).equalsIgnoreCase("Visibility")) {
                                             editor.setEditor(combo, it, 1);
-                                            nodeData.replace("Visibility", combo.getItem(t));
+                                            //nodeData.replace("Visibility", combo.getItem(t));
                                             break;
                                         }
                                     }

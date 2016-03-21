@@ -66,7 +66,7 @@ public class NavigationModel {
 			String localName = tempClass.getLocalName();
 			ontClassLst.add(tempClass);
 			//rootClasses.add(localName);
-			System.out.println("Parent CLass:>>>" + localName);
+			//System.out.println("Parent CLass:>>>" + localName);
 		}
 		
 		
@@ -98,7 +98,8 @@ public class NavigationModel {
 					queue.add(tempClass.getLocalName());
 					 if(tempClass.hasSubClass()) {
 						 	workingQueue.add(tempClass);
-							System.out.println("Subclass For Noun:>>" + tempClass.getLocalName());
+							//System.out.println("Subclass For Noun:>>" + 
+						 	//tempClass.getLocalName());
 		             }
 				}
 				//getSubClass();
@@ -111,7 +112,7 @@ public class NavigationModel {
 			throw new IllegalArgumentException("should be provided specific class name\n"
 					+ "not null");
 		}
-		System.out.println(queue.size());
+		//System.out.println(queue.size());
                 
                 queue.add("<<---------------------------->>");
                 queue.add("Add Custom Parent Value");
@@ -126,7 +127,7 @@ public class NavigationModel {
 		exItr = model.listOntProperties();     
 		while (exItr.hasNext()) {
 				OntProperty prop = exItr.next();
-				System.out.println("Object Property Name: "+ prop.getLocalName());
+				//System.out.println("Object Property Name: "+ prop.getLocalName());
 				properties.add(prop.getLocalName());
 		}
 		
@@ -148,7 +149,7 @@ public class NavigationModel {
 					 * get specific property from model
 					 */
 					Iterator<OntClass> rdfPrimer = model.listClasses();
-				    System.out.println( "\n== The Properties ==" );
+				    //System.out.println( "\n== The Properties ==" );
 				    
 				    while(rdfPrimer.hasNext() ) {
 				      OntClass cls = rdfPrimer.next();
@@ -157,7 +158,7 @@ public class NavigationModel {
 				      
 				      while(it != null  && it.hasNext()){
 					      Statement stmt = it.nextStatement();
-					      System.out.println( "Values ***** * "+stmt.getObject().toString() );
+					      //System.out.println( "Values ***** * "+stmt.getObject().toString() );
 					      String value = stmt.getObject().toString();
 					      values.add(value);
 				      }
@@ -208,8 +209,8 @@ public class NavigationModel {
 			if(propsString.contains(StaticData.OWL_ROOT_URI)){
 				
 				RDFNode value = classSpec.getPropertyValue(p);
-				System.out.println("Our Class is-----------" + classSpec.getLocalName() + "  ");	
-				System.out.println(p.toString() + " Value is " + value.toString());
+				//System.out.println("Our Class is-----------" + classSpec.getLocalName() + "  ");	
+				//System.out.println(p.toString() + " Value is " + value.toString());
 				
 				String property = p.getLocalName();
 				String propValue = value.toString();
