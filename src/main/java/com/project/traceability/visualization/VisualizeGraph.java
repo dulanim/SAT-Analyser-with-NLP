@@ -861,7 +861,7 @@ public class VisualizeGraph {
                                             item.setText(1, text.getText());
                                         }
                                         //System.out.println("Replacing4: " + item.getText(0) + ":" + item.getText(1));
-                                        nodeData.replace(item.getText(0), item.getText(1));
+                                        //nodeData.replace(item.getText(0), item.getText(1));
                                         //System.out.println("Key: " + item.getText(0) + " Value: " + item.getText(1));
                                         text.dispose();
                                         break;
@@ -871,7 +871,7 @@ public class VisualizeGraph {
                                             item.setText(1, text.getText());
                                         }
                                         //System.out.println("Replacing5: " + item.getText(0) + ":" + item.getText(1));
-                                        nodeData.replace(item.getText(0), item.getText(1));
+                                        //nodeData.replace(item.getText(0), item.getText(1));
                                         //System.out.println("Key: " + item.getText(0) + " Value: " + item.getText(1));
                                         text.dispose();
                                         break;
@@ -882,7 +882,7 @@ public class VisualizeGraph {
                                                 } else {
                                                     item.setText(1, text.getText());
                                                 }
-                                                nodeData.replace(item.getText(0), item.getText(1));
+                                                //nodeData.replace(item.getText(0), item.getText(1));
 
                                             case SWT.TRAVERSE_ESCAPE:
                                                 text.dispose();
