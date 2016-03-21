@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.project.NLP.UMLToXML.xmlwriter.WriteToXML;
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.extension.event.trigger.EventTrigger;
 import com.project.property.config.xml.writer.Adapter;
 import com.project.traceability.manager.ClassManager;
 import com.project.traceability.manager.SourceCodeArtefactManager;
@@ -71,6 +73,8 @@ public class CompareModule {
 	}
 	
 	public static void writeToXML(){
+		String projectPath  = EventTrigger.getProjectPath(EventTrigger.projectName);;
+		filePath = FilePropertyName.getXMLFilePath(projectPath, "MODIFIED");
 		File target = new File(filePath + targetFileName);
 		if(!target.exists()){
 			try {
