@@ -6,7 +6,6 @@
 package com.project.text.undoredo;
 
 import java.util.Stack;
-import javafx.application.ConditionalFeature;
 import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyledText;
