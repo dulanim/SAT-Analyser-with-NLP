@@ -46,11 +46,14 @@ public class ExtractInterfaceListener extends Java8BaseListener {
 
     public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
         this.parser = parser;
-        classId = 1;
-        attrId = 1;
-        methodId = 1;
+       
     }
 
+    static{
+    	 classId = 1;
+         attrId = 1;
+         methodId = 1;
+    }
     /**
      * Enters the field declaration
      *
@@ -283,7 +286,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
             AST.scdb.createNodeRelationship(className, currentClassID, superClass, inheritanceType);
         } catch (Exception e) {
         }
-        classId++;
+        ExtractInterfaceListener.classId++;
 
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0).getParentNode();
