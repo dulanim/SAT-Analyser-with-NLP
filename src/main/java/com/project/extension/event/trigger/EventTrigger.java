@@ -20,16 +20,67 @@ import com.project.NLP.SourceCodeToXML.AST;
 import com.project.NLP.SourceCodeToXML.CompareModule;
 import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.property.config.xml.reader.XMLReader;
 import com.project.traceability.staticdata.StaticData;
 
 public class EventTrigger {
 
 	private static DocumentBuilderFactory docFactory = null;
 	public static String sourceCodeDir = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal/src"; // java project file path 
+	public static String projectName = "";
+	public static String projectPath = "";
+	
 	public static void main(String args[]){
-		String projectPath = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal";
-		new EventTrigger().init(projectPath);
+		
+		EventTrigger.projectName = "NewSatWrkspaceskal";
+		if(args != null && args.length >0){
+			//getting project name from running time argument
+			EventTrigger.projectName = args[0];
+		}else{
+			EventTrigger.projectName = "NewSatWrkspaceskal"; // Dummy Project Name
+		}
+		EventTrigger.projectPath = getProjectPath(projectName);
+		EventTrigger.sourceCodeDir = getJenkinsSourcePath(projectName);
+		
+		//if project does not exists return
+		if(EventTrigger.projectPath.equals("") || 
+				EventTrigger.projectPath.isEmpty()){
+			
+//			System.out.println("System running has stopped because "
+//					+ "no file exists in any workspace");
+			return ;
+		}
+		//if project exists start to run
+		new EventTrigger().init(EventTrigger.projectPath);
 	}
+	public static String getProjectPath(String projectName) {
+		//get the actual project from SAT workspace
+		
+		/*
+		 * first read sat_configuration.xml file for matching project name with 
+		 * project name if it founds 
+		 * 
+		 * if not throw an exception cancel the running step 
+		 */
+		
+		XMLReader reader = new XMLReader();
+		String path = reader.readForProjectName(projectName);
+		return path;
+	}
+	private static String getJenkinsSourcePath(String projectName) {
+		// TODO Auto-generated method stub
+		
+		String testPath = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal/src";
+		if(projectName.equals("") || projectName.isEmpty()){
+		
+			String localRoot = FilePropertyName.LOCAL_DIR_JENKINS;
+			
+			testPath = localRoot + projectName + File.separator;
+		}
+		return testPath;
+	}
+	
+
 	public void init(String projectPath){
 		///initialization starts when trigger event from JENKINS
 		boolean isCopied = copyFile(projectPath);// run this method to copy old sourceArtefact.xml to old_version.xml
@@ -127,7 +178,7 @@ public class EventTrigger {
 				FilePropertyName.writeToXML(filepath, doc);//modified
 			}
 
-			System.out.println("------XML File has been saved or modfied in " + filepath + " successfully------");
+			//System.out.println("------XML File has been saved or modfied in " + filepath + " successfully------");
 		}
 	}
 
