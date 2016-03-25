@@ -1,5 +1,6 @@
 package com.project.traceability.visualization;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.traceability.common.PropertyFile;
 import it.uniroma1.dis.wsngroup.gexf4j.core.Edge;
 import it.uniroma1.dis.wsngroup.gexf4j.core.EdgeType;
@@ -121,12 +122,13 @@ public class GraphFileGenerator {
         gg.generateGraphFile(gg.getGraphDb());
         graphDb.shutdown();
     }*/
-
-    /** Method to generate gexf graph file from db using Gephi Toolkit API
+    /**
+     * Method to generate gexf graph file from db using Gephi Toolkit API
+     *
      * @param graphDb GraphDatabaseService
      */
     public void generateGraphFile(GraphDatabaseService graphDb) {
-        System.out.println("Gexf graph "+graphDb.toString());
+        System.out.println("Gexf graph " + graphDb.toString());
         this.graphDb = graphDb;
         Gexf gexf = new GexfImpl();
         gexf.setVisualization(true);
@@ -141,7 +143,6 @@ public class GraphFileGenerator {
 
         StaxGraphWriter graphWriter = new StaxGraphWriter();
         File f = new File(PropertyFile.getGeneratedGexfFilePath());
-
 
         Writer out;
         try {
@@ -173,15 +174,16 @@ public class GraphFileGenerator {
 
     }
 
-    /** Method to add nodes to gexf graph file
-     * 
+    /**
+     * Method to add nodes to gexf graph file
+     *
      */
     public void addNodes() {
         AttributeList nodeAttrList = new AttributeListImpl(AttributeClass.NODE);
         graph.getAttributeLists().add(nodeAttrList);
 
         HashMap<String, Attribute> val = new HashMap<>();
-        System.out.println("gg "+graphDb);
+        System.out.println("gg " + graphDb);
 
         try (Transaction tx = graphDb.beginTx()) {
 
@@ -213,13 +215,14 @@ public class GraphFileGenerator {
                 }
                 nodes.put(id, new_node);
             }
-            System.out.println("Size: "+nodes.size());
+            System.out.println("Size: " + nodes.size());
             tx.success();
         }
     }
 
-    /** Method to add edges to gexf graph file
-     * 
+    /**
+     * Method to add edges to gexf graph file
+     *
      */
     public void addEdges() {
         AttributeList edgeAttrList = new AttributeListImpl(AttributeClass.EDGE);
@@ -229,6 +232,8 @@ public class GraphFileGenerator {
                 AttributeType.STRING, "Neo4j Relationship Type");
         Attribute attr_msg = edgeAttrList.createAttribute("message",
                 AttributeType.STRING, "Message");
+        Attribute attr_stat = edgeAttrList.createAttribute("status",
+                AttributeType.STRING, "Status");
 
         try (Transaction tx = graphDb.beginTx()) {
             result = engine.execute("MATCH (n) RETURN n");
@@ -251,8 +256,19 @@ public class GraphFileGenerator {
                     if (!edges.containsKey(id)) {
                         Edge e = source
                                 .connectTo(Long.toString(rel.getId()), rel
-                                .getType().name(), EdgeType.DIRECTED,
-                                target);
+                                        .getType().name(), EdgeType.DIRECTED,
+                                        target);
+                        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                            String stat = (String) rel.getProperty("status");
+                            if (stat.isEmpty()) {
+                                e.getAttributeValues().addValue(attr_stat,
+                                        "");
+                            } else {
+                                e.getAttributeValues().addValue(attr_stat,
+                                        (String) rel.getProperty("status"));
+                            }
+                        }
+
                         e.getAttributeValues().addValue(attr_msg,
                                 (String) rel.getProperty("message"));
                         e.getAttributeValues().addValue(attr_rt,
@@ -266,8 +282,9 @@ public class GraphFileGenerator {
         }
     }
 
-    /** Method to import graph file into Gephi Toolkit API workspace
-     * 
+    /**
+     * Method to import graph file into Gephi Toolkit API workspace
+     *
      */
     public void importGraphFile() {
         ProjectController pc = Lookup.getDefault().lookup(
