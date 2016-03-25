@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class RelationManager {
         try {
 
             List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
-            System.out.println(hasToaddRelationBodes.toString());
+            //System.out.println(hasToaddRelationBodes.toString());
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory
                     .newInstance();
             DocumentBuilder documentBuilder = documentFactory
@@ -102,8 +103,12 @@ public class RelationManager {
 
     public static void createXML(String projectPath) {
 
-        String filePath = projectPath
-                + File.separator + FilePropertyName.XML + File.separator + "Relations.xml";
+        String filePath = null;
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            filePath = HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "VERSION_Relations.xml";
+        } else {
+            filePath = HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml";
+        }
 
         File file = new File(filePath);
 
@@ -125,12 +130,12 @@ public class RelationManager {
                     .newInstance();
             DocumentBuilder documentBuilder = documentFactory
                     .newDocumentBuilder();
-            
+
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("Relations");
             document.appendChild(rootElement);
-            System.out.println("start");
-            
+            //System.out.println("start");
+
             // creating and writing to xml file
             TransformerFactory transformerFactory = TransformerFactory
                     .newInstance();
@@ -142,9 +147,8 @@ public class RelationManager {
             transformer.setOutputProperty(
                     "{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(domSource, streamResult);
-            
-            System.out.println("File saved to specified path!");
-            
+
+            //System.out.println("File saved to specified path!");
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
         } catch (TransformerConfigurationException ex) {
@@ -157,9 +161,15 @@ public class RelationManager {
     public static void addLinks(List<String> relationNodes) {
 
         List<String> hasToaddRelationBodes = removeDuplicate(relationNodes, readAll());
+        System.out.println("Size " + hasToaddRelationBodes.size());
 //        List<String> hasToaddRelationBodes = relationNodes;
-        File file = new File(HomeGUI.projectPath + File.separator
-                + FilePropertyName.XML + File.separator + "Relations.xml");
+        String filePath = null;
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            filePath = HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "VERSION_Relations.xml";
+        } else {
+            filePath = HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml";
+        }
+        File file = new File(filePath);
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -220,6 +230,16 @@ public class RelationManager {
                         lastname.appendChild(doc.createTextNode(hasToaddRelationBodes
                                 .get(j)));
                         element.appendChild(lastname);
+
+                        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                            j++;
+                            //status element
+                            Element status = doc.createElement("Status");
+
+                            status.appendChild(doc.createTextNode(hasToaddRelationBodes
+                                    .get(j)));
+                            element.appendChild(status);
+                        }
                     }
 
                 }
@@ -229,8 +249,7 @@ public class RelationManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
-            StreamResult result = new StreamResult(new File(
-                    HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml").getPath());
+            StreamResult result = new StreamResult(new File(filePath).getPath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -251,7 +270,13 @@ public class RelationManager {
     }
 
     public static List<String> readAll() {
-        File file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
+
+        File file = null;
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "VERSION_Relations.xml");
+        } else {
+            file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
+        }
         List<String> existingNodes = new ArrayList<String>();
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -317,9 +342,12 @@ public class RelationManager {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
             // System.out.println(PropertyFile.xmlFilePath);
-            StreamResult result = new StreamResult(new File(
-                    HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator
-                    + "Relations.xml").getPath());
+            if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "VERSION_Relations.xml");
+            } else {
+                file = new File(HomeGUI.projectPath + File.separator + FilePropertyName.XML + File.separator + "Relations.xml");
+            }
+            StreamResult result = new StreamResult(file.getAbsolutePath());
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(
@@ -341,23 +369,31 @@ public class RelationManager {
         List<String> fullDescOfRelationNode = new ArrayList<>();
         List<String> fullDescOfExistingRelationNode = new ArrayList<>();
         List<String> partial = new ArrayList<>();
+        System.out.println("Size ee " + relationNodes.size());
 
         //get the full description of rlation "source relationpath target"
-        for (int i = 0; i < relationNodes.size(); i += 3) {
-            partial = relationNodes.subList(i, i + 3);
-
-            System.out.println(partial.toString());
-            String sub = (partial.toString().substring(1, partial.toString().length() - 1));
-            fullDescOfRelationNode.add(sub.replaceAll("\\s", ""));
-//            System.out.println(partial.toString());
+        for (int i = 0; i < relationNodes.size();) {
+            if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                existingRelationNode = null;
+                partial = relationNodes.subList(i, i + 4);
+                String sub = (partial.toString().substring(1, partial.toString().length() - 1));
+                fullDescOfRelationNode.add(sub.replaceAll("\\s", ""));
+                i = i + 4;
+            } else {
+                partial = relationNodes.subList(i, i + 3);
+                String sub = (partial.toString().substring(1, partial.toString().length() - 1));
+                fullDescOfRelationNode.add(sub.replaceAll("\\s", ""));
+                i = i + 3;
+            }
         }
 
         //get the full description of existing relation "source relationpath target"
-        for (int i = 0; i < existingRelationNode.size(); i += 3) {
-            partial = existingRelationNode.subList(i, i + 3);
-            fullDescOfExistingRelationNode.add((partial.toString().substring(1, partial.toString().length() - 1)).replaceAll("\\s", ""));
-
+        if (existingRelationNode != null) {
+            for (int i = 0; i < existingRelationNode.size(); i += 3) {
+                partial = existingRelationNode.subList(i, i + 3);
+                fullDescOfExistingRelationNode.add((partial.toString().substring(1, partial.toString().length() - 1)).replaceAll("\\s", ""));
 //            System.out.println(partial.toString());
+            }
         }
 
         List<String> intersection = new ArrayList<>(fullDescOfExistingRelationNode);
@@ -371,9 +407,17 @@ public class RelationManager {
         //conver into structured format one by one
         for (int i = 0; i < fullDescOfRelationNode.size(); i++) {
             String[] partialNode = fullDescOfRelationNode.get(i).split(",");
+            System.out.print("PA " + partialNode.length);
+
             for (int j = 0; j < partialNode.length; j++) {
                 relationNode3.add(partialNode[j]);
+                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                    if (partialNode.length == 3 && j == 2) {
+                        relationNode3.add("");
+                    }
+                }
             }
+            //relationNode3.add
         }
 
         return relationNode3;

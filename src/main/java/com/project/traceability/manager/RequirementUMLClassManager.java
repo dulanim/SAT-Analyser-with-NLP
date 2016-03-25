@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
+import static com.project.traceability.manager.RequirementSourceClassManager.relationNodes;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
@@ -45,6 +47,8 @@ public class RequirementUMLClassManager {
      */
     @SuppressWarnings("rawtypes")
     public static List<String> compareClassNames(String projectPath) {
+        relationNodes = new ArrayList<String>();
+        relationNodes.clear();
         RequirementsManger.readXML(projectPath);
         requirementClasses = ClassManager.getReqClassName(projectPath);
         Map<String, ArtefactElement> reqMap = RequirementsManger.requirementArtefactElements;
@@ -205,56 +209,15 @@ public class RequirementUMLClassManager {
     public static void compareSubElements(TreeItem classItem,
             ArtefactElement reqArtefactElement,
             ArtefactElement UMLArtefactElement) {
-        /*relationNodes.add(reqArtefactElement
-				.getArtefactElementId().substring(
-						reqArtefactElement
-								.getArtefactElementId()
-<<<<<<< HEAD
-								.indexOf("RQ")));
-        relationNodes.add("Req Class To UML Class");
-		relationNodes.add(UMLArtefactElement
-				.getArtefactElementId());
-		if (CompareWindow.tree != null
-				&& !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
-			classItem = new TreeItem(CompareWindow.tree, SWT.NONE);
-			classItem.setText(0, reqArtefactElement.getName());
-			classItem.setData("0", reqArtefactElement);
-			classItem.setImage(exactImage);
-			classItem.setForeground(Display.getDefault()
-					.getSystemColor(SWT.COLOR_DARK_BLUE));
-			classItem.setText(1, UMLArtefactElement.getName());
-			classItem.setData("1", UMLArtefactElement);
 
-		}
-		ArrayList<ArtefactSubElement> UMLAttributesList = new ArrayList<ArtefactSubElement>();
-		ArrayList<ArtefactSubElement> UMLMethodsList = new ArrayList<ArtefactSubElement>();
-
-		ArrayList<ArtefactSubElement> reqAttributesList = new ArrayList<ArtefactSubElement>();
-		ArrayList<ArtefactSubElement> reqMethodsList = new ArrayList<ArtefactSubElement>();
-		
-		ArrayList<WordsMap> methodWordsMapList = new ArrayList<WordsMap>();
-		ArrayList<WordsMap> attributeWordsMapList = new ArrayList<WordsMap>();
-
-		List<ArtefactSubElement> UMLAttributeElements = UMLArtefactElement
-				.getArtefactSubElements();
-		List<ArtefactSubElement> reqAttributeElements = reqArtefactElement
-				.getArtefactSubElements();
-		for (int i = 0; i < UMLAttributeElements.size(); i++) {
-			ArtefactSubElement UMLSubElement = UMLAttributeElements
-					.get(i);
-			for (int j = 0; j < reqAttributeElements.size(); j++) {
-				ArtefactSubElement reqSubElement = reqAttributeElements
-						.get(j);
-				WordsMap w2 = new WordsMap();
-				String requirementArtName = reqSubElement.getName();
-				String umlArtName = UMLSubElement.getName();
-=======
-								.indexOf("RQ")));*/
         relationNodes.add(reqArtefactElement
                 .getArtefactElementId());
         relationNodes.add("Req Class To UML Class");
         relationNodes.add(UMLArtefactElement
                 .getArtefactElementId());
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            relationNodes.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+        }
         if (CompareWindow.tree != null
                 && !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {
             classItem = new TreeItem(CompareWindow.tree, SWT.NONE);
@@ -305,11 +268,13 @@ public class RequirementUMLClassManager {
                         //call the check similarity algorithm or edit distance
                         //based on edit distance we find out the similarity
                         isMatched = MatchWords.compareStrings(requirementArtName, umlArtName);
-                        if(isMatched)
-                        	w2.setMapID(1000);
+                        if (isMatched) {
+                            w2.setMapID(1000);
+                        }
                     }
-                    if(isMatched)
-                    	w2.setMapID(1000);
+                    if (isMatched) {
+                        w2.setMapID(1000);
+                    }
                 }
                 if (UMLSubElement.getName().equalsIgnoreCase(
                         reqSubElement.getName())
@@ -324,6 +289,9 @@ public class RequirementUMLClassManager {
                     relationNodes.add("Req " + reqSubElement.getType() + " To " + UMLSubElement.getType());
                     relationNodes.add(UMLSubElement
                             .getSubElementId());
+                    if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                        relationNodes.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                    }
 
                     // if(UMLAttribute.getName().equalsIgnoreCase(reqElement.getName())
                     // ||LevenshteinDistance.similarity(UMLAttribute.getName(),
@@ -432,6 +400,5 @@ public class RequirementUMLClassManager {
             }
         }
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.project.traceability.manager;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.NLP.file.operations.FilePropertyName;
 import static com.project.NLP.file.operations.FilePropertyName.XML;
 import com.project.traceability.GUI.HomeGUI;
@@ -28,6 +29,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.io.FileUtils;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.neo4j.graphdb.Relationship;
@@ -46,29 +48,34 @@ public class ReadXML {
     public static void initApp(String projectPath, String graphType) {
 
         try {
-            System.out.println("Enter");
             HomeGUI.isComaparing = false;
-            transferDataToDBFromXML(projectPath, true);
-            System.out.println("Enter");
+            if(graphType.equalsIgnoreCase("Req-UML-Modified Source View")){
+                SourceCodeArtefactManager.isComparing = "MOD";
+                WriteToXML.isTragging = "Tragging";
+                transferDataToDBFromXML(projectPath, true);
+                
+            }
+            else{
+                SourceCodeArtefactManager.isComparing = "NONE";
+                WriteToXML.isTragging = "" ;
+                transferDataToDBFromXML(projectPath, true);
+            }
 
             VisualizeGraph visual = VisualizeGraph.getInstance();
             AccessLinksTextFile.addNewLinkstoGraph();
             AccessLinksTextFile.deleteRemovalLinkstoGraph();
-            System.out.println("Enter");
             visual.importFile();//import the generated graph file into Gephi toolkit API workspace
             GraphModel model = Lookup.getDefault().lookup(GraphController.class).getModel();// get graph model            
             visual.setGraph(model, PropertyFile.getGraphType());//set the graph type
             visual.setGraph(model);
-            System.out.println("Enter");
             visual.showGraph();//show the graph visualization in tool
-            System.out.println("Enter");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
+    } 
+    
     public static void transferDataToDBFromXML(String projectPath, boolean op) {
-        relationNodes = null;
+        relationNodes = new ArrayList<>();
         ReadFiles.readFiles(projectPath);
         Map<String, ArtefactElement> UMLAretefactElements = UMLArtefactManager.UMLAretefactElements;
         Map<String, ArtefactElement> sourceCodeAretefactElements = SourceCodeArtefactManager.sourceCodeAretefactElements;
@@ -79,11 +86,17 @@ public class ReadXML {
                     + ".graphdb");
             if (f.exists()) {
                 System.out.println("File exist is deleted");
-                f.delete();
+                try {
+                    FileUtils.deleteDirectory(f);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
+        System.out.println("Rel "+relationNodes.size());
         GraphDB graphDB = new GraphDB();
         graphDB.initiateGraphDB();
+        System.out.println("Rel "+relationNodes.size());
 
         System.out.println("Entering UML.....");
         graphDB.addNodeToGraphDB("UML", UMLAretefactElements);//add UML artefact elements to db
@@ -91,15 +104,18 @@ public class ReadXML {
         graphDB.addNodeToGraphDB("REQ", requirementsAretefactElements);//add requirement artefact elements to db
         System.out.println("Entering SourceCode.....");
         graphDB.addNodeToGraphDB("SRC", sourceCodeAretefactElements);//add source code artefact elements to db
-
+        System.out.println("Relaaa "+relationNodes.size());
+     
         //trace class links between UML & source code
-        relationNodes = UMLSourceClassManager.compareClassNames(projectPath);
+        relationNodes = UMLSourceClassManager.compareClassNames(projectPath);        
         graphDB.addRelationTOGraphDB(relationNodes);//add relationships between UML and SourceCode to db
+        System.out.println("Rel "+relationNodes.size());
 
         // trace class links between requirement & source code
         List<String> reqSrcRelationNodes = RequirementSourceClassManager
                 .compareClassNames(projectPath);
         graphDB.addRelationTOGraphDB(reqSrcRelationNodes);//add relationships between Requirments and SourceCode to db
+        System.out.println("Rel "+relationNodes.size());
 
         List<String> reqUMLRelationNodes = RequirementUMLClassManager
                 .compareClassNames(projectPath);
@@ -136,7 +152,7 @@ public class ReadXML {
 
             deleteRelations(relProps);
             for (org.neo4j.graphdb.Node nodeProp : deleteNodeProps) {
-                System.out.println("" + nodeProp.getProperty("ID"));
+                //System.out.println("" + nodeProp.getProperty("ID"));
                 NodeList nodeList = document.getElementsByTagName("ArtefactElement");
                 NodeList subList = document.getElementsByTagName("ArtefactSubElement");
                 boolean found = false;
@@ -146,7 +162,7 @@ public class ReadXML {
                     //System.out.println("" + nodeList.item(x));
                     if (null != nodeList.item(x)) {
                         if (nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                            System.out.println("Donesc");
+                            //System.out.println("Donesc");
                             //System.out.println(""+nodeList.item(x).getAttributes().toString());
                             nodeList.item(x).getParentNode().removeChild(nodeList.item(x));
                             found = true;
@@ -161,7 +177,7 @@ public class ReadXML {
                         if (subList.item(y) != null) {
                             //System.out.println(""+subNodeList.item(y).getAttributes().toString());
                             if (subList.item(y).getAttributes().getNamedItem("id").getNodeValue().equalsIgnoreCase(nodeProp.getProperty("ID").toString())) {
-                                System.out.println("Done");
+                                //System.out.println("Done");
                                 subList.item(y).getParentNode().removeChild(subList.item(y));
                                 found = false;
                                 break;
@@ -176,11 +192,11 @@ public class ReadXML {
             String xmlpath = HomeGUI.projectPath + File.separator + XML;
             File file = new File(xmlpath, path);
 
-            System.out.println("file: " + file.getAbsolutePath());
+            //System.out.println("file: " + file.getAbsolutePath());
             StreamResult result = new StreamResult(file.getPath());
             transformer.transform(source, result);
 
-            System.out.println("Done nod");
+            //System.out.println("Done nod");
 
         } catch (ParserConfigurationException | SAXException | IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -193,12 +209,12 @@ public class ReadXML {
 
     public static void readSourceFile(HashMap<String, Object> nodeProps, String id, String xmlFile) throws TransformerException {
 
-        System.out.println(xmlFile);
+        //System.out.println(xmlFile);
         String xml = xmlFile.substring(xmlFile.lastIndexOf(File.separator));
-        System.out.println("XML:" + xml);
+        //System.out.println("XML:" + xml);
         try {
             for (String key : nodeProps.keySet()) {
-                System.out.println("Key: " + key + " Value: " + nodeProps.get(key));
+                //System.out.println("Key: " + key + " Value: " + nodeProps.get(key));
             }
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
