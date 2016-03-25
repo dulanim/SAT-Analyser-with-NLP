@@ -41,12 +41,13 @@ public class ExtractInterfaceListener extends Java8BaseListener {
     private static final String INHERITANCE = "INHERITANCE";
     private static final String COMPOSITION = "COMPOSITION";
     private String currentClassID = "";
-	private String methodStatus;
-	private String classStatus;
-
+    private String methodStatus;
+    private String classStatus;
+    
     public ExtractInterfaceListener(Java8Parser parser) throws ParserConfigurationException {
         this.parser = parser;
-        classId = 1;
+        /*classId = 1;
+        */
         attrId = 1;
         methodId = 1;
     }
@@ -94,6 +95,9 @@ public class ExtractInterfaceListener extends Java8BaseListener {
                 }
             } else {
                 try {
+                    if(fieldType.contains("<")&&fieldType.contains(">")){
+                       fieldType =  fieldType.substring(fieldType.indexOf("<")+1, fieldType.indexOf(">"));
+                    }
                     AST.scdb.createNodeRelationship(className, currentClassID, fieldType, associationType);
                 } catch (Exception e) {
 
@@ -116,7 +120,7 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         typeAttr.setValue(type);
         artefactSubElement.setAttributeNode(typeAttr);
 
-        Attr idAttr = WriteToXML.getDocument().createAttribute("id");
+        Attr idAttr = WriteToXML.getDocument().createAttribute("id");       
         String attrID = currentClassID + "_F" + ExtractInterfaceListener.attrId;
         ExtractInterfaceListener.attrId++;
         idAttr.setValue(attrID);
@@ -275,15 +279,16 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         }
         
         if(WriteToXML.isTragging.equals("Tragging"))
-        	currentClassID = WriteToXML.TAG + "_" + "SC" + classId;
+        	currentClassID = WriteToXML.TAG + "_" + "SC" + ExtractInterfaceListener.classId;
         else{
-        	currentClassID = "SC" + classId;
+        	currentClassID = "SC" + ExtractInterfaceListener.classId;
         }
         try {
             AST.scdb.createNodeRelationship(className, currentClassID, superClass, inheritanceType);
+            AST.scdb.addClassID(className, currentClassID);
         } catch (Exception e) {
         }
-        classId++;
+        ExtractInterfaceListener.classId++;
 
         artefactElement = WriteToXML.getDocument().createElement("ArtefactElement");
         root = WriteToXML.getDocument().getElementsByTagName("FileSystemLocation").item(0).getParentNode();

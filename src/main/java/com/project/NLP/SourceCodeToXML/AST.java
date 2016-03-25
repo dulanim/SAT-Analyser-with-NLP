@@ -41,7 +41,7 @@ public class AST {
      * @throws java.lang.Exception
      */
     public static void main(String args[]){
-    	String filePath =  System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/Jar";
+    	String filePath =  System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/NewSatWrkspaceskal/src";
     	try{
     		new AST().startSourceCodeConversion(filePath);
     	}catch(Exception e){

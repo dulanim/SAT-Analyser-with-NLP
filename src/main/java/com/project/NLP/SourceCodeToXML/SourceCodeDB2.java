@@ -45,26 +45,33 @@ public class SourceCodeDB2 {
     private static Node firstNode, secondNode;
     private String fileName = "soucredb-121";
 
-    public SourceCodeDB2()  {
+    public SourceCodeDB2() {
         //start the database server
-       /// graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName + File.separator + FilePropertyName.PROPERTY + File.separator + ProjectCreateWindow.projectName + "-source" + ".graphdb");
-    	
-    	graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName +
-    			File.separator + FilePropertyName.PROPERTY + File.separator +
-    			ProjectCreateWindow.projectName + "-source" + ".graphdb");
+        /// graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName + File.separator + FilePropertyName.PROPERTY + File.separator + ProjectCreateWindow.projectName + "-source" + ".graphdb");
+        String name;
+        if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
+            File f =  new File(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName
+                + File.separator + FilePropertyName.PROPERTY + File.separator
+                + ProjectCreateWindow.projectName + "-source" + ".graphdb");
+            f.renameTo(new File(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName
+                + File.separator + FilePropertyName.PROPERTY + File.separator
+                + "OLD_"+ProjectCreateWindow.projectName + "-source" + ".graphdb"));
+        }
+        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName
+                + File.separator + FilePropertyName.PROPERTY + File.separator
+                + ProjectCreateWindow.projectName + "-source" + ".graphdb");
         createNodes();
     }
-    
+
     /**
-     * Creates the node labels and class nodes 
+     * Creates the node labels and class nodes
      */
     public static void createNodes() {
         try (Transaction tx = graphDb.beginTx()) {
             firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
             secondNode = graphDb.createNode(ClassLabel.CLASS_NODE);
             tx.success();
-        } 
-
+        }
     }
 
     /**
@@ -76,8 +83,9 @@ public class SourceCodeDB2 {
 
     /**
      * Returns the node with a given name
+     *
      * @param name
-     * @return 
+     * @return
      */
     public static Node getNode(String name) {
         Node node = null;
@@ -96,36 +104,37 @@ public class SourceCodeDB2 {
             }
             tx.success();
 
-        } 
+        }
         return node;
     }
-    
-    public static void setGraphDB(GraphDatabaseService db){
+
+    public static void setGraphDB(GraphDatabaseService db) {
         graphDb = db;
     }
 
     /**
      * Creates the node relationship
+     *
      * @param class1
      * @param classID1
      * @param class2
-     * @param relationshipType 
+     * @param relationshipType
      */
     public void createNodeRelationship(String class1, String classID1, String class2, String relationshipType) {
         try (Transaction tx = graphDb.beginTx()) {
-            String attrID = classID1+"_F"+ ExtractInterfaceListener.attrId;
-            ExtractInterfaceListener.attrId++;
+            //String attrID = classID1+"_F"+ ExtractInterfaceListener.attrId;
+            //ExtractInterfaceListener.attrId++;
             firstNode = getNode(class1);
             Relationship relation;
             if (firstNode != null) {
                 String id = firstNode.getProperty("class_id").toString();
                 if (id.isEmpty()) {
-                    firstNode.setProperty("class_id", attrID);
+                    firstNode.setProperty("class_id", id);
                 }
             } else {
                 firstNode = graphDb.createNode(ClassLabel.CLASS_NODE);
                 firstNode.setProperty("className", class1);
-                firstNode.setProperty("class_id", attrID);
+                firstNode.setProperty("class_id", classID1);
             }
             if (!class2.isEmpty()) {
                 secondNode = getNode(class2);
@@ -173,12 +182,25 @@ public class SourceCodeDB2 {
 
             }
             tx.success();
-        } 
+        }
+    }
+
+    public void addClassID(String className, String classID) {
+        try (Transaction tx = graphDb.beginTx()) {
+            firstNode = getNode(className);
+            if (firstNode != null) {
+                if (firstNode.getProperty("class_id").toString().isEmpty()) {
+                    firstNode.setProperty("class_id", classID);
+                }
+            }
+            tx.success();
+        }
     }
 
     /**
      * Gets the inheritance from relationship data
-     * @return 
+     *
+     * @return
      */
     public ArrayList getInheritanceRelationshipData() {
         ArrayList<Map> relationshipList = new ArrayList<>();
@@ -193,43 +215,43 @@ public class SourceCodeDB2 {
                     Node o = r.getOtherNode(n);
                     map.put("1", n.getProperty("class_id").toString());
                     map.put("2", o.getProperty("class_id").toString());
+                    map.put("type", "INHERITANCE");
                     relationshipList.add(map);
                 }
             }
-        } 
+        }
         return relationshipList;
     }
 
     /**
      * Gets the association from relationship data
-     * @return 
+     *
+     * @return
      */
     public ArrayList getAssociationRelationshipData() {
         ArrayList<Map> relationshipList = new ArrayList<>();
         Map<String, String> map;
-
         try (Transaction tx = graphDb.beginTx()) {
             int count = 0;
             for (Node n : GlobalGraphOperations.at(graphDb).getAllNodesWithLabel(ClassLabel.CLASS_NODE)) {
-                map = new HashMap<>();
-                count++;
 
+                count++;
                 for (Relationship r : n.getRelationships(RelTypes.COMPOSITION, Direction.OUTGOING)) {
                     Node o = r.getOtherNode(n);
+                    map = new HashMap<>();
 
                     if (!o.getProperty("class_id").toString().isEmpty()) {
-                        //System.out.println("g " + n.getProperty("class_id") + " " + o.getProperty("class_id"));
                         map.put("1", n.getProperty("class_id").toString());
                         map.put("2", o.getProperty("class_id").toString());
+                        map.put("type", "COMPOSITION");
                         relationshipList.add(map);
                     }
-
                 }
             }
-            //System.out.println(count);
-        } 
+            tx.success();
+            return relationshipList;
+        }
 
-        return relationshipList;
     }
 
     /*public static void main(String args[]){
