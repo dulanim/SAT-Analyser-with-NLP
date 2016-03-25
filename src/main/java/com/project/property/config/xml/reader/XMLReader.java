@@ -1,25 +1,26 @@
 package com.project.property.config.xml.reader;
 
-import com.project.NLP.file.operations.FilePropertyName;
-import com.project.property.config.xml.writer.XMLWriter;
 import java.io.File;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import com.project.traceability.staticdata.StaticData;
-import com.project.traceability.common.PropertyFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.project.NLP.file.operations.FilePropertyName;
+import com.project.traceability.common.PropertyFile;
+import com.project.traceability.staticdata.StaticData;
 
 
 public class XMLReader {
@@ -77,7 +78,7 @@ public class XMLReader {
                     doc = dBuilder.parse(config_XmlFile);
                     //get workspaces
                     NodeList nList = doc.getElementsByTagName("Workspace");
-                    Boolean active = false;
+                    //Boolean active = false;
                     for(int i=0;i<nList.getLength();i++){
                        Element element = (Element)nList.item(i); 
                        String path = element.getAttribute("path");
@@ -95,11 +96,11 @@ public class XMLReader {
         public void readDefaultNode(){
             //get status
             NodeList nList = doc.getElementsByTagName("Config");
-            Boolean active = false;
+            //Boolean active = false;
             for(int i=0;i<nList.getLength();i++){
                Element element = (Element)nList.item(i); 
-               String tempactive = element.getAttribute("active");
-               active = Boolean.parseBoolean(tempactive);
+               //String tempactive = element.getAttribute("active");
+               //active = Boolean.parseBoolean(tempactive);
                StaticData.workspace = element.getAttribute("currentPath");
             }       
             
@@ -121,7 +122,7 @@ public class XMLReader {
                                 
                                 Map<String,Boolean> aMap = new HashMap<>();
                                 Element projectElmnt = (Element)projectNode.item(j);
-                                String status = projectElmnt.getAttribute("expanded");
+                                //String status = projectElmnt.getAttribute("expanded");
 					
 					
 						String projectName = projectElmnt.getAttribute("path");
@@ -194,7 +195,7 @@ public class XMLReader {
                             int end = projectpath.length();
                             String prjectName = projectpath.substring(start,end);
 
-                            List<String> temp = new ArrayList();
+                            List<String> temp = new ArrayList<>();
                             for(int i=0;i<files.getLength();i++){
                                     Element fileElmnt = (Element) files.item(i);
                                     String status = fileElmnt.getAttribute("opened");
@@ -213,5 +214,41 @@ public class XMLReader {
                 
 		
 		return openedFiles;
+	}
+	
+	public  String readForProjectName(String projectName){
+		
+		/*****
+		 * This method read the configuration xml file for checking project Name
+		 * if project name matched with projectName return its project path
+		 * 
+		 * if not return null
+		 */
+		String projectPath = null;
+		
+		Map<String,String> map = readAllProjectName();
+		projectPath = map.get(projectName);
+		return projectPath;
+	}
+	
+	public Map<String,String> readAllProjectName(){
+		   Map<String,String> projectMap = new HashMap<String,String>();
+		   
+		   NodeList projectList = doc.getElementsByTagName("Project");
+			
+			for(int j=0;j<projectList.getLength();j++){
+				Node projectNode = projectList.item(j);
+				Element projectElement = (Element) projectNode;
+				
+				String tmpProjectPath = projectElement.getAttribute("path");
+				String tmpProjectName = "";
+				
+				int index = tmpProjectPath.lastIndexOf(File.separator);
+				tmpProjectName = tmpProjectPath.substring(index+1);
+				
+				projectMap.put(tmpProjectName, tmpProjectPath);
+					
+			}	
+		   return projectMap;
 	}
 }

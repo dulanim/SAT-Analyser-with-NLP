@@ -52,6 +52,11 @@ public class ExtractInterfaceListener extends Java8BaseListener {
         methodId = 1;
     }
 
+    static{
+    	 classId = 1;
+         attrId = 1;
+         methodId = 1;
+    }
     /**
      * Enters the field declaration
      *

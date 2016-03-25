@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.extension.event.trigger.EventTrigger;
 import com.project.property.config.xml.writer.Adapter;
 
 /**
@@ -52,6 +53,10 @@ public class WriteToXML {
      */
     public static void getFilePath(){
         String root = Adapter.projectPath;
+        
+        if(isTragging.equals("Tragging")){
+        	root = EventTrigger.projectPath;
+        }
         //System.out.println("Root: "+root);
         File f = new File(root + File.separator +FilePropertyName.XML);
         if(!f.exists())
