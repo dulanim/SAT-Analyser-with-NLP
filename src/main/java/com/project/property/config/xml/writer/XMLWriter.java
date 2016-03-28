@@ -25,7 +25,7 @@ import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.common.PropertyFile;
 
 public class XMLWriter {
-        private static XMLWriter writer;
+    private static XMLWriter writer;
 	String filepath = PropertyFile.configuration_file_path;//PropertyFile.filePath + File.separator + "sat_config.xml";
 	DocumentBuilderFactory docFactory;
 	DocumentBuilder docBuilder;
@@ -57,6 +57,9 @@ public class XMLWriter {
         
         private void init(){
             try{
+            	File root_folder = new File(PropertyFile.configuration_root);
+            	if(!root_folder.exists())
+            		root_folder.mkdir();
 				File file = new File(filepath);
 				if(!file.exists()){
 		             file.createNewFile();

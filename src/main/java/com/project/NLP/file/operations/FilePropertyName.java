@@ -2,9 +2,11 @@ package com.project.NLP.file.operations;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,6 +26,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.w3c.dom.Document;
 
 import com.project.traceability.GUI.CompareWindow;
+import com.project.traceability.common.PropertyFile;
 
 /**
  *
@@ -263,6 +266,42 @@ public class FilePropertyName {
     		}catch(Exception e){
     			 
     		}
+    }
+    public static File createScriptFile(String fileName){
+    	
+    	String config_root = PropertyFile.configuration_root;
+    	String script_file_path = config_root + "scripts" + File.separator;
+    	
+    	File folder = new File(script_file_path);
+    	if(!folder.exists())
+    		folder.mkdir(); // makes scripts folder directory under SAT_CONFIGS folder
+    	
+    	File script_file = new File(script_file_path + fileName);
+    	
+    	if(!script_file.exists())
+			try {
+				script_file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	
+    	return script_file;
+    }
+    public static void writeScriptContent(File file,String contents){
+    	
+    	
+    	FileWriter fw;
+		try {
+			fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(contents);
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
     }
 
 	

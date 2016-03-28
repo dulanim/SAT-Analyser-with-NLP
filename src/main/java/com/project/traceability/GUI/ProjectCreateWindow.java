@@ -45,6 +45,7 @@ import com.project.property.config.xml.writer.XMLConversion;
 import com.project.traceability.common.Dimension;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.RelationManager;
+import com.project.traceability.staticdata.ScriptContents;
 import com.project.traceability.staticdata.StaticData;
 
 public class ProjectCreateWindow {
@@ -491,11 +492,24 @@ public class ProjectCreateWindow {
             @Override
             public void widgetSelected(SelectionEvent e) {
 
+            	String projectName = txtProjectName.getText();
+            	
+            	//making script file for this project
+            	File file_root_script_folder = new File(PropertyFile.configuration_root + "scripts");
+            	if(!file_root_script_folder.exists())//home/shiyam/SAT_CONFIGS/scripts/
+            		file_root_script_folder.mkdirs(); // making script file for each projects
+            	
+            	File script_file = FilePropertyName.createScriptFile(projectName + ".py");
+            	
+            	String scripts = ScriptContents.getContents(projectName);
+            	FilePropertyName.writeScriptContent(script_file,scripts);
+            	//finished the script file creation
+            	
                 String reqFilePath = PropertyFile.docsFilePath;
                 String umFilePath = StaticData.umlFilePath;
                 String srcFilePath = StaticData.sourceFilePath;
 
-                String projectName = txtProjectName.getText();
+                
 
                 if (!(StaticData.workspace.lastIndexOf(File.separator) == StaticData.workspace.length() - 1)) {
                     StaticData.workspace += (File.separator);
