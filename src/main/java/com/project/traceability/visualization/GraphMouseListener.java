@@ -162,7 +162,6 @@ public class GraphMouseListener implements PreviewMouseListener {
                     }
                 });
             }
-
         }
 
         properties.removeSimpleValue("display-label.node.id");
