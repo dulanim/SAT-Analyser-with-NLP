@@ -4,6 +4,7 @@
  */
 package com.project.traceability.visualization;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.NLP.file.operations.FilePropertyName;
 import static com.project.NLP.file.operations.FilePropertyName.XML;
 import com.project.traceability.GUI.HomeGUI;
@@ -32,6 +33,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 import static com.project.traceability.visualization.VisualizeGraph.popupMenu;
 import java.io.File;
+import javax.swing.JOptionPane;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableCursor;
@@ -83,20 +85,23 @@ public class GraphMouseListener implements PreviewMouseListener {
         if (event.button == PreviewMouseEvent.Button.LEFT) {
             for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
                 if (clickingInNode(node, event)) {
-
-                    graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
+                    if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
+                        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
+                            HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "VERSION_" + HomeGUI.projectName
+                            + ".graphdb");
+                    } else {
+                        graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
                             HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                             + ".graphdb");
-                    //System.out.println("DB path- " + graphDb.toString());
+                    }
 
                     Transaction tx = graphDb.beginTx();
                     try {
-
                         IndexManager index = graphDb.index();
                         Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
                         IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
                         org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
-
+                        
                         //System.out.println(neo4j_node.toString());
                         id = neo4j_node.getProperty("ID").toString();
 
@@ -130,7 +135,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                             }
                         });
                         GraphMouseListener.lock = true;
-                        System.out.println("Releseing lock");
+                        System.out.println("Releseing lock");                    
                     }
                 }
             }
@@ -157,7 +162,6 @@ public class GraphMouseListener implements PreviewMouseListener {
                     }
                 });
             }
-
         }
 
         properties.removeSimpleValue("display-label.node.id");
@@ -238,19 +242,17 @@ public class GraphMouseListener implements PreviewMouseListener {
                         tableItem = new TableItem(HomeGUI.table, SWT.NONE, i);
                         tableItem.setText(0, key);
                         tableItem.setText(1, val.toString());
+                        System.out.println("Key: "+ key+" Value: "+val.toString());
                         if (key.equalsIgnoreCase("Visibility")) {
                             combo.add("");
                             combo.add("Default");
                             combo.add("Public");
                             combo.add("Private");
                             combo.add("Protected");
-                            combo.add("Default");
                             int index = 0;
-                            //System.out.println("Item count " + combo.getItemCount());
                             for (int j = 0; j < combo.getItemCount(); j++) {
                                 if (combo.getItem(j).equalsIgnoreCase(val.toString())) {
                                     combo.deselectAll();
-                                    //System.out.println("Item " + val.toString() + " " + combo.getItem(j));
                                     combo.setText(combo.getItem(j));
                                     editor.grabHorizontal = true;
                                     editor.setEditor(combo, tableItem, 1);
@@ -263,8 +265,10 @@ public class GraphMouseListener implements PreviewMouseListener {
                                 @Override
                                 public void widgetSelected(SelectionEvent se) {
                                     int t = ((CCombo) se.getSource()).getSelectionIndex();
+
                                     //System.out.println("elected " + combo.getItem(t));
                                     //nodeData.replace("Visibility", combo.getItem(t));
+                                    nodeData.replace("Visibility", combo.getItem(t));
                                     combo.setText(combo.getItem(t));
                                     for (TableItem it : HomeGUI.table.getItems()) {
                                         if (it.getText(0).equalsIgnoreCase("Visibility")) {

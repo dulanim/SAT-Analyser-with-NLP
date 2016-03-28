@@ -1,5 +1,7 @@
 package com.project.traceability.visualization;
 
+import org.apache.commons.io.FileUtils;
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.HomeGUI;
 import com.project.traceability.model.ArtefactElement;
@@ -8,7 +10,12 @@ import com.project.traceability.model.AttributeModel;
 import com.project.traceability.model.MethodModel;
 import com.project.traceability.model.ParameterModel;
 import com.project.traceability.model.RequirementModel;
+import com.project.traceability.staticdata.StaticData;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +32,7 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.openide.util.Exceptions;
 
 /**
  * Model to add data to Neo4j graph DB.
@@ -38,8 +46,6 @@ public class GraphDB {
     Index<Relationship> edges;
     private String fileType;
 
-    
-    
     /**
      * Define relationship type.
      *
@@ -117,11 +123,11 @@ public class GraphDB {
             return nodeType;
         }
     }
-    
+
     GraphDatabaseService graphDb;
     Relationship relationship;
-    
-    public void setGraphDb(GraphDatabaseService db){
+
+    public void setGraphDb(GraphDatabaseService db) {
         this.graphDb = db;
     }
 
@@ -130,9 +136,22 @@ public class GraphDB {
      *
      */
     public void initiateGraphDB() {
-        graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
-                + ".graphdb").newGraphDatabase();
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            //System.out.println("Tragging");
+            Path path = FileSystems.getDefault().getPath(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY, "VERSION_" + HomeGUI.projectName + ".graphdb");
+            try {
+                FileUtils.deleteDirectory(new File(path.toAbsolutePath().toString()));
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "VERSION_" + HomeGUI.projectName
+                    + ".graphdb").newGraphDatabase();
+        } else {
+            graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
+                    + ".graphdb").newGraphDatabase();
+        }
         Transaction tx = graphDb.beginTx();
+        //System.out.println(""+graphDb.toString());
 
         try {
             tx.success();
@@ -145,10 +164,11 @@ public class GraphDB {
 
     /**
      * Creates a new node into the database
+     *
      * @param myLabel
      * @param artefacts
      * @param edges
-     * @param artefactElement 
+     * @param artefactElement
      */
     public void addNewNodeToDB(Label myLabel, Index<Node> artefacts, Index<Relationship> edges, ArtefactElement artefactElement) {
         Node n = graphDb.createNode();
@@ -177,10 +197,10 @@ public class GraphDB {
             }
         }
     }
-    
+
     private void addStatus(ArtefactElement artefactElement, Node n) {
-        if (null == artefactElement.getStatus()) {
-            n.setProperty("Status", "");
+        if (null == artefactElement.getStatus() || artefactElement.getStatus().isEmpty()) {
+            n.setProperty("Status", StaticData.DEFAULT_STATUS);
         } else {
             n.setProperty("Status", artefactElement.getStatus());
         }
@@ -188,8 +208,9 @@ public class GraphDB {
 
     /**
      * Identifies the type of artefact
+     *
      * @param id
-     * @return 
+     * @return
      */
     public String getArtefact(String id) {
         String lbl = "";
@@ -211,8 +232,9 @@ public class GraphDB {
 
     /**
      * Adds the visibility of a node
+     *
      * @param artefactElement
-     * @param n 
+     * @param n
      */
     public void addVisibility(ArtefactElement artefactElement, Node n) {
         if (null == artefactElement.getVisibility()) {
@@ -224,8 +246,9 @@ public class GraphDB {
 
     /**
      * Adds the type of a node
+     *
      * @param artefactElement
-     * @param n 
+     * @param n
      */
     public void addType(ArtefactElement artefactElement, Node n) {
         if (null == artefactElement.getType()) {
@@ -237,8 +260,9 @@ public class GraphDB {
 
     /**
      * Adds the name of a node
+     *
      * @param artefactElement
-     * @param n 
+     * @param n
      */
     public void addName(ArtefactElement artefactElement, Node n) {
         if (null == artefactElement.getName()) {
@@ -250,8 +274,9 @@ public class GraphDB {
 
     /**
      * Adds the id of a node
+     *
      * @param artefactElement
-     * @param n 
+     * @param n
      */
     public void addID(ArtefactElement artefactElement, Node n) {
         if (null == artefactElement.getArtefactElementId()) {
@@ -263,10 +288,11 @@ public class GraphDB {
 
     /**
      * Creates a new sub node into the database
+     *
      * @param temp
      * @param artefacts
      * @param n
-     * @param edges 
+     * @param edges
      */
     public void addNewSubNodeToDB(ArtefactSubElement temp, Index<Node> artefacts, Node n, Index<Relationship> edges) {
         Label myLabel;
@@ -274,7 +300,7 @@ public class GraphDB {
         myLabel = DynamicLabel.label(temp.getType());
         m.addLabel(myLabel);
         String lbl = getArtefact(temp.getSubElementId());
-        m.setProperty("Artefact", lbl);      
+        m.setProperty("Artefact", lbl);
         addSubID(temp, m);
         addSubName(temp, m);
         addSubType(temp, m);
@@ -301,21 +327,38 @@ public class GraphDB {
                 RelTypes.SUB_ELEMENT);
         relationship.setProperty("message",
                 RelTypes.SUB_ELEMENT.getValue());
+        if (m.getProperty("Status") != null || n.getProperty("Status") != null) {
+
+            boolean stat = false;
+            if ((!n.getProperty("Status").toString().equalsIgnoreCase("NONE")) || (n.getProperty("Status").toString() != null)) {
+                stat = true;
+                relationship.setProperty("status", n.getProperty("Status").toString());
+            }
+            if ((!m.getProperty("Status").toString().equalsIgnoreCase("NONE")) || (m.getProperty("Status").toString() != null)) {
+                if (!stat) {
+                    relationship.setProperty("status", m.getProperty("Status").toString());
+                }
+            }
+        } else {
+            relationship.setProperty("status", "");
+        }
+
         edges.add(relationship, "ID", n.getProperty("ID") + "-" + m.getProperty("ID"));
     }
-    
+
     public void addSubStatus(ArtefactSubElement temp, Node m) {
-        if (null != temp.getVisibility()) {
-            m.setProperty("Status", temp.getVisibility());
+        if (null == temp.getStatus() || temp.getStatus().isEmpty()) {
+            m.setProperty("Status", StaticData.DEFAULT_STATUS);
         } else {
-            m.setProperty("Status", "");
+            m.setProperty("Status", temp.getStatus());
         }
     }
 
     /**
      * Adds the variable of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubVariable(ArtefactSubElement temp, Node m) {
         AttributeModel mtemp = (AttributeModel) temp;
@@ -329,8 +372,9 @@ public class GraphDB {
 
     /**
      * Adds the method of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubMethod(ArtefactSubElement temp, Node m) {
         MethodModel mtemp = (MethodModel) temp;
@@ -359,8 +403,9 @@ public class GraphDB {
 
     /**
      * Adds the visibility of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubVisibility(ArtefactSubElement temp, Node m) {
         if (null != temp.getVisibility()) {
@@ -372,8 +417,9 @@ public class GraphDB {
 
     /**
      * Adds the type of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubType(ArtefactSubElement temp, Node m) {
         if (null == temp.getType()) {
@@ -385,8 +431,9 @@ public class GraphDB {
 
     /**
      * Adds the name of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubName(ArtefactSubElement temp, Node m) {
         if (null == temp.getName()) {
@@ -398,8 +445,9 @@ public class GraphDB {
 
     /**
      * Adds the id of a sub node
+     *
      * @param temp
-     * @param m 
+     * @param m
      */
     public void addSubID(ArtefactSubElement temp, Node m) {
         if (null == temp.getSubElementId()) {
@@ -458,8 +506,9 @@ public class GraphDB {
 
     /**
      * Updates the changes in the artefact sub element to the database.
+     *
      * @param subNode
-     * @param temp 
+     * @param temp
      */
     public void updateSubNodeToDB(Node subNode, ArtefactSubElement temp) {
         //Updates if there are any change in the Name of the artefact sub element 
@@ -512,6 +561,7 @@ public class GraphDB {
                 ArtefactElement artefactElement = (ArtefactElement) pairs
                         .getValue();
                 String lbl = getArtfefact(artefactElement);
+                //System.out.println("Label " + lbl);
                 Label myLabel = DynamicLabel.label(lbl);
 
                 IndexManager index = graphDb.index();
@@ -520,6 +570,7 @@ public class GraphDB {
 
                 IndexHits<Node> hits = artefacts.get("ID",
                         artefactElement.getArtefactElementId());
+                //System.out.println("ID * " + artefactElement.getArtefactElementId());
                 Node node = hits.getSingle();
                 if (node == null) {
                     addNewNodeToDB(myLabel, artefacts, edges, artefactElement);
@@ -535,12 +586,16 @@ public class GraphDB {
 
     /**
      * Returns the artefact type
+     *
      * @param artefactElement
-     * @return 
+     * @return
      */
     public String getArtfefact(ArtefactElement artefactElement) {
         String lbl = "";
-        switch (artefactElement.getArtefactElementId().charAt(0)) {
+        //System.out.println("a " + artefactElement.getArtefactElementId());
+        String artefactId = artefactElement.getArtefactElementId().replace("NEW_", "");
+        //System.out.println("a " + artefactId);
+        switch (artefactId.charAt(0)) {
             case 'R':
                 lbl = "Requirement";
                 break;
@@ -563,14 +618,14 @@ public class GraphDB {
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                 + ".graphdb").newGraphDatabase();
         try (Transaction tx = graphDb.beginTx()) {
-            System.out.println("Entered db...");
+            //System.out.println("Entered db...");
             for (Node n : GlobalGraphOperations.at(graphDb).getAllNodes()) {
                 for (String m : n.getPropertyKeys()) {
-                    System.out.println("" + m + " : " + n.getProperty(m));
+                    //System.out.println("" + m + " : " + n.getProperty(m));
                 }
             }
             for (Relationship r : GlobalGraphOperations.at(graphDb).getAllRelationships()) {
-                System.out.println("" + r.getStartNode().getProperty("ID") + "-" + r.getEndNode().getProperty("ID") + ":" + r.getType().name());
+                //System.out.println("" + r.getStartNode().getProperty("ID") + "-" + r.getEndNode().getProperty("ID") + ":" + r.getType().name());
             }
         } finally {
             graphDb.shutdown();
@@ -596,6 +651,10 @@ public class GraphDB {
                 String message = relation.get(++i);
                 RelTypes relType = RelTypes.parseEnum(message);
                 hits = artefacts.get("ID", relation.get(++i));
+                String status = "";
+                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                    status = relation.get(++i);
+                }
                 Node target = hits.getSingle();
 
                 if (null != source && null != target) {
@@ -607,10 +666,11 @@ public class GraphDB {
                             exist = true;
                         }
                     }
-                    System.out.println(" "+target+" "+relType);
-                    if (!exist && null != target  && relType != null) {
+                    //System.out.println(" " + target + " " + relType);
+                    if (!exist && null != target && relType != null) {
                         relationship = source.createRelationshipTo(target, relType);
                         relationship.setProperty("message", message);
+                        relationship.setProperty("status", status);
                         edges.add(relationship, "ID", source.getProperty("ID") + "-" + target.getProperty("ID"));
                     }
                 }
@@ -641,6 +701,9 @@ public class GraphDB {
                 relType = RelTypes.parseEnum(message);
                 hits = artefacts.get("ID", relation.get(++i));
                 Node target = hits.getSingle();
+                if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
+                    i++;
+                }
 
                 if (null != source && null != target) {
 
@@ -653,10 +716,13 @@ public class GraphDB {
                         }
                     }
                     if (!exist) {
-                        relationship = source.createRelationshipTo(target,
-                                relType);
+                        relationship = source.createRelationshipTo(target, relType);
                         relationship.setProperty("message",
                                 relType.getValue());
+                        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                            relationship.setProperty("status",
+                                    StaticData.DEFAULT_STATUS);
+                        }
                         edges.add(relationship, "ID", source.getProperty("ID") + "-" + target.getProperty("ID"));
                     }
                 }

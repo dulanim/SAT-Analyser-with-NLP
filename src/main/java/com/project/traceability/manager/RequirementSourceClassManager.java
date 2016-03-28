@@ -3,6 +3,7 @@
  */
 package com.project.traceability.manager;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.CompareWindow;
 import com.project.traceability.GUI.HomeGUI;
+import static com.project.traceability.manager.UMLSourceClassManager.relationNodes;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import com.project.traceability.model.WordsMap;
@@ -59,6 +61,8 @@ public class RequirementSourceClassManager {
     //comapre class names
     @SuppressWarnings("rawtypes")
     public static List<String> compareClassNames(String projectPath) {
+        relationNodes = new ArrayList<String>();
+        relationNodes.clear();
         //get the project path
         RequirementSourceClassManager.projectPath = projectPath;
 
@@ -133,12 +137,12 @@ public class RequirementSourceClassManager {
                         ModelCreator modelCreator = ModelCreator.getModelInstance();
                         isWordMatchd = modelCreator.isMatchingWords(sourceName, name);
                         StaticData.isStartedJustNow = true;
-                        if(!isWordMatchd){
-                        	//if it is not match by our dictionary 
-                        	//call the check similarity algorithm or edit distance
-                        	//based on edit distance we find out the similarity
-                        	isWordMatchd = MatchWords.compareStrings(sourceName, name);
-                        }	
+                        if (!isWordMatchd) {
+                            //if it is not match by our dictionary 
+                            //call the check similarity algorithm or edit distance
+                            //based on edit distance we find out the similarity
+                            isWordMatchd = MatchWords.compareStrings(sourceName, name);
+                        }
                     }
                     if (sourceArtefactElement.getType().equalsIgnoreCase(
                             "Class")
@@ -234,7 +238,7 @@ public class RequirementSourceClassManager {
         }
 
         if (countSourceClass == countReqClass) {
-            System.out.println("class compared");
+            //System.out.println("class compared");
         }
         return countSourceClass;
     }
@@ -274,10 +278,19 @@ public class RequirementSourceClassManager {
         } else if (actualID.contains("D")) {
             id = actualID.substring(actualID.indexOf("D"));
         }
-
+        
+        System.out.println("RelS : "+relationNodes.size());
         relationNodes.add(id);
         relationNodes.add("Req Class To Source Class");
         relationNodes.add(sourceArtefactElement.getArtefactElementId());
+        System.out.println("RelS : "+relationNodes.size());
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            if (!"NONE".equals(sourceArtefactElement.getStatus())) {
+                relationNodes.add(sourceArtefactElement.getStatus());
+            } else{
+                relationNodes.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+            }
+        }
 
         ArrayList<ArtefactSubElement> reqAttributesList = new ArrayList<>();
         ArrayList<ArtefactSubElement> reqMethodsList = new ArrayList<>();
@@ -328,13 +341,23 @@ public class RequirementSourceClassManager {
                     if (requElement.getSubElementId().contains("RQ")) {
                         requElement.setSubElementId(requElement.getSubElementId().substring(requElement.getSubElementId().indexOf("RQ")));
                     }
-                    System.out.println(requElement.getSubElementId() + "Uadcgbdhsuuuuuuuuuuug");
+                    System.out.println("RelS : "+relationNodes.size());
+                    //System.out.println(requElement.getSubElementId() + "Uadcgbdhsuuuuuuuuuuug");
                     relationNodes.add(requElement.getSubElementId());
                     relationNodes.add("Req " + requElement.getType() + " To Source " + sourceAttribute.getType());
                     relationNodes.add(sourceAttribute.getSubElementId());
-
-                    System.out.println(TAG + "compareSubElements "
+                    if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                        if (!"NONE".equals(sourceAttribute.getStatus())) {
+                            relationNodes.add(sourceAttribute.getStatus());
+                        } else{
+                            relationNodes.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                        }
+                    }
+                    System.out.println("RelS : "+relationNodes.size());
+                    
+                    /*System.out.println(TAG + "compareSubElements "
                             + requElement.getName() + " is Matched with " + sourceAttribute.getName());
+                    */
 
                     if (CompareWindow.tree != null
                             && !CompareWindow.tree.isDisposed() && HomeGUI.isComaparing) {

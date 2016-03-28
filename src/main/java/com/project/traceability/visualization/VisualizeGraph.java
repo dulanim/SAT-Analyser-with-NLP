@@ -1,5 +1,6 @@
 package com.project.traceability.visualization;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.traceability.GUI.HomeGUI;
 import static com.project.traceability.GUI.HomeGUI.projectPath;
@@ -9,6 +10,7 @@ import static com.project.traceability.GUI.HomeGUI.tbtmPropertyInfos;
 import com.project.traceability.common.PropertyFile;
 import com.project.traceability.manager.ReadXML;
 import static com.project.traceability.manager.ReadXML.transferDataToDBFromXML;
+import com.project.traceability.staticdata.StaticData;
 import static com.project.traceability.visualization.GraphMouseListener.id;
 import static com.project.traceability.visualization.GraphMouseListener.nodeData;
 import static com.project.traceability.visualization.GraphMouseListener.tblclmnValue;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import javax.swing.DefaultComboBoxModel;
@@ -107,6 +110,7 @@ import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
+import scala.collection.mutable.HashTable;
 
 /**
  * Model to add and visualize generated graph file (Traceability link
@@ -297,12 +301,14 @@ public class VisualizeGraph {
         edgeFilter.unselectAll();
 
         if (graphType.equalsIgnoreCase("Full Graph")) { // visualize the entire project artefact element overview
+        } else if (graphType.equalsIgnoreCase("Req-UML-Modified Source View")) {
+
         } else if (graphType.equalsIgnoreCase(
                 "Requirement")) {// visualize "Class" type artefact element view
             NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            classFilter.unselectAll();          
-            
+            classFilter.unselectAll();
+
             classFilter.addPart(node_partition.getPartFromValue("Requirement"));//set filter to "Class" type artefact elements
             Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
             GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
@@ -312,8 +318,8 @@ public class VisualizeGraph {
 
             NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            classFilter.unselectAll();          
-            
+            classFilter.unselectAll();
+
             classFilter.addPart(node_partition.getPartFromValue("Source"));//set filter to "Class" type artefact elements
             Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
             GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
@@ -322,20 +328,17 @@ public class VisualizeGraph {
                 "Diagram")) {// visualize methods artefact element from source and UML
             NodePartitionFilter classFilter = new NodePartitionFilter(
                     node_partition);
-            classFilter.unselectAll();          
-            
+            classFilter.unselectAll();
+
             classFilter.addPart(node_partition.getPartFromValue("Diagram"));//set filter to "Class" type artefact elements
             Query class_query = filterController.createQuery(classFilter);//filter "Class" and "Functinal" type artefact elements
             GraphView class_view = filterController.filter(class_query);//set graph view to class cluster view
             graphModel.setVisibleView(class_view);//set graph model to class view
-        } else if (graphType.equalsIgnoreCase("Modifications")){
-            
-        }
-        else {//then user asked to get rel cluter view
+        } else {//then user asked to get rel cluter view
 
             for (GraphDB.RelTypes type : GraphDB.RelTypes.values()) {
                 if (type.getValue().equalsIgnoreCase(graphType)) {
-                    edgeFilter.unselectAll();                    
+                    edgeFilter.unselectAll();
                     edgeFilter.addPart(edge_partition.getPartFromValue(type.name()));//set filter to specified rel type
                     Query edge_query = filterController.createQuery(edgeFilter);//filter to specified rel type
                     GraphView edge_view = filterController.filter(edge_query);//set graph view to specified rel type cluster view
@@ -509,49 +512,92 @@ public class VisualizeGraph {
         DirectedGraph graph = graphModel.getDirectedGraph();
 
         // Partition with 'type' column, which is in the data
-        NodePartition node_partition = (NodePartition) partitionController
-                .buildPartition(
-                        attributeModel.getNodeTable().getColumn("Artefact"), graph);
+        NodePartition node_partition = null;
 
         // Partition with 'Neo4j Relationship Type' column, which is in the data
-        EdgePartition edge_partition = (EdgePartition) partitionController
+        EdgePartition edge_partition = null;
+
+        edge_partition = (EdgePartition) partitionController
                 .buildPartition(
                         attributeModel.getEdgeTable().getColumn(
                                 "Neo4j Relationship Type"), graph);
 
-        for (AttributeColumn col : attributeModel.getNodeTable().getColumns()) {
-            //System.out.println(" " + col.getId() + " " + col.getTitle());
-        }
-
+        /*for(AttributeColumn a : attributeModel.getEdgeTable().getColumns()){
+            System.out.println(""+a.getTitle());
+        }*/
         List<Color> colors = addColors();
         int i = 0;
+        /**/
+        HashMap<String, Color> colorStatus = new HashMap<>();
+        colorStatus.put(StaticData.DEFAULT_STATUS, Color.GREEN);
+        colorStatus.put(StaticData.ADDED_STATUS, Color.BLUE);
+        colorStatus.put(StaticData.DELETED_STATUS, Color.RED);
+        colorStatus.put(StaticData.MODIFIED_STATUS, Color.ORANGE);
+
+        if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            System.out.println("Trag done");
+            node_partition = (NodePartition) partitionController
+                    .buildPartition(
+                            attributeModel.getNodeTable().getColumn("Status"), graph);
+            edge_partition = (EdgePartition) partitionController
+                    .buildPartition(
+                            attributeModel.getEdgeTable().getColumn(
+                                    "Status"), graph);
+        } else {
+            System.out.println("Trag not done");
+            node_partition = (NodePartition) partitionController
+                    .buildPartition(
+                            attributeModel.getNodeTable().getColumn("Artefact"), graph);
+            edge_partition = (EdgePartition) partitionController
+                    .buildPartition(
+                            attributeModel.getEdgeTable().getColumn(
+                                    "Neo4j Relationship Type"), graph);
+        }
 
         //color nodes according to node partition
         NodeColorTransformer nodeColorTransformer = new NodeColorTransformer();
         for (Part p : node_partition.getParts()) {
-            //System.out.println("Node : " + p.getValue());
-            nodeColorTransformer.getMap().put(p.getValue(), colors.get(i));
-            i++;
-        }
-        nodeColorTransformer.randomizeColors(node_partition);
+            if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                if (p.getValue() != null) {
+                    nodeColorTransformer.getMap().put(p.getValue(), colorStatus.get(p.getValue().toString()));
+                }
+            } else {
+                nodeColorTransformer.randomizeColors(node_partition);
+            }            
+        }        
         partitionController.transform(node_partition, nodeColorTransformer);
 
         //color edges according to edge partition
         EdgeColorTransformer edgeColorTransformer = new EdgeColorTransformer();
 
         for (Part p : edge_partition.getParts()) {
-            int green = colors.get(i).getGreen();
-            int blue = colors.get(i).getBlue();
-            int red = colors.get(i).getRed();
-            org.eclipse.swt.graphics.Color cl = new org.eclipse.swt.graphics.Color(Display.getCurrent(), red, green, blue);
-            edgeColoring.put(p.getValue().toString(), cl);
-            edgeColorTransformer.getMap().put(p.getValue(), colors.get(i));
-            i++;
-            if (i == colors.size()) {
-                i = 0;
+            if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                if (p.getValue() != null) {
+                    edgeColorTransformer.getMap().put(p.getValue(), colorStatus.get(p.getValue().toString()));
+                    org.eclipse.swt.graphics.Color cl = getSWTColor(colorStatus.get(p.getValue().toString()), p);
+                    edgeColoring.put(p.getValue().toString(), cl);                    
+                }
+
+            } else {
+                org.eclipse.swt.graphics.Color cl = getSWTColor(colors.get(i), p);
+                edgeColoring.put(p.getValue().toString(), cl);
+                edgeColorTransformer.getMap().put(p.getValue(), colors.get(i));
+                i++;
+                if (i == colors.size()) {
+                    i = 0;
+                }
             }
+
         }
         partitionController.transform(edge_partition, edgeColorTransformer);
+    }
+
+    public org.eclipse.swt.graphics.Color getSWTColor(Color color, Part p) {
+        int green = color.getGreen();
+        int blue = color.getBlue();
+        int red = color.getRed();
+        org.eclipse.swt.graphics.Color cl = new org.eclipse.swt.graphics.Color(Display.getCurrent(), red, green, blue);
+        return cl;
     }
 
     /**
@@ -659,6 +705,7 @@ public class VisualizeGraph {
                 composite4 = new Composite(composite2, SWT.RIGHT);
                 composite4.setLayout(new GridLayout(2, false));
                 composite4.setRedraw(true);
+                composite2.setRedraw(true);
 
                 for (String type : edgeColoring.keySet()) {
                     Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
@@ -669,7 +716,11 @@ public class VisualizeGraph {
                     edgeColor.setText("");
                     Label edgeDetailLabel = new Label(composite4, SWT.NONE);
                     edgeDetailLabel.setFont(new org.eclipse.swt.graphics.Font(Display.getCurrent(), "Serif", 7, SWT.BOLD));
-                    edgeDetailLabel.setText(type);
+                    if (type == null) {
+                        edgeDetailLabel.setText("Null");
+                    } else {
+                        edgeDetailLabel.setText(type);
+                    }
                     edgeColor.setCursor(new Cursor(Display.getCurrent(), SWT.NONE));
                     edgeColor.setBackground(edgeColoring.get(type));
                 }
@@ -699,7 +750,6 @@ public class VisualizeGraph {
                 HomeGUI.graphtabItem.setControl(composite);        //set the table visible when the visualization is active
 
                 frame.revalidate();
-
             }
         });
 
@@ -727,7 +777,7 @@ public class VisualizeGraph {
     /**
      * Creates the table to show node properties
      */
-    public void createTableComponents() {
+    public void createTableComponents() {        
         table = new Table(composite2, SWT.BORDER);
         GridData data = new GridData();
         data.horizontalAlignment = GridData.FILL;

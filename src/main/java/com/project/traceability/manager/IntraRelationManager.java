@@ -5,6 +5,9 @@
  */
 package com.project.traceability.manager;
 
+import com.project.NLP.SourceCodeToXML.WriteToXML;
+import static com.project.traceability.manager.RequirementSourceClassManager.relationNodes;
+import static com.project.traceability.manager.RequirementUMLClassManager.relationNodes;
 import com.project.traceability.model.ArtefactElement;
 import com.project.traceability.model.ArtefactSubElement;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ public class IntraRelationManager {
     static String projectPath;
 
     public static List<String> getReqIntraRelation(String projectPath) {
+        
         IntraRelationManager.projectPath = projectPath;
         RequirementsManger.readXML(projectPath);
         Map<String, ArtefactElement> reqMap = RequirementsManger.requirementArtefactElements;
@@ -46,6 +50,8 @@ public class IntraRelationManager {
     }
 
     public static void compareSubElements(ArtefactElement reqArtefactElement) {
+        relationNodes = new ArrayList<String>();
+        relationNodes.clear();
         List<ArtefactSubElement> reqAttributeElements = reqArtefactElement
                 .getArtefactSubElements();
         for (int i = 0; i < reqAttributeElements.size() && reqAttributeElements.get(i).getType().equalsIgnoreCase("Field"); i++) {
@@ -56,12 +62,12 @@ public class IntraRelationManager {
                     if (reqAttributeElements.get(i).getName().equalsIgnoreCase(reqAttributeElements.get(j).getName().substring(3))) {
                         //System.out.println(reqAttributeElements.get(i).getName() + "KAMALAN" + reqAttributeElements.get(j).getName());
                         count++;
-                        if(reqAttributeElements.get(j).getName().toLowerCase().contains("get")){
+                        if (reqAttributeElements.get(j).getName().toLowerCase().contains("get")) {
                             //System.out.println(reqAttributeElements.get(i).getSubElementId()+":"+reqAttributeElements.get(i).getName()+":"+reqAttributeElements.get(j).getName()+":"+reqAttributeElements.get(j).getSubElementId());
                             relationNodes.add(reqAttributeElements.get(i).getSubElementId().substring(reqAttributeElements.get(i).getSubElementId().indexOf("RQ")));
                             relationNodes.add("Getter Method");
                             relationNodes.add(reqAttributeElements.get(j).getSubElementId().substring(reqAttributeElements.get(j).getSubElementId().indexOf("RQ")));
-                        }else{
+                        } else {
                             //System.out.println(reqAttributeElements.get(i).getSubElementId()+":"+reqAttributeElements.get(i).getName()+":"+reqAttributeElements.get(j).getName()+":"+reqAttributeElements.get(j).getSubElementId());
                             relationNodes.add(reqAttributeElements.get(i).getSubElementId().substring(reqAttributeElements.get(i).getSubElementId().indexOf("RQ")));
                             relationNodes.add("Setter Method");
@@ -77,8 +83,10 @@ public class IntraRelationManager {
             }
         }
     }
-    
+
     public static List<String> getSourceIntraRelation(String projectPath) {
+        relationNodes1 = new ArrayList<String>();
+        relationNodes1.clear();
         SourceCodeArtefactManager.readXML(projectPath);
         Map<String, ArtefactElement> sourceMap = SourceCodeArtefactManager.sourceCodeAretefactElements;
         Iterator<Map.Entry<String, ArtefactElement>> sourceIterator = null;
@@ -94,17 +102,31 @@ public class IntraRelationManager {
                 for (int j = 0; j < sourceAttributeElements.size(); j++) {
                     //System.out.println(sourceAttributeElements.get(j).getType());
                     if (sourceAttributeElements.get(j).getType().equalsIgnoreCase("Method")) {
-                        
+
                         if (sourceAttributeElements.get(i).getName().equalsIgnoreCase(sourceAttributeElements.get(j).getName().substring(3))) {
                             count++;
                             if (sourceAttributeElements.get(j).getName().contains("get")) {
                                 relationNodes1.add(sourceAttributeElements.get(i).getSubElementId());
                                 relationNodes1.add("Getter Method");
                                 relationNodes1.add(sourceAttributeElements.get(j).getSubElementId());
+                                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                                    if (!"NONE".equals(sourceAttributeElements.get(j).getStatus())) {
+                                        relationNodes1.add(sourceAttributeElements.get(i).getStatus());
+                                    } else {
+                                        relationNodes1.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                                    }
+                                }
                             } else {
                                 relationNodes1.add(sourceAttributeElements.get(i).getSubElementId());
                                 relationNodes1.add("Setter Method");
                                 relationNodes1.add(sourceAttributeElements.get(j).getSubElementId());
+                                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                                    if (!"NONE".equals(sourceAttributeElements.get(j).getStatus())) {
+                                        relationNodes1.add(sourceAttributeElements.get(i).getStatus());
+                                    } else {
+                                        relationNodes1.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                                    }
+                                }
 
                             }
                             if (count == 2) {
@@ -117,45 +139,53 @@ public class IntraRelationManager {
             }
 
         }
-        
+
         return relationNodes1;
     }
-    
-    public static List<String> getUMLIntraRelation(String projectPath){
+
+    public static List<String> getUMLIntraRelation(String projectPath) {
+        relationNodes2 = new ArrayList<String>();
+        relationNodes2.clear();
         UMLArtefactManager.readXML(projectPath);
-	Map<String, ArtefactElement> UMLMap = UMLArtefactManager.UMLAretefactElements;
-	Iterator<Map.Entry<String, ArtefactElement>> umlIterator = null;
-        
+        Map<String, ArtefactElement> UMLMap = UMLArtefactManager.UMLAretefactElements;
+        Iterator<Map.Entry<String, ArtefactElement>> umlIterator = null;
+
         umlIterator = UMLMap.entrySet().iterator();
         while (umlIterator.hasNext()) {
             Map.Entry pairs1 = umlIterator.next();
             ArtefactElement UMLArtefactElement = (ArtefactElement) pairs1
-							.getValue();
+                    .getValue();
             List<ArtefactSubElement> UMLAttributeElements = UMLArtefactElement
-				.getArtefactSubElements();
+                    .getArtefactSubElements();
             for (int i = 0; i < UMLAttributeElements.size() && UMLAttributeElements.get(i).getType().equalsIgnoreCase("Field"); i++) {
                 int count = 0;
-                for(int j = 0; j<UMLAttributeElements.size(); j++){
+                for (int j = 0; j < UMLAttributeElements.size(); j++) {
                     //System.out.println(UMLAttributeElements.get(j).getType());
-                    if(UMLAttributeElements.get(j).getType().equalsIgnoreCase("Method")){
-                        if(UMLAttributeElements.get(i).getName().equalsIgnoreCase(UMLAttributeElements.get(j).getName().substring(3))){
+                    if (UMLAttributeElements.get(j).getType().equalsIgnoreCase("Method")) {
+                        if (UMLAttributeElements.get(i).getName().equalsIgnoreCase(UMLAttributeElements.get(j).getName().substring(3))) {
                             count++;
-                            if(UMLAttributeElements.get(j).getName().contains("get")){
+                            if (UMLAttributeElements.get(j).getName().contains("get")) {
                                 relationNodes2.add(UMLAttributeElements.get(i).getSubElementId());
                                 relationNodes2.add("Getter Method");
                                 relationNodes2.add(UMLAttributeElements.get(j).getSubElementId());
-                            }else{
+                                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                                    relationNodes2.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                                }
+                            } else {
                                 relationNodes2.add(UMLAttributeElements.get(i).getSubElementId());
                                 relationNodes2.add("Setter Method");
                                 relationNodes2.add(UMLAttributeElements.get(j).getSubElementId());
+                                if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+                                    relationNodes2.add(com.project.traceability.staticdata.StaticData.DEFAULT_STATUS);
+                                }
                             }
                         }
                     }
                 }
-                
+
             }
         }
-         
+
         return relationNodes2;
     }
 }

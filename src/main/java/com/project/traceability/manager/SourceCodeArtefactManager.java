@@ -52,6 +52,7 @@ public class SourceCodeArtefactManager {
         }else{
         	FilePropertyName.SOURCE_ARTIFACT_NAME = "SourceCodeArtefactFile.xml";
         }
+        System.out.println("Source: "+FilePropertyName.SOURCE_ARTIFACT_NAME);
         sourceXmlFile = new File(projectPath + File.separator + FilePropertyName.XML + File.separator
                 + FilePropertyName.SOURCE_ARTIFACT_NAME);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

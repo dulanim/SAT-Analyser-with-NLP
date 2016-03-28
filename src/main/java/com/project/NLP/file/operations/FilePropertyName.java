@@ -65,7 +65,7 @@ public class FilePropertyName {
     //For an extension project 
     //localDirectory of JENKINS 
     
-    public static final String LOCAL_DIR_JENKINS = "/home/shiyam/Desktop/SatWrks/";
+    public static final String LOCAL_DIR_JENKINS = System.getProperty("user.home")+ File.separator + ".jenkins" + File.separator +"jobs"+File.separator;
 
     //    public static Path getPath(Path target,String type){
 //        if(type.contains(XML)){
@@ -239,6 +239,7 @@ public class FilePropertyName {
         copyFolder(sourceFile, destFile);
     }
     public static void copyTwoFile(File sourceFile, File destFile) throws IOException {
+        System.out.println("Copying "+ sourceFile + " " + destFile);
         copyFolder(sourceFile, destFile);
     }
     

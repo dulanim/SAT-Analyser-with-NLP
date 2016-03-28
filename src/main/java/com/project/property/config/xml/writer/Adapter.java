@@ -6,6 +6,7 @@
 package com.project.property.config.xml.writer;
 
 import com.project.traceability.staticdata.StaticData;
+import java.io.File;
 
 /**
  *
@@ -14,7 +15,7 @@ import com.project.traceability.staticdata.StaticData;
 public class Adapter {
     
     static XMLWriter writer;
-    public static String projectPath = "/home/shiyam/Desktop/SatWrks/NewSatWrkspaceskal";
+    public static String projectPath = System.getProperty("user.home") + File.separator+ "Desktop/SatWrks/NewSatWrkspaceskal";
     public static String wrkspace = "";
     
     static{

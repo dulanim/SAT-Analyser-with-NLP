@@ -3,6 +3,7 @@ package com.project.traceability.GUI;
 /**
  * @author Gitanjali Nov 12, 2014
  */
+import com.project.NLP.SourceCodeToXML.WriteToXML;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
@@ -143,6 +144,10 @@ public class HomeGUI extends JFrame implements KeyListener {
      */
     public static void main(String[] args) {
 
+        startHomeGUI();
+    }
+
+    public static void startHomeGUI() {
         try {
             //XMLWriter writer = new XMLWriter();
             window = new HomeGUI(); 		//start the project
@@ -1146,6 +1151,10 @@ public class HomeGUI extends JFrame implements KeyListener {
         MenuItem graphItem = new MenuItem(popupMenu, SWT.CASCADE);
         graphItem.setText("Visualization");
         graphItem.setEnabled(hasThreeFiles);
+        
+        MenuItem graphVersionItem = new MenuItem(popupMenu, SWT.CASCADE);
+        graphVersionItem.setText("Visualization of Versioning");
+        graphVersionItem.setEnabled(hasThreeFiles);
 
         MenuItem refreshItem = new MenuItem(popupMenu, SWT.NONE);
         refreshItem.addSelectionListener(new SelectionAdapter() {
@@ -1205,6 +1214,7 @@ public class HomeGUI extends JFrame implements KeyListener {
         });
         compareItem.setText("Compare Files");
         compareItem.setEnabled(hasTwoFiles);
+        
 
         Menu newMenu = new Menu(popupMenu);
         newItem.setMenu(newMenu);
@@ -1267,6 +1277,19 @@ public class HomeGUI extends JFrame implements KeyListener {
         });
         resolveProItem.setText("Resolve");
 
+        Menu visualVersionMenu = new Menu(popupMenu);
+        graphVersionItem.setMenu(visualVersionMenu);
+        
+        final MenuItem req_uml_modifiedSrcItem = new MenuItem(visualVersionMenu, SWT.NONE);
+        req_uml_modifiedSrcItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                HomeGUI.setupProject(req_uml_modifiedSrcItem.getText());
+            }
+        });
+        req_uml_modifiedSrcItem.setText("Req-UML-Modified Source");
+        
+        
         Menu visualMenu = new Menu(popupMenu);
         graphItem.setMenu(visualMenu);
 
@@ -1351,12 +1374,20 @@ public class HomeGUI extends JFrame implements KeyListener {
     public static void setupProject(String graphType) {
         projectName = trtmNewTreeitem.getText();
         PropertyFile.setProjectName(projectName);
-        PropertyFile.setGraphDbPath(projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + projectName
+        if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
+            PropertyFile.setGraphDbPath(projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "VERSION_" + projectName
                 + ".graphdb");
+            PropertyFile.setRelationshipXMLPath(projectPath + File.separator + projectName + FilePropertyName.XML + File.separator+ "VERSION_" 
+                + "Relations.xml");
+        } else{
+            PropertyFile.setGraphDbPath(projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + projectName
+                + ".graphdb");
+            PropertyFile.setRelationshipXMLPath(projectPath + File.separator + projectName + FilePropertyName.XML + File.separator
+                + "Relations.xml");
+        }
         PropertyFile.setGeneratedGexfFilePath(projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + projectName
                 + ".gexf");
-        PropertyFile.setRelationshipXMLPath(projectPath + File.separator + projectName + FilePropertyName.XML + File.separator
-                + "Relations.xml");
+        
         PropertyFile.setGraphType(graphType);
         System.out.println("Path: " + projectPath);
         System.out.println("DB Path: " + PropertyFile.getGraphDbPath());

@@ -1,7 +1,6 @@
 
 package com.project.traceability.ontology.models;
 
-import com.project.NLP.file.operations.FilePropertyName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +20,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
-import scala.sys.process.FileProcessLogger;
+
+import com.project.NLP.file.operations.FilePropertyName;
 
 
 public class NavigationModel {
@@ -63,7 +63,7 @@ public class NavigationModel {
 		ontClassLst = new ArrayList<>();
 		while(classList.hasNext()){
 			OntClass tempClass = classList.next();
-			String localName = tempClass.getLocalName();
+			//String localName = tempClass.getLocalName();
 			ontClassLst.add(tempClass);
 			//rootClasses.add(localName);
 			//System.out.println("Parent CLass:>>>" + localName);
@@ -98,8 +98,11 @@ public class NavigationModel {
 					queue.add(tempClass.getLocalName());
 					 if(tempClass.hasSubClass()) {
 						 	workingQueue.add(tempClass);
+
 							//System.out.println("Subclass For Noun:>>" + 
 						 	//tempClass.getLocalName());
+
+							//System.out.println("Subclass For Noun:>>" + tempClass.getLocalName());
 		             }
 				}
 				//getSubClass();
@@ -173,24 +176,24 @@ public class NavigationModel {
 		return listValues;
 	}
 	
-	private String getValueFor(OntClass className,String propertyName){
-		/*
-		 * this method return value for specific class and specific property name
-		 */
-		  model.read(generator.getInputStream(),null);
-		  String propURI = StaticData.OWL_ROOT_URI + "#" + propertyName;//building property uri
-		  OntProperty property = model.getOntProperty(propURI);//get OntProperty from model.wl
-		  String result = "";
-		  RDFNode value = className.getPropertyValue(property);
-		  if(value != null)
-			 result = value.toString().split("#")[1];
-//	      while(it != null &&it.hasNext()){
-//	    	  Statement stmt = it.nextStatement();
-//		      result = stmt.getObject().toString();
-//	      }
-	      
-	      return result;
-	}
+//	private String getValueFor(OntClass className,String propertyName){
+//		/*
+//		 * this method return value for specific class and specific property name
+//		 */
+//		  model.read(generator.getInputStream(),null);
+//		  String propURI = StaticData.OWL_ROOT_URI + "#" + propertyName;//building property uri
+//		  OntProperty property = model.getOntProperty(propURI);//get OntProperty from model.wl
+//		  String result = "";
+//		  RDFNode value = className.getPropertyValue(property);
+//		  if(value != null)
+//			 result = value.toString().split("#")[1];
+////	      while(it != null &&it.hasNext()){
+////	    	  Statement stmt = it.nextStatement();
+////		      result = stmt.getObject().toString();
+////	      }
+//	      
+//	      return result;
+//	}
 	private Map<String,List<String>> getProperty(OntClass classSpec,
 			Map<String,List<String>> map,
 			List<String> allProperties){
