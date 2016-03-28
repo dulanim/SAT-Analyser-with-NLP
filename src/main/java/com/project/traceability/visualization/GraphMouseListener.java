@@ -33,6 +33,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 import static com.project.traceability.visualization.VisualizeGraph.popupMenu;
 import java.io.File;
+import javax.swing.JOptionPane;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableCursor;
@@ -84,7 +85,6 @@ public class GraphMouseListener implements PreviewMouseListener {
         if (event.button == PreviewMouseEvent.Button.LEFT) {
             for (Node node : Lookup.getDefault().lookup(GraphController.class).getModel(workspace).getGraph().getNodes()) {
                 if (clickingInNode(node, event)) {
-                    
                     if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
                         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(
                             HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + "VERSION_" + HomeGUI.projectName
@@ -94,17 +94,14 @@ public class GraphMouseListener implements PreviewMouseListener {
                             HomeGUI.projectPath + File.separator + FilePropertyName.PROPERTY + File.separator + HomeGUI.projectName
                             + ".graphdb");
                     }
-                    
-                    //System.out.println("DB path- " + graphDb.toString());
 
                     Transaction tx = graphDb.beginTx();
                     try {
-
                         IndexManager index = graphDb.index();
                         Index<org.neo4j.graphdb.Node> artefacts = index.forNodes("ArtefactElement");
                         IndexHits<org.neo4j.graphdb.Node> hits = artefacts.get("ID", node.getNodeData().getAttributes().getValue("ID"));
                         org.neo4j.graphdb.Node neo4j_node = hits.getSingle();
-
+                        
                         //System.out.println(neo4j_node.toString());
                         id = neo4j_node.getProperty("ID").toString();
 
@@ -138,7 +135,7 @@ public class GraphMouseListener implements PreviewMouseListener {
                             }
                         });
                         GraphMouseListener.lock = true;
-                        System.out.println("Releseing lock");
+                        System.out.println("Releseing lock");                    
                     }
                 }
             }

@@ -192,7 +192,6 @@ public class RelationManager {
                     Element element = null;
                     if (artefactElementList.getLength() == 0) {
                         newId = 1;
-                        System.out.println("00000000000");
                         relationNode = artefactNode;
                     } else {
                         artefactElementNode = (Node) artefactElementList
@@ -369,7 +368,7 @@ public class RelationManager {
         List<String> fullDescOfRelationNode = new ArrayList<>();
         List<String> fullDescOfExistingRelationNode = new ArrayList<>();
         List<String> partial = new ArrayList<>();
-        System.out.println("Size ee " + relationNodes.size());
+        //System.out.println("Size ee " + relationNodes.size());
 
         //get the full description of rlation "source relationpath target"
         for (int i = 0; i < relationNodes.size();) {
@@ -407,7 +406,7 @@ public class RelationManager {
         //conver into structured format one by one
         for (int i = 0; i < fullDescOfRelationNode.size(); i++) {
             String[] partialNode = fullDescOfRelationNode.get(i).split(",");
-            System.out.print("PA " + partialNode.length);
+            //System.out.print("PA " + partialNode.length);
 
             for (int j = 0; j < partialNode.length; j++) {
                 relationNode3.add(partialNode[j]);

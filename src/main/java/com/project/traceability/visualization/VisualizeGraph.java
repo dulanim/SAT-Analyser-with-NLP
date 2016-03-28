@@ -535,6 +535,7 @@ public class VisualizeGraph {
         colorStatus.put(StaticData.MODIFIED_STATUS, Color.ORANGE);
 
         if (WriteToXML.isTragging.equalsIgnoreCase("Tragging")) {
+            System.out.println("Trag done");
             node_partition = (NodePartition) partitionController
                     .buildPartition(
                             attributeModel.getNodeTable().getColumn("Status"), graph);
@@ -543,6 +544,7 @@ public class VisualizeGraph {
                             attributeModel.getEdgeTable().getColumn(
                                     "Status"), graph);
         } else {
+            System.out.println("Trag not done");
             node_partition = (NodePartition) partitionController
                     .buildPartition(
                             attributeModel.getNodeTable().getColumn("Artefact"), graph);
@@ -703,6 +705,7 @@ public class VisualizeGraph {
                 composite4 = new Composite(composite2, SWT.RIGHT);
                 composite4.setLayout(new GridLayout(2, false));
                 composite4.setRedraw(true);
+                composite2.setRedraw(true);
 
                 for (String type : edgeColoring.keySet()) {
                     Label edgeColor = new Label(composite4, SWT.BORDER | SWT.PUSH);
@@ -774,7 +777,7 @@ public class VisualizeGraph {
     /**
      * Creates the table to show node properties
      */
-    public void createTableComponents() {
+    public void createTableComponents() {        
         table = new Table(composite2, SWT.BORDER);
         GridData data = new GridData();
         data.horizontalAlignment = GridData.FILL;

@@ -49,7 +49,7 @@ public class ReadXML {
 
         try {
             HomeGUI.isComaparing = false;
-            if(graphType.equalsIgnoreCase("Req-UML-Modified Source View")){
+            if(graphType.equalsIgnoreCase("Req-UML-Modified Source")){
                 SourceCodeArtefactManager.isComparing = "MOD";
                 WriteToXML.isTragging = "Tragging";
                 transferDataToDBFromXML(projectPath, true);

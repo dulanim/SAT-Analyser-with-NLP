@@ -48,9 +48,7 @@ public class UMLSourceClassManager {
     @SuppressWarnings({"rawtypes", "unused"})
     public static List<String> compareClassNames(String projectPath) {
         relationNodes = new ArrayList<String>();
-        System.out.println("Relas : "+relationNodes.size());
         relationNodes.clear();
-        System.out.println("ReltS : "+relationNodes.size());
         UMLSourceClassManager.projectPath = projectPath;
         UMLClasses = ClassManager.getUmlClassName(projectPath);
         Map<String, ArtefactElement> UMLMap = UMLArtefactManager.UMLAretefactElements; // get

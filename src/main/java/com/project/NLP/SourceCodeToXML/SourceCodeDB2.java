@@ -50,6 +50,7 @@ public class SourceCodeDB2 {
         /// graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName + File.separator + FilePropertyName.PROPERTY + File.separator + ProjectCreateWindow.projectName + "-source" + ".graphdb");
         String name;
         if(WriteToXML.isTragging.equalsIgnoreCase("Tragging")){
+            System.out.println("Enter src");
             File f =  new File(PropertyFile.filePath + File.separator + ProjectCreateWindow.projectName
                 + File.separator + FilePropertyName.PROPERTY + File.separator
                 + ProjectCreateWindow.projectName + "-source" + ".graphdb");

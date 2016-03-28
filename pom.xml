@@ -18,7 +18,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.project.traceability.GUI.StartUpProject</mainClass>
+                            <mainClass>com.project.extension.event.trigger.EventTrigger</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -47,7 +47,7 @@
                     <target>1.7</target>
                     <manifest>
                         <addClasspath>true</addClasspath>
-                        <mainClass>com.project.traceability.GUI.StartpProject</mainClass>
+                        <mainClass>com.project.extension.event.trigger.EventTrigger</mainClass>
                     </manifest>
                 </configuration>
             </plugin>

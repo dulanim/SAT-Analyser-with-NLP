@@ -144,6 +144,10 @@ public class HomeGUI extends JFrame implements KeyListener {
      */
     public static void main(String[] args) {
 
+        startHomeGUI();
+    }
+
+    public static void startHomeGUI() {
         try {
             //XMLWriter writer = new XMLWriter();
             window = new HomeGUI(); 		//start the project
