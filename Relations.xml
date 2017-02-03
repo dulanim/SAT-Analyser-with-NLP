@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Relations>
+  <Relation id="1">
+    <SourceNode>TC2</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC17</TargetNode>
+  </Relation>
+  <Relation id="2">
+    <SourceNode>TC6</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC19</TargetNode>
+  </Relation>
+  <Relation id="3">
+    <SourceNode>TC7</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC20</TargetNode>
+  </Relation>
+  <Relation id="4">
+    <SourceNode>TC9</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC17</TargetNode>
+  </Relation>
+  <Relation id="5">
+    <SourceNode>TC13</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC19</TargetNode>
+  </Relation>
+  <Relation id="6">
+    <SourceNode>TC14</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC20</TargetNode>
+  </Relation>
+  <Relation id="7">
+    <SourceNode>TC16</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC17</TargetNode>
+  </Relation>
+  <Relation id="8">
+    <SourceNode>TC20</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC19</TargetNode>
+  </Relation>
+  <Relation id="9">
+    <SourceNode>TC21</SourceNode>
+    <RelationPath>SourceCodeToTestCases</RelationPath>
+    <TargetNode>SC20</TargetNode>
+  </Relation>
+</Relations>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Artefacts>
+  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC1" visibility="public">
+    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC2" visibility="public"/>
+    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC3" visibility="public"/>
+    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC4" visibility="public"/>
+  </ArtefactElement>
+  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC5" visibility="public">
+    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC6" visibility="public"/>
+    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC7" visibility="public"/>
+  </ArtefactElement>
+  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC8" visibility="public">
+    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC9" visibility="public"/>
+    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC10" visibility="public"/>
+    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC11" visibility="public"/>
+  </ArtefactElement>
+  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC12" visibility="public">
+    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC13" visibility="public"/>
+    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC14" visibility="public"/>
+  </ArtefactElement>
+  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC15" visibility="public">
+    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC16" visibility="public"/>
+    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC17" visibility="public"/>
+    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC18" visibility="public"/>
+  </ArtefactElement>
+  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC19" visibility="public">
+    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC20" visibility="public"/>
+    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC21" visibility="public"/>
+  </ArtefactElement>
+</Artefacts>
