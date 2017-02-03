@@ -76,6 +76,8 @@ import com.project.traceability.visualization.GraphDB.RelTypes;
  */
 
 public class HomeGUI extends JFrame implements KeyListener {
+	public HomeGUI() {
+	}
 
     public static Dimension screen = java.awt.Toolkit.getDefaultToolkit()
             .getScreenSize();

@@ -190,7 +190,7 @@ public class GraphFileGenerator {
             result = engine.execute("MATCH (n) RETURN n");
 
             Iterator<org.neo4j.graphdb.Node> n_column = result.columnAs("n");
-            nodes = new HashMap<>();
+            nodes = new HashMap<>();	
 
             for (org.neo4j.graphdb.Node node : IteratorUtil
                     .asIterable(n_column)) {

@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.TransformerException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -39,6 +41,9 @@ import org.openide.util.Exceptions;
 
 import com.project.NLP.SourceCodeToXML.AccessProject;
 import com.project.NLP.file.operations.FilePropertyName;
+import com.project.extendedsat.config.MainClass;
+import com.project.extendedsat.deployment.extendedsat.Main;
+import com.project.extendedsat.test.TestAST;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.Adapter;
 import com.project.property.config.xml.writer.XMLConversion;
@@ -123,7 +128,7 @@ public class ProjectCreateWindow {
      */
     protected void createContents() {
         shell = new Shell();
-        shell.setSize(598, 508);
+        shell.setSize(598, 699);
         shell.setText("SWT Application");
 
         Dimension.toCenter(shell);//set the shell into center point 
@@ -371,7 +376,7 @@ public class ProjectCreateWindow {
         btnOk.setBounds(477, 67, 77, 29);
         btnOk.setText("Ok");
         Composite composite = new Composite(shell, SWT.NONE);
-        composite.setBounds(10, 394, 568, 97);
+        composite.setBounds(0, 553, 568, 97);
         
         final Label lblNewLabel = new Label(composite, SWT.NONE);
         lblNewLabel.setBounds(24, 10, 459, 17);
@@ -674,6 +679,63 @@ public class ProjectCreateWindow {
         Label label_6 = new Label(shell, SWT.NONE);
         label_6.setText("New project will be created ");
         label_6.setBounds(20, 10, 189, 17);
+        
+        Group grpExetendedSatAnalizer = new Group(shell, SWT.NONE);
+        grpExetendedSatAnalizer.setText("Exetended SAT Analizer");
+        grpExetendedSatAnalizer.setBounds(20, 394, 548, 142);
+        
+        Button btnNewButton = new Button(grpExetendedSatAnalizer, SWT.NONE);
+        btnNewButton.addSelectionListener(new SelectionAdapter() {
+        	@Override
+        	public void widgetSelected(SelectionEvent arg0) {
+        		MainClass configMain = new MainClass();
+        		configMain.startConfig();
+        	}
+        });
+        btnNewButton.setBounds(369, 25, 169, 25);
+        btnNewButton.setText("Launch Config Traceablity");
+        
+        Label lblConfiguratio = new Label(grpExetendedSatAnalizer, SWT.NONE);
+        lblConfiguratio.setBounds(10, 30, 183, 15);
+        lblConfiguratio.setText("Configuration Phase");
+        
+        Label lblDeploymentPhase = new Label(grpExetendedSatAnalizer, SWT.NONE);
+        lblDeploymentPhase.setBounds(10, 65, 138, 15);
+        lblDeploymentPhase.setText("Deployment Phase");
+        
+        Button btnNewButton_1 = new Button(grpExetendedSatAnalizer, SWT.NONE);
+        btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+        	@Override
+        	public void widgetSelected(SelectionEvent arg0) {
+        		Main deploymentMain = new Main();
+        		deploymentMain.startDeployment();
+        	}
+        });
+        btnNewButton_1.setBounds(369, 55, 169, 25);
+        btnNewButton_1.setText("Launch Deployment Tracebility");
+        
+        Label lblTestPhase = new Label(grpExetendedSatAnalizer, SWT.NONE);
+        lblTestPhase.setText("Test Phase");
+        lblTestPhase.setBounds(10, 100, 138, 15);
+        
+        Button btnLaunchTestingTracebility = new Button(grpExetendedSatAnalizer, SWT.NONE);
+        btnLaunchTestingTracebility.addSelectionListener(new SelectionAdapter() {
+        	@Override
+        	public void widgetSelected(SelectionEvent arg0) {
+        		TestAST test = new TestAST();
+        		try {
+					test.TestingTraceability();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        });
+        btnLaunchTestingTracebility.setText("Launch Testing Tracebility");
+        btnLaunchTestingTracebility.setBounds(369, 90, 169, 25);
 
     }
 

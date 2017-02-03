@@ -111,6 +111,7 @@ import org.gephi.project.api.Workspace;
 import org.openide.util.Lookup;
 import processing.core.PApplet;
 import scala.collection.mutable.HashTable;
+import java.awt.GridBagLayout;
 
 /**
  * Model to add and visualize generated graph file (Traceability link
@@ -171,6 +172,12 @@ public class VisualizeGraph {
     static org.eclipse.swt.widgets.Button undoBtn = null;
 
     private VisualizeGraph() {
+    	GridBagLayout gbl_newLinkPanel = new GridBagLayout();
+    	gbl_newLinkPanel.columnWidths = new int[]{0};
+    	gbl_newLinkPanel.rowHeights = new int[]{0};
+    	gbl_newLinkPanel.columnWeights = new double[]{Double.MIN_VALUE};
+    	gbl_newLinkPanel.rowWeights = new double[]{Double.MIN_VALUE};
+    	newLinkPanel.setLayout(gbl_newLinkPanel);
     }
 
     public static VisualizeGraph getInstance() {
@@ -1477,7 +1484,7 @@ public class VisualizeGraph {
         frameRemoval.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frameRemoval.setLocation(dim.width / 2 - frameRemoval.getSize().width / 2, dim.height / 2 - frameRemoval.getSize().height / 2);
-        frameRemoval.add(removePanel);
+        frameRemoval.getContentPane().add(removePanel);
         //frameRemoval.setSize(300, 400);
         frameRemoval.setTitle("Links Removal");
 
@@ -1507,7 +1514,7 @@ public class VisualizeGraph {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         newLinkFrame.setLocation(dim.width / 2 - newLinkFrame.getSize().width / 2, dim.height / 2 - newLinkFrame.getSize().height / 2);
 
-        newLinkFrame.add(newLinkPanel);
+        newLinkFrame.getContentPane().add(newLinkPanel);
         //newLinkFrame.setPreferredSize(new Dimension(100, 100));
         //newLinkFrame.setSize(300, 400);
         newLinkFrame.pack();

@@ -250,9 +250,9 @@ public class GraphDB {
      * @param artefactElement
      * @param n
      */
-    public void addType(ArtefactElement artefactElement, Node n) {
+    public void addType(ArtefactElement artefactElement, Node n) {	
         if (null == artefactElement.getType()) {
-            n.setProperty("Type", "");
+            n.setProperty("Type", "");	
         } else {
             n.setProperty("Type", artefactElement.getType());
         }

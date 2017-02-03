@@ -20,7 +20,8 @@ public class PropertyFile {
     public static String requirementXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"RequirementArtefactFile.xml";
     public static String umlXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"UMLArtefactFile.xml";
     public static String sourceXMLPath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator+"SourceCodeArtefactFile.xml";
-    public static final String wordNetDbDirectory = System.getProperty("user.home")+File.separator+"WordNet"+File.separator+"dict";
+   // public static final String wordNetDbDirectory = System.getProperty("user.home")+File.separator+"WordNet"+File.separator+"dict";
+    public static final String wordNetDbDirectory = "C:\\Users\\SAMITHA-LAP\\WordNet\\dict";
 
     public static String filePath = StaticData.workspace;
     public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
@@ -33,7 +34,7 @@ public class PropertyFile {
             +File.separator +"SAT_CONFIGS"+ File.separator;
     // project
     private static String projectName = null;
-    public static String graphDbPath = null;
+    public static String graphDbPath = "C:\\Users\\SAMITHA-LAP\\Documents\\Neo4j\\default.graphdb";
     private static String generatedGexfFilePath = null;
     private static String relationshipXMLPath = null;
     public static String graphType = null;

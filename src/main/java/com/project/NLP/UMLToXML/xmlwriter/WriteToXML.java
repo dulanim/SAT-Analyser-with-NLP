@@ -310,6 +310,7 @@ public class WriteToXML {
                 String parameterString = "";
                 String tempString = operation.getParamString();
                 if(tempString.equals("")){
+                    tempString = new String();
 	                for (int j = 0; paramList != null && j < paramList.size(); j++) {
 	                    Parameter param = paramList.get(j);
 	                    parameterString += param.getParameterName().concat(":").concat(param.getParameterType());
