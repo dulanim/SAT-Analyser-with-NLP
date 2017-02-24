@@ -26,9 +26,6 @@ public class PropertyFile {
     public static String filePath = StaticData.workspace;
     public static String xmlFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files";
     public static String docsFilePath = System.getProperty("user.home")+File.separator+"SATAnalyzer"+File.separator+"XML Files"+File.separator;
-   // public static String docsFilePath = "C:\\Users\\SAMITHA-LAP\\Desktop\\Data\\Input\\OrderRequirement.txt";
-
-    
     public static final String imagePath = IMAGE_PATH ; // img folder in
     public static String configuration_file_path = System.getProperty("user.home")
                 +File.separator +"SAT_CONFIGS"+ File.separator +"sat_configuration.xml";

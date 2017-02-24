@@ -1,21 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <Artefacts>
-  <Artefact type="SourceCode">
-    <FileSystemLocation/>
-    <ArtefactElement id="SC1" interface="[]" name="Customer" status="NONE" superClass="" type="Class" visibility="public">
-      <ArtefactSubElement id="SC1_F1" name="name" status="NONE" type="Field" variableType="String" visibility="private"/>
-      <ArtefactSubElement id="SC1_F2" name="address" status="NONE" type="Field" variableType="String" visibility="private"/>
-      <ArtefactSubElement id="SC1_M1" name="sendOrder" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
-      <ArtefactSubElement id="SC1_M2" name="reciveOrder" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
-    </ArtefactElement>
- 
-    
-    <ArtefactElement id="SC3" interface="[]" name="Order" status="NONE" superClass="" type="Class" visibility="public">
-      <ArtefactSubElement id="SC3_F1" name="date" status="NONE" type="Field" variableType="String" visibility="private"/>
-      <ArtefactSubElement id="SC3_F2" name="number" status="NONE" type="Field" variableType="String" visibility="private"/>
-      <ArtefactSubElement id="SC3_M1" name="confirm" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
-      <ArtefactSubElement id="SC3_M2" name="close" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
-    </ArtefactElement>
-    
-  </Artefact>
+	<Artefact type="SourceCode">
+		<FileSystemLocation></FileSystemLocation>
+		<ArtefactElement name="ClassIdentification" type="Class" id="SC16" visibility="public">
+				<ArtefactSubElement name="classIdentify" parameters="" returnType="void" visibility="public" content="" type="Method" id="SC17">
+				</ArtefactSubElement>
+		</ArtefactElement>
+		<ArtefactElement name="ParserTreeGenerator" type="Class" id="SC16" visibility="public">
+				<ArtefactSubElement name="getJavFiles" parameters="" returnType="void" visibility="public" content="" type="Method" id="SC19">
+				</ArtefactSubElement>
+				<ArtefactSubElement name="getEmptyFiles" parameters="sum:Double" returnType="void" visibility="public" content="" type="Method" id="SC20">
+				</ArtefactSubElement>
+				<ArtefactSubElement name="printDetails" parameters="" returnType="void" visibility="public" content="" type="Method" id="SC21">
+				</ArtefactSubElement>
+		</ArtefactElement>
+		<ArtefactElement name="Account" type="Class" id="SC1" visibility="public">
+			<ArtefactSubElement name="accountNumber" type="Field" visibility="private" id="SC2" variableType="String">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="accountBalance" type="Field" visibility="private" id="SC4" variableType="Double">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="accountHolder" type="Field" visibility="private" id="SC5" variableType="String">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="Account" parameters="" returnType="" visibility="public" type="Method" content="" id="SC6">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="Account" parameters="num:String, balance:Double, holder:String" visibility="public" content="" returnType="" type="Method" id="SC7">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="getAccountNumber" parameters="" visibility="public" returnType="String" type="Method" content="" id="SC8">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="setAccountNumber" parameters="accNum:String" visibility="public" returnType="void" type="Method" content="" id="SC9">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="getAccountBalance" parameters="" returnType="Double" visibility="public" type="Method" content="" id="SC10">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="setAccountBalance" parameters="balance:Double" visibility="public" returnType="void" content="" type="Method" id="SC11">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="getAccountHolder" parameters="" returnType="String" visibility="public" content="" type="Method" id="SC12">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="setAccountHolder" parameters="accHolder:String" visibility="public" returnType="void" content="" type="Method" id="SC13">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="printDetails" parameters="" returnType="void" visibility="public" content="" type="Method" id="SC14">
+			</ArtefactSubElement>
+			<ArtefactSubElement name="withdraw" parameters="sum:Double" returnType="void" visibility="public" content="" type="Method" id="SC15">
+			</ArtefactSubElement>
+		</ArtefactElement>
+
+			<IntraConnections>
+					<Connection>
+						<Type>Inheritance</Type>
+						<StartPoint>SC16</StartPoint>
+						<EndPoint>SC1</EndPoint>
+					</Connection>
+					<Connection>
+						<Type>Inheritance</Type>
+						<StartPoint>SC27</StartPoint>
+						<EndPoint>SC1</EndPoint>
+					</Connection>
+					<Connection>
+						<Type></Type>
+						<StartPoint>SC35</StartPoint>
+						<EndPoint>SC1</EndPoint>
+					</Connection>
+					<Connection>
+						<Type></Type>
+						<StartPoint>SC53</StartPoint>
+						<EndPoint>SC35</EndPoint>
+					</Connection>
+				</IntraConnections>
+	</Artefact>
 </Artefacts>

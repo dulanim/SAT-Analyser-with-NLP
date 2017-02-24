@@ -27,31 +27,4 @@
     <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC20" visibility="public"/>
     <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC21" visibility="public"/>
   </ArtefactElement>
-  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC22" visibility="public">
-    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC23" visibility="public"/>
-    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC24" visibility="public"/>
-    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC25" visibility="public"/>
-  </ArtefactElement>
-  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC26" visibility="public">
-    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC27" visibility="public"/>
-    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC28" visibility="public"/>
-  </ArtefactElement>
-  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC29" visibility="public">
-    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC30" visibility="public"/>
-    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC31" visibility="public"/>
-    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC32" visibility="public"/>
-  </ArtefactElement>
-  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC33" visibility="public">
-    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC34" visibility="public"/>
-    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC35" visibility="public"/>
-  </ArtefactElement>
-  <ArtefactElement name="ClassIdentificationTest" type="Class" id="TC36" visibility="public">
-    <ArtefactSubElement name="classIdentifyTest" type="TestMethod" id="TC37" visibility="public"/>
-    <ArtefactSubElement name="classWithAttrTest" type="TestMethod" id="TC38" visibility="public"/>
-    <ArtefactSubElement name="attributesFromClassTest" type="TestMethod" id="TC39" visibility="public"/>
-  </ArtefactElement>
-  <ArtefactElement name="ParserTreeGeneratorTest" type="Class" id="TC40" visibility="public">
-    <ArtefactSubElement name="getJavFilesTest" type="TestMethod" id="TC41" visibility="public"/>
-    <ArtefactSubElement name="getEmptyFilesTest" type="TestMethod" id="TC42" visibility="public"/>
-  </ArtefactElement>
 </Artefacts>

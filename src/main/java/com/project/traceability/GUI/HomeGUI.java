@@ -61,7 +61,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import com.project.NLP.file.operations.FilePropertyName;
 import com.project.NLP.file.operations.FileSave;
-import com.project.extendedsat.jenkins.Listner;
 import com.project.property.config.xml.reader.XMLReader;
 import com.project.property.config.xml.writer.XMLWriter;
 import com.project.text.undoredo.UndoRedoImpl;
@@ -146,8 +145,7 @@ public class HomeGUI extends JFrame implements KeyListener {
      * @param args
      */
     public static void main(String[] args) {
-//    	Thread t = new Thread( new Listner() );
-//    	t.start();
+
         startHomeGUI();
     }
 

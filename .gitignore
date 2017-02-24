@@ -1,3 +1,9 @@
 /target/
 
 target/*
+target/
+.metadata/
+pom.xml
+OrderRequirement.txt
+Requirement_Output.txt
+src/main/java/com/project/traceability/common/PropertyFile.java
