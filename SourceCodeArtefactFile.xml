@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Artefacts>
+  <Artefact type="SourceCode">
+    <FileSystemLocation/>
+    <ArtefactElement id="SC1" interface="[]" name="Customer" status="NONE" superClass="" type="Class" visibility="public">
+      <ArtefactSubElement id="SC1_F1" name="name" status="NONE" type="Field" variableType="String" visibility="private"/>
+      <ArtefactSubElement id="SC1_F2" name="address" status="NONE" type="Field" variableType="String" visibility="private"/>
+      <ArtefactSubElement id="SC1_M1" name="sendOrder" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
+      <ArtefactSubElement id="SC1_M2" name="reciveOrder" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
+    </ArtefactElement>
+ 
+    
+    <ArtefactElement id="SC3" interface="[]" name="Order" status="NONE" superClass="" type="Class" visibility="public">
+      <ArtefactSubElement id="SC3_F1" name="date" status="NONE" type="Field" variableType="String" visibility="private"/>
+      <ArtefactSubElement id="SC3_F2" name="number" status="NONE" type="Field" variableType="String" visibility="private"/>
+      <ArtefactSubElement id="SC3_M1" name="confirm" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
+      <ArtefactSubElement id="SC3_M2" name="close" parameters="" returnType="void" status="NONE" type="Method" visibility="public"/>
+    </ArtefactElement>
+    
+  </Artefact>
+</Artefacts>

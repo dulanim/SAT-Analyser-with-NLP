@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Artefacts>
+  <Artefact type="PropertyFile">
+    <ArtefactElement Visibility="Private" id="C1" name="DBusername" type="Field" value="SATdoor" variableType="String"/>
+    <ArtefactElement Visibility="Private" id="C2" name="DBpassward" type="Field" value="sat_project" variableType="String"/>
+    <ArtefactElement Visibility="Private" id="C3" name="DBurl" type="Field" value="https://google.com" variableType="String"/>
+  </Artefact>
+</Artefacts>

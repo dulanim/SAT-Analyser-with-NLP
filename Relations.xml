@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Relations>
+  <Relation id="1">
+    <SourceNode>P1</SourceNode>
+    <RelationPath>PropertyFileToConfigurations</RelationPath>
+    <TargetNode>C1</TargetNode>
+  </Relation>
+  <Relation id="2">
+    <SourceNode>P2</SourceNode>
+    <RelationPath>PropertyFileToConfigurations</RelationPath>
+    <TargetNode>C2</TargetNode>
+  </Relation>
+  <Relation id="3">
+    <SourceNode>P3</SourceNode>
+    <RelationPath>PropertyFileToConfigurations</RelationPath>
+    <TargetNode>C3</TargetNode>
+  </Relation>
+</Relations>

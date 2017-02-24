@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Artefacts>
+  <Artefact type="UMLDiagram">
+    <ArtefactElement id="D1" name="Customer" type="Class">
+      <ArtefactSubElement id="D1_F1" name="name" type="UMLAttribute" variableType="" visibility="public"/>
+      <ArtefactSubElement id="D1_F2" name="location" type="UMLAttribute" variableType="" visibility="public"/>
+      <ArtefactSubElement id="D1_M1" name="sendOrder" returnType="" status="" type="UMLOperation" visibility="public"/>
+    </ArtefactElement>
+    <ArtefactElement id="D2" name="Order" type="Class">
+      <ArtefactSubElement id="D2_F1" name="date" type="UMLAttribute" variableType="" visibility="public"/>
+      <ArtefactSubElement id="D2_F2" name="number" type="UMLAttribute" variableType="" visibility="public"/>
+      <ArtefactSubElement id="D2_M1" name="confirm" returnType="" status="" type="UMLOperation" visibility="public"/>
+    </ArtefactElement>
+    
+  </Artefact>
+</Artefacts>

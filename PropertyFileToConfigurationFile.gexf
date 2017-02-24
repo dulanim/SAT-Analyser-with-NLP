@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" version="1.2">
+  <graph defaultedgetype="directed" idtype="string" mode="dynamic" timeformat="double">
+    <attributes class="node" mode="static">
+      <attribute id="Artefact" title="Artefact" type="string"/>
+      <attribute id="ID" title="ID" type="string"/>
+      <attribute id="Name" title="Name" type="string"/>
+      <attribute id="Type" title="Type" type="string"/>
+      <attribute id="Visibility" title="Visibility" type="string"/>
+      <attribute id="Status" title="Status" type="string"/>
+      <attribute id="Variable Type" title="Variable Type" type="string"/>
+      <attribute id="Return Type" title="Return Type" type="string"/>
+      <attribute id="Parameters" title="Parameters" type="string"/>
+    </attributes>
+    <attributes class="edge" mode="static">
+      <attribute id="neo4j_rt" title="Neo4j Relationship Type" type="string"/>
+      <attribute id="message" title="Message" type="string"/>
+      <attribute id="status" title="Status" type="string"/>
+    </attributes>
+    <nodes count="5">
+      <node id="PF1" label="PF1">
+        <attvalues>
+          <attvalue for="Artefact" value="PropertyFile"/>
+          <attvalue for="ID" value="PF1"/>
+          <attvalue for="Name" value="Branch"/>
+          <attvalue for="Type" value="Class"/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+      <node id="PF2" label="PF2">
+        <attvalues>
+          <attvalue for="Artefact" value="PropertyFile"/>
+          <attvalue for="ID" value="PF2"/>
+          <attvalue for="Name" value="name"/>
+          <attvalue for="Type" value="UMLAttribute"/>
+          <attvalue for="Visibility" value="private"/>
+          <attvalue for="Status" value="NONE"/>
+          <attvalue for="Variable Type" value=""/>
+        </attvalues>
+      </node>     
+      <node id="PF3" label="PF3">
+        <attvalues>
+          <attvalue for="Artefact" value="PropertyFile"/>
+          <attvalue for="ID" value="PF3"/>
+          <attvalue for="Name" value="PF3"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  <node id="PF4" label="PF4">
+        <attvalues>
+          <attvalue for="Artefact" value="PropertyFile"/>
+          <attvalue for="ID" value="PF4"/>
+          <attvalue for="Name" value="PF4"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="PF5" label="PF5">
+        <attvalues>
+          <attvalue for="Artefact" value="PropertyFile"/>
+          <attvalue for="ID" value="PF5"/>
+          <attvalue for="Name" value="PF5"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="CF1" label="CF1">
+        <attvalues>
+          <attvalue for="Artefact" value="ConfigurationFile"/>
+          <attvalue for="ID" value="CF1"/>
+          <attvalue for="Name" value="CF1"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="CF2" label="CF2">
+        <attvalues>
+          <attvalue for="Artefact" value="ConfigurationFile"/>
+          <attvalue for="ID" value="CF2"/>
+          <attvalue for="Name" value="CF2"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="CF3" label="CF3">
+        <attvalues>
+          <attvalue for="Artefact" value="ConfigurationFile"/>
+          <attvalue for="ID" value="CF3"/>
+          <attvalue for="Name" value="CF3"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="CF4" label="CF4">
+        <attvalues>
+          <attvalue for="Artefact" value="ConfigurationFile"/>
+          <attvalue for="ID" value="CF4"/>
+          <attvalue for="Name" value="CF4"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+    </nodes>
+    <edges count="4">
+      <edge id="0" label="PropertyFileToConfigurationFile" source="PF1" target="CF4" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="1" label="PropertyFileToConfigurationFile" source="PF2" target="CF3" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="2" label="PropertyFileToConfigurationFile" source="PF3" target="CF2" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="3" label="PropertyFileToConfigurationFile" source="PF4" target="CF1" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+           
+    </edges>
+  </graph>
+</gexf>

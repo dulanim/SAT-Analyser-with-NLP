@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" version="1.2">
+  <graph defaultedgetype="directed" idtype="string" mode="dynamic" timeformat="double">
+    <attributes class="node" mode="static">
+      <attribute id="Artefact" title="Artefact" type="string"/>
+      <attribute id="ID" title="ID" type="string"/>
+      <attribute id="Name" title="Name" type="string"/>
+      <attribute id="Type" title="Type" type="string"/>
+      <attribute id="Visibility" title="Visibility" type="string"/>
+      <attribute id="Status" title="Status" type="string"/>
+      <attribute id="Variable Type" title="Variable Type" type="string"/>
+      <attribute id="Return Type" title="Return Type" type="string"/>
+      <attribute id="Parameters" title="Parameters" type="string"/>
+    </attributes>
+    <attributes class="edge" mode="static">
+      <attribute id="neo4j_rt" title="Neo4j Relationship Type" type="string"/>
+      <attribute id="message" title="Message" type="string"/>
+      <attribute id="status" title="Status" type="string"/>
+    </attributes>
+    <nodes count="16">
+      <node id="DD1" label="DD1">
+        <attvalues>
+          <attvalue for="Artefact" value="DeploymentDiagram"/>
+          <attvalue for="ID" value="DD1"/>
+          <attvalue for="Name" value="Branch"/>
+          <attvalue for="Type" value="Class"/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+      <node id="DD2" label="DD2">
+        <attvalues>
+          <attvalue for="Artefact" value="DeploymentDiagram"/>
+          <attvalue for="ID" value="DD2"/>
+          <attvalue for="Name" value="name"/>
+          <attvalue for="Type" value="UMLAttribute"/>
+          <attvalue for="Visibility" value="private"/>
+          <attvalue for="Status" value="NONE"/>
+          <attvalue for="Variable Type" value=""/>
+        </attvalues>
+      </node>     
+      <node id="DD3" label="DD3">
+        <attvalues>
+          <attvalue for="Artefact" value="DeploymentDiagram"/>
+          <attvalue for="ID" value="DD3"/>
+          <attvalue for="Name" value="DD3"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  <node id="DD4" label="DD4">
+        <attvalues>
+          <attvalue for="Artefact" value="DeploymentDiagram"/>
+          <attvalue for="ID" value="DD4"/>
+          <attvalue for="Name" value="DD4"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="DF1" label="DF1">
+        <attvalues>
+          <attvalue for="Artefact" value="DockerFile"/>
+          <attvalue for="ID" value="DF1"/>
+          <attvalue for="Name" value="DF1"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="DF2" label="DF2">
+        <attvalues>
+          <attvalue for="Artefact" value="DockerFile"/>
+          <attvalue for="ID" value="DF2"/>
+          <attvalue for="Name" value="DF2"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="DF3" label="DF3">
+        <attvalues>
+          <attvalue for="Artefact" value="DockerFile"/>
+          <attvalue for="ID" value="DF3"/>
+          <attvalue for="Name" value="DF3"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+	  	  <node id="DF4" label="DF4">
+        <attvalues>
+          <attvalue for="Artefact" value="DockerFile"/>
+          <attvalue for="ID" value="DF4"/>
+          <attvalue for="Name" value="DF4"/>
+          <attvalue for="Type" value=""/>
+          <attvalue for="Visibility" value=""/>
+          <attvalue for="Status" value="NONE"/>
+        </attvalues>
+      </node>
+    </nodes>
+    <edges count="6">
+      <edge id="0" label="DeploymentUmlToDocker" source="DD1" target="DF4" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="1" label="DeploymentUmlToDocker" source="DD2" target="DF3" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="2" label="DeploymentUmlToDocker" source="DD3" target="DF2" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>
+      <edge id="3" label="DeploymentUmlToDocker" source="DD4" target="DF1" type="directed">
+        <attvalues>
+          <attvalue for="status" value="NONE"/>
+          <attvalue for="message" value="Sub Element"/>
+          <attvalue for="neo4j_rt" value=""/>
+        </attvalues>
+      </edge>	
+           
+    </edges>
+  </graph>
+</gexf>
